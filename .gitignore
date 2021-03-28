@@ -1,0 +1,50 @@
+# This file defines files that Git should ignore
+
+#
+# COMMON ELEMENTS 
+#
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Mac crap
+.DS_Store
+
+#
+# PLIGG ELEMENTS
+#
+
+# Uploaded Avatars
+avatars/groups_uploaded/*.jpg
+avatars/groups_uploaded/*.png
+avatars/groups_uploaded/*.gif
+avatars/user_uploaded/*.jpg
+avatars/user_uploaded/*.png
+avatars/user_uploaded/*.gif
+
+# Renamed .default Pligg files
+.htaccess
+languages/*.conf
+libs/dbconnect.php
+logs/
+settings.php
+
+
+# Upload module attachments
+modules/upload/attachments/*.jpg
+modules/upload/attachments/*.png
+modules/upload/attachments/*.gif
+modules/upload/attachments/thumbs/*.jpg
+modules/upload/attachments/thumbs/*.png
+modules/upload/attachments/thumbs/*.gif
+
+
+# All .log files
+*.log
