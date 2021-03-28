@@ -1,31 +1,73 @@
 AddDefaultCharset UTF-8
-
+############################################################################################################
 ## 404 Error Page
-## If Pligg is installed in a subfolder, change the below line to ErrorDocument 404 /name-of-subfolder/error_404.php
+## IF PLIKLI IS INSTALLED IN A SUBFOLDER, change LINE 7 to ErrorDocument 404 /NAME-OF-SUBFOLDER/error_404.php
+############################################################################################################
 ErrorDocument 404 /error_404.php
 
-## Re-directing Begin
+############################################ Re-directing Begin ############################################
+
 Options +FollowSymlinks -MultiViews
 RewriteEngine on
-## If Pligg is installed in a subfolder, change the below line to RewriteBase /name-of-subfolder
+############################################################################################################
+###### IF PLIKLI IS INSTALLED IN A SUBFOLDER, change LINE 18 to RewriteBase /NAME-OF-SUBFOLDER ######
+############################################################################################################
 RewriteBase /
-## Force forward slash at the end of URL
+
+############################################################################################################
+################################## Force forward slash at the end of URL ###################################
+############################################################################################################
 RewriteCond %{REQUEST_URI} !(\.[a-zA-Z0-9]{1,5}|/)$
-## If installed in a subfolder, you will need to add that directory after {HTTP_HOST} on the next line.
+
+############################################################################################################
+### IF INSTALLED IN A SUBFOLDER, you will need to add that directory after {HTTP_HOST} on LINE 31. ###
+##Example:
+## RewriteRule (.*)([^/])$ http://%{HTTP_HOST}/NAME-OF-SUBFOLDER/$1$2/ [R=301,L] #########################
+
 RewriteRule (.*)([^/])$ http://%{HTTP_HOST}/$1$2/ [R=301,L]
 
-## If installed in a subfolder you may need to add ## to the beginning of the next line
-RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /.*index\.php\ HTTP/
+############################################################################################################
+########### IF INSTALLED IN A SUBFOLDER you may need to add ## to the beginning of LINE 36 #################
 
-## Comment out or remove these two lines if you have a sub-domain like: http://subdomain.pligg.com or http://localhost
-## Keep if your site is like: http://www.pligg.com
-RewriteCond %{HTTP_HOST} !^www\.
-RewriteCond %{HTTP_HOST} !^localhost
-RewriteRule .* http://www.%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
-##### Re-directing End #####
+##RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /.*index\.php\ HTTP/
 
-## The settings that you should configure are all above this line.
-## Continue below only if you are an advanced user.
+############################################################################################################
+######################### TO FORCE WWW ONLY ( KEEP THEM COMMENTED IF YOU ARE ON LOCALHOST ) ################
+##### UNCOMMENT LINE 43, 44, 45 AND 46
+############################################################################################################
+
+##RewriteCond %{HTTP_HOST} !^$
+##RewriteCond %{HTTP_HOST} !^www\. [NC]
+##RewriteCond %{HTTPS}s ^on(s)|
+##RewriteRule ^ http%1://www.%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+############################################################################################################
+######################### TO FORCE HTTPS ONLY ( KEEP THEM COMMENTED IF YOU ARE ON LOCALHOST ) ################
+##### UNCOMMENT LINE 53 AND 54
+############################################################################################################
+
+##RewriteCond %{HTTPS} !=on
+##RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+############################################################################################################
+##### TO FORCE WWW AND HTTPS ( KEEP THEM COMMENTED IF YOU ARE ON LOCALHOST ) ###############################
+##### UNCOMMENT LINE 61, 62, 63, 64, 65 AND 66
+############################################################################################################
+
+##RewriteCond %{HTTP_HOST} !^$
+##RewriteCond %{HTTP_HOST} !^www\. [NC]
+##RewriteCond %{HTTPS}s ^on(s)|
+##RewriteRule ^ http%1://www.%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+##RewriteCond %{HTTPS} off
+##RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+###################################### RE-DIRECTING END ####################################################
+
+##################### THE SETTINGS THAT YOU SHOULD CONFIGURE ARE ALL ABOVE THIS LINE. ######################
+
+######################################   DO NOT TOUCH AT ALL   #############################################
+############################# CONTINUE BELOW ONLY IF YOU ARE AN ADVANCED USER. #############################
+############################################################################################################
 
 # Story and Category URLs
 RewriteRule ^(all)/([^/]+)/?$ story.php?title=$2 [L]
@@ -100,12 +142,12 @@ RewriteRule ^tagcloud/range/([0-9]+)/?$ cloud.php?range=$1 [L]
 RewriteRule ^topusers/?$ topusers.php [L]
 RewriteRule ^trackback/([0-9]+)/?$ trackback.php?id=$1  [L]
 RewriteRule ^new/?$ new.php [L]
-RewriteRule ^new/(year|month|week|today|yesterday|recent|alltime|upvoted|downvoted|commented)/?$ new.php?part=$1 [L]
-RewriteRule ^new/(year|month|week|today|yesterday|recent|alltime|upvoted|downvoted|commented)/category/([^/]+)/?$ new.php?part=$1&category=$2 [L]
+RewriteRule ^new/(year|month|week|today|yesterday|recent|alltime|upvoted|downvoted|commented|curmonth)/?$ new.php?part=$1 [L]
+RewriteRule ^new/(year|month|week|today|yesterday|recent|alltime|upvoted|downvoted|commented|curmonth)/category/([^/]+)/?$ new.php?part=$1&category=$2 [L]
 RewriteRule ^new/([^/]+)/?$ new.php?category=$1 [L]
 RewriteRule ^new/page/([0-9]+)/?$ new.php?page=$1 [L]
-RewriteRule ^new/(year|month|week|today|yesterday|recent|alltime|upvoted|downvoted|commented)/page/(\d+)/?$ new.php?part=$1&page=$2 [L]
-RewriteRule ^new/(year|month|week|today|yesterday|recent|alltime|upvoted|downvoted|commented)/category/([^/]+)/page/(\d+)/?$ new.php?part=$1&category=$2&page=$3 [L]
+RewriteRule ^new/(year|month|week|today|yesterday|recent|alltime|upvoted|downvoted|commented|curmonth)/page/(\d+)/?$ new.php?part=$1&page=$2 [L]
+RewriteRule ^new/(year|month|week|today|yesterday|recent|alltime|upvoted|downvoted|commented|curmonth)/category/([^/]+)/page/(\d+)/?$ new.php?part=$1&category=$2&page=$3 [L]
 RewriteRule ^user/search/([^/]+)/?$ user.php?view=search&keyword=$1 [L]
 RewriteRule ^user/([^/]+)/link/([0-9+]+)/?$ user_add_remove_links.php?action=$1&link=$2 [L]
 
@@ -167,7 +209,7 @@ RewriteRule ^inbox/?$ module.php?module=simple_messaging&view=inbox [L]
 RewriteRule ^sitemapindex.xml module.php?module=xml_sitemaps_show_sitemap [L]
 RewriteRule ^sitemap-([a-zA-Z0-9]+).xml module.php?module=xml_sitemaps_show_sitemap&i=$1 [L]
 RewriteRule ^status/([0-9]+)/?$ modules/status/status.php?id=$1 [L]
-RewriteRule ^toolbar/(\d+)/?$ modules/pligg_web_toolbar/toolbar.php?id=$1
+RewriteRule ^toolbar/(\d+)/?$ modules/plikli_web_toolbar/toolbar.php?id=$1
 RewriteRule ^sitemap-([0-9a-z]+).xml module.php?module=xml_sitemaps_show_sitemap&i=$1 [L]
 
 ## Pages
@@ -193,14 +235,14 @@ RewriteRule ^user/page/([^/]+)/([^/]+)/([^/]+)/?$ user.php?page=$1&view=$2&login
 RewriteRule ^user/([^/]+)/([^/]+)/page/(\d+)/?$ user.php?page=$3&view=$1&login=$2 [L]
 
 ## Sort
-RewriteRule ^(year|month|week|today|yesterday|recent|alltime|upvoted|downvoted|commented)/?$ index.php?part=$1 [L]
-RewriteRule ^(year|month|week|today|yesterday|recent|alltime|upvoted|downvoted|commented)/category/([^/]+)/?$ index.php?part=$1&category=$2 [L]
-RewriteRule ^(year|month|week|today|yesterday|recent|alltime|upvoted|downvoted|commented)/page/(\d+)/?$ index.php?part=$1&page=$2 [L]
-RewriteRule ^(year|month|week|today|yesterday|recent|alltime|upvoted|downvoted|commented)/category/([^/]+)/page/(\d+)/?$ index.php?part=$1&category=$2&page=$3 [L]
-RewriteRule ^new/(year|month|week|today|yesterday|recent|alltime|upvoted|downvoted|commented)/([^/]+)/?$ new.php?part=$1&category=$2 [L]
-RewriteRule ^new/(year|month|week|today|yesterday|recent|alltime|upvoted|downvoted|commented)/([^/]+)/page/(\d+)/?$ new.php?part=$1&category=$2&page=$3 [L]
-RewriteRule ^(year|month|week|today|yesterday|recent|alltime|upvoted|downvoted|commented)/([^/]+)/?$ index.php?part=$1&category=$2 [L]
-RewriteRule ^(year|month|week|today|yesterday|recent|alltime|upvoted|downvoted|commented)/([^/]+)/page/(\d+)/?$ index.php?part=$1&category=$2&page=$3 [L]
+RewriteRule ^(year|month|week|today|yesterday|recent|alltime|upvoted|downvoted|commented|curmonth)/?$ index.php?part=$1 [L]
+RewriteRule ^(year|month|week|today|yesterday|recent|alltime|upvoted|downvoted|commented|curmonth)/category/([^/]+)/?$ index.php?part=$1&category=$2 [L]
+RewriteRule ^(year|month|week|today|yesterday|recent|alltime|upvoted|downvoted|commented|curmonth)/page/(\d+)/?$ index.php?part=$1&page=$2 [L]
+RewriteRule ^(year|month|week|today|yesterday|recent|alltime|upvoted|downvoted|commented|curmonth)/category/([^/]+)/page/(\d+)/?$ index.php?part=$1&category=$2&page=$3 [L]
+RewriteRule ^new/(year|month|week|today|yesterday|recent|alltime|upvoted|downvoted|commented|curmonth)/([^/]+)/?$ new.php?part=$1&category=$2 [L]
+RewriteRule ^new/(year|month|week|today|yesterday|recent|alltime|upvoted|downvoted|commented|curmonth)/([^/]+)/page/(\d+)/?$ new.php?part=$1&category=$2&page=$3 [L]
+RewriteRule ^(year|month|week|today|yesterday|recent|alltime|upvoted|downvoted|commented|curmonth)/([^/]+)/?$ index.php?part=$1&category=$2 [L]
+RewriteRule ^(year|month|week|today|yesterday|recent|alltime|upvoted|downvoted|commented|curmonth)/([^/]+)/page/(\d+)/?$ index.php?part=$1&category=$2&page=$3 [L]
 
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f

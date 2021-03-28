@@ -126,16 +126,21 @@ function tree_to_array($root, $table, $showRoot = TRUE) {
 	foreach($result as $row){
 		if (count($right)>0) {
 			// check if we should remove a node from the stack
-			while ($right[count($right)-1]<$row->rgt) {
+			while ($right && end($right)<$row->rgt) {
 				array_pop($left);
 				if (array_pop($right) == NULL) {
 					break;  // We've reached the top of the category chain
 				}
 			}
 		}
-
+		/* Redwine: to eliminate PHP Notice:  Undefined offset: -1 */
+		if (sizeof($left) >0) {
 		$array[$i]['first'] = $row->lft-1 == $left[sizeof($left)-1];
+		}
+		if (sizeof($right) > 0) {
 		$array[$i]['last']  = $row->rgt+1 == $right[sizeof($right)-1];
+		}
+		/* Redwine: end to eliminate PHP Notice:  Undefined offset: -1 */
 		$array[$i]['principlecat'] = $row->rgt - $row->lft -1;
 		$array[$i]['spacercount'] = count($right);
 		$array[$i]['lastspacercount'] = $lastspacer;
@@ -178,7 +183,8 @@ function tree_to_array($root, $table, $showRoot = TRUE) {
 }
 
 function GetSubCatCount($catid){
-	global $db, $the_cats;
+	/* Redwine added gloabal $dblang below to eliminate all the Notice: Undefined variable: dblang and make the function work as intended */
+	global $db, $dblang, $the_cats;
 
 	$count = 0;
 

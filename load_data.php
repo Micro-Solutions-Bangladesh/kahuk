@@ -20,16 +20,16 @@ $page_name=$_REQUEST['pname'];
 
 $page_size=$_REQUEST['pagesize'];
 $catID=$_REQUEST['catID'];
-$groupid=$_REQUEST['groupid'];
+if (isset($_REQUEST['groupid'])) $groupid=$_REQUEST['groupid'];
 $start_up=$_REQUEST['start_up'];
 $part=$_REQUEST['part'];
-$view=$_REQUEST['view'];
+if (isset($_REQUEST['view'])) $view=$_REQUEST['view'];
 
 
 $sorder=$_REQUEST['sorder'];
-$group_vote=$_REQUEST['group_vote'];
-$userid=$_REQUEST['userid'];
-$curuserid=$_REQUEST['curuserid'];
+if (isset($_REQUEST['group_vote'])) $group_vote=$_REQUEST['group_vote'];
+if (isset($_REQUEST['userid'])) $userid=$_REQUEST['userid'];
+if (isset($_REQUEST['curuserid'])) $curuserid=$_REQUEST['curuserid'];
 
 
 if(isset($catID) && (!empty($catID))){$search->category = $catID;}
@@ -60,7 +60,7 @@ if($page_name=="new"){  // For upcomming page
 $search->do_setmek();	
 
 // do the search
-$search->doSearch();
+$search->doSearch($search->pagesize);
 
 
 
@@ -187,6 +187,7 @@ function gen_query_forCatId($catId){
 	{
 		$child_cats = '';
 		// do we also search the subcategories? 
+/* Redwine: Fix applied to fix the "Show subcategories" feature in Admin Panel -> Settings -> Miscellenaous -> Show subcategories. See https://github.com/Pligg/pligg-cms/commit/2fcf3bac73246ca27de9e9f23f865153632fe4aa */
 		if( Independent_Subcategories == true){
 			$child_array = '';
 

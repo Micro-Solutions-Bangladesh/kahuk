@@ -30,12 +30,12 @@ function welcome_email_send(&$registration_details)
 			$thisUserName = $username;
 			$thisUserEmail = $email;
 			
-			// Pligg Information
-			$siteName = $main_smarty->get_config_vars('PLIGG_Visual_Name'); 
-			$siteEmail = $main_smarty->get_config_vars('PLIGG_PassEmail_From');
+			// Plikli Information
+			$siteName = $main_smarty->get_config_vars('PLIKLI_Visual_Name'); 
+			$siteEmail = $main_smarty->get_config_vars('PLIKLI_PassEmail_From');
 			
 			$installedURL = my_base_url;
-			$installedBase = my_pligg_base;
+			$installedBase = my_plikli_base;
 			
 			// Email Subject
 			$messageSubject = "Welcome to ".$siteName."!";
@@ -47,7 +47,7 @@ function welcome_email_send(&$registration_details)
 			$messageText .= "-----------------------------------------\n\n";		
 			$messageText .= "  Login URL: ".$installedURL.$installedBase."/login.php\n\n";
 			$messageText .= "  Username.: ".$thisUserName."\n";
-			$messageText .= "  Password.: (password choosen when registered)\n\n";
+			$messageText .= "  Password.: (password chosen when registered)\n\n";
 			$messageText .= "-----------------------------------------\n";		
 			$messageText .= "Email has been automatically generated on ".$thisDate." at ".$thisTime.".\n";
 			

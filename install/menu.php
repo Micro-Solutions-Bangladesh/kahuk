@@ -7,7 +7,7 @@
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand" href="http://pligg.com/"><img src="../templates/admin/img/pligg.png" height="20px;" alt="Pligg CMS" title="Pligg CMS"/></a>
+			<a class="navbar-brand" href="https://www.plikli.com/"><img src="../templates/admin/img/plikli.png" alt="Plikli CMS" title="Plikli CMS"/></a>
 		</div>
 		<nav role="navigation" class="collapse navbar-collapse bs-navbar-collapse">
 			<ul class="nav navbar-nav">

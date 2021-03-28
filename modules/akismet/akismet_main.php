@@ -11,7 +11,7 @@ function akismet_save_profile(&$x){
 	if(phpnum()>=5){
 		include akismet_lib_path . 'Akismet.class_5.php'; 
 			
-		$akismet = new Akismet(my_base_url . my_pligg_base, get_misc_data('wordpress_key'));
+		$akismet = new Akismet(my_base_url . my_plikli_base, get_misc_data('wordpress_key'));
 		$akismet->setCommentAuthor($user->username);
 		$akismet->setCommentAuthorEmail($user->email);
 		$akismet->setCommentContent($text);
@@ -31,7 +31,7 @@ function akismet_save_profile(&$x){
 		$story['referrer']   = $_SERVER['HTTP_REFERER'];
 		$story['user_ip'] = $user->extra_field['user_lastip'];
 
-		$akismet = new Akismet(my_base_url . my_pligg_base, get_misc_data('wordpress_key'), $story); 
+		$akismet = new Akismet(my_base_url . my_plikli_base, get_misc_data('wordpress_key'), $story); 
 
 		if($akismet->errorsExist()) { // returns true if any errors exist 
 			if($akismet->isError('AKISMET_INVALID_KEY')) { 
@@ -60,7 +60,7 @@ function akismet_save_comment(&$x){
 		$user->id = $comment->author;
 		$user->read();
 			
-		$akismet = new Akismet(my_base_url . my_pligg_base, get_misc_data('wordpress_key'));
+		$akismet = new Akismet(my_base_url . my_plikli_base, get_misc_data('wordpress_key'));
 		$akismet->setCommentAuthor($user->username);
 		$akismet->setCommentAuthorEmail($user->email);
 		$akismet->setCommentContent($comment->content);
@@ -92,7 +92,7 @@ function akismet_save_comment(&$x){
 		$story['referrer']   = $_SERVER['HTTP_REFERER'];
 		$story['user_ip'] = $user->extra_field['user_lastip'];
 
-		$akismet = new Akismet(my_base_url . my_pligg_base, get_misc_data('wordpress_key'), $story); 
+		$akismet = new Akismet(my_base_url . my_plikli_base, get_misc_data('wordpress_key'), $story); 
 
 		if($akismet->errorsExist()) { // returns true if any errors exist 
 			if($akismet->isError('AKISMET_INVALID_KEY')) { 
@@ -123,7 +123,7 @@ function akismet_check_submit(&$vars){
 		$user->id = $vars['linkres']->author;
 		$user->read();
 	
-		$akismet = new Akismet(my_base_url . my_pligg_base, get_misc_data('wordpress_key'));
+		$akismet = new Akismet(my_base_url . my_plikli_base, get_misc_data('wordpress_key'));
 		$akismet->setCommentAuthor($user->username);
 		$akismet->setCommentAuthorEmail($user->email);
 		$akismet->setCommentAuthorURL($vars['linkres']->url);
@@ -155,7 +155,7 @@ function akismet_check_submit(&$vars){
 		$story['permalink'] = my_base_url.getmyurl('story', $vars['linkres']->id);
 		$story['user_ip'] = $user->extra_field['user_lastip'];
 
-		$akismet = new Akismet(my_base_url . my_pligg_base, get_misc_data('wordpress_key'), $story); 
+		$akismet = new Akismet(my_base_url . my_plikli_base, get_misc_data('wordpress_key'), $story); 
 
 		// test for errors 
 
@@ -225,11 +225,11 @@ function akismet_showpage(){
 			$main_smarty->assign('spam_links_count', akismet_get_link_count());
 			$main_smarty->assign('spam_comments_count', akismet_get_comment_count());
 			
-			$main_smarty = do_sidebar($main_smarty, $navwhere);
-			$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('PLIGG_Visual_Header_AdminPanel'));
+			//$main_smarty = do_sidebar($main_smarty, $navwhere);
+			$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel'));
 
 			$main_smarty->assign('tpl_center', akismet_tpl_path . 'main');
-			$main_smarty->display($template_dir . '/admin/admin.tpl');
+			$main_smarty->display('/admin/admin.tpl');
 		}
 
 		if($view == 'updateKey'){
@@ -240,7 +240,7 @@ function akismet_showpage(){
 			    if(phpnum()>=5){
 				include akismet_lib_path . 'Akismet.class_5.php'; 
 
-				$akismet = new Akismet(my_base_url . my_pligg_base, $wordpress_key);
+				$akismet = new Akismet(my_base_url . my_plikli_base, $wordpress_key);
 				if (!$akismet->isKeyValid())
 					$main_smarty->assign('error', 1);
 				else
@@ -248,7 +248,7 @@ function akismet_showpage(){
 			    } else {
 				include akismet_lib_path . 'Akismet.class_4.php'; 
                 
-				$akismet = new Akismet(my_base_url . my_pligg_base, $wordpress_key); 
+				$akismet = new Akismet(my_base_url . my_plikli_base, $wordpress_key); 
 				if (!$akismet->_isValidApiKey($wordpress_key)) 
 					$main_smarty->assign('error', 1);
 				else
@@ -265,11 +265,11 @@ function akismet_showpage(){
 			$wordpress_key = get_misc_data('wordpress_key');
 			$main_smarty->assign('wordpress_key', $wordpress_key);
 
-			$main_smarty = do_sidebar($main_smarty, $navwhere);
-			$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('PLIGG_Visual_Header_AdminPanel'));
+			//$main_smarty = do_sidebar($main_smarty, $navwhere);
+			$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel'));
 
 			$main_smarty->assign('tpl_center', akismet_tpl_path . 'manageKey');
-			$main_smarty->display($template_dir . '/admin/admin.tpl');
+			$main_smarty->display('/admin/admin.tpl');
 		}
 
 		if($view == 'manageSpam'){
@@ -282,26 +282,26 @@ function akismet_showpage(){
 			if (sizeof($link_data)) {
 				$main_smarty->assign('link_data', object_2_array($link_data));
 			} else {
-				header("Location: ".my_pligg_base."/admin/admin_index.php");
+				header("Location: ".my_plikli_base."/admin/admin_index.php");
 //				header('Location: ' . URL_akismet);
 				die();
 			}
 
-			$main_smarty = do_sidebar($main_smarty, $navwhere);
-			$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('PLIGG_Visual_Header_AdminPanel'));
+			//$main_smarty = do_sidebar($main_smarty, $navwhere);
+			$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel'));
 
 			$main_smarty->assign('tpl_center', akismet_tpl_path . 'manageSpam');
-			$main_smarty->display($template_dir . '/admin/admin.tpl');
+			$main_smarty->display('/admin/admin.tpl');
 
 		}
 
 		if($view == 'manageSettings'){
 
-			$main_smarty = do_sidebar($main_smarty, $navwhere);
-			$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('PLIGG_Visual_Header_AdminPanel'));
+			//$main_smarty = do_sidebar($main_smarty, $navwhere);
+			$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel'));
 
 			$main_smarty->assign('tpl_center', akismet_tpl_path . 'manageSettings');
-			$main_smarty->display($template_dir . '/admin/admin.tpl');
+			$main_smarty->display('/admin/admin.tpl');
 
 		}
 		if($view == 'manageSpamcomments'){
@@ -343,15 +343,15 @@ function akismet_showpage(){
 				$main_smarty->assign('spam_output', $spam_output);
 				$main_smarty->assign('link_data', object_2_array($link_data));
 			} else {
-				header("Location: ".my_pligg_base."/admin/admin_index.php");
+				header("Location: ".my_plikli_base."/admin/admin_index.php");
 //				header('Location: ' . URL_akismet);
 				die();
 			}
-			$main_smarty = do_sidebar($main_smarty, $navwhere);
-			$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('PLIGG_Visual_Header_AdminPanel'));
+			//$main_smarty = do_sidebar($main_smarty, $navwhere);
+			$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel'));
 
 			$main_smarty->assign('tpl_center', akismet_tpl_path . 'manageSpamcomments');
-			$main_smarty->display($template_dir . '/admin/admin.tpl');
+			$main_smarty->display('/admin/admin.tpl');
 		}
 		
 		if(phpnum()>=5)
@@ -386,9 +386,9 @@ function akismet_showpage(){
 							       'body'      => $link->content,
 							       'permalink' => my_base_url.getmyurl('story', $link->id)
 							       );
-							$akismet = new Akismet(my_base_url . my_pligg_base, get_misc_data('wordpress_key'), $comment);
+							$akismet = new Akismet(my_base_url . my_plikli_base, get_misc_data('wordpress_key'), $comment);
 						} else {
-							$akismet = new Akismet(my_base_url . my_pligg_base, get_misc_data('wordpress_key'));
+							$akismet = new Akismet(my_base_url . my_plikli_base, get_misc_data('wordpress_key'));
 							$akismet->setCommentAuthor($user->username);
 							$akismet->setCommentAuthorEmail($user->email);
 							$akismet->setCommentAuthorURL($link->url);
@@ -450,9 +450,9 @@ function akismet_showpage(){
 							       'body'      => $result->cmt_content,
 							       'permalink' => my_base_url.getmyurl('story', $link->id)
 							       );
-							$akismet = new Akismet(my_base_url . my_pligg_base, get_misc_data('wordpress_key'), $comment);
+							$akismet = new Akismet(my_base_url . my_plikli_base, get_misc_data('wordpress_key'), $comment);
 						} else {
-							$akismet = new Akismet(my_base_url . my_pligg_base, get_misc_data('wordpress_key'));
+							$akismet = new Akismet(my_base_url . my_plikli_base, get_misc_data('wordpress_key'));
 							$akismet->setCommentAuthor($user->username);
 							$akismet->setCommentAuthorEmail($user->email);
 							$akismet->setCommentAuthorURL($link->url);
@@ -509,8 +509,9 @@ function akismet_link_to_ham($link_id)
 
 function akismet_comment_to_spam($comment)
 {
+	global $db;
 	$sql = (" INSERT INTO ".table_prefix . "spam_comments ( `auto_id` , `userid` , `linkid` , `cmt_rand` , `cmt_content`, `cmt_date` , `cmt_parent`) VALUES ( NULL , $comment->author, $comment->link, $comment->randkey, '$comment->content', now(), $comment->parent) ");
-	$result  = mysql_query($sql);
+	$result  =$db->query($sql);
 }
 
 function akismet_get_link_count()

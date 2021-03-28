@@ -12,7 +12,14 @@ check_referrer();
 
 // require user to log in
 force_authentication();
-
+/* Redwine: Roles and permissions and Groups fixes */
+// Check if the user didn't exceed the max number of creating groups.
+$numGr = $db->get_var("SELECT count(*) FROM " .table_groups . " WHERE `group_creator` = " . $current_user->user_id);
+$max_user_groups_allowed = $main_smarty->get_template_vars('max_user_groups_allowed');
+if ($numGr >= $max_user_groups_allowed) {
+	$error_max = $main_smarty->get_config_vars('PLIKLI_Visual_Submit_A_New_Group_Error');
+	$main_smarty->assign('error_max', $error_max);
+}
 // restrict access to admins and moderators
 $amIadmin = 0;
 $amIadmin = $amIadmin + checklevel('admin');
@@ -33,17 +40,14 @@ if($canIhaveAccess == 0){
 $main_smarty->assign('isAdmin', $canIhaveAccess);
 
 // sidebar
-$main_smarty = do_sidebar($main_smarty);
+//$main_smarty = do_sidebar($main_smarty);
 
 // pagename
 define('pagename', 'admin_group'); 
 $main_smarty->assign('pagename', pagename);
 
-// read the mysql database to get the pligg version
-$sql = "SELECT data FROM " . table_misc_data . " WHERE name = 'pligg_version'";
-$pligg_version = $db->get_var($sql);
-$main_smarty->assign('version_number', $pligg_version); 
-
+// read the mysql database to get the plikli version
+/* Redwine: plikli version query removed and added to /libs/smartyvriables.php */
 global $db;
 
 if(isset($_REQUEST['mode'])){
@@ -54,13 +58,13 @@ if(isset($_REQUEST['mode'])){
 		$db->query("DELETE FROM ".table_group_member." WHERE member_group_id=".$group_id);
 		$db->query("DELETE FROM ".table_group_shared." WHERE share_group_id=".$group_id);
 
-		header("Location: ".my_pligg_base."/admin/admin_group.php");
+		header("Location: ".my_plikli_base."/admin/admin_group.php");
 		die();
 	}
 	elseif($mode=='approve' && is_numeric($group_id)){
 	        $db->query("UPDATE ".table_groups." SET group_status='Enable' WHERE group_id=$group_id");
 
-		header("Location: ".my_pligg_base."/admin/admin_group.php");
+		header("Location: ".my_plikli_base."/admin/admin_group.php");
 		die();
 	}
 }
@@ -74,8 +78,8 @@ $main_smarty->assign('groups',$db->get_results($sql,ARRAY_A));
 // show the template
 $main_smarty->assign('tpl_center', '/admin/groups');
 if ($is_moderator == '1'){
-	$main_smarty->display($template_dir . '/admin/moderator.tpl');
+	$main_smarty->display('/admin/moderator.tpl');
 } else {
-	$main_smarty->display($template_dir . '/admin/admin.tpl');
+	$main_smarty->display('/admin/admin.tpl');
 }
 ?>

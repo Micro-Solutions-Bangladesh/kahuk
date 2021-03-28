@@ -28,13 +28,13 @@ $is_moderator = checklevel('moderator'); // Moderators have a value of '1' for t
 
 if($canIhaveAccess == 0){	
 //	$main_smarty->assign('tpl_center', '/admin/access_denied');
-//	$main_smarty->display($template_dir . '/admin/admin.tpl');		
+//	$main_smarty->display('/admin/admin.tpl');		
 	header("Location: " . getmyurl('admin_login', $_SERVER['REQUEST_URI']));
 	die();
 }
 
 // sidebar
-$main_smarty = do_sidebar($main_smarty);
+//$main_smarty = do_sidebar($main_smarty);
 
 if($canIhaveAccess == 1) {
 	global $offset;
@@ -50,18 +50,19 @@ if($canIhaveAccess == 1) {
 	
 	// figure out what "page" of the results we're on
 	$offset=(get_current_page()-1)*$pagesize;
-	
+	$user_sql = '';
+	$search_sql = '';
 	// if user is searching
 	$temp = '';
-	if($_GET["keyword"] && $_GET["keyword"]!= $main_smarty->get_config_vars('PLIGG_Visual_Search_SearchDefaultText')){
-		$pligg_keyword = sanitize($_GET["keyword"], 3);
-		$search_sql = " AND (link_author LIKE '%".$pligg_keyword."%' OR link_title LIKE '%".$pligg_keyword."%' OR link_content LIKE '%".$pligg_keyword."%' OR link_tags LIKE '%".$pligg_keyword."%') ";
+	if(isset($_GET['keyword']) && $_GET['keyword']!= $main_smarty->get_config_vars('PLIKLI_Visual_Search_SearchDefaultText')){
+		$plikli_keyword = sanitize($_GET["keyword"], 3);
+		$search_sql = " AND (link_author LIKE '%".$plikli_keyword."%' OR link_title LIKE '%".$plikli_keyword."%' OR link_content LIKE '%".$plikli_keyword."%' OR link_tags LIKE '%".$plikli_keyword."%') ";
 	}
 
-	if ($_GET['user'])
+	if (!empty($_GET['user']))
 	{
-		$user = mysql_fetch_array(mysql_query("SELECT * FROM " . table_users . " where user_login='".sanitize($_GET['user'], 3)."'"));
-		$user_sql = " AND link_author='".$user['user_id']."'";
+		$user = $db->get_var("SELECT user_id FROM " . table_users . " where user_login='".sanitize($_GET['user'], 3)."'");
+		$user_sql = " AND link_author='".$user."'";
 	}
 
 	
@@ -70,6 +71,12 @@ if($canIhaveAccess == 1) {
 		switch (sanitize($_GET["filter"], 3)) {
 		 	case 'new':
 				$filter_sql = " link_status = 'new' ";
+				break;
+			case 'draft':
+				$filter_sql = " link_status = 'draft' ";
+				break;
+			case 'scheduled':
+				$filter_sql = " link_status = 'scheduled' ";
 				break;
 			case 'all':
 				$filter_sql = " link_status <> 'page' AND link_status <> 'discard' AND link_status <> 'spam' ";
@@ -89,6 +96,9 @@ if($canIhaveAccess == 1) {
 			case 'spam':
 			 	$filter_sql = " link_status = 'spam' ";
 			 	break;
+			case 'moderated':
+			 	$filter_sql = " link_status = 'moderated' ";
+			 	break;
 			case 'page':
 			 	$filter_sql = " link_status = 'page' ";
 			 	break;
@@ -103,9 +113,8 @@ if($canIhaveAccess == 1) {
 	} else {
 		$filter_sql = " link_status <> 'page' AND link_status <> 'discard' AND link_status <> 'spam' ";
 	}
-	$filtered = $db->get_results($sql="SELECT SQL_CALC_FOUND_ROWS * FROM " . table_links . " WHERE $filter_sql $search_sql $user_sql ORDER BY link_date DESC LIMIT $offset,$pagesize");
+	$filtered = $db->get_results("SELECT SQL_CALC_FOUND_ROWS * FROM " . table_links . " WHERE $filter_sql $search_sql $user_sql ORDER BY link_date DESC LIMIT $offset,$pagesize");
 	$rows = $db->get_var("SELECT FOUND_ROWS()");
-
 	// read links from database 
 	$user = new User;
 	$link = new Link;
@@ -117,41 +126,53 @@ if($canIhaveAccess == 1) {
 			$link->read();
 			$user->id = $link->author;
 			$user->read();
-			$template_stories[] = array(
-				'link_title_url' => $link->title_url,
-				'link_id' => $link->id,
-				'link_title' => $link->title,
-				'link_status' => $link->status,
-				'link_author' => $user->username,
-				'link_date' => date("d-m-Y",$link->date),
-			);
+			/*Redwine: to restrict changing the story status where authors are admins, only to admins*/
+			if ($amIadmin) {
+				$template_stories[] = array(
+					'link_title_url' => $link->title_url,
+					'link_id' => $link->id,
+					'link_title' => $link->title,
+					'link_status' => $link->status,
+					'link_author' => $user->username,
+					'link_date' => date("d-m-Y",$link->date),
+				);
+			/*Redwine: moderators are restricted to changing the story status to normal level and moderators authors only*/
+			}elseif ($is_moderator && $user->level != 'admin') {
+				$template_stories[] = array(
+					'link_title_url' => $link->title_url,
+					'link_id' => $link->id,
+					'link_title' => $link->title,
+					'link_status' => $link->status,
+					'link_author' => $user->username,
+					'link_date' => date("d-m-Y",$link->date),
+				);
+			}
 		}
 		$main_smarty->assign('template_stories', $template_stories);
 	}
 
 	// breadcrumbs and page title
-	$navwhere['text1'] = $main_smarty->get_config_vars('PLIGG_Visual_Header_AdminPanel');
+	$navwhere['text1'] = $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel');
 	$navwhere['link1'] = getmyurl('admin', '');
-	$navwhere['text2'] = $main_smarty->get_config_vars('PLIGG_Visual_Header_AdminPanel_Links');
+	$navwhere['text2'] = $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel_Links');
 	$main_smarty->assign('navbar_where', $navwhere);
-	$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('PLIGG_Visual_Header_AdminPanel'));
+	$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel'));
 	
 	// if admin changes the link status
 	if (isset($_GET['action']) && sanitize($_GET['action'], 3) == "bulkmod" && isset($_POST['admin_acction'])) {
-		
-		$CSRF->check_expired('admin_links_edit');
-		if ($CSRF->check_valid(sanitize($_POST['token'], 3), 'admin_links_edit')){
+		// Redwine: if TOKEN is empty, no need to continue, just display the invalid token error.
+		if (empty($_POST['token'])) {
+			$CSRF->show_invalid_error(1);
+			exit;
+		}
+		// Redwine: if valid TOKEN, proceed. A valid integer must be equal to 2.
+		if ($CSRF->check_valid(sanitize($_POST['token'], 3), 'admin_links_edit') == 2){
 			$comment = array();
-			
-			
 			$admin_acction=$_POST['admin_acction'];
-            		
 			foreach ($_POST["link"] as $key => $v) {
-			    
-				if($admin_acction=="published" || $admin_acction=="new" || $admin_acction=="discard" || $admin_acction=="spam"){
+				if($admin_acction=="published" || $admin_acction=="new" || $admin_acction=="discard" || $admin_acction=="moderated" || $admin_acction=="spam"){
 					$link_status=$db->get_var('select link_status from ' . table_links . '  WHERE link_id = "'.$key.'"');
 					if($link_status!=$admin_acction){
-								
 						if ($admin_acction == "published") {
 							$db->query('UPDATE `' . table_links . '` SET `link_status` = "published", link_published_date = now() WHERE `link_id` = "'.$key.'"');
 							$vars = array('link_id' => $key);
@@ -160,15 +181,15 @@ if($canIhaveAccess == 1) {
 						elseif ($admin_acction == "new") {
 							$db->query('UPDATE `' . table_links . '` SET `link_status` = "new", link_published_date=0 WHERE `link_id` = "'.$key.'"');
 						}
+						elseif ($admin_acction == "moderated") {
+							$db->query('UPDATE `' . table_links . '` SET `link_status` = "moderated", link_published_date=0 WHERE `link_id` = "'.$key.'"');
+						}
 						elseif ($admin_acction == "discard") {
 							$db->query('UPDATE `' . table_links . '` SET `link_status` = "discard" WHERE `link_id` = "'.$key.'"');
-		
 							$vars = array('link_id' => $key);
 							check_actions('story_discard', $vars);
 						}
 						elseif ($admin_acction == "spam") {
-							
-							
 							$user_id = $db->get_var($sql="SELECT link_author FROM `" . table_links . "` WHERE `link_id` = ".$key.";");
 							$db->query('UPDATE `' . table_links . '` SET `link_status` = "spam" WHERE `link_id` = "'.$key.'"');
 							$vars = array('link_id' => $key);
@@ -183,16 +204,11 @@ if($canIhaveAccess == 1) {
 								$killspammed[$user_id] = 1;
 								}
 							}
-					
-								
 						}
-					
 				}
-				
 			}
-			
 			totals_regenerate();
-			//header("Location: ".my_pligg_base."/admin/admin_links.php?page=".sanitize($_GET['page'],3));
+			//header("Location: ".my_plikli_base."/admin/admin_links.php?page=".sanitize($_GET['page'],3));
 			$redirect_url=$_SERVER['HTTP_REFERER'];
 			header("Location:". $redirect_url);
 			exit();
@@ -208,17 +224,15 @@ if($canIhaveAccess == 1) {
 	define('pagename', 'admin_links'); 
 	$main_smarty->assign('pagename', pagename);
 	
-	// read the mysql database to get the pligg version
-	$sql = "SELECT data FROM " . table_misc_data . " WHERE name = 'pligg_version'";
-	$pligg_version = $db->get_var($sql);
-	$main_smarty->assign('version_number', $pligg_version);
+// read the mysql database to get the plikli version
+/* Redwine: plikli version query removed and added to /libs/smartyvriables.php */
 	
 	// show the template
 	$main_smarty->assign('tpl_center', '/admin/submissions');
 	if ($is_moderator == '1'){
-		$main_smarty->display($template_dir . '/admin/moderator.tpl');
+		$main_smarty->display('/admin/moderator.tpl');
 	} else {
-		$main_smarty->display($template_dir . '/admin/admin.tpl');
+		$main_smarty->display('/admin/admin.tpl');
 	}
 }
 else {

@@ -76,7 +76,7 @@ class Template_Lite_Compiler extends Template_Lite {
     var $_obj_call_regexp       =   null;
 	var $_templatelite_vars		=	array();
 
-	function Template_Lite_compiler()
+	function __construct()
 	{
 		// matches double quoted strings:
 		// "foobar"
@@ -243,8 +243,16 @@ class Template_Lite_Compiler extends Template_Lite {
 		}
 
 		// remove all comments
-		$file_contents = preg_replace("!{$ldq}\*.*?\*{$rdq}!se","",$file_contents);
-
+		/*** Redwine: As of PHP 5.5.0, the preg_replace() emitts an error E_DEPRECATED level when passing in the "\e" modifier
+				As of PHP 7.0.0 E_WARNING is emited in this case and "\e" modifier has no effect.
+		***/
+		//$file_contents = preg_replace("!{$ldq}\*.*?\*{$rdq}!se","",$file_contents);
+		/* Redwine: Substituting preg_replace with preg_replace_callback */
+		
+		$file_contents =  preg_replace_callback("/{$ldq}\*.*?\*{$rdq}/is",
+        function($m) {
+			return '';
+		},$file_contents);
 		// replace all php start and end tags
 		$file_contents = preg_replace('%(<\?(?!php|=|$))%i', '<?php echo \'\\1\'?>'."\n", $file_contents);
 

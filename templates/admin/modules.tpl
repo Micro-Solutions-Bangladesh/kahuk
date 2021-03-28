@@ -91,9 +91,9 @@ $(document).ready(function(){
 					</table>    
 				</form>
 			{else if $status eq "uninstalled"}	
-				{if $no_module_update_require neq '0'}
+				{if $un_no_module_update_require neq '0'}
 					<div class="alert alert-warning">
-						There are updates available for {$no_module_update_require} modules. <a href="admin_modules.php?status=uninstalled&updkey={$updatekey}&token=1">Click here</a> to review them.
+						There are updates available for {$un_no_module_update_require} modules. <a href="admin_modules.php?status=uninstalled&updkey={$updatekey}&token=1">Click here</a> to review them.
 					</div>
 				{/if}
 				<table class="table table-bordered">
@@ -101,7 +101,7 @@ $(document).ready(function(){
 						<tr>
 							<th>Details</th>
 							<th>Requires</th>
-							<th style="text-align:center;">Homepage</th>
+							<th style="text-align:center;">Download</th>
 							<th style="text-align:center;">Install</th>
 							{php} if (isset($_GET['token'])) { {/php}
 								<th style="text-align:center;">Update</th>
@@ -139,7 +139,7 @@ $(document).ready(function(){
 								<td style="text-align:center;vertical-align:middle;"><a {php} if ($requirements_met == 'false'){ echo 'class="btn btn-default disabled btn-xs" rel="tooltip" title="Cannot install until requirements are met."'; }else{ echo 'class="btn btn-success btn-xs"'; } {/php} href="?action=install&module={$module_info[nr].value}">Install</a></td>
 								{php} if (isset($_GET['token'])) { {/php}
 									<td style="text-align:center;vertical-align:middle;">
-										{$module_info[nr].version}
+										{$module_info[nr].version|number_format:1}
 									</td>
 								{php} } {/php}
 							</tr>

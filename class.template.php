@@ -93,7 +93,7 @@ class Template_Lite {
 	var $_sections = array();
 	var $_foreach = array();
 
-	function Template_Lite()
+	function __construct()
 	{
 		$this->_tpl_vars = &$this->_vars;
 		$this->_version_date = strtotime($this->_version_date);
@@ -980,23 +980,23 @@ class Template_Lite {
         $smarty_compiler->plugins_dir       = $this->plugins_dir;
         $smarty_compiler->config_dir        = $this->config_dir;
         $smarty_compiler->force_compile     = $this->force_compile;
-        $smarty_compiler->caching           = $this->caching;
-        $smarty_compiler->php_handling      = $this->php_handling;
+        if (isset($this->caching)) $smarty_compiler->caching           = $this->caching;
+        if (isset($this->php_handling)) $smarty_compiler->php_handling      = $this->php_handling;
         $smarty_compiler->left_delimiter    = $this->left_delimiter;
         $smarty_compiler->right_delimiter   = $this->right_delimiter;
         $smarty_compiler->_version          = $this->_version;
-        $smarty_compiler->security          = $this->security;
-        $smarty_compiler->secure_dir        = $this->secure_dir;
-        $smarty_compiler->security_settings = $this->security_settings;
-        $smarty_compiler->trusted_dir       = $this->trusted_dir;
-        $smarty_compiler->use_sub_dirs      = $this->use_sub_dirs;
+        if (isset($this->security)) $smarty_compiler->security          = $this->security;
+        if (isset($this->secure_dir)) $smarty_compiler->secure_dir        = $this->secure_dir;
+        if (isset($this->security_settings)) $smarty_compiler->security_settings = $this->security_settings;
+        if (isset($this->trusted_dir)) $smarty_compiler->trusted_dir       = $this->trusted_dir;
+        if (isset($this->use_sub_dirs)) $smarty_compiler->use_sub_dirs      = $this->use_sub_dirs;
         $smarty_compiler->_reg_objects      = &$this->_reg_objects;
         $smarty_compiler->_plugins          = &$this->_plugins;
         $smarty_compiler->_tpl_vars         = &$this->_tpl_vars;
         $smarty_compiler->default_modifiers = $this->default_modifiers;
-        $smarty_compiler->compile_id        = $this->_compile_id;
-        $smarty_compiler->_config            = $this->_config;
-        $smarty_compiler->request_use_auto_globals  = $this->request_use_auto_globals;
+        if (isset($this->_compile_id)) $smarty_compiler->compile_id        = $this->_compile_id;
+        if (isset($this->_config)) $smarty_compiler->_config            = $this->_config;
+        if (isset($this->request_use_auto_globals)) $smarty_compiler->request_use_auto_globals  = $this->request_use_auto_globals;
 
         if (isset($cache_include_path) && isset($this->_cache_serials[$cache_include_path])) {
             $smarty_compiler->_cache_serial = $this->_cache_serials[$cache_include_path];
@@ -1006,7 +1006,7 @@ class Template_Lite {
 
         $compiled_content = $smarty_compiler->_compile_file($source_content);
 
-        if ($smarty_compiler->_cache_serial) {
+        if (isset($smarty_compiler->_cache_serial)) {
             $this->_cache_include_info = array(
                 'cache_serial'=>$smarty_compiler->_cache_serial
                 ,'plugins_code'=>$smarty_compiler->_plugins_code

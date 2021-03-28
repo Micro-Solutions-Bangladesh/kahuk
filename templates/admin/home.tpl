@@ -26,20 +26,20 @@
 									<div class="panel-wrapper">
 										{if $widget.lang_conf}{config_load file=`$widget.lang_conf`}{/if}
 										{include file=`$widget.main`}
-										{config_load file=$pligg_lang_conf}
+										{config_load file=$plikli_lang_conf}
 										<div style="clear:both;"> </div>
 									</div>
 								</div>
-								{if $widget.widget_has_settings}
-								<div class="panel">
-									<div class="panel-wrapper">
-										{if $widget.lang_conf}{config_load file=`$widget.lang_conf`}{/if}
-										{include file=`$widget.settings`}
-										{config_load file=$pligg_lang_conf}
-										<div style="clear:both;"> </div>
+								{*if $widget.widget_has_settings*}
+								<!--<div class="panel">
+									<div class="panel-wrapper">-->
+										{*if $widget.lang_conf*}{*config_load file=`$widget.lang_conf`*}{*/if*}
+										{*include file=`$widget.settings`*}
+										{*config_load file=$plikli_lang_conf*}
+										<!--<div style="clear:both;"> </div>
 									</div>
-								</div>
-								{/if}
+								</div>-->
+								{*/if*}
 							</div><!-- .coda-slider -->
 						</div><!-- .coda-slider-wrapper -->
 					</div>
@@ -73,7 +73,7 @@
 									<div class="panel-wrapper">
 										{if $widget.lang_conf}{config_load file=`$widget.lang_conf`}{/if}
 										{include file=`$widget.main`}
-										{config_load file=$pligg_lang_conf}
+										{config_load file=$plikli_lang_conf}
 										<div style="clear:both;"> </div>
 									</div>
 								</div>
@@ -82,7 +82,7 @@
 									<div class="panel-wrapper">
 										{if $widget.lang_conf}{config_load file=`$widget.lang_conf`}{/if}
 										{include file=`$widget.settings`}
-										{config_load file=$pligg_lang_conf}
+										{config_load file=$plikli_lang_conf}
 										<div style="clear:both;"> </div>
 									</div>
 								</div>
@@ -95,6 +95,6 @@
 		{/foreach}
 	</div>
 {else}
-	{#PLIGG_Visual_AdminPanel_NoAccess#}
+	{#PLIKLI_Visual_AdminPanel_NoAccess#}
 {/if}
 <!--/home.tpl -->

@@ -76,29 +76,30 @@ function simple_messaging_showpage(){
 			}
 			
 			$main_smarty->assign('msg_array', $array);
-			
-			if ($_GET['action'] == "bulkmod") {
-				if(isset($_POST['submit'])) {
-					$message = array();
-					foreach ($_POST["message"] as $k => $v) {
-						$message[intval($k)] = $v;
-					}
-					$m = new KMessaging(true);
-					foreach($message as $key => $value) {
-						if ($value == "delete") {
-							$result = $m->DeleteMessage($key,2);
-//							$db->query('DELETE FROM `' . table_messages . '` WHERE `idMsg` = "'.$key.'"');
+			if (isset($_GET['action'])) {
+				if ($db->escape(sanitize($_GET['action'],3)) == "bulkmod") {
+					if(isset($_POST['submit'])) {
+						$message = array();
+						foreach ($_POST["message"] as $k => $v) {
+							$message[intval($k)] = $v;
 						}
+						$m = new KMessaging(true);
+						foreach($message as $key => $value) {
+							if ($value == "delete") {
+								$result = $m->DeleteMessage($key,2);
+	//							$db->query('DELETE FROM `' . table_messages . '` WHERE `idMsg` = "'.$key.'"');
+							}
+						}
+						
+						header("Location: ".my_plikli_base."/module.php?module=simple_messaging&view=inbox");
+						die();
 					}
-					
-					header("Location: ".my_pligg_base."/module.php?module=simple_messaging&view=inbox");
-					die();
 				}
 			}
 		}
-		
-		$main_smarty->assign('user_url_friends', getmyurl('user_friends', $login, 'following'));
-		$main_smarty->assign('user_url_friends2', getmyurl('user_friends', $login, 'followers'));
+		/* Redwine: commented the 2 lines below and all the 4 other instances thereafter because they were generating 10 notices "Undefined variable: login". First $login is not defined anywhere or even passed. Secondly, both user_url_friends and user_url_friends2 are already assigned in smartyvariables. */
+		//$main_smarty->assign('user_url_friends', getmyurl('user_friends', $login, 'following'));
+		//$main_smarty->assign('user_url_friends2', getmyurl('user_friends', $login, 'followers'));
 
 		$main_smarty = do_sidebar($main_smarty, $navwhere);
 		$main_smarty->assign('posttitle', "Inbox");
@@ -107,7 +108,7 @@ function simple_messaging_showpage(){
 		$main_smarty->assign('modulepage', modulepage);
 	
 		$main_smarty->assign('tpl_center', simple_messaging_tpl_path . 'inbox');
-		$main_smarty->display($the_template . '/pligg.tpl');
+		$main_smarty->display($the_template . '/plikli.tpl');
 
 	}
 	
@@ -137,42 +138,64 @@ function simple_messaging_showpage(){
 		} else 
 		   	$array = '';
 		$main_smarty->assign('msg_array', $array);
-
-			if ($_GET['action'] == "bulkmod") {
-				if(isset($_POST['submit'])) {
-					$message = array();
-					foreach ($_POST["message"] as $k => $v) {
-						$message[intval($k)] = $v;
-					}
-					$m = new KMessaging(true);
-					foreach($message as $key => $value) {
-						if ($value == "delete") {
-							$result = $m->DeleteMessage($key,1);
+			if (isset($_GET['action'])) {
+				if ($db->escape(sanitize($_GET['action'],3)) == "bulkmod") {
+					if(isset($_POST['submit'])) {
+						$message = array();
+						foreach ($_POST["message"] as $k => $v) {
+							$message[intval($k)] = $v;
 						}
+						$m = new KMessaging(true);
+						foreach($message as $key => $value) {
+							if ($value == "delete") {
+								$result = $m->DeleteMessage($key,1);
+							}
+						}
+						
+						header("Location: ".my_plikli_base."/module.php?module=simple_messaging&view=sent");
+						die();
 					}
-					
-					header("Location: ".my_pligg_base."/module.php?module=simple_messaging&view=sent");
-					die();
 				}
 			}
 
-		$main_smarty->assign('user_url_friends', getmyurl('user_friends', $login, 'following'));
-		$main_smarty->assign('user_url_friends2', getmyurl('user_friends', $login, 'followers'));
+		//$main_smarty->assign('user_url_friends', getmyurl('user_friends', $login, 'following'));
+		//$main_smarty->assign('user_url_friends2', getmyurl('user_friends', $login, 'followers'));
 	
 		$main_smarty = do_sidebar($main_smarty, $navwhere);
 		$main_smarty->assign('posttitle', "Inbox");
 		
-		define('modulepage', 'simple_messaging_sentbox'); 
+		//define('modulepage', 'simple_messaging_sentbox'); 
 		$main_smarty->assign('modulepage', modulepage);
 	
 		$main_smarty->assign('tpl_center', simple_messaging_tpl_path . 'sent');
-		$main_smarty->display($the_template . '/pligg.tpl');
+		$main_smarty->display($the_template . '/plikli.tpl');
 
 	}
 
 
 	if($view == 'compose'){
-
+		/* Redwine: ChuckRoast caught this exploit and we applied a fix to force athentication and prevent users from altering the URL to message other users who don't follow them. */
+		if(!$current_user->authenticated) {
+			header('Location:  '.my_base_url.my_plikli_base);
+			die;
+		}
+		require_once(mnminclude.'user.php');
+		$receiver_name = sanitize($_REQUEST['to']);
+		$user_receiver=new User();
+		$receiver_id = $db->get_var("select user_id from ". table_users. " where user_login = '$receiver_name'");
+		$user_receiver->id = $receiver_id;
+		if(!$user_receiver->read()) {
+			 header('Location:  '.$my_base_url.$my_plikli_base);
+			die;
+		}
+		$user_receiver_id = $user_receiver->id;
+		include(mnminclude.'friend.php');
+		$friend = new Friend();
+		$friendship = $friend->get_friend_status($user_receiver_id);
+		if ($friendship != "mutual") {
+			header('Location:  '.my_base_url.my_plikli_base);
+			die;
+		}
 		define('modulename_sm', 'simple_messaging_compose');
 		$main_smarty->assign('modulename_sm', modulename_sm);
 
@@ -184,8 +207,8 @@ function simple_messaging_showpage(){
 
 		if($msgToName == ''){die('error, invalid to');}
 		
-		$main_smarty->assign('user_url_friends', getmyurl('user_friends', $login, 'following'));
-		$main_smarty->assign('user_url_friends2', getmyurl('user_friends', $login, 'followers'));
+		//$main_smarty->assign('user_url_friends', getmyurl('user_friends', $login, 'following'));
+		//$main_smarty->assign('user_url_friends2', getmyurl('user_friends', $login, 'followers'));
 
 		$main_smarty = do_sidebar($main_smarty, $navwhere);
 		$main_smarty->assign('posttitle', "Inbox");
@@ -194,7 +217,7 @@ function simple_messaging_showpage(){
 		$main_smarty->assign('modulepage', modulepage);
 	
 		$main_smarty->assign('tpl_center', simple_messaging_tpl_path . 'compose');
-		$main_smarty->display($the_template . '/pligg.tpl');
+		$main_smarty->display($the_template . '/plikli.tpl');
 
 	}
 	
@@ -221,7 +244,7 @@ function simple_messaging_showpage(){
 		if(!$user_to->read()) {
 			$main_smarty->assign('message', 'The person you are trying to send a message to does not exist!');
 			$main_smarty->assign('tpl_center', simple_messaging_tpl_path . 'error');
-			$main_smarty->display($the_template . '/pligg.tpl');
+			$main_smarty->display($the_template . '/plikli.tpl');
 			die;
 		}
 		$msg_to_ID = $user_to->id;
@@ -231,21 +254,24 @@ function simple_messaging_showpage(){
 		$msg_result = $message->SendMessage($msg_subject,$msg_body,$msg_from_ID,$msg_to_ID,0);
 		if ($msg_result != 0){
 			$main_smarty->config_load(simple_messaging_lang_conf);
-			//print 'PLIGG_MESSAGING_Error_'.$msg_result;
-			//print $main_smarty->get_config_vars('PLIGG_MESSAGING_Error_'.$msg_result);
+			//print 'PLIKLI_MESSAGING_Error_'.$msg_result;
+			//print $main_smarty->get_config_vars('PLIKLI_MESSAGING_Error_'.$msg_result);
 
-			$main_smarty->assign('message', $main_smarty->get_config_vars('PLIGG_MESSAGING_Error_'.$msg_result));
-			$main_smarty->config_load(simple_messaging_pligg_lang_conf);
+			$main_smarty->assign('message', $main_smarty->get_config_vars('PLIKLI_MESSAGING_Error_'.$msg_result));
+			$main_smarty->config_load(simple_messaging_plikli_lang_conf);
 			$main_smarty->assign('tpl_center', simple_messaging_tpl_path . 'error');
-			$main_smarty->display($the_template . '/pligg.tpl');
+			$main_smarty->display($the_template . '/plikli.tpl');
 			die;
 		} else {
+			/* Redwine: changed the $email_headers = "From: " . Send_From_Email . "\r\nReply-To: " . Send_From_Email . "\r\n";
+			to the value defined in the language file. If the From is not an actual email address, PHP still sends it but assigns an arbitrary email address in the From fields. So basically the email sent will be:
+			Send_From_Email@boscustweb(SOME RANDOM NUMBERS HERE).eigbox.net*/
 			// The message has been put in the database successfully, so let's alert the recipient by email:
 			$email_to =  $db->get_var("SELECT user_email FROM `" . table_users . "` WHERE `user_id` = '$user_to->id';");
 			$email_from =  $db->get_var("SELECT user_login FROM `" . table_users . "` WHERE `user_id` = '$current_user->user_id';");
-			$email_subject = "You've got a message in your " . $main_smarty->get_config_vars("PLIGG_Visual_Name") . " inbox";
-			$email_message = "Hi " . $user_to->username . ",\r\n\r\nYou've been sent a private message from " . $email_from . ". \r\n\r\nTo see the message, go to your " . $main_smarty->get_config_vars("PLIGG_Visual_Name") . " inbox here: " .  my_base_url . URL_simple_messaging_inbox . "\r\n\r\nThank you, \r\n" . $main_smarty->get_config_vars("PLIGG_Visual_Name") . " Admin";
-			$email_headers = "From: " . Send_From_Email . "\r\nReply-To: " . Send_From_Email . "\r\n";
+			$email_subject = "You've got a message in your " . $main_smarty->get_config_vars("PLIKLI_Visual_Name") . " inbox";
+			$email_message = "Hi " . $user_to->username . ",\r\n\r\nYou've been sent a private message from " . $email_from . ". \r\n\r\nTo see the message, go to your " . $main_smarty->get_config_vars("PLIKLI_Visual_Name") . " inbox here: " .  my_base_url . URL_simple_messaging_inbox . "\r\n\r\nThank you, \r\n" . $main_smarty->get_config_vars("PLIKLI_Visual_Name") . " Admin";
+			$email_headers = "From: " . $main_smarty->get_config_vars("PLIKLI_PassEmail_From") . "\r\nReply-To: " . $main_smarty->get_config_vars("PLIKLI_PassEmail_From") . "\r\n";
                         @mail($email_to, $email_subject, $email_message, $email_headers);
 			
 			// show 'message sent', click to continue or wait 5..4..3..2..1.. then redirect
@@ -267,8 +293,8 @@ function simple_messaging_showpage(){
 		$main_smarty->assign('js_reply', "lightbox_do_on_activate('view_message~!~action=reply~!~replyID=" . $array['id'] . "~!~view=small_msg_compose~!~login=" . $array['sender_name'] . "');");
 		$main_smarty->assign('js_delete', "lightbox_do_on_activate('view_message~!~view=small_msg_confirm_delete~!~msgid=" . $array['id'] . "');");
 		
-		$main_smarty->assign('user_url_friends', getmyurl('user_friends', $login, 'following'));
-		$main_smarty->assign('user_url_friends2', getmyurl('user_friends', $login, 'followers'));
+		//$main_smarty->assign('user_url_friends', getmyurl('user_friends', $login, 'following'));
+		//$main_smarty->assign('user_url_friends2', getmyurl('user_friends', $login, 'followers'));
 
 		$main_smarty = do_sidebar($main_smarty, $navwhere);
 		$main_smarty->assign('posttitle', "Inbox");
@@ -277,7 +303,7 @@ function simple_messaging_showpage(){
 		$main_smarty->assign('modulepage', modulepage);
 	
 		$main_smarty->assign('tpl_center', simple_messaging_tpl_path . 'show_message');
-		$main_smarty->display($the_template . '/pligg.tpl');
+		$main_smarty->display($the_template . '/plikli.tpl');
 
 	}
 	
@@ -299,7 +325,7 @@ function simple_messaging_showpage(){
 		$main_smarty->assign('modulepage', modulepage);
 	
 		$main_smarty->assign('tpl_center', simple_messaging_tpl_path . 'show_sent_message');
-		$main_smarty->display($the_template . '/pligg.tpl');
+		$main_smarty->display($the_template . '/plikli.tpl');
 
 	}
 
@@ -331,8 +357,8 @@ function simple_messaging_showpage(){
 		$main_smarty->assign('msg_subject', 're: ' . $array['title']);
 		$main_smarty->assign('return', URL_simple_messaging_viewmsg . $msg_id);
 		
-		$main_smarty->assign('user_url_friends', getmyurl('user_friends', $login, 'following'));
-		$main_smarty->assign('user_url_friends2', getmyurl('user_friends', $login, 'followers'));
+		//$main_smarty->assign('user_url_friends', getmyurl('user_friends', $login, 'following'));
+		//$main_smarty->assign('user_url_friends2', getmyurl('user_friends', $login, 'followers'));
 
 		$main_smarty = do_sidebar($main_smarty, $navwhere);
 		$main_smarty->assign('posttitle', "Inbox");
@@ -341,7 +367,7 @@ function simple_messaging_showpage(){
 		$main_smarty->assign('modulepage', modulepage);
 	
 		$main_smarty->assign('tpl_center', simple_messaging_tpl_path . 'compose');
-		$main_smarty->display($the_template . '/pligg.tpl');
+		$main_smarty->display($the_template . '/plikli.tpl');
 
 	}
 
@@ -349,10 +375,10 @@ function simple_messaging_showpage(){
 
 function messaging_get_message_details($msgID){	
 	global $db, $current_user, $main_smarty;
-	
+	/* Redwine: already defined and assigned on line 48 */
 	// Method for identifying modules rather than pagename
-	define('modulename', 'simple_messaging');
-	$main_smarty->assign('modulename', modulename);
+	//define('modulename', 'simple_messaging');
+	//$main_smarty->assign('modulename', modulename);
 
 	if (!is_numeric($msgID)) die("Wrong ID");
 	

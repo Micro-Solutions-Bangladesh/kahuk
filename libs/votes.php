@@ -10,7 +10,7 @@ class Vote {
 	var $link;
 	var $ip='';
 	
-	function Vote() {
+	function __construct() {
 		return;
 	}
 	
@@ -185,14 +185,14 @@ class Vote {
 		global $db;
 		$where = "vote_type='$this->type' AND vote_link_id=$this->link AND vote_value $value";
 		if($this->user !== -1) {
-			$where .= " AND vote_user_id=$this->user";
+			$where .= " AND vote_user_id=".$this->user;
 		}
 		if($this->user == 0 || !empty($this->ip)) {
 			if ($this->ip == '') {
 				require_once(mnminclude.'check_behind_proxy.php');
 				$this->ip=check_ip_behind_proxy();
 			}
-			$where .= " AND vote_ip='$this->ip'";
+			$where .= " AND vote_ip='".$this->ip."'";
 		}
 		$sql = "SELECT count(*) FROM " . table_votes . " WHERE $where";
 		$count=$db->get_var($sql);

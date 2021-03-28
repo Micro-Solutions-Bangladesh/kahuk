@@ -7,6 +7,7 @@ include mnminclude.'extra_fields_smarty.php';
 $main_smarty->compile_dir = mnmpath."cache/";
 $main_smarty->template_dir = mnmpath."templates/";
 $main_smarty->cache_dir = mnmpath."cache/";
+//global $current_user;
 
 // determine if we're in root or another folder like admin
 if(!defined('lang_loc')){
@@ -14,42 +15,55 @@ if(!defined('lang_loc')){
 	$path = substr($_SERVER["SCRIPT_NAME"], 0, $pos);
 	if ($path == "/"){$path = "";}
 	
-	if($path != my_pligg_base){
+	if($path != my_plikli_base){
 		define('lang_loc', '..');
 	} else {
 		define('lang_loc', '.');
 	}
 }
 
-// Check if a .maintenance file exists in the Pligg root directory
-$maintenance_file = "./.maintenance";
-if(file_exists($maintenance_file)){
-	$main_smarty->assign('maintenance_mode', 'true');
-} else {
-	$main_smarty->assign('maintenance_mode', 'false');
-}
+// Check maintenance mode
+$maintenance = $main_smarty->get_template_vars('maintenance_mode');
+$main_smarty->assign('maintenance_mode', $maintenance);
+
+
 
 $main_smarty->config_dir = "";
 $main_smarty->force_compile = false; // has to be off to use cache
-$main_smarty->config_load(lang_loc . "/languages/lang_" . pligg_language . ".conf");
+$main_smarty->config_load(lang_loc . "/languages/lang_" . plikli_language . ".conf");
 
 if(isset($_GET['id']) && is_numeric($_GET['id'])){$main_smarty->assign('request_id', $_GET['id']);}
 if(isset($_GET['category']) && sanitize($_GET['category'], 3) != ''){$main_smarty->assign('request_category', sanitize($_GET['category'], 3));}
 if(isset($_GET['search']) && sanitize($_GET['search'], 3) != ''){$main_smarty->assign('request_search', sanitize($_GET['search'], 3));}
-if(isset($_POST['username']) && sanitize($_GET['username'], 3) != ''){$main_smarty->assign('login_username', sanitize($_POST['username'], 3));}
+if(isset($_POST['username']) && sanitize($_POST['username'], 0) != ''){$main_smarty->assign('login_username', sanitize($_POST['username'], 0));}
 
 $main_smarty->assign('votes_per_ip', votes_per_ip);
 $main_smarty->assign('dblang', $dblang);
-$main_smarty->assign('pligg_language', pligg_language);
+$main_smarty->assign('plikli_language', plikli_language);
 $main_smarty->assign('user_logged_in', $current_user->user_login);
 $main_smarty->assign('user_id', $current_user->user_id);
-$main_smarty->assign('user_level', $current_user->user_level);
+if ($current_user->authenticated == true) {
+	$main_smarty->assign('user_level', $current_user->user_level);
+	if ($current_user->user_level == 'admin') {
+		$Story_Content_Tags_To_Allow = Story_Content_Tags_To_Allow_God;
+	}elseif ($current_user->user_level == 'moderator') {
+		$Story_Content_Tags_To_Allow = Story_Content_Tags_To_Allow_Admin;
+	}elseif ($current_user->user_level == 'normal') {
+		$Story_Content_Tags_To_Allow = Story_Content_Tags_To_Allow_Normal;
+	}
+	$main_smarty->assign('Story_Content_Tags_To_Allow', htmlspecialchars($Story_Content_Tags_To_Allow));
+	define(Story_Content_Tags_To_Allow, htmlspecialchars($Story_Content_Tags_To_Allow));
+	$current_user_level = $current_user->user_level; /* Redwine: user_level is not part oof the $current_user array when user is not auhtenticated (logged in), hence this variable to be used on line 74. otherwise, generating a Notice in case user is not authenticated. */
+}else{
+	$main_smarty->assign('user_level', "");
+	$current_user_level = ''; /* Redwine: user_level is not part oof the $current_user array when user is not auhtenticated (logged in), hence this variable to be used on line 74. otherwise, generating a Notice in case user is not authenticated. */
+}
 $main_smarty->assign('user_authenticated', $current_user->authenticated);
 $main_smarty->assign('Enable_Tags', Enable_Tags);
 $main_smarty->assign('Enable_Live', Enable_Live);
 $main_smarty->assign('Voting_Method', Voting_Method);
 $main_smarty->assign('my_base_url', my_base_url);
-$main_smarty->assign('my_pligg_base', my_pligg_base);
+$main_smarty->assign('my_plikli_base', my_plikli_base);
 $main_smarty->assign('Allow_User_Change_Templates', Allow_User_Change_Templates);
 $main_smarty->assign('urlmethod', urlmethod);
 $main_smarty->assign('UseAvatars', do_we_use_avatars());
@@ -65,7 +79,6 @@ if($current_user->user_login){
 $main_smarty->assign('enable_group', enable_group);
 $main_smarty->assign('group_submit_level', group_submit_level);
 $group_submit_level = group_submit_level;
-$current_user_level = $current_user->user_level;
 if(group_submit_level == $current_user_level || group_submit_level == 'normal' || $current_user_level == 'admin')
 	$main_smarty->assign('group_allow', 1);
 
@@ -92,33 +105,198 @@ if($canIhaveAccess == 1){$main_smarty->assign('isadmin', 1);}
 $canIhaveAccess = $canIhaveAccess + checklevel('moderator');
 if($canIhaveAccess == 1){$main_smarty->assign('isadmin', 1);}
 
-// show count of new stories
-$new_submissions_count = $db->get_var('SELECT count(*) from ' . table_links . ' where link_status = "new";');
-$main_smarty->assign('new', $new_submissions_count);
-// Renaming new variable to new_count
-$main_smarty->assign('new_submissions_count', $new_submissions_count);
+/* Redwine: I removed the block of code that was before this and which runs 3 queries and added the below block with only one query. */
 
-// Count variable for published stories
-$published_submissions_count = $db->get_var('SELECT count(*) from ' . table_links . ' where link_status = "published";');
-$main_smarty->assign('published', $published_submissions_count);
-// Renaming published variable to published_count
-$main_smarty->assign('published_submissions_count', $published_submissions_count);
-
-// Count variable for moderated stories
-$moderated_submissions_count = $db->get_var('SELECT count(*) from ' . table_links . ' where link_status != "published" AND link_status != "new" AND link_status != "spam" AND link_status != "discard" AND link_status != "page";');
-$main_smarty->assign('moderated_submissions_count', $moderated_submissions_count);
-
-// Count variable for moderated comments
+/* Redwine: all submissions status. Also added a varibale to hold the total of published and new to be used in the sidebar stats module */
+$sidebar_stats_stories = 0;
+$stats = $db->get_results('select link_status, count(*) total from '.table_links. ' group by link_status');
+$total_submissions = 0;
+$published_submissions_count = 0;
+$new_submissions_count = 0;
+$draft_submissions_count = 0;
+$scheduled_submissions_count = 0;
+$moderated_submissions_count = 0;
+$abuse_submissions_count = 0;
+$discarded_submissions_count = 0;
+$duplicate_submissions_count = 0;
+$page_submissions_count = 0;
+$spam_submissions_count = 0;
+if ($stats) {
+	foreach($stats as $row) {
+		if ($row->link_status == 'published') {
+			$published_submissions_count = $row->total;
+			$main_smarty->assign('published_submissions_count', $published_submissions_count);
+			$total_submissions += $row->total;
+			$sidebar_stats_stories += $row->total;
+		}elseif ($row->link_status == 'new') {
+			$new_submissions_count = $row->total;
+			$main_smarty->assign('new_submissions_count', $new_submissions_count);
+			$total_submissions += $row->total;
+			$sidebar_stats_stories += $row->total;
+		}elseif ($row->link_status == 'draft') {
+			$draft_submissions_count = $row->total;
+			$main_smarty->assign('draft_submissions_count', $draft_submissions_count);
+			$total_submissions += $row->total;
+		}elseif ($row->link_status == 'scheduled') {
+			$scheduled_submissions_count = $row->total;
+			$main_smarty->assign('scheduled_submissions_count', $scheduled_submissions_count);
+			$total_submissions += $row->total;
+		}elseif ($row->link_status == 'moderated') {
+			$moderated_submissions_count = $row->total;
+			$main_smarty->assign('moderated_submissions_count', $moderated_submissions_count);
+			$total_submissions += $row->total;
+		}elseif ($row->link_status == 'abuse') {
+			$abuse_submissions_count = $row->total;
+			$main_smarty->assign('abuse_submissions_count', $abuse_submissions_count);
+			$total_submissions += $row->total;
+		}elseif ($row->link_status == 'discard') {
+			$discarded_submissions_count = $row->total;
+			$main_smarty->assign('discarded_submissions_count', $discarded_submissions_count);
+			$total_submissions += $row->total;
+		}elseif ($row->link_status == 'duplicate') {
+			$duplicate_submissions_count = $row->total;
+			$main_smarty->assign('duplicate_submissions_count', $duplicate_submissions_count);
+			$total_submissions += $row->total;
+		}elseif ($row->link_status == 'page') {
+			$page_submissions_count = $row->total;
+			$main_smarty->assign('page_submissions_count', $page_submissions_count);
+			$total_submissions += $row->total;
+		}elseif ($row->link_status == 'spam') {
+			$spam_submissions_count = $row->total;
+			$main_smarty->assign('spam_submissions_count', $spam_submissions_count);
+			$total_submissions += $row->total;
+		}
+	}
+}
+$main_smarty->assign('total_submissions', $total_submissions);
+$main_smarty->assign('sidebar_stats_stories', $sidebar_stats_stories);
+/* Redwine: all user levels */
+$users_total = 0;
+/* Redwine: added a variable to hold the total of active users that will be used in the sidebar stats module */
+$sidebar_stats_members = 0;
+$moderated_users_count = 0;
+$spammer_users_count = 0;
+$admin_users_count = 0;
+$moderator_users_count = 0;
+$normal_users_count = 0;
+$usersstats = $db->get_results("select  user_level, count(*) as TTL, 'DISABLED' as LEVEL from " . table_users. " where (user_level = 'normal' OR user_level = 'Spammer') AND user_enabled=0 group by user_level, user_enabled UNION select user_level, count(*) as ENB, 'ENABLED' as LEVEL
+from " . table_users . " where user_enabled = 1 group by user_level, user_enabled");
+foreach($usersstats as $user) {
+	if ($user->LEVEL == 'DISABLED' && $user->user_level == 'normal') {
+		$moderated_users_count = $user->TTL;
+		$main_smarty->assign('moderated_users_count', $moderated_users_count);
+		$users_total += $user->TTL;
+	}elseif ($user->LEVEL == 'DISABLED' && $user->user_level == 'Spammer') {	
+		$spammer_users_count = $user->TTL;
+		$main_smarty->assign('spammer_users_count', $spammer_users_count);
+		$users_total += $user->TTL;
+	}elseif ($user->LEVEL == 'ENABLED') {
+		$tempVariable = "$".$user->user_level . "_users_count";
+		$smartyTempVariable  = str_replace("$", "", $tempVariable);
+		$tempVariable = $user->TTL;
+		$main_smarty->assign($smartyTempVariable, $tempVariable);
+		$users_total += $user->TTL;
+		$sidebar_stats_members += $user->TTL;
+	}
+}
+$main_smarty->assign('users_total', $users_total);
+$main_smarty->assign('sidebar_stats_members', $sidebar_stats_members);
+/* Get the last user to sign up */
+/* Redwine: Changed the query to get the last legitimate (excluding spammers) user to sign up */
+$last_user = $db->get_var("SELECT user_login FROM " . table_users . " where user_level != 'Spammer' ORDER BY user_id DESC LIMIT 1");
+$main_smarty->assign('last_user', $last_user); 
+/* Redwine: added the query to get the version and removed 16 duplicate queries from all admin and some other files */
+// read the mysql database to get the plikli version
+$plikli_version = plikli_version();
+$main_smarty->assign('version_number', $plikli_version); 
+/* Redwine: redundant query */
+/*// Count variable for moderated comments
 $moderated_comments_count = $db->get_var('SELECT count(*) from ' . table_comments . ' where comment_status = "moderated";');
-$main_smarty->assign('moderated_comments_count', $moderated_comments_count);
-
-// Count variable for moderated users
-$moderated_users_count = $db->get_var('SELECT count(*) from ' . table_users . ' where user_enabled = "0" AND user_level != "Spammer";');
-$main_smarty->assign('moderated_users_count', $moderated_users_count);
-
-// Count variable for moderated groups
+$main_smarty->assign('moderated_comments_count', $moderated_comments_count);*/
+/* Redwine: get the votes count breakdown by vote type (links, comments) and vote value (upvote & downvote */
+$all_votes = $db->get_results('SELECT `vote_type`, count(*) total, `vote_value` FROM ' .table_votes. ' group by `vote_type`, `vote_value`');
+$votes = 0;
+$upvote_links_count = 0;
+$downvote_links_count = 0;
+$upvote_comments_count = 0;
+$downvote_comments_count = 0;
+if ($all_votes) {
+	foreach($all_votes as $details) {
+		if ($details->vote_type == 'links' && $details->vote_value == 10) {
+			$upvote_links_count = $details->total;
+			$main_smarty->assign('upvote_links_count', $upvote_links_count);
+			$votes += $details->total;
+		}elseif ($details->vote_type == 'links' && $details->vote_value == -10) {
+			$downvote_links_count = $details->total;
+			$main_smarty->assign('downvote_links_count', $downvote_links_count);
+			$votes += $details->total;
+		}elseif ($details->vote_type == 'comments' && $details->vote_value == 10) {
+			$upvote_comments_count = $details->total;
+			$main_smarty->assign('upvote_comments_count', $upvote_comments_count);
+			$votes += $details->total;
+		}elseif ($details->vote_type == 'comments' && $details->vote_value == -10) {
+			$downvote_comments_count = $details->total;
+			$main_smarty->assign('downvote_comments_count', $downvote_comments_count);
+			$votes += $details->total;
+		}
+	}
+}
+$main_smarty->assign('votes', $votes);
+/* Redwine: added variables to hold the total votes on links and comments to use in the sidebar stats module */
+$main_smarty->assign('sidebar_links_votes', $upvote_links_count + $downvote_links_count);
+$main_smarty->assign('sidebar_stats_comment_votes', $upvote_comments_count + $downvote_comments_count);
+/* get the comments count, with a breakdown by comment status */
+$all_comments = $db->get_results('select `comment_status`, count(*) total from ' . table_comments . ' group by `comment_status`');
+$comments = 0;
+$published_comments_count = 0;
+$moderated_comments_count = 0;
+$discarded_comments_count = 0;
+$spam_comments_count = 0;
+if ($all_comments) {
+	foreach($all_comments as $comstatus) {
+		if ($comstatus->comment_status == 'published') {
+			$published_comments_count = $comstatus->total;
+			$main_smarty->assign('published_comments_count', $published_comments_count);
+			$comments += $comstatus->total;
+		}elseif ($comstatus->comment_status == 'moderated') {
+			$moderated_comments_count = $comstatus->total;
+			$main_smarty->assign('moderated_comments_count', $moderated_comments_count);
+			$comments += $comstatus->total;
+		}elseif ($comstatus->comment_status == 'discard') {
+			$discarded_comments_count = $comstatus->total;
+			$main_smarty->assign('discarded_comments_count', $discarded_comments_count);
+			$comments += $comstatus->total;
+		}elseif ($comstatus->comment_status == 'spam') {
+			$spam_comments_count = $comstatus->total;
+			$main_smarty->assign('spam_comments_count', $spam_comments_count);
+			$comments += $comstatus->total;
+		}
+	}
+}
+$main_smarty->assign('comments', $comments);
+/* getting the breakdown of Groups by group_status */
+$all_groups = $db->get_results('SELECT `group_status`, count(*) total FROM ' . table_groups. ' group by `group_status`');
+$grouptotal = 0;
+$enabled_groups_count = 0;
+$disabled_groups_count = 0;
+if ($all_groups) {
+	foreach($all_groups as $grpstatus) {
+		if ($grpstatus->group_status == 'Enable') {
+			$enabled_groups_count = $grpstatus->total;
+			$main_smarty->assign('enabled_groups_count', $enabled_groups_count);
+			$grouptotal += $grpstatus->total;
+		}elseif ($grpstatus->group_status == 'disable') {
+			$disabled_groups_count = $grpstatus->total;
+			$main_smarty->assign('disabled_groups_count', $disabled_groups_count);
+			$grouptotal += $grpstatus->total;
+		}
+	}
+}
+$main_smarty->assign('grouptotal', $grouptotal);
+/* Redwine: redundant query */
+/*// Count variable for moderated groups
 $moderated_groups_count = $db->get_var('SELECT count(*) from ' . table_groups . ' where group_status = "disable";');
-$main_smarty->assign('moderated_groups_count', $moderated_groups_count);
+$main_smarty->assign('moderated_groups_count', $moderated_groups_count);*/
 
 // Count the number of errors
 $error_log_path = mnminclude.'../logs/error.log';
@@ -142,47 +320,281 @@ $main_smarty->assign('backup_count', $sqlcount+$zipcount);
 $backup_count = $sqlcount+$zipcount;
 
 // Count moderated total
-$moderated_total_count = $moderated_groups_count+$moderated_users_count+$moderated_comments_count+$moderated_submissions_count+$error_count+$backup_count;
+$moderated_total_count = $disabled_groups_count+$moderated_users_count+$moderated_comments_count+$moderated_submissions_count+$error_count+$backup_count;
 $main_smarty->assign('moderated_total_count', $moderated_total_count);
 
-//count installed module with updates available
-$res_update_mod=mysql_query('SELECT folder from ' . table_modules . ' where latest_version>version') or die(mysql_error());
+/********************** NEW FOR PLIKLI VERSION, INSTALLED / UNINSTALLED MODULES UPDATES **********************/
+
+/**********
+Redwine: this block of code is the new check for module and plikli version updates. It checks if today's date is the date to check for updates, then it computes all the needed processes and generate all the variabes to pass to admin_modules.php for the installed and uninstalled modules pages.
+
+1- Redwine: verify if it is time to run the check for update. 
+If yes it should run, then it runs and updates the $update_uninstalled data.
+if not, then it checks the $update_uninstalled if it is not empty and then it takes whatever uninstalled modules that already needed updates and still not updated.
+**********/
+
+/* 3- Find all the modules in the modules directory */
+$dir = mnmmodules; //the defined path to the modules, in config.php
+if (is_dir($dir)) {
+   if ($dh = opendir($dir)) {
+	   while (($file = readdir($dh)) !== false) {
+			if(is_dir($dir . $file)) {
+				if($file != '.' && $file != '..') {
+					$foundfolders[] = $file;
+				}
+			}
+		}
+	   closedir($dh);
+	}
+}
+/* Redwine: We want to create an array of only the uninstalled modules to check for their updates. */
+$modules = $db->get_results('SELECT * from ' . table_modules . ' order by weight asc;');
+$foundfolders_unins = $foundfolders; // copying array of all the folders to a new one that will only hold the uninstalled modules.
+if($modules) {
+	foreach($modules as $module) {
+		if(isset($foundfolders_unins) && is_array($foundfolders_unins)) {
+			foreach($foundfolders_unins as $key => $value) {
+				if ($module->folder == $value  && file_exists(mnmmodules . $module->folder)) {
+					unset($foundfolders_unins[$key]);
+				}
+			}
+		}
+	}
+}
+
+$sql_get_mods_update = $db->get_results('SELECT * from `' . table_misc_data . '` where `name` like "modules_%" OR `name` like "plikli_update%";');
+
+if($sql_get_mods_update) {
+	foreach($sql_get_mods_update as $item) {
+		if ($item->name == 'modules_update_date') {
+			$check_for_update = $item->data; // holds the date to run the check for updates.
+		}elseif ($item->name == 'modules_update_url') {
+			$update_link = $item->data; //holds the location of the file from where it gets the latest versions.
+		}elseif ($item->name == 'modules_update_unins') {
+			$update_uninstalled = $item->data; //holds serialized array of the uninstalled modules that need update.
+		}elseif ($item->name == 'plikli_update') {
+			$update_available = $item->data; //holds the latest plikli version if there is an update or empty if not.
+		}elseif ($item->name == 'modules_upd_versions') {
+			$update_latest_versions = $item->data; //holds the latest plikli versions from the file.
+		}elseif ($item->name == 'plikli_update_url') {
+			$update_plikli_url = $item->data; //holds the latest plikli versions from the file.
+		}
+	}
+}
+
+/* Redwine: 2- verify if the check for updates should run today. */
+$proceed_check_update = 'false';
+if(time() >= strtotime($check_for_update)) {
+	$proceed_check_update = 'true'; // meaning go ahead and check the latest versions.
+	/* Redwine: checking if modules updates exist. It runs only if today is equal or greater than the date in the misc_data table. $versionupdate is an array that holds the name and latest version of each module that is due for update. */
+	$versionupdate = array();
+	$versionplikliupdate = array();
+	$lines = file($update_link, FILE_IGNORE_NEW_LINES);
+
+	foreach ($lines as $key => $value) {
+		if (strpos($value, 'plikli_new_version') !== false) {
+			$versionplikliupdate[$key] = str_getcsv($value);
+		}else{
+			$versionupdate[$key] = str_getcsv($value);
+		}
+	}
+	/* Redwine: the only way to mantain the $versionupdate if it not the time to check is to insert it in the misc_data table. */
+	misc_data_update('modules_upd_versions',serialize($versionupdate));
+	/* Redwine: first let's check if there is a new plikli version. */
+	if ($update_available == '0' || $update_available == ''|| $update_available == $plikli_version) {
+		$update_plikli = '';
+		if ($proceed_check_update == 'true') {
+			$plikli_new_version = 'plikli_new_version';
+			foreach($versionplikliupdate as $entry) {
+				if (in_array($plikli_new_version, $entry)) {
+					if($entry[1]>$plikli_version) {
+						$update_plikli = $entry[1];
+						misc_data_update('plikli_update',$update_plikli);
+					}
+				}
+			}	
+		}
+	}
+	/* END CHECKING PLIKLI NEW VERSION. */
+	
+	/* Redwine: we need to maintain a copy to pass on to the installed modules instead of running the process again. */
+	$versionupdate_to_pass_to_installed = $versionupdate;
+
+	
+	$module_info_data=array();
+	if(isset($foundfolders) && is_array($foundfolders)) {
+		asort($foundfolders);
+		$i=0;
+		$update_key = array();
+		$updatecount=0;
+		foreach($foundfolders as $key => $value) {
+			$text = array();
+			if($module_info = include_module_settings($value)) {
+				$text[] = $module_info['desc'];
+				$module_info_data[$i]['version'] = $module_info['version'];
+				 
+				if(isset($module_info['update_url'])) {
+					if (is_array($versionupdate)) {
+						foreach($versionupdate as $mod) {
+							if (in_array($value, $mod)) {
+								if($mod[1]>$module_info['version']) {
+									$update_key[$updatecount] = array($value,$mod[1]);
+									$updatecount++;
+									//we want to pass on the latest version to smarty in the $module_info array
+									$module_info_data[$i]['version'] = $mod[1];
+								}
+							}
+						}
+					}
+				
+					$module_info_data[$i]['value'] = $value;
+					$module_info_data[$i]['name'] = $module_info['name'];
+				
+					if(file_exists('../modules/' . $value . '/' . $value . '_readme.htm')) {
+						$module_info_data[$i]['dname']="<a href='?action=readme&module=". $value ."'>".$module_info['name']."</a>";
+					} else {
+						$module_info_data[$i]['dname']="".$module_info['name']."";
+					}
+				
+					if(is_array($text)) {
+						$module_info_data[$i]['desc']=@implode("",$text);
+					} else {
+						$module_info_data[$i]['desc']=$module_info['desc'];
+					}
+					if(isset($module_info['requires'])) {
+						$requires = $module_info['requires'];
+						if(is_array($requires)) {
+							$req_data='<ul class="unstyled">';
+							foreach($requires as $requirement) {
+								$req_data.='<li style="line-height:22px;">';
+								if(check_for_enabled_module($requirement[0], $requirement[1])) {
+									$req_data.= '<span class="label label-success" style="padding:3px 5px;"><i class="fa fa-white fa-check"></i> ';
+								} else {
+									$req_data.= '<span class="label label-danger" style="padding:3px 5px;"><i class="fa fa-white fa-times"></i> ';
+								}
+								if ($requirement[3]) {
+									$req_data.= '<a href="' . $requirement[3] . '" style="color:#fff;">';
+								}
+								if ($requirement[2]) {
+									$req_data.= $requirement[2];
+								} else {
+									$req_data.= $requirement[0];
+								}
+								if ($requirement[3]) {
+									$req_data.= '</a>';
+								}
+								$req_data.= ' ' . $requirement[1] .'</span></li>';
+							}
+							$req_data.= '</ul>';
+						}
+						$module_info_data[$i]['requires']=$req_data;	
+					} else {
+						$module_info_data[$i]['requires']="&nbsp;";
+					}
+				
+					if(isset($module_info['homepage_url'])) {
+						$homepage_url = $module_info['homepage_url'];
+						$module_info_data[$i]['homepage_url']= " <a class='btn btn-default btn-xs' href='" . $homepage_url . "' target='_blank' rel='noopener noreferrer'>Homepage</a>";
+					} else {
+						$module_info_data[$i]['homepage_url']="&nbsp;";	
+					}
+				
+					$i++;	
+			
+				}
+			}
+		}
+		$updatekey = '';
+		$modules_name = array();
+		if (!empty($update_key)) {
+			if (is_array($update_key)) {
+				$update_key = array_filter($update_key);
+				$update_misc_data=serialize($update_key);
+				foreach($update_key as $module_to_update) {
+					//$updatekey .= $module_to_update['module'] . ","; 
+					$modules_name[] = $module_to_update[0];
+				}
+				$updatekey = implode(",", $modules_name);
+			}
+		}else{
+			$updatekey = "";
+			$update_misc_data = '';
+		}
+		misc_data_update('modules_update_unins',$update_misc_data);
+		$main_smarty->assign('updatekey', $updatekey);
+	}
+	update_module_update_date($check_for_update);
+	
+	
+}else{
+	if ($update_uninstalled != ''){
+		$versionupdate = unserialize($update_uninstalled);
+	}else{
+		$versionupdate = unserialize($update_latest_versions);
+	}	
+	$versionupdate_to_pass_to_installed = unserialize($update_latest_versions);
+	if ($update_available == $plikli_version) {
+		$update_plikli = '';
+	}else{
+		$update_plikli = $update_available;
+	}
+	
+
+$res_update_mod=$db->get_results('SELECT folder from ' . table_modules . ' where latest_version>version order by weight asc;');
 $num_update_mod=0;
-if(mysql_num_rows($res_update_mod)>0){
-while($modules_folders=mysql_fetch_array($res_update_mod)){
-	if (file_exists(mnmmodules . $modules_folders['folder']))
+if(count($res_update_mod)>0){
+foreach($res_update_mod as $modules_folders){
+	if (file_exists(mnmmodules . $modules_folders->folder))
 			$num_update_mod++;
  }
 }
+$main_smarty->assign('update_plikli', $update_plikli);
+$main_smarty->assign('update_plikli_url', $update_plikli_url);
 $main_smarty->assign('in_no_module_update_require', $num_update_mod);
 
-$res_for_update=mysql_query("select var_value from " . table_config . "  where var_name = 'uninstall_module_updates'");
-$data_for_update_uninstall_mod=mysql_fetch_array($res_for_update);
+$res_for_update=$db->get_var("select var_value from " . table_config . "  where var_name = 'uninstall_module_updates'");
+$data_for_update_uninstall_mod=$res_for_update;
 //count uninstalled modules with updates available
+$main_smarty->assign('un_no_module_update_require', $data_for_update_uninstall_mod);
+}
 
-$main_smarty->assign('un_no_module_update_require', $data_for_update_uninstall_mod['var_value']);
+
+function update_module_update_date($update_new_date){
+	$date = strtotime($update_new_date);
+	$date = strtotime("+7 day", $date);
+	misc_data_update('modules_update_date',date('Y/m/d', $date));
+}
+
+
+/* END CHECKING FOR UNINSTALLED MODULES.*/
+
+/********************** END NEW FOR PLIKLI VERSION, INSTALLED / UNINSTALLED MODULES UPDATES **********************/
+//count installed module with updates available
+
 
 //count total module updates required
-$total_update_required_mod=$num_update_mod+$data_for_update_uninstall_mod['var_value'];
+$total_update_required_mod=$num_update_mod+$data_for_update_uninstall_mod;
 $main_smarty->assign('total_update_required_mod', $total_update_required_mod);
 
 $vars = '';
 check_actions('all_pages_top', $vars);
 
 // setup the sorting links on the index page in smarty
-$pligg_category = isset($_GET['category']) ? sanitize($_GET['category'], 3) : '';
-if($pligg_category != ''){
-	$main_smarty->assign('index_url_recent', getmyurl('maincategory', $pligg_category));
-	$main_smarty->assign('index_url_today', getmyurl('index_sort', 'today', $pligg_category));
-	$main_smarty->assign('index_url_yesterday', getmyurl('index_sort', 'yesterday', $pligg_category));
-	$main_smarty->assign('index_url_week', getmyurl('index_sort', 'week', $pligg_category));
-	$main_smarty->assign('index_url_month', getmyurl('index_sort', 'month', $pligg_category));
-	$main_smarty->assign('index_url_year', getmyurl('index_sort', 'year', $pligg_category));
-	$main_smarty->assign('index_url_alltime', getmyurl('index_sort', 'alltime', $pligg_category));
+$plikli_category = isset($_GET['category']) ? sanitize($_GET['category'], 3) : '';
+if($plikli_category != ''){
+	$main_smarty->assign('index_url_recent', getmyurl('maincategory', $plikli_category));
+	$main_smarty->assign('index_url_today', getmyurl('index_sort', 'today', $plikli_category));
+	$main_smarty->assign('index_url_yesterday', getmyurl('index_sort', 'yesterday', $plikli_category));
+	$main_smarty->assign('index_url_week', getmyurl('index_sort', 'week', $plikli_category));
+	$main_smarty->assign('index_url_month', getmyurl('index_sort', 'month', $plikli_category));
+/* Redwine: add an additional Sort by from the sort button to sort the stories of the current month */
+	$main_smarty->assign('index_url_curmonth', getmyurl('index_sort', 'curmonth', $plikli_category));
+	$main_smarty->assign('index_url_year', getmyurl('index_sort', 'year', $plikli_category));
+	$main_smarty->assign('index_url_alltime', getmyurl('index_sort', 'alltime', $plikli_category));
 	
-	$main_smarty->assign('index_url_upvoted', getmyurl('index_sort', 'upvoted', $pligg_category));
-	$main_smarty->assign('index_url_downvoted', getmyurl('index_sort', 'downvoted', $pligg_category));
-	$main_smarty->assign('index_url_commented', getmyurl('index_sort', 'commented', $pligg_category));
+	$main_smarty->assign('index_url_upvoted', getmyurl('index_sort', 'upvoted', $plikli_category));
+	$main_smarty->assign('index_url_downvoted', getmyurl('index_sort', 'downvoted', $plikli_category));
+	$main_smarty->assign('index_url_commented', getmyurl('index_sort', 'commented', $plikli_category));
 	
 	$main_smarty->assign('cat_url', getmyurl("maincategory"));
 }	
@@ -192,6 +604,8 @@ else {
 	$main_smarty->assign('index_url_yesterday', getmyurl('index_sort', 'yesterday'));
 	$main_smarty->assign('index_url_week', getmyurl('index_sort', 'week'));
 	$main_smarty->assign('index_url_month', getmyurl('index_sort', 'month'));
+/* Redwine: add an additional Sort by from the sort button to sort the stories of the current month */
+	$main_smarty->assign('index_url_curmonth', getmyurl('index_sort', 'curmonth'));
 	$main_smarty->assign('index_url_year', getmyurl('index_sort', 'year'));
 	$main_smarty->assign('index_url_alltime', getmyurl('index_sort', 'alltime'));
 	
@@ -214,6 +628,8 @@ if ($current_user->user_id > 0 && $current_user->authenticated)
 	$main_smarty->assign('user_url_news_sent', getmyurl('user2', $login, 'history'));
 	$main_smarty->assign('user_url_news_published', getmyurl('user2', $login, 'published'));
 	$main_smarty->assign('user_url_news_unpublished', getmyurl('user2', $login, 'new'));
+	$main_smarty->assign('user_url_draft', getmyurl('user2', $login, 'draft'));
+	$main_smarty->assign('user_url_scheduled', getmyurl('user2', $login, 'scheduled'));
 	$main_smarty->assign('user_url_news_voted', getmyurl('user2', $login, 'voted'));
 	$main_smarty->assign('user_url_news_upvoted', getmyurl('user2', $login, 'upvoted'));
 	$main_smarty->assign('user_url_news_downvoted', getmyurl('user2', $login, 'downvoted'));

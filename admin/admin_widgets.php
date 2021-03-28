@@ -23,34 +23,32 @@ if($canIhaveAccess == 0){
 define('pagename', 'admin_widgets');
 $main_smarty->assign('pagename', pagename);
 
-// read the mysql database to get the pligg version
-$sql = "SELECT data FROM " . table_misc_data . " WHERE name = 'pligg_version'";
-$pligg_version = $db->get_var($sql);
-$main_smarty->assign('version_number', $pligg_version);
+// read the mysql database to get the plikli version
+/* Redwine: plikli version query removed and added to /libs/smartyvriables.php */
 
 // breadcrumbs and page title
-$navwhere['text1'] = $main_smarty->get_config_vars('PLIGG_Visual_Header_AdminPanel');
+$navwhere['text1'] = $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel');
 $navwhere['link1'] = getmyurl('admin', '');
-$navwhere['text2'] = $main_smarty->get_config_vars('PLIGG_Visual_Header_AdminPanel_6');
+$navwhere['text2'] = $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel_6');
 $main_smarty->assign('navbar_where', $navwhere);
-$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('PLIGG_Visual_Header_AdminPanel_6'));
+$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel_6'));
 
 // sidebar
-$main_smarty = do_sidebar($main_smarty);
+//$main_smarty = do_sidebar($main_smarty);
 
 
 if($canIhaveAccess == 1){
-	if ($_POST["enabled"]) {
+	if (isset($_POST["enabled"])) {
 		foreach($_POST["enabled"] as $id => $value) 
 		{
-			$sql = "UPDATE " . table_widgets . " set enabled = $value where id=$id";
+			$sql = "UPDATE " . table_widgets . " set enabled = ".$db->escape(sanitize($value,3)). " where id=". $db->escape(sanitize($id,3));
 			$db->query($sql);
 		}
 		header("Location: admin_widgets.php");
 		exit;
 	}
 
-	if($_GET['action'] == 'disable'){
+	if(isset($_GET['action']) && $_GET['action']== 'disable'){
 		$module = $db->escape(sanitize($_REQUEST['module'],3));
 		$sql = "UPDATE " . table_widgets . " set enabled = 0 where `name` = '" . $module . "';";
 		//echo $sql;
@@ -61,7 +59,7 @@ if($canIhaveAccess == 1){
 		header('Location: admin_widgets.php');
 		die();
 	}	
-	if($_GET['action'] == 'enable'){
+	if(isset($_GET['action']) && $_GET['action'] == 'enable'){
 		$module = $db->escape(sanitize($_REQUEST['module'],3));
 		$sql = "UPDATE " . table_widgets . " set enabled = 1 where `name` = '" . $module . "';";
 		//echo $sql;
@@ -72,7 +70,7 @@ if($canIhaveAccess == 1){
 		header('Location: admin_widgets.php');
 		die();
 	}
-if($_GET['action'] == 'install'){
+if(isset($_GET['action']) && $_GET['action']== 'install'){
 	$widget = $db->escape(sanitize($_REQUEST['widget'],3));
 
 	if($widget_info = include_widget_settings($widget))
@@ -94,7 +92,7 @@ if($_GET['action'] == 'install'){
 	header('Location: admin_widgets.php?status=uninstalled');
 	die();
 }	
-if($_GET['action'] == 'remove'){
+if(isset($_GET['action']) && $_GET['action']== 'remove'){
 	$widget = $db->escape(sanitize($_REQUEST['widget'],3));
 	$sql = "SELECT * FROM " . table_widgets . " WHERE `name` = '" . $widget . "';";
 	$row = $db->get_row($sql);
@@ -113,10 +111,10 @@ if($_GET['action'] == 'remove'){
 	
 
 	$main_smarty->assign('tpl_center', '/admin/widgets');
-	$output = $main_smarty->fetch($template_dir . '/admin/admin.tpl');		
+	$output = $main_smarty->fetch('/admin/admin.tpl');		
 
 	if (!function_exists('clear_widget_cache')) {
-		echo "Your template is not compatible with this version of Pligg. Missing the 'clear_widgets_cache' function in admin_widgets_center.tpl.";
+		echo "Your template is not compatible with this version of Plikli. Missing the 'clear_widgets_cache' function in admin_widgets_center.tpl.";
 	} else {
 		echo $output;
 	}

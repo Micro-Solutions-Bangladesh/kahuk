@@ -1,6 +1,6 @@
 <?php
 /*
-    XML Sitemaps module for Pligg
+    XML Sitemaps module for Plikli
     Copyright (C) 2007-2008  Secasiu Mihai - http://patchlog.com
 
     This program is free software; you can redistribute it and/or modify
@@ -17,18 +17,21 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-
+global $db;
+$XmlSitemaps_Links_per_sitemap = $db->get_var("SELECT `var_value` FROM `". table_config. "` WHERE `var_name` = 'XmlSitemaps_Links_per_sitemap';");
+$XmlSitemaps_friendly_url = $db->get_var("SELECT `var_value` FROM `". table_config. "` WHERE `var_name` = 'XmlSitemaps_friendly_url';");
 function xml_sitemaps_show_sitemap(){
+	global $XmlSitemaps_Links_per_sitemap;
 	ob_end_clean();
 	header("Content-type: text/xml");
 	if(isset($_GET['i']))
 	{
-		if(is_numeric($_GET['i'])) create_sitemap_links($_GET['i'],XmlSitemaps_Links_per_sitemap);
+		if(is_numeric($_GET['i'])) create_sitemap_links($_GET['i'],$XmlSitemaps_Links_per_sitemap);
 		else if ($_GET['i']=="main") create_sitemap_main();
-		else if (preg_match('/pages(\d+)/',$_GET['i'],$m))  create_sitemap_pages($m[1],XmlSitemaps_Links_per_sitemap);
-		else if (preg_match('/users(\d+)/',$_GET['i'],$m))  create_sitemap_users($m[1],XmlSitemaps_Links_per_sitemap);
-		else if (preg_match('/groups(\d+)/',$_GET['i'],$m)) create_sitemap_groups($m[1],XmlSitemaps_Links_per_sitemap);
-	} else create_sitemaps_index(XmlSitemaps_Links_per_sitemap);
+		else if (preg_match('/pages(\d+)/',$_GET['i'],$m))  create_sitemap_pages($m[1],$XmlSitemaps_Links_per_sitemap);
+		else if (preg_match('/users(\d+)/',$_GET['i'],$m))  create_sitemap_users($m[1],$XmlSitemaps_Links_per_sitemap);
+		else if (preg_match('/groups(\d+)/',$_GET['i'],$m)) create_sitemap_groups($m[1],$XmlSitemaps_Links_per_sitemap);
+	} else create_sitemaps_index($XmlSitemaps_Links_per_sitemap);
 }
 
 //
@@ -36,7 +39,7 @@ function xml_sitemaps_show_sitemap(){
 //
 function create_sitemaps_index($max_rec)
 {
-	global $db,$my_base_url,$my_pligg_base;
+	global $db,$my_base_url,$my_plikli_base, $XmlSitemaps_friendly_url;
 	$nr=0;
 
 	if (sitemap_header("index",true)) return true;
@@ -59,10 +62,10 @@ function create_sitemaps_index($max_rec)
 
 	// Main pages
 	echo "<sitemap>\n";
-	if(XmlSitemaps_friendly_url){
-	        echo "<loc>$my_base_url$my_pligg_base/sitemap-main.xml</loc>\n";
+	if($XmlSitemaps_friendly_url == true){
+	        echo "<loc>$my_base_url$my_plikli_base/sitemap-main.xml</loc>\n";
 	}else{
-		echo "<loc>$my_base_url$my_pligg_base/module.php?module=xml_sitemaps_show_sitemap&amp;i=main</loc>\n";
+		echo "<loc>$my_base_url$my_plikli_base/module.php?module=xml_sitemaps_show_sitemap&amp;i=main</loc>\n";
 	}
         echo "</sitemap>";
 
@@ -96,7 +99,7 @@ function create_sitemap_groups($index,$max_rec)
 }
 
 //
-// Pligg static pages
+// Plikli static pages
 //
 function create_sitemap_pages($index,$max_rec)
 {
@@ -109,7 +112,7 @@ function create_sitemap_pages($index,$max_rec)
 }
 
 //
-// Pligg stories
+// Plikli stories
 //
 function create_sitemap_links($index,$max_rec)
 {
@@ -143,11 +146,11 @@ function create_sitemap_links($index,$max_rec)
 }
 
 //
-// Pligg main pages
+// Plikli main pages
 //
 function create_sitemap_main()
 {
-	global $db,$my_base_url,$my_pligg_base,$URLMethod;
+	global $db,$my_base_url,$my_plikli_base,$URLMethod;
 
 	if (sitemap_header("main")) return true;
 
@@ -181,7 +184,7 @@ function create_sitemap_main()
                 }
 	}
 	// rssfeeds
-	create_entry($maxtime,"$my_base_url$my_pligg_base/rssfeeds.php");
+	create_entry($maxtime,"$my_base_url$my_plikli_base/rssfeeds.php");
 	
  	$vars = '';
 	check_actions('xml_sitemaps_main', $vars);
@@ -193,13 +196,13 @@ function create_sitemap_main()
 // Ping search engines
 //
 function xml_sitemaps_sites_ping(){
-	global $my_base_url,$my_pligg_base;
+	global $my_base_url,$my_plikli_base, $XmlSitemaps_friendly_url;
 	$res= "";
 
-	if (XmlSitemaps_friendly_url) 
-		$Url = "$my_base_url$my_pligg_base/sitemapindex.xml";
+	if ($XmlSitemaps_friendly_url == true) 
+		$Url = "$my_base_url$my_plikli_base/sitemapindex.xml";
 	else {
-		$Url = "$my_base_url$my_pligg_base/modules.php?module=xml_sitemaps_show_sitemap";
+		$Url = "$my_base_url$my_plikli_base/modules.php?module=xml_sitemaps_show_sitemap";
 		$Url = urlencode($Url);
 	}
 //	if (XmlSitemaps_use_cache && ($s=stat('cache/sitemapindex.xml')) && time()-$s['mtime']<XmlSitemaps_cache_ttl){
@@ -210,9 +213,10 @@ function xml_sitemaps_sites_ping(){
 
 	if (XmlSitemaps_ping_ask)
 		sitemap_call_url("http://submissions.ask.com/ping?sitemap=".$Url);
-
+/* Redwine: fix Yahoo ping */
+	//Yahoo now is using Bing
 	if (XmlSitemaps_ping_yahoo)
-		sitemap_call_url("http://search.yahooapis.com/SiteExplorerService/V1/updateNotification?appid=".Xml_Sitemaps_yahoo_key."&url=".$Url);
+		sitemap_call_url("http://www.bing.com/webmaster/ping.aspx?siteMap=".Xml_Sitemaps_yahoo_key."&url=".$Url);
 }
 
 //
@@ -234,7 +238,7 @@ function sitemap_call_url($pingUrl)
 //
 function sitemap_index_body($sql,$name,$max_rec)
 {
-	global $db,$my_base_url,$my_pligg_base;
+	global $db,$my_base_url,$my_plikli_base, $XmlSitemaps_friendly_url;
 
 	// Calculate total data size using given query
         $db->query($sql1=str_ireplace('select ','SELECT SQL_CALC_FOUND_ROWS ',$sql)." LIMIT 0,1");
@@ -250,10 +254,10 @@ function sitemap_index_body($sql,$name,$max_rec)
 		// Get last modification timestamp for next part of the data
 		$r=$db->get_var($sql1="SELECT MAX(UNIX_TIMESTAMP(l.date)) FROM ($sql LIMIT ".$i*$max_rec.",$max_rec ) l");
 		echo "<sitemap>\n";
-		if (XmlSitemaps_friendly_url) 
-			echo "<loc>$my_base_url$my_pligg_base/sitemap-$name$i.xml</loc>\n";
+		if ($XmlSitemaps_friendly_url == true) 
+			echo "<loc>$my_base_url$my_plikli_base/sitemap-$name$i.xml</loc>\n";
 		else 
-			echo "<loc>$my_base_url$my_pligg_base/module.php?module=xml_sitemaps_show_sitemap&amp;i=$name$i</loc>\n";
+			echo "<loc>$my_base_url$my_plikli_base/module.php?module=xml_sitemaps_show_sitemap&amp;i=$name$i</loc>\n";
 		echo "<lastmod>";
 		echo my_format_date($r);
 		echo "</lastmod>";
@@ -268,8 +272,8 @@ function sitemap_index_body($sql,$name,$max_rec)
 function sitemap_body($sql, $datefield, $urlname, $urlfield, $pri, $index, $max_rec)
 {
 	global $db;
-
 	$results = $db->get_results($sql." LIMIT ".($index*$max_rec).",$max_rec");
+
 	if ($results) 
 	{
 		foreach($results as $result) {
@@ -288,7 +292,7 @@ function sitemap_body($sql, $datefield, $urlname, $urlfield, $pri, $index, $max_
 }
 
 //
-// Create an entry for given pligg URL specified by $name, depending of data last modification
+// Create an entry for given plikli URL specified by $name, depending of data last modification
 // $sql should be 'SELECT MAX(UNIX_TIMESTAMP(<modification_datetime_field)) FROM xxx'
 //
 function sitemap_add_page($name,$sql)
@@ -318,7 +322,11 @@ function sitemap_header($name,$isindex)
 	if ($isindex)
 	    echo "<sitemapindex xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n";
 	else
-       	    echo '<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/09/sitemap.xsd"     xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
+/*** Redwine: fix as per Google schema ***/
+       	    //echo '<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/09/sitemap.xsd"     xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
+			
+			// Redwine: Latest as per Google recommendations
+			echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
 }
 
 //

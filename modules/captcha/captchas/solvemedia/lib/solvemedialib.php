@@ -5,7 +5,7 @@
  * Created: 2009-Jun-22 16:44 (EDT)
  * Function: SolveMedia API php code
  *
- * $Id: solvemedialib.php,v 1.2 2010/09/16 18:43:14 ilia Exp $
+ * $Id: solvemedialib.php,v 1.8 2011/02/21 16:48:23 jaw Exp $
  *
  * This is a PHP library that handles calling SolveMedia.
  *    - Documentation and latest version
@@ -113,24 +113,12 @@ function _adcopy_http_post($host, $path, $data, $port = 80) {
 
  * @return string - The HTML to be embedded in the user's form.
  */
-function solvemedia_get_html ($pubkey, $error = null, $use_ssl = false)
+function solvemedia_get_html ($pubkey, $use_ssl, $error = null)
 {
-	
-	if ($pubkey == 'KLoj-jfX2UP0GEYOmYX.NOWL0ReUhErZ' || $pubkey == '' || $pubkey == null ){
-		
-		$pubkey = 'KLoj-jfX2UP0GEYOmYX.NOWL0ReUhErZ'; // Redeclare default key in case of null value
-	
-		$page_file = basename($_SERVER['PHP_SELF']); // Get the file generating the page to figure out what key to assign it
-		
-		if ($page_file == "register.php"){ // Register CAPTCHA
-			$pubkey = 'Ql92.ORmU5DjtPyAdAW4i6OghCHVPtsq';
-		} elseif ($page_file == "story.php"){ // Comment CAPTCHA
-			$pubkey = 'AufuaJDa73CtTXf2VZ7NY8MQewLMWcEX';
-		} elseif ($page_file == "submit.php"){ // Story Submission CAPTCHA
-			$pubkey = 'h5HLnVA0W5kRZWIlPf7mEixB5A6koX4p';
-		}
+	if ($pubkey == null || $pubkey == '') {
+		die ("To use solvemedia you must get an API key from <a href='" . ADCOPY_SIGNUP . "'>" . ADCOPY_SIGNUP . "</a>");
 	}
-	
+
 	if ($use_ssl) {
                 $server = ADCOPY_API_SECURE_SERVER;
         } else {
@@ -150,8 +138,24 @@ function solvemedia_get_html ($pubkey, $error = null, $use_ssl = false)
 	</noscript>';
 }
 
+	function get_crypt( $string, $action = 'e' ) {
+		$secret_key = 'b3b4bf94e5fce221238777396ec1338cf25427c88a2bb9a34baf27d9205bde6a';
+		$secret_iv = '29fe5eb3624f951d0ddaf5871d6bb6e26d3f88f73d00d66c8e75b5cbec427597';
 
+		$output = false;
+		$encrypt_method = "AES-256-CBC";
+		$key = hash( 'sha256', $secret_key );
+		$iv = substr( hash( 'sha256', $secret_iv ), 0, 16 );
 
+		if( $action == 'e' ) {
+			$output = base64_encode( openssl_encrypt( $string, $encrypt_method, $key, 0, $iv ) );
+		}
+		else if( $action == 'd' ){
+			$output = openssl_decrypt( base64_decode( $string ), $encrypt_method, $key, 0, $iv );
+		}
+	 
+		return $output;
+	}
 
 /**
  * A SolveMediaResponse is returned from solvemedia_check_answer()
@@ -173,24 +177,8 @@ class SolveMediaResponse {
   */
 function solvemedia_check_answer ($privkey, $remoteip, $challenge, $response, $hashkey = '' )
 {
-
-	if ($privkey == 'Dm.c-mjmNP7Fhz-hKOpNz8l.NAMGp0wO' || $privkey == '' || $privkey == null ){
-		
-		// Re-declare the default private key and hash in case of null value
-		$privkey = 'Dm.c-mjmNP7Fhz-hKOpNz8l.NAMGp0wO';
-		$hashkey = 'nePptHN4rt.-UVLPFScpSuddqdtFdu2N';
-		
-		$page_file = basename($_SERVER['PHP_SELF']); // Get the file generating the page to figure out what key to assign it
-		if ($page_file == "register.php"){
-			$privkey = 'RfinGw00jddSv9eqIEo.LDUcZSbSEU6S';
-			$hashkey = 'SoR.tNYZtGpSkFrMBrLP2kPrpyiYyQpM';
-		} elseif ($page_file == "story.php"){
-			$privkey = 'MdwcHqbrYQPcJt0JjXSMrgFwROeLY5Ce';
-			$hashkey = 'xRJmWazYhZm6zSrrgdZHHctXUTYK6fZa';
-		} elseif ($page_file == "submit.php"){
-			$privkey = 'gAilaBopkMs8Bk9R9wx6mhRdl1ljt9Ig';
-			$hashkey = 'VH9T8Zr8EeUqUiGWfjZpbkS9u.sGf1cp';
-		}
+	if ($privkey == null || $privkey == '') {
+		die ("To use solvemedia you must get an API key from <a href='" . ADCOPY_SIGNUP . "'>" . ADCOPY_SIGNUP . "</a>");
 	}
 
 	if ($remoteip == null || $remoteip == '') {
@@ -218,22 +206,22 @@ function solvemedia_check_answer ($privkey, $remoteip, $challenge, $response, $h
         $adcopy_response = new SolveMediaResponse();
 
         if( strlen($hashkey) ){
-			# validate message authenticator
-			$hash = sha1( $answers[0] . $challenge . $hashkey );
+                # validate message authenticator
+                $hash = sha1( $answers[0] . $challenge . $hashkey );
 
-			if( $hash != $answers[2] ){
-					$adcopy_response->is_valid = false;
-					$adcopy_response->error = 'hash-fail';
-					return $adcopy_response;
-			}
+                if( $hash != $answers[2] ){
+                        $adcopy_response->is_valid = false;
+                        $adcopy_response->error = 'hash-fail';
+                        return $adcopy_response;
+                }
         }
 
         if (trim ($answers [0]) == 'true') {
-            $adcopy_response->is_valid = true;
+                $adcopy_response->is_valid = true;
         }
         else {
-			$adcopy_response->is_valid = false;
-			$adcopy_response->error = $answers [1];
+                $adcopy_response->is_valid = false;
+                $adcopy_response->error = $answers [1];
         }
         return $adcopy_response;
 

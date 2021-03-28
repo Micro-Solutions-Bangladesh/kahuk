@@ -1,5 +1,4 @@
 <?php
-
 if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
 
 define("EZSQL_DB_USER", "");

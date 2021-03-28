@@ -1,7 +1,7 @@
 @charset "UTF-8";
 /* CSS Document */
 p {
-font-size: 0.85em;
+font-size: 1.0em;
 }
 a:hover {
 text-decoration:none;
@@ -34,14 +34,14 @@ color: #C80700;
 }
 
 .btn-primary {
-	background-color: #2D6CE0;
-    border-color: #185ACC;
+	background-color: #183a52;
+    border-color: #183a52;
     color: #FFFFFF;
 	background-image: none;
 }
 .btn-primary:hover,.btn-primary:active {
-	background-color: #185ACC;
-    border-color: #2D6CE0;
+	background-color: #183a52;
+    border-color: #183a52;
     color: #FFFFFF;
 	background-image: none;
 }
@@ -136,19 +136,19 @@ font-size:1.0em;
 }
 
 .dropdown-menu > li > a:hover, .dropdown-menu > li > a:focus {
-    background-color: #2D6CE0;
+    background-color: #183a52;
 }
 
 /********************* NAVIGATION MENU ********************/
 .custom_header {
-    background-color: #2D6CE0;
-    border-color: #185ACC;
+    background-color: #183a52;
+    border-color: #183a52;
     box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1);
     text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.15);
 	background-image:none;
 }
 .custom_header .navbar-collapse {
-    border-color: #185ACC;
+    border-color: #183a52;
 }
 .custom_header .navbar-brand {
     color: #FFFFFF;
@@ -160,16 +160,16 @@ font-size:1.0em;
     color: #FFFFFF;
 }
 .custom_header .navbar-nav > .active > a, .custom_header .navbar-nav > .active > a:hover {
-    background-color: #185ACC;
+    background-color: #183a52;
     color: #FFFFFF;
 	background-image:none;
 }
 .custom_header .navbar-toggle {
-    border-color: #2D6CE0;
+    border-color: #183a52;
 }
 .custom_header .navbar-toggle:hover {
-    background-color: #185ACC;
-    border-color: #185ACC;
+    background-color: #183a52;
+    border-color: #183a52;
 }
 .custom_nav_search {
 	margin: 8px 10px 0 10px !important;
@@ -296,7 +296,7 @@ margin: 7px 4px;
     display: block;
 }
 .nav-tabs {
-	font-size:0.85em;
+	font-size:1.0em;
 }
 .nav-tabs .dropdown-menu, .nav-pills .dropdown-menu, .navbar .dropdown-menu {
     margin-top: 0;
@@ -330,8 +330,8 @@ padding:7px 14px;
 /****************** PAGINATION ******************/
 
 .pagination > .active > a, .pagination > .active > span, .pagination > .active > a:hover, .pagination > .active > span:hover, .pagination > .active > a:focus, .pagination > .active > span:focus {
-    background-color: #2D6CE0;
-    border-color: #2D6CE0;
+    background-color: #183a52;
+    border-color: #183a52;
 }
 
 /********************* STORY ********************/
@@ -395,14 +395,24 @@ font-size: 1.5em;
 margin-bottom: 2px;
 } 
 .subtext {
-display: block;
+/* Redwine: changed display block to inline to fix the mobile display */
+display: inline;
 font-size: 10px;
 line-height:10px;
 color: #aaa;
 }
+/* Redwine: added this rule to provide enough clickable spacing in the mobile display */
+#footer>.subtext> a {padding:5px}
+.storycontent {margin-left: 73px;}
 .news-body-text {
-font-size:0.85em;
+font-size:1.0em;
 padding:2px 10px 0 10px;
+/* Redwine: to prevent long urls from pushing the page to the right. Now the content wraps properly */
+word-wrap:break-word;
+/*margin-left: 73px;*/
+max-width: 720px;
+margin-top: 5px;
+text-align: justify;
 }
 .storyfooter {
 padding: 0 10px;
@@ -440,7 +450,7 @@ position:absolute;
 display:block;
 background:#fff;
 padding:10px 15px;
-font-size:0.85em;
+font-size:1.0em;
 white-space:nowrap;
 border-radius: 4px;
 box-shadow: 0 1px 2px rgba(0,0,0,.5);
@@ -449,12 +459,39 @@ box-shadow: 0 1px 2px rgba(0,0,0,.5);
 padding:2px 4px;
 }
 .group-share-popup a:hover {
-background:#2D6CE0;
+background:#183a52;
+color:#fff;
+}
+.group-unshare-popup{
+z-index:900;
+top:15px;
+left:0;
+position:absolute;
+display:block;
+background:#fff;
+padding:10px 15px;
+font-size:1.0em;
+white-space:nowrap;
+border-radius: 4px;
+box-shadow: 0 1px 2px rgba(0,0,0,.5);
+}
+.group-unshare-popup a {
+padding:2px 4px;
+}
+.group-unshare-popup a:hover {
+background:#183a52;
 color:#fff;
 }
 .read_more_article{
-display:inline;
-color:#0088CC;
+display:table-cell;
+color:#ffffff;
+background-color: #183a52;
+border: 1px solid #939a9c;
+padding: 3px;
+margin-left: 10px;
+}
+.read_more_article a {
+color: #ffffff !important;
 }
 .read_more_article:hover{
 color:#005580;
@@ -512,7 +549,7 @@ margin-bottom: 8px;
 }
 
 .comment-author p, .comment-negative p , .comment-moderated p {
-font-size: 0.85em;
+font-size: 1.0em;
 font-weight:normal;
 color:#000;
 }
@@ -626,7 +663,7 @@ margin-bottom:15px;
 margin-bottom:20px;
 }
 #aboutcontent p{
-font-size:0.85em;
+font-size:1.0em;
 }
 #navlist{
 margin:0 0 10px 0;
@@ -665,8 +702,8 @@ font-weight:normal;
 line-height:24px;
 padding:0 10px;
 margin:-1px 8px 0 0;
-background:#fff;
-color:#8A8A8A;
+background:#183a52;
+color:#ffffff;
 border: 1px solid #ccc;
 border: 1px solid rgba(0, 0, 0, 0.15);
 -webkit-border-radius: 4px;
@@ -696,7 +733,7 @@ border-bottom:1px dotted #ddd;
 }
 .simple_message_menu ul li a {
 color:#4E4E4E;
-font-size:0.85em;
+font-size:1.0em;
 }
 .simple_message_menu ul.nav-tabs li a{
 padding: 6px 10px 5px 10px;
@@ -734,6 +771,18 @@ width:23%;
 }
 #user_search_body tr td {
 vertical-align:middle;
+}
+.storycontent img {max-width:720px;margin-top:5px;padding-bottom:5px;padding: 2px 10px 0 10px;}
+.news-body-text img {max-width:720px;margin-top:5px;padding-bottom:5px;}
+@media screen and (max-width: 767px) { 
+.subtext {
+    display: inline-block;
+    line-height: 20px;
+    /*margin-left: 73px;*/
+    text-align: justify;
+    max-width: 720px;
+    padding: 2px 10px 0 10px;
+}
 }
 
 @media screen and (min-width: 992px) and (max-width: 1199px) { 
@@ -919,7 +968,8 @@ clear:both;
 .help-block, .help-inline {
 font-size:0.8em;
 clear:both;
-padding-top: 5px;
+padding: 5px;
+background-color: #d5d7d5;
 }
 
 .field-description {}
@@ -974,13 +1024,13 @@ font-weight:bold;
 font-size:1.2em;
 }
 .group_created_by {
-font-size:0.85em;
+font-size:1.0em;
 }
 .group_created_on {
-font-size:0.85em;
+font-size:1.0em;
 }
 .group_members {
-font-size:0.85em;
+font-size:1.0em;
 }
 .group_description {
 
@@ -1122,3 +1172,35 @@ margin-left:15px;
 background-color:#5CB85C !important;
 background-image:none;
 }
+/* Redwine: Roles and permissions and Groups fixes.  Fix the button for group creation */
+.strike-through {text-decoration:line-through;}
+/* Redwine: css to show the open in new tab/window icon */
+a[target="_blank"]:after {
+content: '';
+background: no-repeat url(../img/ui-icons_222222_256x240.png) -36px -82px;
+display: inline-block;
+height: 10px;
+margin: 0 3px 0 5px;
+width: 10px;
+}
+.display_img_to_upload{word-wrap:normal;text-align:justify;margin:5px 0 5px 0;}
+.site-logo{margin-top:-12px}
+
+.videoWrapper{position:relative;padding-bottom:56.25%;padding-top:25px;height:0}
+.videoWrapper iframe{position:absolute;top:0;left:0;width:100%;height:100%}
+.videoWrapper img{position:absolute;top:0;left:0;width:100%;height:100%}
+@media screen and (max-width: 767px) {
+.title h2 {
+   /* display: inline-block;
+   margin-left: 73px;*/
+   display: -webkit-box;
+    line-height: 20px;
+    text-align: justify;
+    max-width: 720px;
+    padding: 2px 10px 0 10px;
+}
+}
+.draft-scheduled{border: 1px solid #d1d1d1;padding: 5px;margin-top: 10px;}
+#btn-desc{font-size:20px;padding:5px;display:none;}
+.advanced-search{background-color:#183a52;padding:3px;}
+.advanced-search a{color:#ffffff !important;}

@@ -44,10 +44,10 @@
 		var $cache_inserts    = false;
 		var $use_disk_cache   = false;
 		var $cache_timeout    = 24; // hours
-		var $log_to_file      = false;	// create a file in your root pligg folder 
+		var $log_to_file      = false;	// create a file in your root plikli folder 
 		var $logfile 	      = 'logs/query.log';
 		var $logpath          = 'logs/query.log';																	// named query.log and chmod 755
-
+		var $log_qry_error		= 'logs/query_error.log';
 		// == TJH == default now needed for echo of debug function
 		var $debug_echo_is_on = true;
 
@@ -55,7 +55,7 @@
 		*  Constructor
 		*/
 
-		function ezSQLcore()
+		function __construct()
 		{
 		}
 

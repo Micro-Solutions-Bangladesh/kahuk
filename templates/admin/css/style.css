@@ -1,4 +1,4 @@
-/************** PLIGG ADMIN PANEL *****************/
+/************** PLIKLI ADMIN PANEL *****************/
 
 /************** GENERAL *****************/
 
@@ -455,4 +455,13 @@ table.tablesorter thead tr .headerSortUp {
 }
 table.tablesorter thead tr .headerSortDown {
 	background-image: url(../img/desc.gif);
+}
+/* Redwine: css to show the open in new tab/window icon */
+a[target="_blank"]:after {
+content: '';
+background: no-repeat url(../img/ui-icons_222222_256x240.png) -36px -82px;
+display: inline-block;
+height: 10px;
+margin: 0 3px 0 5px;
+width: 10px;
 }

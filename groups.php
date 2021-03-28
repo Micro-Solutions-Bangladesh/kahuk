@@ -9,21 +9,30 @@ include(mnminclude.'group.php');
 include(mnminclude.'smartyvariables.php');
 include mnminclude.'extra_fields_smarty.php';
 
+$sanitezedREQUEST = array();
+foreach ($_REQUEST as $key => $value) {
+	$sanitezedREQUEST[$key] = preg_replace('/[^\p{L}\p{N}-_\s\/]/u', '', $value);
+}
+$_GET = $_REQUEST = $sanitezedREQUEST;
+
 $from_where = "1";
 if (!checklevel('admin'))
     $from_where .= " AND group_status = 'Enable' ";
-elseif ($_REQUEST["approve"] && is_numeric($_REQUEST["approve"]))
+elseif (isset($_REQUEST["approve"]) && is_numeric($_REQUEST["approve"]))
     $db->query("UPDATE ".table_groups." SET group_status='Enable' WHERE group_id=".$db->escape(sanitize($_REQUEST["approve"],3)));
 
-
-    $keyword = $db->escape(sanitize(trim($_REQUEST['keyword']), 3));
-    if ($keyword) 
-    {
-		$from_where .= " AND (group_name LIKE '%$keyword%' OR group_description LIKE '%$keyword%')";
-		$main_smarty->assign('search', $keyword);
-    }
-
-if($_REQUEST["sortby"])
+	if (isset($_REQUEST['keyword'])) {
+		$_REQUEST['keyword']= preg_replace('/[^\p{L}\p{N}-_\s]/u', ' ', $_REQUEST['keyword']);
+		$keyword = $db->escape(sanitize(trim($_REQUEST['keyword']), 3));
+		if (!empty($keyword))
+		{
+			$from_where .= " AND (group_name LIKE '%$keyword%' OR group_description LIKE '%$keyword%')";
+			$main_smarty->assign('search', $keyword);
+			$main_smarty->assign('get', $_GET);
+		}
+	}
+$order_by = "";
+if(isset($_REQUEST["sortby"]))
 {
 	$sortby  = $_REQUEST["sortby"];
 	if($sortby == 'newest')
@@ -40,7 +49,13 @@ if($_REQUEST["sortby"])
 $rows = $db->get_var("SELECT count(*) FROM " . table_groups . " WHERE group_status='Enable'");
 $main_smarty->assign('total_row_for_group', $rows);
 
-
+/* Redwine: Roles and permissions and Groups fixes. Fix to Admin -> Settings -> Groups -> Max Groups User Create. Check if the user didn't exceed the max number of creating groups.*/
+$numGr = $db->get_var("SELECT count(*) FROM " .table_groups . " WHERE `group_creator` = " . $current_user->user_id);
+$max_user_groups_allowed = $main_smarty->get_template_vars('max_user_groups_allowed');
+if ($numGr >= $max_user_groups_allowed) {
+	$error_max = $main_smarty->get_config_vars('PLIKLI_Visual_Submit_A_New_Group_Error');
+	$main_smarty->assign('error_max', $error_max);
+}
 
 
 // pagename
@@ -57,7 +72,8 @@ function group_read($from_where,$order_by)
 	$offset=(get_current_page()-1)*$page_size;
 
 	// pagesize set in the admin panel
-	$search->pagesize = $page_size;
+	/* Redwine: $search->pagesize is useless and generating Warning:  Creating default object from empty value. $pagesize is already in the globals. */
+	//$search->pagesize = $page_size;
 
 	if ($order_by == "")
 		$order_by = "group_date DESC";
@@ -68,6 +84,8 @@ function group_read($from_where,$order_by)
 	
 	if ($group)
 	{
+		/* Redwine: initializing $group_display to eliminate the Notice:  Undefined variable: group_display. */
+		$group_display = "";
 		foreach($group as $groupid)
 		{
 			$group_display .= group_print_summary($groupid->group_id);
@@ -92,5 +110,5 @@ function group_read($from_where,$order_by)
 
 // show the template
 $main_smarty->assign('tpl_center', $the_template . '/group_center');
-$main_smarty->display($the_template . '/pligg.tpl');
+$main_smarty->display($the_template . '/plikli.tpl');
 ?>

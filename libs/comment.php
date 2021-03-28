@@ -51,7 +51,10 @@ class Comment {
 				$link = new Link;
 				$link->id=$this->link;
 				$link->read();
-				$link->adjust_comment(1);
+				/* Redwine: added an if statement so that if the comment was flagged as spam by the spam trigger module, we don't have to worry about recalc commetns */
+				if ($comment_status !== 'spam') {
+					$link->adjust_comment(1);
+				}
 				$link->store();
 				$link='';
 
@@ -127,8 +130,8 @@ class Comment {
 			$smarty->compile_dir = "cache/";
 			$smarty->template_dir = "templates/";
 			$smarty->config_dir = "";
-			$smarty->assign('pligg_language', pligg_language);
-			$smarty->config_load("/languages/lang_" . pligg_language . ".conf");
+			$smarty->assign('plikli_language', plikli_language);
+			$smarty->config_load("/languages/lang_" . plikli_language . ".conf");
 
 		// if we can't read the comment, return
 			if(!$this->read) return;
@@ -148,7 +151,7 @@ class Comment {
 	}
 	
 	function fill_smarty($smarty){
-		global $current_user, $the_template, $comment_counter, $link, $ranklist, $db;  
+		global $current_user, $the_template, $comment_counter, $link, $ranklist, $db, $Story_Content_Tags_To_Allow;  
 	    if (!$ranklist)
 	    {
 		$users = $db->get_results("SELECT user_karma, COUNT(*) FROM ".table_users." WHERE user_level NOT IN ('Spammer') AND user_karma>0 GROUP BY user_karma ORDER BY user_karma DESC",ARRAY_N);
@@ -164,7 +167,11 @@ class Comment {
 
 		$smarty->assign('comment_counter', $comment_counter);
 
+		if ($Story_Content_Tags_To_Allow == ''){
 		$text = save_text_to_html($this->content);
+		}else{
+			$text =  nl2br($this->content);
+		}
 		$vars = array('comment_text' => $text, 'comment_id' => $this->id, 'smarty' => $smarty);
 		check_actions('show_comment_content', $vars); 
 		$smarty->assign('comment_content', $vars['comment_text']); 
@@ -205,8 +212,8 @@ class Comment {
 		$smarty->assign('user_userlogin', $this->username);
 		
 		// the url for the edit comment link
-		$smarty->assign('edit_comment_url', getmyurl('editcomment', $this->id, $link->id));
-		$smarty->assign('delete_comment_url', my_pligg_base.'/delete.php?comment_id='.$this->id);
+		$smarty->assign('edit_comment_url', getmyurl('editcomment', $this->id, $this->link));
+		$smarty->assign('delete_comment_url', my_plikli_base.'/delete.php?comment_id='.$this->id);
 
 		// avatars
 		$smarty->assign('UseAvatars', do_we_use_avatars());
@@ -221,23 +228,23 @@ class Comment {
 		if($canIhaveAccess == 1){$smarty->assign('isadmin', 1);}
 		
 		// the link to upvote the comment
-		$jslinky = "cvote($current_user->user_id,$this->id,$this->id," . "'" . md5($current_user->user_id.$this->randkey) . "',10,'" . my_base_url . my_pligg_base . "/')";
+		$jslinky = "cvote($current_user->user_id,$this->id,$this->id," . "'" . md5($current_user->user_id.$this->randkey) . "',10,'" . my_base_url . my_plikli_base . "/')";
 		$smarty->assign('link_shakebox_javascript_votey', $jslinky);
 
-		$jslinky = "cunvote($current_user->user_id,$this->id,$this->id," . "'" . md5($current_user->user_id.$this->randkey) . "',10,'" . my_base_url . my_pligg_base . "/')";
+		$jslinky = "cunvote($current_user->user_id,$this->id,$this->id," . "'" . md5($current_user->user_id.$this->randkey) . "',10,'" . my_base_url . my_plikli_base . "/')";
 		$smarty->assign('link_shakebox_javascript_unvotey', $jslinky);
 
 		// the link to downvote the comment
-		$jslinkn = "cvote($current_user->user_id,$this->id,$this->id," . "'" . md5($current_user->user_id.$this->randkey) . "',-10,'" . my_base_url . my_pligg_base . "/')";
+		$jslinkn = "cvote($current_user->user_id,$this->id,$this->id," . "'" . md5($current_user->user_id.$this->randkey) . "',-10,'" . my_base_url . my_plikli_base . "/')";
 		$smarty->assign('link_shakebox_javascript_voten', $jslinkn);
 
-		$jslinkn = "cunvote($current_user->user_id,$this->id,$this->id," . "'" . md5($current_user->user_id.$this->randkey) . "',-10,'" . my_base_url . my_pligg_base . "/')";
+		$jslinkn = "cunvote($current_user->user_id,$this->id,$this->id," . "'" . md5($current_user->user_id.$this->randkey) . "',-10,'" . my_base_url . my_plikli_base . "/')";
 		$smarty->assign('link_shakebox_javascript_unvoten', $jslinkn);
 
 		// misc
 		$smarty->assign('Enable_Comment_Voting', Enable_Comment_Voting);
 		$smarty->assign('my_base_url', my_base_url);
-		$smarty->assign('my_pligg_base', my_pligg_base);
+		$smarty->assign('my_plikli_base', my_plikli_base);
 		$smarty->assign('Default_Gravatar_Small', Default_Gravatar_Small);
 		
 		return $smarty;
@@ -322,7 +329,8 @@ class Comment {
 
 				$vars = array('comment_id' => $this->id);
 				check_actions('comment_spam', $vars);
-
+/* Redwine: Fix the Negative votes to remove comment in Admin Panel -> Settings -> Comments -> Negative votes to remove comment. See https://github.com/Pligg/pligg-cms/commit/68a52f2e77cec7f95d5775444d213d1a6419e121 */
+				require_once(mnminclude.'link.php');
 				$link = new Link;
 				$link->id=$this->link;
 				$link->read();

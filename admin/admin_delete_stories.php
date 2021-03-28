@@ -23,96 +23,81 @@ if($canIhaveAccess == 0){
 	die();
 }
 
+function delete_storylink($todelete) {
+	global $db;
 
-function delete_storylink($linkid) {
-    if (!is_numeric($linkid)) return;
-   
-
-    $query="SELECT * FROM " . table_links . " WHERE link_id = '$linkid'";
-    if (! $result=mysql_query($query)) {error_page(mysql_error());}
-    else {$sql_array = mysql_fetch_object($result); }
-
+/* Redwine: creating a mysqli connection */
+$handle = new mysqli(EZSQL_DB_HOST,EZSQL_DB_USER,EZSQL_DB_PASSWORD,EZSQL_DB_NAME);
+	/* check connection */
+	if (mysqli_connect_errno()) {
+		printf("Connect failed: %s\n", mysqli_connect_error());
+		exit();
+	} 
     # delete the story link
-    $query="DELETE FROM " . table_links . " WHERE link_id = '$linkid'";
-    if (! $result=mysql_query($query)) {error_page(mysql_error());}
-
-    # delete the story comments
-    $query="DELETE FROM " . table_comments . " WHERE comment_link_id = '$linkid'";
-    if (! $result=mysql_query($query)) {error_page(mysql_error());}
-
-    # delete the saved links
-    $query="DELETE FROM " . table_saved_links . " WHERE saved_link_id = '$linkid'";
-    if (! $result=mysql_query($query)) {error_page(mysql_error());}
-
-    # delete the story tags
-    $query="DELETE FROM " . table_tags . " WHERE tag_link_id = '$linkid'";
-    if (! $result=mysql_query($query)) {error_page(mysql_error());}
+    $handle->query("DELETE FROM " . table_links . " WHERE link_id IN (" . $todelete.");");
+	
+	# delete the story comments
+    $handle->query("DELETE FROM " . table_comments . " WHERE comment_link_id IN (" . $todelete.");");
+    
+	# delete the saved links
+    $handle->query("DELETE FROM " . table_saved_links . " WHERE saved_link_id IN (" . $todelete.");");
+    
+	# delete the story tags
+    $handle->query("DELETE FROM " . table_tags . " WHERE tag_link_id IN (" . $todelete.");");
 
     # delete the story trackbacks
-    $query="DELETE FROM " . table_trackbacks . " WHERE trackback_link_id = '$linkid'";
-    if (! $result=mysql_query($query)) {error_page(mysql_error());}
-
-    # delete the story votes
-    $query="DELETE FROM " . table_votes . " WHERE vote_link_id = '$linkid'";
-    if (! $result=mysql_query($query)) {error_page(mysql_error());}
+    $handle->query("DELETE FROM " . table_trackbacks . " WHERE trackback_link_id IN (" . $todelete.");");
+    
+	# delete the story votes
+    $handle->query("DELETE FROM " . table_votes . " WHERE vote_link_id IN (" . $todelete.");");
 
     # delete additional categories
-    $query="DELETE FROM ".table_additional_categories." WHERE ac_link_id = '$linkid'";
-    if (! $result=mysql_query($query)) {error_page(mysql_error());}
+    $handle->query("DELETE FROM ".table_additional_categories." WHERE ac_link_id IN (" . $todelete.");");
 
     // module system hook
-    $vars = array('link_id' => $linkid);
-    check_actions('admin_story_delete', $vars);
+	$linksstr = explode(",", $todelete);
+	foreach($linksstr as $linkid) {
+		$vars = array('link_id' => $linkid);
+		check_actions('admin_story_delete', $vars);
+	}
 }
-
-
-$sql_query = "SELECT * FROM " . table_links . " WHERE link_status = 'discard'";
-
-$result_storylinks = mysql_query($sql_query);
-$num_rows = mysql_num_rows($result_storylinks);
-                while($storylink = mysql_fetch_object($result_storylinks))
-                {
-                        delete_storylink($storylink->link_id);
-                }
-
+/* Redwine: everything has been modified in this file; first to migrate to mysqli, and secondly to optimize the enormous amout of queries that are used. Below, I modified the query to only get the link_id and created an array that was imploded into a string to pass to the function above. Now the function will use the IN clause to save all the quries that were passed one at a time for each link_id. */
+$sql_query = "SELECT link_id FROM " . table_links . " WHERE link_status = 'discard'";
+$result_storylinks = $db->get_results($sql_query);
+$num_rows =count($result_storylinks);
+if ($num_rows > 0) {
+	$link_to_delete = array();
+	foreach($result_storylinks as $storylink) {
+		$links_to_delete[] = $storylink->link_id;
+	}
+	$discarded_links = implode("," , $links_to_delete);
+	delete_storylink($discarded_links);
+}
 # set discards total to zero
-$query="UPDATE " . table_totals . " SET total = '0' WHERE name = 'discard'";
-if (!mysql_query($query)) error_page(mysql_error());
-
-$query="DELETE FROM " . table_tag_cache;
-if (!mysql_query($query)) {error_page(mysql_error());}
+$db->query("UPDATE " . table_totals . " SET total = '0' WHERE name = 'discard'");
+/* Redwine: empty the table tag cache to rebuild it. */
+$db->query("DELETE FROM " . table_tag_cache);
 
 # Redwine - Sidebar tag cache fix
-$sql="INSERT INTO ".table_tag_cache." select tag_words, count(DISTINCT link_id) as count FROM ".table_tags.", ".table_links." WHERE tag_lang='en' and link_id = tag_link_id and (link_status='published' OR link_status='new') GROUP BY tag_words order by count desc";
-if (!mysql_query($sql)) {error_page(mysql_error());}
-
-
+$db->query("INSERT INTO ".table_tag_cache." select tag_words, count(DISTINCT link_id) as count FROM ".table_tags.", ".table_links." WHERE tag_lang='en' and link_id = tag_link_id and (link_status='published' OR link_status='new') GROUP BY tag_words order by count desc");
 ?>
 
 <div class="modal-dialog">
 	<div class="modal-content">
 		<div class="modal-header">
 			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-			<h4 class="modal-title"><?php echo $main_smarty->get_config_vars('PLIGG_Visual_AdminPanel_Discarded_Stories_Removed') ?></h4>
+			<h4 class="modal-title"><?php echo $main_smarty->get_config_vars('PLIKLI_Visual_AdminPanel_Discarded_Stories_Removed') ?></h4>
 		</div>
 		<div class="modal-body">
 			<?php
-				$query = "SHOW TABLE STATUS";
-				$result=mysql_query($query);
-				$table_list = "";
-				while ($cur_table = mysql_fetch_object($result)) {
-					$table_list .= $cur_table->Name.", ";
-				}
+			include_once('../libs/dbconnect.php');
+			/* Redwine: new query created to get the optimize table query in one shot and therefore save some processing time and cpu.*/
+			$query = "SELECT CONCAT('OPTIMIZE TABLE ', GROUP_CONCAT(table_name) , ';' ) AS statement FROM information_schema.tables WHERE table_schema = '".EZSQL_DB_NAME."' AND table_name LIKE '".table_prefix."%';";
 
-				if (!empty($table_list)) {
-					$table_list = substr($table_list, 0, -2);
-					$query = "OPTIMIZE TABLE ".$table_list;
-					mysql_query($query);
-				if (mysql_error())
-					echo '<p>'.mysql_error().'</p>';
-				else
-					echo '<p><strong>'.$num_rows.'</strong> '.$main_smarty->get_config_vars("PLIGG_Visual_AdminPanel_Discarded_Stories_Removed_Message").'</p>';
-				}
+				$sqlqry = $db->get_var($query);
+				$db->query($sqlqry);
+			
+				echo '<p><strong>'.$num_rows.'</strong> '.$main_smarty->get_config_vars("PLIKLI_Visual_AdminPanel_Discarded_Stories_Removed_Message");
 			?>
 		</div>
 		<div class="modal-footer">

@@ -28,7 +28,7 @@ $canIhaveAccess = $canIhaveAccess + checklevel('moderator');
 
 if($canIhaveAccess == 0){	
 //	$main_smarty->assign('tpl_center', '/admin/access_denied');
-//	$main_smarty->display($template_dir . '/admin/admin.tpl');		
+//	$main_smarty->display('/admin/admin.tpl');		
 	header("Location: " . getmyurl('admin_login', $_SERVER['REQUEST_URI']));
 	die();
 }
@@ -37,7 +37,7 @@ if($canIhaveAccess == 0){
 $main_smarty->assign('isAdmin', $canIhaveAccess);
 
 // sidebar
-$main_smarty = do_sidebar($main_smarty);
+//$main_smarty = do_sidebar($main_smarty);
 
 	$randkey = rand(1000000,100000000);
 	$main_smarty->assign('randkey', $randkey);
@@ -64,12 +64,10 @@ if(isset($_REQUEST['link_id'])){
 	}
 }
 
-// read the mysql database to get the pligg version
-$sql = "SELECT data FROM " . table_misc_data . " WHERE name = 'pligg_version'";
-$pligg_version = $db->get_var($sql);
-$main_smarty->assign('version_number', $pligg_version);
+// read the mysql database to get the plikli version
+/* Redwine: plikli version query removed and added to /libs/smartyvriables.php */
 
-if($_REQUEST['process']=='edit_page'){
+if(isset($_REQUEST['process']) && $_REQUEST['process']=='edit_page'){
 	global $current_user,$db;
    if (!$_REQUEST['page_url'])
 	$_REQUEST['page_url'] = $_REQUEST['page_title'];
@@ -89,7 +87,7 @@ if($_REQUEST['process']=='edit_page'){
 			    $db->query("INSERT INTO ".table_old_urls." SET old_link_id=$link_id, old_title_url='$old_url'");
 
 			$sql = " UPDATE ".table_links." SET `link_modified` = NOW( ) , `link_title` = '$page_title', `link_title_url` = '$page_url', `link_content` = '$page_content', link_field1='$page_keywords', link_field2='$page_description' WHERE `link_id` =".$link_id." LIMIT 1 ";
-			$result = @mysql_query ($sql); 
+			$result = $db->query($sql); 
 			if($result==1){
 				header('Location: '.getmyurl("page", $page_url));
 				die();
@@ -99,7 +97,7 @@ if($_REQUEST['process']=='edit_page'){
   }
 // show the template
 $main_smarty->assign('tpl_center', '/admin/page_edit');
-$main_smarty->display($template_dir . '/admin/admin.tpl');	
+$main_smarty->display('/admin/admin.tpl');	
 
 ?>
 

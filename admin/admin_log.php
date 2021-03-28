@@ -21,7 +21,7 @@ if($canIhaveAccess == 0){
 	die();
 }
 
-if ($_GET['clear'])
+if (isset($_GET['clear']))
 {
     $fp = fopen('../'.LOG_FILE, "a");
     ftruncate($fp,0);
@@ -36,6 +36,6 @@ $main_smarty->assign('pagename', pagename);
 
 // show the template
 $main_smarty->assign('tpl_center', '/admin/error_log');
-$main_smarty->display($template_dir . '/admin/admin.tpl');
+$main_smarty->display('/admin/admin.tpl');
 
 ?>

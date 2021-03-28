@@ -11,7 +11,7 @@ include(mnminclude.'smartyvariables.php');
 include_once(mnminclude.'user.php');
 
 $requestID = isset($_GET['id']) && is_numeric($_GET['id']) ? $_GET['id'] : 0; 
-
+$thecat = array();
 if(isset($_GET['title']) && sanitize($_GET['title'], 3) != ''){$requestTitle = sanitize($_GET['title'], 3);}
 // if we're using "Friendly URL's for categories"
 if(isset($_GET['category']) && sanitize($_GET['category'], 3) != '')
@@ -36,7 +36,7 @@ if($requestID > 0 && enable_friendly_urls == true){
 				      (array_diff($thecat, $link->additional_cats, array($link->category)) || 
 				       sizeof($thecat)!=sizeof($link->additional_cats)+1)))
 	{
-		header("Location: $my_pligg_base/error_404.php");
+		header("Location: $my_plikli_base/error_404.php");
 		die();
 	}
 
@@ -50,10 +50,10 @@ if($requestID > 0 && enable_friendly_urls == true){
 
 // if we're using "Friendly URL's for stories"
 if(isset($requestTitle)){
-	$requestID = $db->get_var($sql="SELECT link_id FROM " . table_links . " WHERE `link_title_url` = '".$db->escape(sanitize($requestTitle,4))."';");
+	$requestID = $db->get_var("SELECT link_id FROM " . table_links . " WHERE `link_title_url` = '".$db->escape(sanitize($requestTitle,4))."';");
 	// Search in old urls if not found
 	if (!is_numeric($requestID)) 
-		$requestID = $db->get_var($sql="SELECT old_link_id FROM " . table_old_urls . " WHERE `old_title_url` = '".$db->escape(sanitize($requestTitle,4))."';");
+		$requestID = $db->get_var("SELECT old_link_id FROM " . table_old_urls . " WHERE `old_title_url` = '".$db->escape(sanitize($requestTitle,4))."';");
 }
 
 if(is_numeric($requestID)) {
@@ -69,7 +69,7 @@ if(is_numeric($requestID)) {
 		include(mnminclude.'redirector.php');
 		$x = new redirector($_SERVER['REQUEST_URI']);
 
-		header("Location: $my_pligg_base/error_404.php");
+		header("Location: $my_plikli_base/error_404.php");
 		die();
 	}
 
@@ -77,7 +77,8 @@ if(is_numeric($requestID)) {
 	if ($link->link_group_id)
 	{
 	    $privacy = $db->get_var("SELECT group_privacy FROM " . table_groups . " WHERE group_id = {$link->link_group_id}");
-	    if ($privacy == 'private' && !isMember($link->link_group_id))
+		/* Redwine: added check level admin and moderator because site admins & moderators could't have access to the private story to check it for moderation */
+	    if ($privacy == 'private' && !checklevel('admin') && !checklevel('moderator') && !isMember($link->link_group_id))
 	    {
 		die('Access denied');
 	    }
@@ -89,6 +90,11 @@ if(is_numeric($requestID)) {
 		
 			$vars = array('user_id' => $link->author,'link_id' => $link->id);
 			check_actions('comment_subscription', $vars);
+			/*Redwine: ADDED: we want to check if the user solved the captcha. If not, we issue a warning to go back and solve it!*/
+			check_actions('story_insert_comment',$vars);
+			if(isset($vars['error']) && $vars['error'] == true && comment_catcha_errors('captcha_error')){
+				return;
+			}
 			insert_comment();
 		}
 	}
@@ -106,7 +112,7 @@ if(is_numeric($requestID)) {
 	$main_smarty->assign('link_submitter', $link->username());
 
 	// setup breadcrumbs and page title
-	$main_smarty->assign('posttitle', $link->title);
+	$main_smarty->assign('posttitle', htmlspecialchars($link->title));
 	$navwhere['text1'] = $globals['category_name'];
 	$navwhere['link1'] = getmyurl('maincategory', $globals['category_url']);
 	$navwhere['text2'] = $link->title;
@@ -121,7 +127,7 @@ if(is_numeric($requestID)) {
 	$main_smarty->assign('link_id', $link->id);
 	$main_smarty->assign('user_id', $current_user->user_id);
 	$main_smarty->assign('randmd5', md5($current_user->user_id.$randkey));
-	
+	$main_smarty->assign('Story_Content_Tags_To_Allow', htmlspecialchars($Story_Content_Tags_To_Allow)); 
 	if(!$current_user->authenticated){
 		$vars = '';
 		check_actions('anonymous_user_id', $vars);
@@ -138,14 +144,16 @@ if(is_numeric($requestID)) {
 
 	// misc smarty
 	$main_smarty->assign('Enable_Comment_Voting', Enable_Comment_Voting);
-	$main_smarty->assign('enable_show_last_visit', enable_show_last_visit);
+	//$main_smarty->assign('enable_show_last_visit', enable_show_last_visit);
 	$main_smarty->assign('UseAvatars', do_we_use_avatars());
 	$main_smarty->assign('related_title_url', getmyurl('storytitle', ""));
 	$main_smarty->assign('related_story', related_stories($id, $link->tags, $link->category));
 
 	// meta tags
 	$meta_description = preg_replace(array('/\r/', '/\n/'), '', $link->truncate_content());
-	$main_smarty->assign('meta_description', strip_tags($meta_description));
+	$meta_description = strip_tags($meta_description);
+	$meta_description = htmlspecialchars($meta_description);
+	$main_smarty->assign('meta_description', $meta_description);
 	$main_smarty->assign('meta_keywords', $link->tags);
 	
 	//sidebar
@@ -163,7 +171,7 @@ if(is_numeric($requestID)) {
     $main_smarty->assign('story_url',$story_url);
 	$main_smarty->assign('the_story', $link->print_summary('full', true));
 	
-	
+	settype($_GET['comment_id'], "integer");
 	$parent_comment_id=sanitize($_GET['comment_id'], 3);
 	
 	if(isset($_GET['reply']) && !empty($parent_comment_id)){
@@ -184,16 +192,16 @@ if(is_numeric($requestID)) {
 	$main_smarty->assign('URL_rss_page', getmyurl('storyrss', isset($requestTitle) ? $requestTitle : urlencode($link->title_url), $link->category_safe_name($link->category)));
 
 	$main_smarty->assign('tpl_center', $the_template . '/story_center');
-	$main_smarty->display($the_template . '/pligg.tpl');
+	$main_smarty->display($the_template . '/plikli.tpl');
 } else {
 
 	// check for redirects
 	include(mnminclude.'redirector.php');
 	$x = new redirector($_SERVER['REQUEST_URI']);
 	
-	header("Location: $my_pligg_base/error_404.php");
+	header("Location: $my_plikli_base/error_404.php");
 //	$main_smarty->assign('tpl_center', 'error_404_center');
-//	$main_smarty->display($the_template . '/pligg.tpl');		
+//	$main_smarty->display($the_template . '/plikli.tpl');		
 	die();
 }
 
@@ -264,12 +272,12 @@ function get_comments ($fetch = false, $parent = 0, $comment_id=0, $show_parent=
 
 
 function insert_comment () {
-	global $link, $db, $current_user, $main_smarty, $the_template, $story_url;
+	global $link, $db, $current_user, $main_smarty, $the_template, $story_url, $Story_Content_Tags_To_Allow;
 
-        
+/* Redwine: Spam Trigger Module was not working as intended. Fix provided by modifying 8 files.">Spam Trigger Module was not working as intended. https://github.com/Pligg/pligg-cms/commit/2faf855793814f82d7c61a8745a93998c13967e0 */        
 		$main_smarty->assign('TheComment',$_POST['comment_content']);
 		
-	if($vars['error'] == true){
+	if(isset($vars['error']) && $vars['error'] == true){
 		$error = true;
 		return;
 	}
@@ -280,29 +288,32 @@ function insert_comment () {
 	
 	//anonymous comment
 	$cancontinue_anon = false;
-	$anon = $_POST['anon'];
-
-	$comment->content=sanitize($_POST['comment_content'], 4);
+	if (isset($_POST['anon'])) $anon = $_POST['anon'];
+	$comment->content=sanitize($_POST['comment_content'], 4, $Story_Content_Tags_To_Allow); 
+	//$comment->content=sanitize($_POST['comment_content'], 4);
 	if (strlen($comment->content) > maxCommentLength)
 	{
 		$main_smarty->assign('url', $_SERVER['REQUEST_URI']);
+/*Redwine: added smarty assign for the length of the comment to be able to provide the relevant warning in the comments_error.tpl*/
+		$main_smarty->assign('max_Comment_Length', 'comment_too_long');
 		$main_smarty->assign('tpl_center', $the_template . '/comment_errors');
-		$main_smarty->display($the_template . '/pligg.tpl');
+		$main_smarty->display($the_template . '/plikli.tpl');
 		exit;
 	}
-
+	settype($_POST['randkey'], "integer");
+	if ($_POST['randkey'] > 0) {
 	if(sanitize($_POST['link_id'], 3) == $link->id && $current_user->authenticated && sanitize($_POST['user_id'], 3) == $current_user->user_id &&	sanitize($_POST['randkey'], 3) > 0) 
 	{
-		if(sanitize($_POST['comment_content'], 4) != '')
+		if(sanitize($_POST['comment_content'], 4, $Story_Content_Tags_To_Allow) != '')
 			// this is a normal new comment
 			$cancontinue = true;
-		if (is_array($_POST['reply_comment_content']))
+		if (isset($_POST['reply_comment_content']) && is_array($_POST['reply_comment_content']))
 		{
 		    // comment replies
 		    foreach ($_POST['reply_comment_content'] as $id => $value)
 		    	if ($id > 0 && $value)
 		    	{
-			    $comment->content = sanitize($value, 4);
+					$comment->content = sanitize($value, 4, $Story_Content_Tags_To_Allow);
 			    $comment->parent= $id;
 			    $cancontinue = true;
 			    break;
@@ -318,12 +329,16 @@ function insert_comment () {
 				$error = true;
 			elseif(!$current_user->authenticated)
 			{
-				$vars = array('link_id' => $link->id,'randkey' => $_POST['randkey'],'user_id' => $_POST['user_id'],'a_email' => $_POST['a_email'],'a_username' => $_POST['a_username'],'a_website' => $_POST['a_website'],'comment_content' => sanitize($_POST['comment_content'],4));
+				$vars = array('link_id' => $link->id,'randkey' => $_POST['randkey'],'user_id' => $_POST['user_id'],'a_email' => $_POST['a_email'],'a_username' => $_POST['a_username'],'a_website' => $_POST['a_website'],'comment_content' => sanitize($_POST['comment_content'],4, $Story_Content_Tags_To_Allow));
 				check_actions('anonymous_comment', $vars);
 			}
 		}
 	}
-
+	}else{
+		$story_url = getmyurl("storyURL", $link->category_safe_names(), urlencode($link->title_url), $link->id);
+		//$story_url;
+		header('Location: '.$story_url);
+	}
     $parrent_comment_id=sanitize($_POST['parrent_comment_id'], 3);
 	if($cancontinue == true)
 	{
@@ -335,8 +350,10 @@ function insert_comment () {
 		
 		$comment->randkey=sanitize($_POST['randkey'], 3);
 		$comment->author=sanitize($_POST['user_id'], 3);
+/* Redwine: Spam Trigger Module was not working as intended. Fix provided by modifying 8 files.">Spam Trigger Module was not working as intended. https://github.com/Pligg/pligg-cms/commit/2faf855793814f82d7c61a8745a93998c13967e0 */
 		$vars = array('comment'=>&$comment);
-		check_actions('story_insert_comment',$vars);
+		
+		
 		if($vars['comment']->status)
 		    $comment->status = $vars['comment']->status;
 		$comment->store();
@@ -344,10 +361,24 @@ function insert_comment () {
 		check_actions( 'after_comment_submit', $vars ) ;
 		$story_url = getmyurl("storyURL", $link->category_safe_names(), urlencode($link->title_url), $link->id);
 		//$story_url;
-		header('Location: '.$story_url."#comment-reply-".$comment->id);
-		die;
+		header('Location: '.$story_url."#comment-reply-".$vars['comment']);
+		
+		//die;
 	}	
 }
+/*Redwine: ADDED: we want to check if the user solved the captcha. If not, we issue a warning to go back and solve it!*/
+function comment_catcha_errors($linkerror)
+{
+	global $main_smarty, $the_template;
+	$error = false;
 
-
+	if($linkerror == 'captcha_error') {
+		$main_smarty->assign('submit_error', 'register_captcha_error');
+		$main_smarty->assign('tpl_center', $the_template . '/comment_errors');
+		$main_smarty->display($the_template . '/plikli.tpl');
+#		$main_smarty->display($the_template . '/submit_errors.tpl');
+		$error = true;
+	}
+	return $error;
+}
 ?>

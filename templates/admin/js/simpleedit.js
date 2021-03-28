@@ -26,9 +26,9 @@ function save_changes(id,form)
 
     var editme = document.getElementById('editme'+id);
     if (form.var_value.type=='text')
-    	value = form.var_value.value;
+    	value = form.var_value.value.trim();
     else
-    	value = form.var_value.options[form.var_value.selectedIndex].value;
+    	value = form.var_value.options[form.var_value.selectedIndex].value.trim();
     editme.innerHTML=htmlentities(value);
     if(XMLHttpRequestObject)
     {

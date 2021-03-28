@@ -36,14 +36,16 @@ if ($main_smarty)
     $get = array();
     foreach ($_GET as $k => $v)
 	$get[$k] = stripslashes(htmlentities(strip_tags($v),ENT_QUOTES,'UTF-8'));
-    $get['return'] = addslashes($get['return']);
-    $main_smarty->assign('get',$get);           
+	if (isset($get['return'])) { 
+		$get['return'] = addslashes($get['return']);
+	}
+    $main_smarty->assign('get',$get);
 }
 
 // CSFR/XSFR protection
 if(!isset($_SESSION)) @session_start();
 
-if ($_SESSION['xsfr']){
+if (!empty($_SESSION['xsfr'])){
     $xsfr_first_page = 0;
 } else {
     $xsfr_first_page = 1;
@@ -55,7 +57,7 @@ if ($_SESSION['xsfr']){
 define("mnmpath", dirname(__FILE__).'/');
 define("mnminclude", dirname(__FILE__).'/libs/');
 define("mnmmodules", dirname(__FILE__).'/modules/');
-
+define("mnminternal", dirname(__FILE__).'/internal/');
 include_once mnminclude . 'pre_install_check.php';
 include_once 'settings.php';
 
@@ -64,9 +66,21 @@ function sanit($var){
 }
 
 if ($my_base_url == ''){
+	$gethttphost = $_SERVER["HTTP_HOST"];
+	$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http') . '://';
+	$port = strpos($gethttphost, ':');
+    if ($port !== false){ 
+		$httphost = substr($gethttphost, 0, $port);
+	}else{
+		$httphost = $gethttphost;
+	}
+	$standardport = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 443 : 80); 
+	$waitTimeoutInSeconds = 1; 
+	if($fp = fsockopen($httphost,$standardport,$errCode,$errStr,$waitTimeoutInSeconds)){   
+		define('my_base_url', $protocol . $httphost);
+	}
+	fclose($fp);
 
-	define('my_base_url', "http://" . $_SERVER["HTTP_HOST"]);
-	
 	if(isset($_REQUEST['action'])){
 		$action = sanit($_REQUEST['action']);
 	} else {
@@ -75,44 +89,44 @@ if ($my_base_url == ''){
 
 	$pos = strrpos($_SERVER["SCRIPT_NAME"], "/");
 	$path = substr($_SERVER["SCRIPT_NAME"], 0, $pos);
-	
+
 	if ($path == "/"){
 		$path = "";
 	}
 
-	define('my_pligg_base', $path);
-	$my_pligg_base = $path;
+	define('my_plikli_base', $path);
+	$my_plikli_base = $path;
 
 } else {
 	define('my_base_url', $my_base_url);
-	define('my_pligg_base', $my_pligg_base);
+	define('my_plikli_base', $my_plikli_base);
 }
 
 define('urlmethod', $URLMethod);
 
 if(isset($_COOKIE['template'])){
 	$thetemp = str_replace('..','',sanit($_COOKIE['template']));
-} 
+}
 
 // template check
-$file = dirname(__FILE__) . '/templates/' . $thetemp . "/pligg.tpl";
+$file = dirname(__FILE__) . '/templates/' . $thetemp . "/plikli.tpl";
 unset($errors);
-if (!file_exists($file)) { 
-	$errors[]='You may have typed the template name wrong or "'. $thetemp . '" does not exist. Click <a href = "admin/admin_config.php?page=Template">here</a> to fix it.'; 
+if (!file_exists($file)) {
+	$errors[]='You may have typed the template name wrong or "'. $thetemp . '" does not exist. Click <a href = "../admin/admin_config.php?page=Template">here</a> to fix it.';
 }
 
 if (isset($errors)) {
-	// Name of the default Pligg template
+	// Name of the default Plikli template
 	$thetemp = "bootstrap";
-	$file = dirname(__FILE__) . '/templates/' . $thetemp . "/pligg.tpl";
+	$file = dirname(__FILE__) . '/templates/' . $thetemp . "/plikli.tpl";
 	if (!file_exists($file)) {
-		echo 'The default template "Bootstrap" does not exist anymore. Please fix this by reuploading the Bootstrap template!'; 
+		echo 'The default template "Bootstrap" does not exist anymore. Please fix this by reuploading the Bootstrap template!';
 		die();
 	}
 
 	foreach ($errors as $error) {
 		$output.="<p><b>Error:</b> $error</p>\n";
-	}	
+	}
 
 	if (strpos($_SERVER['SCRIPT_NAME'], "admin_config.php") == 0 && strpos($_SERVER['SCRIPT_NAME'], "login.php") == 0){
 		echo "<p><b>Error:</b> $error</p>\n";
@@ -159,7 +173,7 @@ include_once mnminclude.'define_tables.php';
 	$cached_users = array();
 
 	// a simple cache type system for the totals table
-	// functions related to this are in /libs/html1.php	
+	// functions related to this are in /libs/html1.php
 	$cached_totals = array();
 	$cached_votes = array();
 	$cached_links = array();
@@ -193,7 +207,7 @@ if (!file_exists(dirname(__FILE__) . '/languages/lang_'.$language.'.conf')) {
 	// If all else fails, default to the english language file
 	$language = 'english';
 }
-define('pligg_language', $language);
+define('plikli_language', $language);
 
 if (!file_exists(dirname(__FILE__) . '/languages/lang_'.$language.'.conf')) {
 	die('The language file /languages/lang_' . $language . '.conf does not exist. Either this file is missing or the server does not have permission to read it. Make sure that you renamed the file /languages/lang_' . $language . '.conf.default to /languages/lang_' . $language . '.conf.');

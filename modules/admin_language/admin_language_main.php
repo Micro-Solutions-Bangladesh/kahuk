@@ -23,13 +23,13 @@ class LangFiles implements Iterator {
 	global $db;
 
 	// Main language file
-	$this->files = array(mnmpath.'/languages/lang_'.pligg_language.'.conf' => '');
+	$this->files = array(mnmpath.'/languages/lang_'.plikli_language.'.conf' => '');
 
    	// Fill files array from installed modules
 	$modules = $db->get_results('SELECT * from ' . table_modules . ' order by weight asc;');
 	foreach ($modules as $module) {
-	    if (file_exists(mnmmodules.$module->folder.'/lang_'.pligg_language.'.conf'))
-		$this->files[mnmmodules.$module->folder.'/lang_'.pligg_language.'.conf'] = $module->name;
+	    if (file_exists(mnmmodules.$module->folder.'/lang_'.plikli_language.'.conf'))
+		$this->files[mnmmodules.$module->folder.'/lang_'.plikli_language.'.conf'] = $module->name;
 	    elseif (file_exists(mnmmodules.$module->folder.'/lang.conf'))
 		$this->files[mnmmodules.$module->folder.'/lang.conf'] = $module->name;
 	}
@@ -48,7 +48,7 @@ class LangFiles implements Iterator {
     /**
      * Replace given line in given file
      *
-     * @param string $id Pligg language constant
+     * @param string $id Plikli language constant
      * @param string $value New value to save
      * @param string $file Full path to language file
      * @return string Error or empty on success
@@ -121,7 +121,7 @@ function admin_language_showpage(){
 	include_once(mnminclude.'tags.php');
 	include_once(mnminclude.'smartyvariables.php');
 	
-	$main_smarty = do_sidebar($main_smarty);
+	//$main_smarty = do_sidebar($main_smarty);
 
 	force_authentication();
 	$canIhaveAccess = 0;
@@ -133,7 +133,7 @@ function admin_language_showpage(){
 		$files = new LangFiles();
 
 		// Update a line
-		if($_GET["mode"] == "save") {
+		if(isset($_GET["mode"]) && $_GET["mode"]== "save") {
 #echo "ankan";
 			if ($error = $files->set($_REQUEST['edit'], js_urldecode($_REQUEST['newvalue']), $_REQUEST['file']))
 				echo "<strong>$error</strong>";
@@ -190,25 +190,25 @@ function admin_language_showpage(){
 		    $main_smarty->assign('lines', $lines);
 
 		// breadcrumbs
-			$navwhere['text1'] = $main_smarty->get_config_vars('PLIGG_Visual_Header_AdminPanel');
+			$navwhere['text1'] = $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel');
 			$navwhere['link1'] = getmyurl('admin', '');
 			$navwhere['text2'] = "Modify Language";
-			$navwhere['link2'] = my_pligg_base . "/module.php?module=admin_language";
+			$navwhere['link2'] = my_plikli_base . "/module.php?module=admin_language";
 			$main_smarty->assign('navbar_where', $navwhere);
-			$main_smarty->assign('posttitle', " | " . $main_smarty->get_config_vars('PLIGG_Visual_Header_AdminPanel'));
+			$main_smarty->assign('posttitle', " | " . $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel'));
 		// breadcrumbs
 
 			//Method for identifying modules rather than pagename
 			define('modulename', 'admin_language'); 
 			$main_smarty->assign('modulename', modulename);
 			
-			define('pagename', 'admin_modifylanguage'); 
+			if (!defined('pagename')) define('pagename', 'admin_modifylanguage'); 
 			$main_smarty->assign('pagename', pagename);
 			
-		    	$main_smarty->assign('editinplace_init', $editinplace_init);
+		    	//$main_smarty->assign('editinplace_init', $editinplace_init);
 
 			$main_smarty->assign('tpl_center', admin_language_tpl_path . 'admin_language_main');
-			$main_smarty->display($template_dir . '/admin/admin.tpl');
+			$main_smarty->display('/admin/admin.tpl');
 		}
 	}
 	else

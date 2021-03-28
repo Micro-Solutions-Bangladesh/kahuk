@@ -6,15 +6,17 @@
 {if !$link_summary_output && $pagename == 'index' && count($templatelite.get) == 0}
 	{* Welcome message for new installations *}
 	<div class="well blank_index">
-		<h2>Welcome to Pligg CMS!</h2>
-		<p style="font-size:1.0em;">It looks like you've just set up a new Pligg website. Now would be a good time to submit your first article and then publish it to the homepage.</p>
-		<p><a href="submit.php" class="btn btn-primary">Submit Your First Entry</a></p>
+		{* Redwine: I added the hard coded text to the language files and replaced it with its language constant here, thus making it available and compliant with language changing *}
+		<h2>{#PLIKLI_Visual_Welcome_to#} {#PLIKLI_Visual_Name#}</h2>
+		<p style="font-size:1.0em;">{#PLIKLI_Visual_Welcome_to_Message#}</p>
+		<p><a href="submit.php" class="btn btn-primary">{#PLIKLI_Visual_Welcome_to_Submit_First_Story#}</a></p>
 	</div>
+{else}
+	{$link_summary_output}
 {/if}
-
-{$link_summary_output}
-
-{checkActionsTpl location="tpl_pligg_pagination_start"}
+{checkActionsTpl location="tpl_plikli_pagination_start"}
+{if $link_summary_output neq ''}
 {$link_pagination}
-{checkActionsTpl location="tpl_pligg_pagination_end"}
+{/if}
+{checkActionsTpl location="tpl_plikli_pagination_end"}
 <!--/index_center.tpl -->

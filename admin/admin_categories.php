@@ -11,9 +11,9 @@ include_once(mnminclude.'dbtree.php');
 include(mnminclude.'csrf.php');
 include(mnminclude.'document_class.php');
 
-$PliggDoc->add_js(my_base_url.my_pligg_base."/templates/admin/js/move.js");
+$PlikliDoc->add_js(my_base_url.my_plikli_base."/templates/admin/js/move.js");
 
-$PliggDoc->get_js();
+$PlikliDoc->get_js();
 
 check_referrer();
 
@@ -26,7 +26,7 @@ $canIhaveAccess = $canIhaveAccess + checklevel('admin');
 
 if($canIhaveAccess == 0){	
 //	$main_smarty->assign('tpl_center', '/admin/access_denied');
-//	$main_smarty->display($template_dir . '/admin/admin.tpl');		
+//	$main_smarty->display('/admin/admin.tpl');		
 	header("Location: " . getmyurl('admin_login', $_SERVER['REQUEST_URI']));
 	die();
 }
@@ -37,12 +37,12 @@ if(caching == 1){
 }
 
 // breadcrumbs and page title
-$navwhere['text1'] = $main_smarty->get_config_vars('PLIGG_Visual_Header_AdminPanel');
+$navwhere['text1'] = $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel');
 $navwhere['link1'] = getmyurl('admin', '');
-$navwhere['text2'] = $main_smarty->get_config_vars('PLIGG_Visual_Header_AdminPanel_2');
-$navwhere['link2'] = my_pligg_base . "/admin_categories.php";
+$navwhere['text2'] = $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel_2');
+$navwhere['link2'] = my_plikli_base . "/admin_categories.php";
 $main_smarty->assign('navbar_where', $navwhere);
-$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('PLIGG_Visual_Header_AdminPanel'));
+$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel'));
 
 if($canIhaveAccess == 1)
 {
@@ -54,7 +54,7 @@ if($canIhaveAccess == 1)
 	$main_smarty->clear_cache();
 	$main_smarty->cache = false; 
 
-	$main_smarty = do_sidebar($main_smarty);
+	//$main_smarty = do_sidebar($main_smarty);
 
 	$smarty = $main_smarty;
 	$main_smarty = $smarty;	
@@ -63,10 +63,8 @@ if($canIhaveAccess == 1)
 	define('pagename', 'admin_categories'); 
 	$main_smarty->assign('pagename', pagename);
 	
-	// read the mysql database to get the pligg version
-	$sql = "SELECT data FROM " . table_misc_data . " WHERE name = 'pligg_version'";
-	$pligg_version = $db->get_var($sql);
-	$main_smarty->assign('version_number', $pligg_version);
+	// read the mysql database to get the plikli version
+	/* Redwine: plikli version query removed and added to /libs/smartyvriables.php */
 
 	rebuild_the_tree();
 	ordernew();
@@ -86,17 +84,22 @@ if($canIhaveAccess == 1)
 	}
 	
 	if($action == "save"){
-	    $CSRF->check_expired('category_manager');
-	    if ($CSRF->check_valid(sanitize($_POST['token'], 3), 'category_manager')){
+		// Redwine: if TOKEN is empty, no need to continue, just display the invalid token error.
+		if (empty($_POST['token'])) {
+			$CSRF->show_invalid_error(1);
+			exit;
+		}
+		// Redwine: if valid TOKEN, proceed. A valid integer must be equal to 2.
+	    if ($CSRF->check_valid(sanitize($_POST['token'], 3), 'category_manager') == 2){
 		    if (!$_POST['safename'])
 		    {
 			$_POST['safename'] = makeCategoryFriendly($_POST['name']);
-			$row = $db->get_row("SELECT * FROM ".table_categories." WHERE category_safe_name='".mysql_real_escape_string(sanitize($_POST['safename'],4))."' AND category__auto_id!='{$_POST['auto_id']}'");
+			$row = $db->get_row("SELECT * FROM ".table_categories." WHERE category_safe_name='".$db->escape(sanitize($_POST['safename'],4))."' AND category__auto_id!='{$_POST['auto_id']}'");
 			$i = '';
 			while ($row->category_id>0)
 			{
 			    $i++;
-			    $row = $db->get_row("SELECT * FROM ".table_categories." WHERE category_safe_name='".mysql_real_escape_string(sanitize($_POST['safename'].$i,4))."' AND category__auto_id!='{$_POST['auto_id']}'");
+			    $row = $db->get_row("SELECT * FROM ".table_categories." WHERE category_safe_name='".$db->escape(sanitize($_POST['safename'].$i,4))."' AND category__auto_id!='{$_POST['auto_id']}'");
 			}
 			$_POST['safename'].=$i;
 		    }
@@ -115,37 +118,37 @@ if($canIhaveAccess == 1)
 			}
 			if($id == $parent) {header("Location: admin_categories.php");die();}
 	
-			$db->query("UPDATE `" . table_categories . "` SET category_name='".mysql_real_escape_string(sanitize($_POST['name'],4))."',
-								  category_safe_name='".mysql_real_escape_string(sanitize($_POST['safename'],4))."',
-								  category_parent='".mysql_real_escape_string(sanitize($_POST['parent'],4))."',
-								  category_desc='".mysql_real_escape_string(sanitize($_POST['description'],4))."',
-								  category_keywords='".mysql_real_escape_string(sanitize($_POST['keywords'],4))."',
-								  category_author_level='".mysql_real_escape_string(sanitize($_POST['level'],4))."',
-								  category_author_group='".mysql_real_escape_string(sanitize($_POST['group'],4))."',
-								  category_votes='".mysql_real_escape_string(sanitize($_POST['votes'],4))."',
-								  category_karma='".mysql_real_escape_string(sanitize($_POST['karma'],4))."'
+			$db->query("UPDATE `" . table_categories . "` SET category_name='".$db->escape(sanitize($_POST['name'],4))."',
+								  category_safe_name='".$db->escape(sanitize($_POST['safename'],4))."',
+								  category_parent='".$db->escape(sanitize($_POST['parent'],4))."',
+								  category_desc='".$db->escape(sanitize($_POST['description'],4))."',
+								  category_keywords='".$db->escape(sanitize($_POST['keywords'],4))."',
+								  category_author_level='".$db->escape(sanitize($_POST['level'],4))."',
+								  category_author_group='".$db->escape(sanitize($_POST['group'],4))."',
+								  category_votes='".$db->escape(sanitize($_POST['votes'],4))."',
+								  category_karma='".$db->escape(sanitize($_POST['karma'],4))."'
 								  WHERE category__auto_id='{$_POST['auto_id']}'");
 		    }
 		    else
 		    {
-			$row = $db->get_row("SELECT * FROM ".table_categories." WHERE category_safe_name='".mysql_real_escape_string(sanitize($_POST['safename'],4))."'");
+			$row = $db->get_row("SELECT * FROM ".table_categories." WHERE category_safe_name='".$db->escape(sanitize($_POST['safename'],4))."'");
 			$i = '';
 			while ($row->category_id>0)
 			{
 			    $i++;
-			    $row = $db->get_row("SELECT * FROM ".table_categories." WHERE category_safe_name='".mysql_real_escape_string(sanitize($_POST['safename'].$i,4))."'");
+			    $row = $db->get_row("SELECT * FROM ".table_categories." WHERE category_safe_name='".$db->escape(sanitize($_POST['safename'].$i,4))."'");
 			}
 			$_POST['safename'].=$i;
-			$db->query("INSERT INTO `" . table_categories . "` SET category_name='".mysql_real_escape_string(sanitize($_POST['name'],4))."',
-									  category_safe_name='".mysql_real_escape_string(sanitize($_POST['safename'],4))."',
-									  category_parent='".mysql_real_escape_string(sanitize($_POST['parent'],4))."',
-									  category_desc='".mysql_real_escape_string(sanitize($_POST['description'],4))."',
-									  category_keywords='".mysql_real_escape_string(sanitize($_POST['keywords'],4))."',
-									  category_author_level='".mysql_real_escape_string(sanitize($_POST['level'],4))."',
+			$db->query("INSERT INTO `" . table_categories . "` SET category_name='".$db->escape(sanitize($_POST['name'],4))."',
+									  category_safe_name='".$db->escape(sanitize($_POST['safename'],4))."',
+									  category_parent='".$db->escape(sanitize($_POST['parent'],4))."',
+									  category_desc='".$db->escape(sanitize($_POST['description'],4))."',
+									  category_keywords='".$db->escape(sanitize($_POST['keywords'],4))."',
+									  category_author_level='".$db->escape(sanitize($_POST['level'],4))."',
 									  category_lang='$dblang',
-									  category_votes='".mysql_real_escape_string(sanitize($_POST['votes'],4))."',
-									  category_karma='".mysql_real_escape_string(sanitize($_POST['karma'],4))."',
-									  category_author_group='".mysql_real_escape_string(sanitize($_POST['group'],4))."'");
+									  category_votes='".$db->escape(sanitize($_POST['votes'],4))."',
+									  category_karma='".$db->escape(sanitize($_POST['karma'],4))."',
+									  category_author_group='".$db->escape(sanitize($_POST['group'],4))."'");
 		    }
 		    Cat_Safe_Names();
 		    if(caching == 1){
@@ -160,8 +163,13 @@ if($canIhaveAccess == 1)
 	    exit;
 	}
 	elseif($action == "add"){
-	    $CSRF->check_expired('category_manager');
-	    if ($CSRF->check_valid(sanitize($_POST['token'], 3), 'category_manager')){
+	    // Redwine: if TOKEN is empty, no need to continue, just display the invalid token error.
+		if (empty($_POST['token'])) {
+			$CSRF->show_invalid_error(1);
+			exit;
+		}
+		// Redwine: if valid TOKEN, proceed. A valid integer must be equal to 2.
+	    if ($CSRF->check_valid(sanitize($_POST['token'], 3), 'category_manager') == 2){
 		$sql = "insert into `" . table_categories . "` (`category_name`) VALUES ('new category');";
 		$db->query($sql);
 		$last_IDsql = $db->get_var("SELECT category__auto_id from " . table_categories . " where category_name = 'new category';");
@@ -193,8 +201,13 @@ if($canIhaveAccess == 1)
 		Cat_Safe_Names();
 	}
 	elseif($action == "remove"){
-	    $CSRF->check_expired('category_manager');
-	    if ($CSRF->check_valid(sanitize($_GET['token'], 3), 'category_manager')){
+		// Redwine: if TOKEN is empty, no need to continue, just display the invalid token error.
+		if (empty($_GET['token'])) {
+			$CSRF->show_invalid_error(1);
+			exit;
+		}
+		// Redwine: if valid TOKEN, proceed. A valid integer must be equal to 2.
+	    if ($CSRF->check_valid(sanitize($_GET['token'], 3), 'category_manager') == 2){
 		$id = sanitize($_REQUEST['id'], 3);
 		if (!is_numeric($id)) die();
 
@@ -223,12 +236,18 @@ if($canIhaveAccess == 1)
 		header("Location: admin_categories.php");
 	    } else {
 		    $CSRF->show_invalid_error(1);
+			exit;
 	    }
+	    
+	    }
+        elseif($action == "changeparent"){
+		// Redwine: if TOKEN is empty, no need to continue, just display the invalid token error.
+		if (empty($_POST['token'])) {
+			$CSRF->show_invalid_error(1);
 	    exit;
 	}
-        elseif($action == "changeparent"){
-	    $CSRF->check_expired('category_manager');
-	    if ($CSRF->check_valid(sanitize($_POST['token'], 3), 'category_manager')){
+		// Redwine: if valid TOKEN, proceed. A valid integer must be equal to 2.
+	    if ($CSRF->check_valid(sanitize($_POST['token'], 3), 'category_manager')== 2){
 		$id = utf8_substr(sanitize($_REQUEST['id'], 3), 9, 100);
 		$parent = utf8_substr(sanitize($_REQUEST['parent'], 3), 9, 100);
 		if (!is_numeric($id)) die();
@@ -333,7 +352,7 @@ if($canIhaveAccess == 1)
 		$main_smarty->assign('cat_count', count($array));
 		$main_smarty->assign('cat_array', $array);
 		$main_smarty->assign('tpl_center', '/admin/categories');
-		$main_smarty->display($template_dir . '/admin/admin.tpl');
+		$main_smarty->display('/admin/admin.tpl');
 	}
 
 }

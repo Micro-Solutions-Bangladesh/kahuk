@@ -2,16 +2,30 @@
 //
 // Settings page
 //
+/* Redwine, made the settings array global to let all the functions have access to it instead of each function calls the get_upload_settings() and also save individual queries to the misc_table. */
+global	$settings, $main_smarty;
+$settings = get_upload_settings();
+/* Redwine: the below code was added as an extra security layer to prevent any malicious act, if gained access to the dashboard, from adding malicious extensions (php or any other for that matter.) so we hard-code the allowed extensions and we validate the changes in the settings against it. */
+function validate_extensions($ext_settings) {
+	$allowed_extensions = array('png','jpg','gif','jpeg','flv','kmz','mov','avi','wmv','divx','rm','ram','asx','mpe','3gp','mp4','mpg','m3u','mpeg','asf');
+
+	$exploded = explode(' ', $ext_settings);
+	foreach($exploded as $ext) {
+		if (!in_array($ext, $allowed_extensions)) {
+			$ext_settings = str_replace(' '.$ext, '',$ext_settings);
+		}
+	}
+	return $ext_settings;
+}
 function upload_showpage(){
-	global $db, $main_smarty, $the_template;
-		
+	global $db, $main_smarty, $the_template, $settings;
 	include_once('config.php');
 	include_once(mnminclude.'html1.php');
 	include_once(mnminclude.'link.php');
 	include_once(mnminclude.'tags.php');
 	include_once(mnminclude.'smartyvariables.php');
 	
-	$main_smarty = do_sidebar($main_smarty);
+	//$main_smarty = do_sidebar($main_smarty);
 
 	force_authentication();
 	$canIhaveAccess = 0;
@@ -20,11 +34,11 @@ function upload_showpage(){
 	if($canIhaveAccess == 1)
 	{	
 		// Save settings
-		if ($_POST['submit'])
+		if (isset($_POST['submit']))
 		{
 			misc_data_update('upload_thumb', sanitize($_REQUEST['upload_thumb'], 3));
 
-			$sizes = unserialize(get_misc_data('upload_sizes'));
+			$sizes = $settings['sizes']; //unserialize(get_misc_data('upload_sizes'));
 			for ($i=0; $i<sizeof($sizes); $i++)
 			{
 			    if (@in_array($sizes[$i],$_POST['delsize']))
@@ -47,9 +61,10 @@ function upload_showpage(){
 				if ($files)
 				{
 				    misc_data_update('upload_sizes', serialize($sizes));
-				    misc_data_update('upload_thumb_format', $_REQUEST['upload_thumb_format']);
+				    misc_data_update('upload_thumb_format', sanitize($_REQUEST['upload_thumb_format'],3));
 				    misc_data_update('upload_quality', $_REQUEST['upload_quality']<=100 && $_REQUEST['upload_quality']>=1 ? $_REQUEST['upload_quality'] : 80 );
-				    $settings = get_upload_settings();
+					/* Redwine: saving 27 queries */
+				    //$settings = get_upload_settings();
 
 				    foreach ($files as $file)
 					generate_thumbs(
@@ -106,32 +121,34 @@ function upload_showpage(){
 			misc_data_update('upload_thdirectory', sanitize($_REQUEST['upload_thdirectory'], 3));
 			misc_data_update('upload_filesize', sanitize($_REQUEST['upload_filesize'], 3));
 			misc_data_update('upload_maxnumber', sanitize($_REQUEST['upload_maxnumber'], 3));
-			misc_data_update('upload_extensions', sanitize($_REQUEST['upload_extensions'], 3));
+			/* Redwine: only allowed image and video extensions will be saved. */
+			$all_extensions = sanitize($_REQUEST['upload_extensions'], 3);
+			misc_data_update('upload_extensions', validate_extensions($all_extensions));
 			misc_data_update('upload_fileplace', sanitize($_REQUEST['upload_fileplace'], 3));
 			misc_data_update('upload_allow_comment', sanitize($_REQUEST['upload_allow_comment'], 3));
 			misc_data_update('upload_commentplace', sanitize($_REQUEST['upload_commentplace'], 3));
 			misc_data_update('upload_cfilelist', sanitize($_REQUEST['upload_commentfilelist'], 3));
 
-			header("Location: ".my_pligg_base."/module.php?module=upload");
+			header("Location: ".my_plikli_base."/module.php?module=upload");
 			die();
 		}
 		// breadcrumbs
-			$navwhere['text1'] = $main_smarty->get_config_vars('PLIGG_Visual_Header_AdminPanel');
+			$navwhere['text1'] = $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel');
 			$navwhere['link1'] = getmyurl('admin', '');
 			$navwhere['text2'] = "Modify Upload";
-			$navwhere['link2'] = my_pligg_base . "/module.php?module=upload";
+			$navwhere['link2'] = my_plikli_base . "/module.php?module=upload";
 			$main_smarty->assign('navbar_where', $navwhere);
-			$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('PLIGG_Visual_Header_AdminPanel'));
+			$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel'));
 		// breadcrumbs
 		define('modulename', 'upload'); 
 		$main_smarty->assign('modulename', modulename);
 		
-		define('pagename', 'admin_modifyupload'); 
+		if (!defined('pagename')) define('pagename', 'admin_modifyupload'); 
 		$main_smarty->assign('pagename', pagename);
 		$main_smarty->assign('settings', str_replace('"','&#034;',get_upload_settings()));
-		$main_smarty->assign('places',$upload_places);
+		//$main_smarty->assign('places',$upload_places);
 		$main_smarty->assign('tpl_center', upload_tpl_path . 'upload_main');
-		$main_smarty->display($template_dir . '/admin/admin.tpl');
+		$main_smarty->display('/admin/admin.tpl');
 	}
 	else
 	{
@@ -141,13 +158,13 @@ function upload_showpage(){
 
 function upload_edit_link()
 {
-	global $db, $current_user;
+	global $db, $current_user, $settings;
 
-	$upload_dir = mnmpath . get_misc_data('upload_directory');
-    	$thumb_dir  = mnmpath . get_misc_data('upload_thdirectory');
+	$upload_dir = mnmpath . $settings['directory'] ;//mnmpath . get_misc_data('upload_directory');
+    $thumb_dir  = mnmpath . $settings['thdirectory'] ;//mnmpath . get_misc_data('upload_thdirectory');
 
 	// Remove selected files
-	if ($_POST['upload_delete'])
+	if (isset($_POST['upload_delete']))
 	    foreach ($_POST['upload_delete'] as $id)
 	    {
 	    	if ($files = $db->get_results($sql = "SELECT * FROM ".table_prefix."files WHERE (file_id='$id' OR file_orig_id='$id') AND file_user_id='{$current_user->user_id}' AND file_comment_id=0"))
@@ -170,19 +187,19 @@ function upload_edit_link()
  */
 function upload_do_comment_submit($vars)
 {
-	global $db;
+	global $db, $settings;
 
 	if ($vars['comment'])
     	    foreach ($_SESSION['upload_files'] as $number => $file) 
 		if ($file['comment']) {
-	    	    $db->query("UPDATE ".table_prefix."files SET file_comment_id=$vars[comment] WHERE file_comment_id=-1 AND (file_id=$file[id] OR file_orig_id=$file[id])");
+	    	    $db->query("UPDATE ".table_prefix."files SET file_comment_id=".$vars['comment']." WHERE file_comment_id=-1 AND (file_id=$file[id] OR file_orig_id=$file[id])");
     		    unset ($_SESSION['upload_files'][$number]);
 	    	}
 }
 
 function upload_save_files()
 {
-	global $db, $main_smarty, $dblang, $the_template, $linkres, $current_user;
+	global $db, $main_smarty, $dblang, $the_template, $linkres, $current_user, $settings;
 
 	$settings = get_upload_settings();
 	$upload_dir = mnmpath . $settings['directory'];
@@ -196,7 +213,7 @@ function upload_save_files()
 		$fields[$k] = sanitize($v,3);
 
 
-    if (strstr($settings['external'],'file') && $_FILES["upload_files"]["error"])
+    if (strstr($settings['external'],'file') && isset($_FILES["upload_files"]["error"]))
     {
 	if (is_dir($upload_dir))
 	{
@@ -215,18 +232,20 @@ function upload_save_files()
 		    }
 		    if ($ext && in_array(strtolower($ext),$extensions))
 		    {
+				$i = 0;
 			    while (file_exists("$upload_dir/$name$i.$ext")) $i++;
 			    $name .= $i;
 	
 		            if (@move_uploaded_file($tmp_name, "$upload_dir/$name.$ext"))
 			    {
+					$comment = isset($_POST['comment']) ?: $comment = 0;
 				$db->query("INSERT INTO ".table_prefix."files 
 						SET file_size='orig',
 						    file_user_id={$current_user->user_id},
 						    file_link_id={$linkres->id},
 						    file_real_size='{$_FILES["upload_files"]["size"][$key]}',	
 						    file_fields='".base64_encode(serialize($fields))."',
-						    file_comment_id='".$db->escape($_POST['comment'])."',
+						    file_comment_id='".$db->escape($comment)."',
 						    file_name='".$db->escape("$name.$ext")."'");
 				$count++;
 				$last_id = $db->insert_id;
@@ -245,21 +264,24 @@ function upload_save_files()
     }
 
 	// Add external links here
-	if (strstr($settings['external'],'url') && $_POST["upload_urls"])
+	if (strstr($settings['external'],'url') && isset($_POST["upload_urls"]))
 	{
+		$comment = isset($_POST['comment']) ?: $comment = 0;
 		foreach ($_POST["upload_urls"] as $url) 
 		{
 		    if ($count > $settings['maxnumber']) break;
 		    $url = trim($url);
 		    if (strlen($url)>10 && strpos($url,'http')===0) 
 		    {
-			$db->query("INSERT INTO ".table_prefix."files 
+			$query = "INSERT INTO ".table_prefix."files 
 					SET file_size='orig',
 					    file_user_id={$current_user->user_id},
 					    file_link_id={$linkres->id},
 					    file_fields='".base64_encode(serialize($fields))."',
-					    file_comment_id='".$db->escape($_POST['comment'])."',
-					    file_name='".$db->escape($url)."'");
+						file_real_size=0,
+					    file_comment_id='".$db->escape($comment)."',
+					    file_name='".$db->escape($url)."'";
+			$db->query($query);
 			$count++;
 			$last_id = $db->insert_id;
 			$error = generate_thumbs($url,$linkres->id,$settings,$last_id);
@@ -267,7 +289,7 @@ function upload_save_files()
 		}
 	}
 
-	if ($error)
+	if (!empty($error))
 	{
 		print $error;
 		return $error;
@@ -278,7 +300,7 @@ function upload_save_files()
 
 function generate_thumbs($fname,$link_id,$settings,$orig_id,$only_size='')
 {
-    global $db, $current_user;
+    global $db, $current_user, $settings;
     
     try
     {
@@ -338,6 +360,7 @@ function generate_thumbs($fname,$link_id,$settings,$orig_id,$only_size='')
       	$tmp_img = imagecreatetruecolor( $new_width, $new_height );
 	
       	// copy and resize old image into new image 
+		$i = 0;
         while (file_exists("$thumb_dir/$name$i.jpg")) $i++;
 	$name = "$name$i.jpg";
 
@@ -346,13 +369,15 @@ function generate_thumbs($fname,$link_id,$settings,$orig_id,$only_size='')
       	if (!imagejpeg( $tmp_img, "$thumb_dir/$name",$settings['quality'] ))
 	    $error .= "Can't create thumbnail $thumb_dir/$name";
 	else
+		$comment = isset($_POST['comment']) ?: $comment = 0;
 	    $db->query("INSERT INTO ".table_prefix."files 
 				SET file_size='$size',
 				    file_orig_id='$orig_id',
 				    file_user_id={$current_user->user_id},
 				    file_link_id=$link_id,
 				    file_ispicture=1,
-				    file_comment_id='".$db->escape($_POST['comment'])."',
+					file_fields='',
+				    file_comment_id='".$db->escape($comment)."',
 				    file_real_size='".filesize("$thumb_dir/$name")."',
 				    file_name='".$db->escape($name)."'");
     }
@@ -364,35 +389,25 @@ function generate_thumbs($fname,$link_id,$settings,$orig_id,$only_size='')
 //
 function get_upload_settings()
 {
-    return array(
-		'thumb' => get_misc_data('upload_thumb'), 
-		'sizes' => unserialize(get_misc_data('upload_sizes')), 
-		'place' => get_misc_data('upload_place'), 
-		'defsize' => get_misc_data('upload_defsize'), 
-		'external' => get_misc_data('upload_external'), 
-		'quality' => get_misc_data('upload_quality'), 
-		'allow_hide' => get_misc_data('upload_allow_hide'), 
-		'fields' => unserialize(base64_decode(get_misc_data('upload_fields'))), 
-		'alternates' => unserialize(base64_decode(get_misc_data('upload_alternates'))), 
-		'mandatory' => unserialize(get_misc_data('upload_mandatory')), 
-		'display' => unserialize(get_misc_data('upload_display')), 
-		'format' => get_misc_data('upload_format'), 
-		'pre_format' => get_misc_data('upload_pre_format'), 
-		'post_format' => get_misc_data('upload_post_format'), 
-		'thumb_format' => get_misc_data('upload_thumb_format'), 
-		'thumb_pre_format' => get_misc_data('upload_t_pre_format'), 
-		'thumb_post_format' => get_misc_data('upload_t_post_format'), 
-		'link' => get_misc_data('upload_link'), 
-		'directory' => get_misc_data('upload_directory'), 
-		'thdirectory' => get_misc_data('upload_thdirectory'), 
-		'filesize' => get_misc_data('upload_filesize'), 
-		'maxnumber' => get_misc_data('upload_maxnumber'), 
-		'extensions' => get_misc_data('upload_extensions'), 
-		'fileplace' => get_misc_data('upload_fileplace'),
-		'commentplace' => get_misc_data('upload_commentplace'),
-		'commentfilelist' => get_misc_data('upload_cfilelist'),
-		'allow_comment' => get_misc_data('upload_allow_comment')
-		);
+	global $db, $settings;
+$upload_settings = array();
+$sql = "SELECT * FROM ".table_prefix."misc_data WHERE `name` like 'upload%'";
+$settings = $db->get_results($sql);
+foreach ($settings as $setting) {
+	if (is_array($setting->data)) {
+		$upload_settings[str_replace('upload_', '', $setting->name)] = unserialize($setting->data);
+	}elseif ($setting->name == 'upload_fields') {
+		$upload_settings[str_replace('upload_', '', $setting->name)] = unserialize(base64_decode($setting->data));
+	}elseif ($setting->name == 'upload_alternates') {
+		$upload_settings[str_replace('upload_', '', $setting->name)] = unserialize(base64_decode($setting->data));
+	}elseif ($setting->name == 'upload_sizes' || $setting->name == 'upload_display' || $setting->name == 'upload_mandatory') {
+		$upload_settings[str_replace('upload_', '', $setting->name)] = unserialize($setting->data);
+	}else{
+		$upload_settings[str_replace('upload_', '', $setting->name)] = $setting->data;
+	}
+}
+//var_dump($upload_settings);
+return $upload_settings;
 }
 
 // 
@@ -423,13 +438,14 @@ function upload_get_file_size($link_id)
 
 function upload_track($vars)
 {
-    global $db, $smarty, $dblang, $the_template, $linkres, $current_user;
+    global $db, $smarty, $dblang, $the_template, $linkres, $current_user, $settings;
 
-    $upload_dir = get_misc_data('upload_directory');
-    $thumb_dir  = get_misc_data('upload_thdirectory');
+    $upload_dir = mnmpath . $settings['directory'] ;//mnmpath . get_misc_data('upload_directory');
+    $thumb_dir  = mnmpath . $settings['thdirectory'] ;//mnmpath . get_misc_data('upload_thdirectory');
 
     $content = $vars['smarty']->_vars['story_content'];
     $link_id = $vars['smarty']->_vars['link_id'];
+	$uploaded_image = $vars['smarty']->_vars['uploaded_image'];
     if (preg_match_all('/\{image(\d+)(\_(\d+x\d+))?\}/s',$content,$m))
     for ($i=0; $i<sizeof($m[1]); $i++)
     {
@@ -440,11 +456,11 @@ function upload_track($vars)
 	if ($file = $db->get_row($sql = "SELECT * FROM " . table_prefix . "files where file_link_id='$link_id' AND file_size='$size' AND file_number=$number AND file_comment_id=0"))
 	{
 	    if (strpos($file->file_name,'http')===0)
-		$image = "<img src='{$file->file_name}'/>";
+		$image = "<div class=\"videoWrapper\"><img src='{$file->file_name}' /></div>";
 	    elseif ($file->file_size=='orig')
-		$image = "<img src='".my_pligg_base."{$upload_dir}/{$file->file_name}'/>";
+		$image = "<div class=\"videoWrapper\"><img src='".my_plikli_base."{$upload_dir}/{$file->file_name}' /></div>";
 	    else
-		$image = "<img src='".my_pligg_base."{$thumb_dir}/{$file->file_name}'/>";
+		$image = "<div class=\"videoWrapper\"><img src='".my_plikli_base."{$thumb_dir}/{$file->file_name}' /></div>";
 	}
 	else
 	    $image = '';	
@@ -455,13 +471,15 @@ function upload_track($vars)
     if ($images)
 	foreach ($images as $file)
 	{
-	    if (strpos($file->file_name,'http')===0)
-		$image = "<img src='{$file->file_name}'/>";
-	    elseif ($file->file_size=='orig')
-		$image = "<img src='".my_pligg_base."{$upload_dir}/{$file->file_name}'/>";
-	    else
-		$image = "<img src='".my_pligg_base."{$thumb_dir}/{$file->file_name}'/>";
-
+	    if (strpos($file->file_name,'http')===0) {
+		$image = "<div class=\"videoWrapper\"><img src='{$file->file_name}'/></div>";
+			$vars['smarty']->_vars['uploaded_image'] = "{$file->file_name}";
+	    }elseif ($file->file_size=='orig') {
+			$image = "<div class=\"videoWrapper\"><img src='{$upload_dir}/{$file->file_name}' /></div>";
+			$vars['smarty']->_vars['uploaded_image'] = my_base_url.my_plikli_base.$settings['directory']."/{$file->file_name}";
+	    }else{
+			$image = "<div class=\"videoWrapper\"><img src='{$thumb_dir}/{$file->file_name} /></div>";
+		}
 	    if ($file->file_size=='orig')
     	    	$vars['smarty']->_vars["image{$file->file_number}"] = $file->file_ispicture ? $image : '';
 	    else
@@ -472,10 +490,10 @@ function upload_track($vars)
 
 function upload_comment_track($vars)
 {
-    global $db, $smarty, $dblang, $the_template, $linkres, $current_user;
+    global $db, $smarty, $dblang, $the_template, $linkres, $current_user, $settings;
 
-    $upload_dir = get_misc_data('upload_directory');
-    $thumb_dir  = get_misc_data('upload_thdirectory');
+    $upload_dir = mnmpath . $settings['directory'] ;//mnmpath . get_misc_data('upload_directory');
+    $thumb_dir  = mnmpath . $settings['thdirectory'] ;//mnmpath . get_misc_data('upload_thdirectory');
 
     $content = $vars['comment_text'];
     $comment_id = $vars['comment_id'];
@@ -489,11 +507,11 @@ function upload_comment_track($vars)
 	if ($file = $db->get_row($sql = "SELECT * FROM " . table_prefix . "files where file_comment_id='$comment_id' AND file_size='$size' AND file_number=$number"))
 	{
 	    if (strpos($file->file_name,'http')===0)
-		$image = "<img src='{$file->file_name}'/>";
+		$image = "<div class=\"videoWrapper\"><img src='{$file->file_name}'/></div>";
 	    elseif ($file->file_size=='orig')
-		$image = "<img src='".my_pligg_base."{$upload_dir}/{$file->file_name}'/>";
+		$image = "<div class=\"videoWrapper\"><img src='".my_plikli_base."{$upload_dir}/{$file->file_name}'/></div>";
 	    else
-		$image = "<img src='".my_pligg_base."{$thumb_dir}/{$file->file_name}'/>";
+		$image = "<div class=\"videoWrapper\"><img src='".my_plikli_base."{$thumb_dir}/{$file->file_name}'/></div>";
 	}
 	else
 	    $image = '';	
@@ -505,11 +523,11 @@ function upload_comment_track($vars)
 	foreach ($images as $file)
 	{
 	    if (strpos($file->file_name,'http')===0)
-		$image = "<img src='{$file->file_name}'/>";
+		$image = "<div class=\"videoWrapper\"><img src='{$file->file_name}'/></div>";
 	    elseif ($file->file_size=='orig')
-		$image = "<img src='".my_pligg_base."{$upload_dir}/{$file->file_name}'/>";
+		$image = "<div class=\"videoWrapper\"><img src='".my_plikli_base."{$upload_dir}/{$file->file_name}'/></div>";
 	    else
-		$image = "<img src='".my_pligg_base."{$thumb_dir}/{$file->file_name}'/>";
+		$image = "<div class=\"videoWrapper\"><img src='".my_plikli_base."{$thumb_dir}/{$file->file_name}'/></div>";
 
 	    if ($file->file_size=='orig')
     	    	$vars['smarty']->_vars["image{$file->file_number}"] = $file->file_ispicture ? $image : '';
@@ -521,10 +539,10 @@ function upload_comment_track($vars)
 
 function upload_delete($vars)
 {
-    global $db, $smarty, $dblang, $the_template, $linkres, $current_user;
+    global $db, $smarty, $dblang, $the_template, $linkres, $current_user, $settings;
 
-    $upload_dir = mnmpath . get_misc_data('upload_directory');
-    $thumb_dir  = mnmpath . get_misc_data('upload_thdirectory');
+    $upload_dir = mnmpath . $settings['directory'] ;//mnmpath . get_misc_data('upload_directory');
+    $thumb_dir  = mnmpath . $settings['thdirectory'] ;//mnmpath . get_misc_data('upload_thdirectory');
 
     // Remove files 
     if (is_numeric($vars['link_id']))
@@ -548,10 +566,10 @@ function upload_delete($vars)
  */
 function upload_comment_delete($vars)
 {
-    global $db, $smarty, $dblang, $the_template, $linkres, $current_user;
+    global $db, $smarty, $dblang, $the_template, $linkres, $current_user, $settings;
 
-    $upload_dir = mnmpath . get_misc_data('upload_directory');
-    $thumb_dir  = mnmpath . get_misc_data('upload_thdirectory');
+    $upload_dir = mnmpath . $settings['directory'] ;//mnmpath . get_misc_data('upload_directory');
+    $thumb_dir  = mnmpath . $settings['thdirectory'] ;//mnmpath . get_misc_data('upload_thdirectory');
 
     // Remove files 
     if (is_numeric($vars['comment_id']))
@@ -569,7 +587,7 @@ function upload_comment_delete($vars)
 }
 
 function upload_rss_item($vars) {
-	global $db;
+	global $db, $settings;
 
 	$upload_link = get_misc_data('upload_link');
 	$upload_defsize = get_misc_data('upload_defsize');
@@ -585,11 +603,11 @@ function upload_rss_item($vars) {
 	$images = $db->get_results($sql,ARRAY_A);
 	if($images)
 	    	foreach ($images as $image)
-		    print "<media:content url=\"".my_base_url.my_pligg_base."{$upload_directory}/{$image['file_name']}\" medium=\"image\" />\n";
+		    print "<media:content url=\"".my_base_url.my_plikli_base."{$upload_directory}/{$image['file_name']}\" medium=\"image\" />\n";
 }
 
 function upload_comment_rss_item($vars) {
-	global $db;
+	global $db, $settings;
 
 	$upload_link = get_misc_data('upload_link');
 	$upload_defsize = get_misc_data('upload_defsize');
@@ -605,6 +623,6 @@ function upload_comment_rss_item($vars) {
 	$images = $db->get_results($sql,ARRAY_A);
 	if($images)
 	    	foreach ($images as $image)
-		    print "<media:content url=\"".my_base_url.my_pligg_base."{$upload_directory}/{$image['file_name']}\" medium=\"image\" />\n";
+		    print "<media:content url=\"".my_base_url.my_plikli_base."{$upload_directory}/{$image['file_name']}\" medium=\"image\" />\n";
 }
 ?>

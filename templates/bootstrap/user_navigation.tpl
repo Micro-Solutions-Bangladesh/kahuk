@@ -5,8 +5,9 @@
 <!-- user_navigation.tpl -->
 
 {***********************************************************************************}
-{checkActionsTpl location="tpl_pligg_profile_start"}
+{checkActionsTpl location="tpl_plikli_profile_start"}
 <div class="row user_navigation_top">
+{checkActionsTpl location="tpl_plikli_profile_begin"}
 	<div class="col-md-12 user_navigation">
 		<h1 class="user_name">
 			{if $UseAvatars neq "0" && $pagename == "user_edit"}
@@ -26,7 +27,9 @@
 								";
 							}
 						{/php}
+						{checkActionsTpl location="tpl_plikli_profile_avatar_start"}
 						<img class="profile_avatar" src="{$Avatar.large}" alt="Avatar" />
+						{checkActionsTpl location="tpl_plikli_profile_avatar_end"}
 						<a href="#profileavatar" data-toggle="modal" class="btn btn-default btn-xs edit-avatar">Edit Avatar</a>
 					</div>
 				</a>
@@ -34,20 +37,22 @@
 				<div class="modal fade" id="profileavatar">
 					<div class="modal-dialog">
 						<div class="modal-content">
+						{checkActionsTpl location="tpl_plikli_profile_avatar_upload_start"}
 							<form method="POST" enctype="multipart/form-data" name="image_upload_form">
-								<script type="text/javascript">
+								<!--<script type="text/javascript">
 									$('.fileupload').fileupload()
-								</script>
+								</script>-->
 								<div class="modal-header">
 									<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-									<h4 class="modal-title">{#PLIGG_Visual_Profile_UploadAvatar2#}</h4>
+									<h4 class="modal-title">{#PLIKLI_Visual_Profile_UploadAvatar2#}</h4>
 								</div>
 								<div class="modal-body">
 									<div class="fileupload fileupload-new" data-provides="fileupload">
 										<div class="fileupload-new img-thumbnail">
-											<img src="{$Avatar.large}" title="{#PLIGG_Visual_Profile_CurrentAvatar#}" />
+											<img src="{$Avatar.large}" title="{#PLIKLI_Visual_Profile_CurrentAvatar#}" />
 										</div>
 										<div class="fileupload-preview fileupload-exists img-thumbnail" style="max-width:{$Avatar_Large}px;max-height:{$Avatar_Large}px;"></div>
+										{if $error.Type neq ""}<span class="alert alert-danger" style="font-size:0.6em">{$error.Type}</span>{/if}
 										<div>
 											<span class="btn btn-default btn-file">
 												<span class="fileupload-new"><i class="fa fa-picture"></i> Browse</span>
@@ -61,27 +66,34 @@
 								<div class="modal-footer">
 									<input type="hidden" name="avatar" value="uploaded"/>
 									{$hidden_token_profile_change}
-									<a class="btn btn-default" data-dismiss="modal">{#PLIGG_Visual_View_User_Edit_Cancel#}</a>
-									<input type="submit" name="action" class="btn btn-primary" value="{#PLIGG_Visual_Profile_AvatarUpload#}"/>
+									<a class="btn btn-default" data-dismiss="modal">{#PLIKLI_Visual_View_User_Edit_Cancel#}</a>
+									<input type="submit" name="action" class="btn btn-primary" value="{#PLIKLI_Visual_Profile_AvatarUpload#}"/>
 								</div>
 							</form>
+							{checkActionsTpl location="tpl_plikli_profile_avatar_upload_end"}
 						</div><!-- /.modal-content -->
 					</div><!-- /.modal-dialog -->
 				</div><!-- /.modal -->
 			{elseif $UseAvatars neq "0" && $pagename == "user"}
-				{if $user_login eq $user_logged_in || $isadmin}
-					<a href="{if $UrlMethod == "2"}{$my_base_url}{$my_pligg_base}/user/{$user_login}/edit/?avatar=edit{else}{$my_base_url}{$my_pligg_base}/profile.php?avatar=edit{/if}">
+				{if $user_login eq $user_logged_in}
+					<a href="{if $UrlMethod == "2"}{$my_base_url}{$my_plikli_base}/user/{$user_login}/edit/?avatar=edit{else}{$my_base_url}{$my_plikli_base}/profile.php?avatar=edit{/if}">
 				{/if}
 				<div class="img-thumbnail avatar_thumb">
-					<img class="profile_avatar" src="{$Avatar.large}" alt="Avatar" />
-					{if $user_login eq $user_logged_in || $isadmin}
-						<a class="btn btn-default btn-xs edit-avatar" href="{if $UrlMethod == "2"}{$my_base_url}{$my_pligg_base}/user/{$user_login}/edit/?avatar=edit{else}{$my_base_url}{$my_pligg_base}/profile.php?avatar=edit{/if}">Edit Avatar</a>
+					<img class="profile_avatar" src="{$Avatar.large}" alt="Avatar" {if $isadmin eq 1 && $user_login neq $user_logged_in} title="Admin can change the avatar from the Settings tab"{/if}/>
+					{if $user_login eq $user_logged_in}
+						<a class="btn btn-default btn-xs edit-avatar" href="{if $UrlMethod == "2"}{$my_base_url}{$my_plikli_base}/user/{$user_login}/edit/?avatar=edit{else}{$my_base_url}{$my_plikli_base}/profile.php?avatar=edit{/if}">Edit Avatar</a>
 					{/if}
 				</div>
-				{if $user_login eq $user_logged_in || $isadmin}</a>{/if}
+				{if $user_login eq $user_logged_in}</a>{/if}
+			{else}
+				<div class="img-thumbnail avatar_thumb">
+					<img class="profile_avatar" src="{$Avatar.large}" alt="Avatar" />
+					
+				</div>
 			{/if}
-			{$user_username|capitalize}
+			{checkActionsTpl location="tpl_plikli_profile_username_start"}{$user_username|capitalize}{checkActionsTpl location="tpl_plikli_profile_username_end"}
 		</h1>
+		{checkActionsTpl location="tpl_plikli_profile_userdetails_start"}
 		<div class="user_details">		
 			{if $user_publicemail ne ""}
 				<i class="fa fa-envelope-o"></i>
@@ -103,9 +115,9 @@
 				//-->
 				</script>
 			{/if}
-			{if $user_url && $user_karma > "20" || $user_login eq $user_logged_in}
+			{if ($user_url neq '' && $user_karma > "20") || ($user_url neq '' && $user_login eq $user_logged_in)}
 				<i class="fa fa-home"></i>
-				<a href="{$user_url}" target="_blank" rel="nofollow" id="user_website">{$user_url}</a>
+				<a href="{$user_url}" target="_blank" rel="nofollow noopener noreferrer" id="user_website">{$user_url}</a>
 				<br />
 			{/if}
 			{checkActionsTpl location="tpl_user_profile_details_start"}
@@ -129,44 +141,49 @@
 			</span>
 			{checkActionsTpl location="tpl_user_profile_details_end"}
 		</div>
+		{checkActionsTpl location="tpl_plikli_profile_userdetails_end"}
 		<div class="user_social">
 			{checkActionsTpl location="tpl_user_profile_social_start"}
 			{if $user_skype}
-				<a href="callto://{$user_skype}" title="Skype {$user_username|capitalize}" rel="nofollow" target="_blank"><span class="fa-stack fa-lg opacity_reset"><i class="fa fa-circle fa-stack-2x opacity_reset" style="color:#00aaf1;"></i><i class="fa fa-skype fa-stack-1x fa-inverse opacity_reset"></i></span></a>
+				<a href="callto://{$user_skype}" title="Skype {$user_username|capitalize}" rel="nofollow noopener noreferrer" target="_blank"><span class="fa-stack fa-lg opacity_reset"><i class="fa fa-circle fa-stack-2x opacity_reset" style="color:#00aaf1;"></i><i class="fa fa-skype fa-stack-1x fa-inverse opacity_reset"></i></span></a>
 			{/if}
 			{if $user_facebook}
-				<a href="http://www.facebook.com/{$user_facebook}" title="{$user_username|capitalize} on Facebook" rel="nofollow" target="_blank"><span class="fa-stack fa-lg opacity_reset"><i class="fa fa-circle fa-stack-2x opacity_reset" style="color:#3c5b9b;"></i><i class="fa fa-facebook fa-stack-1x fa-inverse opacity_reset"></i></span></a>
+				<a href="http://www.facebook.com/{$user_facebook}" title="{$user_username|capitalize} on Facebook" rel="nofollow noopener noreferrer" target="_blank"><span class="fa-stack fa-lg opacity_reset"><i class="fa fa-circle fa-stack-2x opacity_reset" style="color:#3c5b9b;"></i><i class="fa fa-facebook fa-stack-1x fa-inverse opacity_reset"></i></span></a>
 			{/if}
 			{if $user_twitter}
-				<a href="http://twitter.com/{$user_twitter}" title="{$user_username|capitalize} on Twitter" rel="nofollow" target="_blank"><span class="fa-stack fa-lg opacity_reset"><i class="fa fa-circle fa-stack-2x opacity_reset" style="color:#2daae1;"></i><i class="fa fa-twitter fa-stack-1x fa-inverse opacity_reset"></i></span></a>
+				<a href="http://twitter.com/{$user_twitter}" title="{$user_username|capitalize} on Twitter" rel="nofollow noopener noreferrer" target="_blank"><span class="fa-stack fa-lg opacity_reset"><i class="fa fa-circle fa-stack-2x opacity_reset" style="color:#2daae1;"></i><i class="fa fa-twitter fa-stack-1x fa-inverse opacity_reset"></i></span></a>
 			{/if}
 			{if $user_linkedin}
-				<a href="http://www.linkedin.com/in/{$user_linkedin}" title="{$user_username|capitalize} on LinkedIn" rel="nofollow" target="_blank"><span class="fa-stack fa-lg opacity_reset"><i class="fa fa-circle fa-stack-2x opacity_reset" style="color:#0173b2;"></i><i class="fa fa-linkedin fa-stack-1x fa-inverse opacity_reset"></i></span></a>
+				<a href="http://www.linkedin.com/in/{$user_linkedin}" title="{$user_username|capitalize} on LinkedIn" rel="nofollow noopener noreferrer" target="_blank"><span class="fa-stack fa-lg opacity_reset"><i class="fa fa-circle fa-stack-2x opacity_reset" style="color:#0173b2;"></i><i class="fa fa-linkedin fa-stack-1x fa-inverse opacity_reset"></i></span></a>
 			{/if}
 			{if $user_googleplus}
-				<a href="https://plus.google.com/{$user_googleplus}" title="{$user_username|capitalize} on Google+" rel="nofollow" target="_blank"><span class="fa-stack fa-lg opacity_reset"><i class="fa fa-circle fa-stack-2x opacity_reset" style="color:#f63e28;"></i><i class="fa fa-google-plus fa-stack-1x fa-inverse opacity_reset"></i></span></a>
+				<a href="https://plus.google.com/{$user_googleplus}" title="{$user_username|capitalize} on Google+" rel="nofollow noopener noreferrer" target="_blank"><span class="fa-stack fa-lg opacity_reset"><i class="fa fa-circle fa-stack-2x opacity_reset" style="color:#f63e28;"></i><i class="fa fa-google-plus fa-stack-1x fa-inverse opacity_reset"></i></span></a>
 			{/if}
 			{if $user_pinterest}
-				<a href="http://pinterest.com/{$user_pinterest}/" title="{$user_username|capitalize} on Pinterest" rel="nofollow" target="_blank"><span class="fa-stack fa-lg opacity_reset"><i class="fa fa-circle fa-stack-2x opacity_reset" style="color:#cb2027;"></i><i class="fa fa-pinterest fa-stack-1x fa-inverse opacity_reset"></i></span></a>
+				<a href="http://pinterest.com/{$user_pinterest}/" title="{$user_username|capitalize} on Pinterest" rel="nofollow noopener noreferrer" target="_blank"><span class="fa-stack fa-lg opacity_reset"><i class="fa fa-circle fa-stack-2x opacity_reset" style="color:#cb2027;"></i><i class="fa fa-pinterest fa-stack-1x fa-inverse opacity_reset"></i></span></a>
 			{/if}
 			{checkActionsTpl location="tpl_user_profile_social_end"}
 		</div>
 		{checkActionsTpl location="tpl_show_extra_profile"}
 
-		{if $Allow_Friends}
+		{if $Allow_Friends neq "0"}
 			<div class="btn-group user_followers">
-				<a class="btn btn-default btn-sm" href="{$user_url_friends}"><i class="fa fa-user"></i> {$user_following} {#PLIGG_Visual_User_Profile_View_Friends#}</a>
-				<a class="btn btn-default btn-sm" href="{$user_url_friends2}"><i class="fa fa-user"></i> {$user_followers} {#PLIGG_Visual_User_Profile_Your_Friends#}</a>
+				<a class="btn btn-default btn-sm" href="{$user_url_friends}"><i class="fa fa-user"></i> {$user_following} {#PLIKLI_Visual_User_Profile_View_Friends#}</a>
+				<a class="btn btn-default btn-sm" href="{$user_url_friends2}"><i class="fa fa-user"></i> {$user_followers} {#PLIKLI_Visual_User_Profile_Your_Friends#}</a>
+				{if ($is_friend eq "mutual") && $user_login neq $user_logged_in}
 				{if check_for_enabled_module('simple_messaging',2.0) && $is_friend && $user_login neq $user_logged_in}
-					<a class="btn btn-default btn-sm" href="{$my_base_url}{$my_pligg_base}/module.php?module=simple_messaging&view=compose&to={$username}&return={$my_pligg_base}%2Fuser.php%3Flogin%3D{$user_logged_in}%26view%3Dfollowers"><i class="fa fa-envelope"></i> Send Message</a>
+					<a class="btn btn-default btn-sm" href="{$my_base_url}{$my_plikli_base}/module.php?module=simple_messaging&view=compose&to={$username}&return={$my_plikli_base}%2Fuser.php%3Flogin%3D{$user_logged_in}%26view%3Dfollowers"><i class="fa fa-envelope"></i> Send Message</a>
 				{/if}
-				{if $is_friend && $user_login neq $user_logged_in || $is_mutual}
-					<a href="{$user_url_remove}" class="btn btn-sm btn-danger">{#PLIGG_Unfollow#} {$user_login|capitalize} </a>
+				{/if}
+{* Redwine: To fix a bug that was displaying the wrong button (follow/unfollow) under the users avatar and beside the following and followers buttons in the user profile page. See the picture http://mymonalisasmile.com/upload/follow-unfollow-buttons.jpg*}
+				{if ($is_friend eq "following" || $is_friend eq "mutual") && $user_login neq $user_logged_in}
+					<a href="{$user_url_remove}" class="btn btn-sm btn-danger">{#PLIKLI_Unfollow#} {$user_login|capitalize} </a>
 					{if $user_authenticated eq true}
 						{checkActionsTpl location="tpl_user_center"}
 					{/if}
-				{elseif $user_authenticated eq true && $user_login neq $user_logged_in && !$is_friend}
-					<a class="btn btn-sm btn-success" href="{$user_url_add}">{#PLIGG_Visual_User_Profile_Add_Friend#} {$user_login|capitalize}</a>
+{* Redwine: To fix a bug that was displaying the wrong button (follow/unfollow) under the users avatar and beside the following and followers buttons in the user profile page. See the picture http://mymonalisasmile.com/upload/follow-unfollow-buttons.jpg*}
+				{elseif ($is_friend eq "" || $is_friend eq "follower") && $user_login neq $user_logged_in && $user_authenticated neq false}
+					<a class="btn btn-sm btn-success" href="{$user_url_add}">{#PLIKLI_Visual_User_Profile_Add_Friend#} {$user_login|capitalize}</a>
 				{/if}
 				<a class="btn btn-primary btn-sm" href="#user_search_modal" data-toggle="modal"><i class="fa fa-search white_text"></i></a>
 				
@@ -174,15 +191,15 @@
 				<div class="modal fade" id="user_search_modal">
 					<div class="modal-dialog">
 						<div class="modal-content user_search">
-							<form action="{$my_pligg_base}/user.php" class="form-inline" role="form" method="get" {php} global $URLMethod, $my_base_url, $my_pligg_base; if ($URLMethod==2) print "onsubmit='document.location.href=\"{$my_base_url}{$my_pligg_base}/user/search/\"+encodeURIComponent(this.keyword.value); return false;'";{/php}>
+							<form action="{$my_plikli_base}/user.php" class="form-inline" role="form" method="get" {php} global $URLMethod, $my_base_url, $my_plikli_base; if ($URLMethod==2) print "onsubmit='document.location.href=\"{$my_base_url}{$my_plikli_base}/user/search/\"+encodeURIComponent(this.keyword.value); return false;'";{/php}>
 								<input type="hidden" name="view" value="search">
 								<div class="modal-header">
 									<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-									<h4 class="modal-title">{#PLIGG_Visual_User_Search_Users#}</h4>
+									<h4 class="modal-title">{#PLIKLI_Visual_User_Search_Users#}</h4>
 								</div>
 								<div class="modal-body">
-									<input type="text" name="keyword" class="form-control" autofocus="autofocus" placeholder="{#PLIGG_Visual_User_Search_Users#}">
-									<button type="submit" class="btn btn-primary">{#PLIGG_Visual_Search_Go#}</button>
+									<input type="text" name="keyword" class="form-control" autofocus="autofocus" placeholder="{#PLIKLI_Visual_User_Search_Users#}">
+									<button type="submit" class="btn btn-primary">{#PLIKLI_Visual_Search_Go#}</button>
 								</div>
 							</form>
 						</div><!-- /.modal-content -->
@@ -197,19 +214,27 @@
 </div>
 {checkActionsTpl location="tpl_user_center_just_below_header"}
 <ul class="nav nav-tabs" id="profiletabs">
-	{checkActionsTpl location="tpl_pligg_profile_sort_start"}
-	<li {if $user_view eq 'profile' || $user_view eq 'removefriend' || $user_view eq 'addfriend'}class="active"{/if}><a {if $user_view eq 'profile'}data-toggle="tab" href="#personal_info"{else}href="{$user_url_personal_data2}"{/if} class="navbut{$nav_pd}">{#PLIGG_Visual_User_PersonalData#}</a></li>
-	{if $user_login eq $user_logged_in || $isadmin}
-		<li {if $pagename eq 'user_edit'}class="active"{/if}><a href="{$URL_Profile2}" class="navbut{$nav_set}">{#PLIGG_Visual_User_Setting#}</a></li>
+	{checkActionsTpl location="tpl_plikli_profile_sort_start"}
+	<li {if $user_view eq 'profile' || $user_view eq 'removefriend' || $user_view eq 'addfriend'}class="active"{/if}><a {if $user_view eq 'profile'}data-toggle="tab" href="#personal_info"{else}href="{$user_url_personal_data2}"{/if}>{#PLIKLI_Visual_User_PersonalData#}</a></li>
+	{if $user_login eq $user_logged_in || isset($isadmin) && $isadmin eq 1}
+		<li {if $pagename eq 'user_edit'}class="active"{/if}><a href="{$URL_Profile2}">{#PLIKLI_Visual_User_Setting#}</a></li>
 	{/if}
-	<li {if $user_view eq 'history'}class="active"{/if}><a href="{$user_url_news_sent2}" class="navbut{$nav_ns}">{#PLIGG_Visual_User_NewsSent#}</a></li>
-	<li {if $user_view eq 'published'}class="active"{/if}><a href="{$user_url_news_published2}" class="navbut{$nav_np}">{#PLIGG_Visual_User_NewsPublished#}</a></li>
-	<li {if $user_view eq 'new'}class="active"{/if}><a href="{$user_url_news_unpublished2}" class="navbut{$nav_nu}">{#PLIGG_Visual_User_NewsUnPublished#}</a></li>
-	<li {if $user_view eq 'commented'}class="active"{/if}><a href="{$user_url_commented2}" class="navbut{$nav_c}">{#PLIGG_Visual_User_NewsCommented#}</a></li>
-	<li {if $user_view eq 'upvoted'}class="active"{/if}><a href="{$user_url_news_upvoted2}" class="navbut{$nav_nv}">{#PLIGG_Visual_UpVoted#}</a></li>
-	<li {if $user_view eq 'downvoted'}class="active"{/if}><a href="{$user_url_news_downvoted2}" class="navbut{$nav_nv}">{#PLIGG_Visual_DownVoted#}</a></li>
-	<li {if $user_view eq 'saved'}class="active"{/if}><a href="{$user_url_saved2}" class="navbut{$nav_s}">{#PLIGG_Visual_User_NewsSaved#}</a></li>
-	{checkActionsTpl location="tpl_pligg_profile_sort_end"}
+	{checkActionsTpl location="tpl_plikli_profile_sort_middle"}
+	<li {if $user_view eq 'history'}class="active"{/if}><a href="{$user_url_news_sent2}">{#PLIKLI_Visual_User_NewsSent#}</a></li>
+	<li {if $user_view eq 'published'}class="active"{/if}><a href="{$user_url_news_published2}">{#PLIKLI_Visual_User_NewsPublished#}</a></li>
+	<li {if $user_view eq 'new'}class="active"{/if}><a href="{$user_url_news_unpublished2}">{#PLIKLI_Visual_User_NewsUnPublished#}</a></li>
+	{if $user_login eq $user_logged_in}
+	<li {if $user_view eq 'draft'}class="active"{/if}><a href="{$user_url_draft2}">{#PLIKLI_Visual_User_NewsDraft#}</a></li>
+	<li {if $user_view eq 'scheduled'}class="active"{/if}><a href="{$user_url_scheduled2}">{#PLIKLI_Visual_User_NewsScheduled#}</a></li>
+	{/if}
+	<li {if $user_view eq 'commented'}class="active"{/if}><a href="{$user_url_commented2}">{#PLIKLI_Visual_User_NewsCommented#}</a></li>
+	<li {if $user_view eq 'upvoted'}class="active"{/if}><a href="{$user_url_news_upvoted2}">{#PLIKLI_Visual_UpVoted#}</a></li>
+	<li {if $user_view eq 'downvoted'}class="active"{/if}><a href="{$user_url_news_downvoted2}">{#PLIKLI_Visual_DownVoted#}</a></li>
+{* Redwine: to only show the saved links tab to the user owner of the profile. *}
+	{if $user_login eq $user_logged_in}
+		<li {if $user_view eq 'saved'}class="active"{/if}><a href="{$user_url_saved2}">{#PLIKLI_Visual_User_NewsSaved#}</a></li>
+	{/if}
+	{checkActionsTpl location="tpl_plikli_profile_sort_end"}
 </ul>
-
+{checkActionsTpl location="tpl_plikli_profile_end"}
 <!--/user_navigation.tpl -->

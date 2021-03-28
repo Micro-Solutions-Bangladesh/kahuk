@@ -12,7 +12,8 @@ include(mnminclude.'smartyvariables.php');
 $_REQUEST['search'] = str_replace(array('://',':/'),array(':\\',':\\'),$_REQUEST['search']);
 if (strstr($_REQUEST['search'],'/') && $URLMethod == 2)
 {
-    $post = split('/',$_REQUEST['search']);
+/* Redwine: using php explode() instead of the deprecated split() which generates warnings. */
+    $post = explode('/',$_REQUEST['search']);
     $_GET['search'] = $_REQUEST['search'] = $post[0];
     for ($i=1; $i+1<sizeof($post); $i+=2)
 	$_REQUEST[$post[$i]] = $post[$i+1];
@@ -78,9 +79,9 @@ $linksum_sql = $search->sql;
 
 
 if ($_GET['tag'])
-    $title = " | " . $main_smarty->get_config_vars("PLIGG_Visual_Search_Tags");
+    $title = " | " . $main_smarty->get_config_vars("PLIKLI_Visual_Search_Tags");
 else
-    $title = " | " . $main_smarty->get_config_vars("PLIGG_Visual_Search_Keywords");
+    $title = " | " . $main_smarty->get_config_vars("PLIKLI_Visual_Search_Keywords");
 $title .= " | " . sanitize($_GET['search'],4);
 
 do_rss_header($title);
@@ -111,7 +112,7 @@ if ($links) {
 		echo "<dc:creator>" . $link->username($link->author) . "</dc:creator>\n";
 		echo "<category>" . htmlspecialchars($category_name) . "</category>\n";
 		echo "<guid>".getmyFullurl("storyURL", $link->category_safe_names($link->category), urlencode($link->title_url), $link->id)."</guid>\n";
-		echo "<description><![CDATA[" . $link->link_summary . "<br/><br/>".$link->votes." ".$main_smarty->get_config_vars('PLIGG_Visual_RSS_Votes')." ]]></description>\n";
+		echo "<description><![CDATA[" . $link->link_summary . "<br/><br/>".$link->votes." ".$main_smarty->get_config_vars('PLIKLI_Visual_RSS_Votes')." ]]></description>\n";
 		echo "</item>\n\n";
 	}
 }
@@ -128,9 +129,9 @@ function do_rss_header($title) {
 	echo 'xmlns:dc="http://purl.org/dc/elements/1.1/"'."\n";
 	echo '>'. "\n";
 	echo '<channel>'."\n";
-	echo '<title>'.htmlspecialchars($main_smarty->get_config_vars("PLIGG_Visual_Name")).$title.'</title>'."\n";
-	echo '<link>'.my_base_url.my_pligg_base.'</link>'."\n";
-	echo '<description>'.$main_smarty->get_config_vars("PLIGG_Visual_RSS_Description").'</description>'."\n";
+	echo '<title>'.htmlspecialchars($main_smarty->get_config_vars("PLIKLI_Visual_Name")).$title.'</title>'."\n";
+	echo '<link>'.my_base_url.my_plikli_base.'</link>'."\n";
+	echo '<description>'.$main_smarty->get_config_vars("PLIKLI_Visual_RSS_Description").'</description>'."\n";
 	echo '<pubDate>'.date('D, d M Y H:i:s T', $last_modified-misc_timezone*3600).'</pubDate>'."\n";
 	echo '<language>'.$dblang.'</language>'."\n";
 }

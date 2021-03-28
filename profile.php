@@ -11,6 +11,9 @@ include(mnminclude.'user.php');
 include(mnminclude.'csrf.php');
 include(mnminclude.'smartyvariables.php');
 
+$_GET['login'] = sanitize($_GET['login'], 3);
+$_REQUEST['login'] = $_GET['login'] = preg_replace('/[^\p{L}\p{N}_\s\/]/u', '', $_GET['login']);
+
 #ini_set('display_errors', 1);
 error_reporting(E_ALL ^ E_NOTICE);
 
@@ -32,28 +35,32 @@ if ($_GET['login'] && $canIhaveAccess)
 elseif ($current_user->user_id > 0 && $current_user->authenticated) {
 	$login = $current_user->user_login;
 	if ($_GET['avatar'] != 'edit')
-	    header("Location: $my_base_url$my_pligg_base/user/$login/edit/");
+		if (urlmethod == 1) {
+			header("Location: $my_base_url$my_plikli_base/profile.php?login=$login");
+		}elseif (urlmethod == 2) {
+			header("Location: $my_base_url$my_plikli_base/user/$login/");
+		}
 } else {
-	//header('Location: '.$my_base_url.$my_pligg_base);
+	//header('Location: '.$my_base_url.$my_plikli_base);
 	//die;
-	$myname=$my_base_url.$my_pligg_base;
+	$myname=$my_base_url.$my_plikli_base;
 }
 
 // breadcrumbs and page title
-$navwhere['text1'] = $main_smarty->get_config_vars('PLIGG_Visual_Breadcrumb_Profile');
+$navwhere['text1'] = $main_smarty->get_config_vars('PLIKLI_Visual_Breadcrumb_Profile');
 $navwhere['link1'] = getmyurl('user2', $login, 'profile');
 $navwhere['text2'] = $login;
 $navwhere['link2'] = getmyurl('user2', $login, 'profile');
-$navwhere['text3'] = $main_smarty->get_config_vars('PLIGG_Visual_Profile_ModifyProfile');
+$navwhere['text3'] = $main_smarty->get_config_vars('PLIKLI_Visual_Profile_ModifyProfile');
 $navwhere['link3'] = getmyurl('profile', '');
 $main_smarty->assign('navbar_where', $navwhere);
-$main_smarty->assign('posttitle', $main_smarty->get_config_vars('PLIGG_Visual_Profile_ModifyProfile'));
+$main_smarty->assign('posttitle', $main_smarty->get_config_vars('PLIKLI_Visual_Profile_ModifyProfile'));
 
 // read the users information from the database
 $user=new User();
 $user->username = $login;
 if(!$user->read()) {
-	header('Location: '.$my_base_url.$my_pligg_base);
+	header('Location: '.$my_base_url.$my_plikli_base);
 	die;
 }
 
@@ -62,6 +69,8 @@ $main_smarty->assign('user_url_personal_data2', getmyurl('user2', $login));
 $main_smarty->assign('user_url_news_sent2', getmyurl('user2', $login, 'history'));
 $main_smarty->assign('user_url_news_published2', getmyurl('user2', $login, 'published'));
 $main_smarty->assign('user_url_news_unpublished2', getmyurl('user2', $login, 'new'));
+$main_smarty->assign('user_url_draft2', getmyurl('user2', $login, 'draft'));
+$main_smarty->assign('user_url_scheduled2', getmyurl('user2', $login, 'scheduled'));
 $main_smarty->assign('user_url_news_voted2', getmyurl('user2', $login, 'voted'));
 $main_smarty->assign('user_url_news_upvoted2', getmyurl('user2', $login, 'upvoted'));
 $main_smarty->assign('user_url_news_downvoted2', getmyurl('user2', $login, 'downvoted'));	
@@ -81,8 +90,13 @@ $main_smarty->assign('user_following', $user->getFollowingCount());
 
 	// uploading avatar
 	if(isset($_POST["avatar"]) && sanitize($_POST["avatar"], 3) == "uploaded" && Enable_User_Upload_Avatar == true){
-		if ($CSRF->check_valid(sanitize($_POST['token'], 3), 'profile_change')){
-
+		// Redwine: if TOKEN is empty, no need to continue, just display the invalid token error.
+		if (empty($_POST['token'])) {
+			$CSRF->show_invalid_error(1);
+			exit;
+		}
+		// Redwine: if valid TOKEN, proceed. A valid integer must be equal to 2.
+		if ($CSRF->check_valid(sanitize($_POST['token'], 3), 'profile_change') == 2){
 			$user_image_path = "avatars/user_uploaded" . "/";
 			$user_image_apath = "/" . $user_image_path;
 			$allowedFileTypes = array("image/jpeg","image/gif","image/png",'image/x-png','image/pjpeg');
@@ -92,6 +106,9 @@ $main_smarty->assign('user_following', $user->getFollowingCount());
 			$imagename = basename($myfile);
 
 			$mytmpfile = $_FILES['image_file']['tmp_name'];
+			if ($_FILES['image_file']["size"]/1024 > max_avatar_size) {
+				$error['Type'] = 'Maximum file size '. max_avatar_size . 'Kb exceeded';
+			}
 
 			if(!in_array($_FILES['image_file']['type'],$allowedFileTypes)){
 				$error['Type'] = 'Only these file types are allowed : jpeg, gif, png';
@@ -109,6 +126,8 @@ $main_smarty->assign('user_following', $user->getFollowingCount());
 				$result = move_uploaded_file($_FILES['image_file']['tmp_name'], $newimage);
 				if(empty($result))
 					$error["result"] = "There was an error moving the uploaded file.";
+			}else{
+				$main_smarty->assign('error', $error); 
 			}			
 		
 			// create large avatar
@@ -131,10 +150,13 @@ $main_smarty->assign('user_following', $user->getFollowingCount());
 			$db->query($sql="UPDATE ".table_users." SET user_avatar_source='useruploaded' WHERE user_id='$user->id'");	
 			unset($cached_users[$user->id]);
 		} else {
-			echo 'An error occured while uploading your avatar.';
+			$CSRF->show_invalid_error(1);
+			exit;
 		}
 			
-	}		
+	}/*else{
+		echo 'An error occured while uploading your avatar.';
+	}*/		
 
 	if(isset($error) && is_array($error)) {
 		while(list($key, $val) = each($error)) {
@@ -153,11 +175,11 @@ if(isset($_POST['email'])){
 				
 	}else
 	{
-		$save_message_text=$main_smarty->get_config_vars("PLIGG_Visual_Profile_DataUpdated");
+		$save_message_text=$main_smarty->get_config_vars("PLIKLI_Visual_Profile_DataUpdated");
 		if($savemsg['username']==1)
-		 $save_message_text.="<br/>".$main_smarty->get_config_vars("PLIGG_Visual_Profile_UsernameUpdated");
+		 $save_message_text.="<br/>".$main_smarty->get_config_vars("PLIKLI_Visual_Profile_UsernameUpdated");
 		if($savemsg['pass']==1)
-		 $save_message_text.="<br/>".$main_smarty->get_config_vars("PLIGG_Visual_Profile_PassUpdated");
+		 $save_message_text.="<br/>".$main_smarty->get_config_vars("PLIKLI_Visual_Profile_PassUpdated");
 
 	    // Reload the page if no error
 	    $_SESSION['savemsg'] = $save_message_text;
@@ -216,7 +238,7 @@ function show_profile() {
 	$main_smarty->assign('user_published_votes', $user->published_votes);
 	
 	// If the user language setting is NULL, present the site's default language file
-	$main_smarty->assign('user_language', !empty($user->language) ? $user->language : pligg_language);
+	$main_smarty->assign('user_language', !empty($user->language) ? $user->language : plikli_language);
 
 	$languages = array();
 	$files = glob("languages/*.conf");
@@ -266,35 +288,87 @@ function show_profile() {
 
 	// show the template
 	$main_smarty->assign('tpl_center', $the_template . '/user_settings_center');
-	$main_smarty->display($the_template . '/pligg.tpl');	
+	$main_smarty->display($the_template . '/plikli.tpl');	
 }
 
 function save_profile() {
 	global $user, $current_user, $db, $main_smarty, $CSRF, $canIhaveAccess, $language;
-  
-  
-
-	if ($CSRF->check_valid(sanitize($_POST['token'], 3), 'profile_change')){
-	
+	// Redwine: if TOKEN is empty, no need to continue, just display the invalid token error.
+	if (empty($_POST['token'])) {
+		$CSRF->show_invalid_error(1);
+		exit;
+	}
+	// Redwine: if valid TOKEN, proceed. A valid integer must be equal to 2.
+	if ($CSRF->check_valid(sanitize($_POST['token'], 3), 'profile_change') == 2){
 		if(!isset($_POST['save_profile']) || !$_POST['process'] || (!$canIhaveAccess && sanitize($_POST['user_id'], 3) != $current_user->user_id)) return;
+		//Redwine: sanitizing the POST and REQUEST
+		$sanitezedPOST = array();
+		foreach ($_REQUEST as $key => $value) {
+			if ($key == 'login') {
+				$sanitezedPOST[$key] = filter_var($value, FILTER_SANITIZE_STRING);
+			}elseif ($key == 'user_login') {
+				$sanitezedPOST[$key] = filter_var($value, FILTER_SANITIZE_STRING); 
+			}elseif ($key == 'email') {
+				if (filter_var(filter_var($value, FILTER_SANITIZE_EMAIL), FILTER_VALIDATE_EMAIL)) {
+					$sanitezedPOST[$key] = filter_var($value, FILTER_SANITIZE_EMAIL);
+				}else{
+					$sanitezedPOST[$key] = '';
+				}
+			}elseif ($key == 'public_email') {
+				if (filter_var(filter_var($value, FILTER_SANITIZE_EMAIL), FILTER_VALIDATE_EMAIL)) {
+					$sanitezedPOST[$key] = filter_var($value, FILTER_SANITIZE_EMAIL);
+				}else{
+					$sanitezedPOST[$key] = '';
+				}
+			}elseif ($key == 'url') {
+				if (filter_var(filter_var($value, FILTER_SANITIZE_URL), FILTER_VALIDATE_URL)) {
+					$sanitezedPOST[$key] = filter_var($value, FILTER_SANITIZE_URL);
+				}else{
+					$sanitezedPOST[$key] = '';
+				}
+			}elseif ($key == 'process') {
+				if (filter_var(filter_var($value, FILTER_SANITIZE_NUMBER_INT), FILTER_VALIDATE_INT)) {
+					$sanitezedPOST[$key] = filter_var($value, FILTER_SANITIZE_NUMBER_INT);
+				}else{
+					$sanitezedPOST[$key] = '';
+				}
+			}elseif ($key == 'user_id') {
+				if (filter_var(filter_var($value, FILTER_SANITIZE_NUMBER_INT), FILTER_VALIDATE_INT)) {
+					$sanitezedPOST[$key] = filter_var($value, FILTER_SANITIZE_NUMBER_INT);
+				}else{
+					$sanitezedPOST[$key] = '';
+				}
+			}elseif ($key == 'chack') {
+				foreach ($_REQUEST['chack'] as $k => $v) {
+					if (filter_var(filter_var($v, FILTER_SANITIZE_NUMBER_INT), FILTER_VALIDATE_INT)) {
+						$sanitezedPOST[$key][$k] = filter_var($v, FILTER_SANITIZE_NUMBER_INT);
+					}else{
+						$sanitezedPOST[$key][$k] = '';
+					}
+				}
+			}else{
+				$sanitezedPOST[$key] = filter_var($value, FILTER_SANITIZE_STRING);
+			}
+		}
+		$_POST = $_REQUEST = $sanitezedPOST;
 		
 		if ($user->email!=sanitize($_POST['email'], 3))
 		{
 		    if(!check_email(sanitize($_POST['email'], 3))) {
-			$savemsg = $main_smarty->get_config_vars("PLIGG_Visual_Profile_BadEmail");
+			$savemsg = $main_smarty->get_config_vars("PLIKLI_Visual_Profile_BadEmail");
 			return $savemsg;
 		    } 
 		    elseif(email_exists(trim(sanitize($_POST['email'], 3)))) { // if email already exists
-			$savemsg = $main_smarty->get_config_vars("PLIGG_Visual_Register_Error_EmailExists");
+			$savemsg = $main_smarty->get_config_vars("PLIKLI_Visual_Register_Error_EmailExists");
 			return $savemsg;
 		    }
 		    else {
-			if(pligg_validate()){
-				$encode=md5($_POST['email'] . $user->karma .  $user->username. pligg_hash().$main_smarty->get_config_vars('PLIGG_Visual_Name'));
+			if(plikli_validate()){
+				$encode=md5($_POST['email'] . $user->karma .  $user->username. plikli_hash().$main_smarty->get_config_vars('PLIKLI_Visual_Name'));
 
-				$domain = $main_smarty->get_config_vars('PLIGG_Visual_Name');			
-				$validation = my_base_url . my_pligg_base . "/validation.php?code=$encode&uid=".urlencode($user->username)."&email=".urlencode($_POST['email']);
-				$str = $main_smarty->get_config_vars('PLIGG_PassEmail_verification_message');
+				$domain = $main_smarty->get_config_vars('PLIKLI_Visual_Name');			
+				$validation = my_base_url . my_plikli_base . "/validation.php?code=$encode&uid=".urlencode($user->username)."&email=".urlencode($_POST['email']);
+				$str = $main_smarty->get_config_vars('PLIKLI_PassEmail_verification_message');
 				eval('$str = "'.str_replace('"','\"',$str).'";');
 				$message = "$str";
 
@@ -303,19 +377,19 @@ function save_profile() {
 				else
 					require("libs/class.phpmailer4.php");
 				$mail = new PHPMailer();
-				$mail->From = $main_smarty->get_config_vars('PLIGG_PassEmail_From');
-				$mail->FromName = $main_smarty->get_config_vars('PLIGG_PassEmail_Name');
+				$mail->From = $main_smarty->get_config_vars('PLIKLI_PassEmail_From');
+				$mail->FromName = $main_smarty->get_config_vars('PLIKLI_PassEmail_Name');
 				$mail->AddAddress($_POST['email']);
-				$mail->AddReplyTo($main_smarty->get_config_vars('PLIGG_PassEmail_From'));
+				$mail->AddReplyTo($main_smarty->get_config_vars('PLIKLI_PassEmail_From'));
 				$mail->IsHTML(false);
-				$mail->Subject = $main_smarty->get_config_vars('PLIGG_PassEmail_Subject_verification');
+				$mail->Subject = $main_smarty->get_config_vars('PLIKLI_PassEmail_Subject_verification');
 				$mail->Body = $message;
 				$mail->CharSet = 'utf-8';
 
 #print_r($mail);					
 				if(!$mail->Send())
 					return false;
-				$savemsg = $main_smarty->get_config_vars("PLIGG_Visual_Register_Noemail").' '.sprintf($main_smarty->get_config_vars("PLIGG_Visual_Register_ToDo"),$main_smarty->get_config_vars('PLIGG_PassEmail_From'));
+				$savemsg = $main_smarty->get_config_vars("PLIKLI_Visual_Register_Noemail").' '.sprintf($main_smarty->get_config_vars("PLIKLI_Visual_Register_ToDo"),$main_smarty->get_config_vars('PLIKLI_PassEmail_From'));
 			}
 			else
 				$user->email=sanitize($_POST['email'], 2);
@@ -325,23 +399,28 @@ function save_profile() {
 		// User settings
 		if (Allow_User_Change_Templates && file_exists("./templates/".$_POST['template']."/header.tpl"))
 		{
-			$domain = $_SERVER['HTTP_HOST']=='localhost' ? '' : preg_replace('/^www/','',$_SERVER['HTTP_HOST']);
+			$domain = preg_replace('/^www/','',$_SERVER['HTTP_HOST']);
+			// Remove port information.
+			$port = strpos($domain, ':');
+			if ($port !== false)  $domain = substr($domain, 0, $port);			
+			if (!strstr($domain,'.') || strpos($domain,'localhost:')===0) $domain='';
 			setcookie("template", $_POST['template'], time()+60*60*24*30,'/',$domain);
 		}
 
 		$sqlGetiCategory = "SELECT category__auto_id from " . table_categories . " where category__auto_id!= 0;";
-		$sqlGetiCategoryQ = mysql_query($sqlGetiCategory);
-		$arr = array();
-		while ($row = mysql_fetch_array($sqlGetiCategoryQ, MYSQL_NUM)) 
-			$arr[] = $row[0];
-
+		$sqlGetiCategoryQ = $db->get_col($sqlGetiCategory);
+		/* Redwine: changed the query above to get_col and therefore we do not need to create $arr anymore. */
+		/*$arr = array();
+		foreach($sqlGetiCategoryQ as $row) { 
+			$arr[] = $row;
+		}*/
 		$select_check = $_POST['chack'];
 		if (!$select_check) $select_check = array();
-		$diff = array_diff($arr,$select_check);
+		$diff = array_diff($sqlGetiCategoryQ,$select_check);
 		$select_checked = $db->escape(implode(",",$diff));
 
 		$sql = "UPDATE " . table_users . " set user_categories='$select_checked' WHERE user_id = '{$user->id}'";	
-		$query = mysql_query($sql);
+		$query = $db->query($sql);
 		/////
 		
 		// Santizie user input
@@ -404,20 +483,20 @@ function save_profile() {
 			 $user_login=sanitize($_POST['user_login'], 2);
 				
 			if (preg_match('/\pL/u', 'a')) {	// Check if PCRE was compiled with UTF-8 support
-			if (!preg_match('/^[_\-\d\p{L}\p{M}]+$/iu',$user_login)) { // if username contains invalid characters
-			$savemsg = $main_smarty->get_config_vars('PLIGG_Visual_Register_Error_UserInvalid');
+			if (!preg_match('/^[_\d\p{L}\p{M}]+$/iu',$user_login)) { // if username contains invalid characters
+			$savemsg = $main_smarty->get_config_vars('PLIKLI_Visual_Register_Error_UserInvalid');
 			return $savemsg;
 			}
 			} else {
 				if (!preg_match('/^[^~`@%&=\\/;:\\.,<>!"\\\'\\^\\.\\[\\]\\$\\(\\)\\|\\*\\+\\-\\?\\{\\}\\\\]+$/', $user_login)) {
-				$savemsg = $main_smarty->get_config_vars('PLIGG_Visual_Register_Error_UserInvalid');
+				$savemsg = $main_smarty->get_config_vars('PLIKLI_Visual_Register_Error_UserInvalid');
 				 return $savemsg;
 				}
 			}
 		
 					
 			if(user_exists(trim($user_login)) ) {
-			  $savemsg = $main_smarty->get_config_vars("PLIGG_Visual_Register_Error_UserExists");
+			  $savemsg = $main_smarty->get_config_vars("PLIKLI_Visual_Register_Error_UserExists");
 			  $user->username= $user_login;
 			  return $savemsg;
 			
@@ -430,20 +509,19 @@ function save_profile() {
 	    }
 	
 		if(!empty($_POST['newpassword']) || !empty($_POST['newpassword2'])) {
-			$oldpass = sanitize($_POST['oldpassword'], 2);
+			$oldpass = sanitize($_POST['oldpassword'], 0);
 			$userX=$db->get_row("SELECT user_id, user_pass, user_login FROM " . table_users . " WHERE user_login = '".$user->username."'");
-			$saltedpass=generateHash($oldpass, substr($userX->user_pass, 0, SALT_LENGTH));
-			if($userX->user_pass == $saltedpass){
+            if(verifyPassHash($oldpass, $userX->user_pass)){
 				if(sanitize($_POST['newpassword'], 3) !== sanitize($_POST['newpassword2'], 3)) {
-					$savemsg = $main_smarty->get_config_vars("PLIGG_Visual_Profile_BadPass");
+					$savemsg = $main_smarty->get_config_vars("PLIKLI_Visual_Profile_BadPass");
 					return $savemsg;
 				} else {
-					$saltedpass=generateHash(sanitize($_POST['newpassword'], 3));
+					$saltedpass=generatePassHash(sanitize($_POST['newpassword'], 3));
 					$user->pass = $saltedpass;
 					$saved['pass']=1;
 				}
 			} else {
-				$savemsg = $main_smarty->get_config_vars("PLIGG_Visual_Profile_BadOldPass");
+				$savemsg = $main_smarty->get_config_vars("PLIKLI_Visual_Profile_BadOldPass");
 				return $savemsg;
 			}
 		}
@@ -451,14 +529,15 @@ function save_profile() {
 		$user->store();
 		$user->read();
 		if($saved['pass']==1 || $saved['username']==1)
-		 $current_user->Authenticate($user->username, $user->pass, false, $user->pass);
+		 $current_user->Authenticate($user->username, $user->pass, false);
 		else{
 		 $current_user->Authenticate($user->username, $user->pass);
 		 $saved['profile']=1;
 		}
 		return $saved;
 	} else {
-		return 'There was a token error.';
+		$CSRF->show_invalid_error(1);
+		exit;
 	}
 }
 

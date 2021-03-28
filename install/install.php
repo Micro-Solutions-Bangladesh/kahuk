@@ -19,7 +19,7 @@ if (file_exists($include)) { include_once($include); }
 $include='functions.php'; 
 if (file_exists($include)) { require_once($include); }
 
-echo '<div class="steps"><legend>' . $lang['Step'] . ' '.$step.'</legend></div>';
+echo '<fieldset><legend>' . $lang['Step'] . ' '.$step.'</legend>';
 echo '<div class="installercontent">';
 
 // intro

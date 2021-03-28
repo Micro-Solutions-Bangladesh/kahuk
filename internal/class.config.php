@@ -35,7 +35,7 @@ class config {
 	var $_bool_false_regexp		= null;
 	var $_qstr_regexp		= null;
 
-	function config()
+	function __construct()
 	{
 		$this->_db_qstr_regexp = '"[^"\\\\]*(?:\\\\.[^"\\\\]*)*"';
 		$this->_bool_true_regexp = 'true|yes|on';
@@ -45,10 +45,10 @@ class config {
 
 	function config_load($file, $section_name = null, $var_name = null)
 	{
-
 		if (preg_match('/^(.+)\.([^\.]+)$/',$file,$m))
 		{
-		    include ('../settings.php');
+			/* Redwwine: the include file always failed and generated warnings. Added mnmpath to correct it. */
+		    include (mnmpath.'settings.php');
 		    $file2 = "{$m[1]}_$language.{$m[2]}";
 		    if (file_exists($file2)) $file = $file2;
 		}

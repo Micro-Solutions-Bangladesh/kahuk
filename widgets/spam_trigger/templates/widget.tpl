@@ -1,13 +1,15 @@
-{php}
-global $db;
-$links = $db->get_var("SELECT COUNT(*) FROM ".table_links." WHERE link_status='moderated'");
-$comments = $db->get_var("SELECT COUNT(*) FROM ".table_comments." WHERE comment_status='moderated'");
-if ($links>0 || $comments>0)
-{
-    print('<p>');
-    printf($this->_confs['PLIGG_Spam_Trigger_Notification'], 
-	$links>0 ? "<strong>There are <a href='admin_links.php?filter=moderated' style='text-decoration:underline;'>$links stories awaiting moderation</a>!</strong>" : 'There are no stories awaiting moderation.', 
-	$comments>0 ? "<strong>There are <a href='admin_comments.php?filter=moderated' style='text-decoration:underline;'>$comments comments awaiting moderation</a>!</strong>" : 'There are no comments awaiting moderation.');
-    print('</p>');
-}
-{/php}
+{* Redwine: changed the data to display to also include spam comments *}
+<ul>
+	{if $moderated_submissions_count gt 0}
+	<li><strong><a href='admin_links.php?filter=moderated' style='text-decoration:underline;'>You have {if $moderated_submissions_count gt 1}{$moderated_submissions_count} Stories {elseif $moderated_submissions_count eq 1}{$moderated_submissions_count} Story {elseif $moderated_submissions_count eq ''} 0 Story{/if}  awaiting moderation</a></strong></li>
+	{/if}
+	
+	{if $moderated_comments_count gt 0}
+	<li><strong><a href='admin_comments.php?filter=moderated' style='text-decoration:underline;'>You have {if $moderated_comments_count gt 1}{$moderated_comments_count} Comments {elseif $moderated_comments_count eq 1}{$moderated_comments_count} Comment {elseif $moderated_comments_count eq ''} 0 Comment{/if}  awaiting moderation</a></strong></li>
+	{/if}
+	
+	{if $spam_comments_count gt 0}
+	<li><strong><a href='admin_comments.php?filter=spam' style='text-decoration:underline;'>You have {if $spam_comments_count gt 1}{$spam_comments_count} SPAM Comments {elseif $spam_comments_count eq 1}{$spam_comments_count} SPAM Comment {elseif $spam_comments_count eq ''} 0 SPAM Comment{/if}  awaiting revision</a></strong></li>
+	{/if}
+	
+</ul>

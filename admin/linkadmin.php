@@ -16,7 +16,8 @@ force_authentication();
 $canIhaveAccess = 0;
 $canIhaveAccess = $canIhaveAccess + checklevel('admin');
 $canIhaveAccess = $canIhaveAccess + checklevel('moderator');
-
+/* Redwine: Roles and permissions and Groups fixes */
+$is_moderator = checklevel('moderator'); // Moderators have a value of '1' for the variable $is_moderator
 if($canIhaveAccess == 1)
 {
 	if(isset($_REQUEST["action"])){
@@ -48,7 +49,12 @@ if($canIhaveAccess == 1)
 				
 				// show the template
 				$main_smarty->assign('tpl_center', '/admin/submission_view');
-				$main_smarty->display($template_dir . '/admin/admin.tpl');
+/* Redwine: To properly display the template according to the Roles and Permissions */
+				if ($is_moderator == '1'){
+					$main_smarty->display('/admin/moderator.tpl');
+				} else {
+					$main_smarty->display('/admin/admin.tpl');
+				}
 			}
 			else
 			{
@@ -78,7 +84,12 @@ if($canIhaveAccess == 1)
 				
 				//show the template
 				$main_smarty->assign('tpl_center', '/admin/submission_status');
-				$main_smarty->display($template_dir . '/admin/admin.tpl');
+/* Redwine: To properly display the template according to the Roles and Permissions */
+				if ($is_moderator == '1'){
+					$main_smarty->display('/admin/moderator.tpl');
+				} else {
+					$main_smarty->display('/admin/admin.tpl');
+				}
 	
 			}
 			else
@@ -108,7 +119,12 @@ if($canIhaveAccess == 1)
 
 			// show the template
 			$main_smarty->assign('tpl_center', '/admin/submission_update');
-			$main_smarty->display($template_dir . '/admin/admin.tpl');
+/* Redwine: To properly display the template according to the Roles and Permissions */
+			if ($is_moderator == '1'){
+				$main_smarty->display('/admin/moderator.tpl');
+			} else {
+				$main_smarty->display('/admin/admin.tpl');
+			}
 			}else{
 				echo 'Error: link not found';
 			}

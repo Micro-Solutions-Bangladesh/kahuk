@@ -18,27 +18,27 @@ if(isset($_POST['id'])){
 	$comment->read();
 	
 	if ($current_user->user_id == 0 && !anonnymous_vote) {
-		error($main_smarty->get_config_vars('PLIGG_Visual_Vote_NoAnon'));
+		error($main_smarty->get_config_vars('PLIKLI_Visual_Vote_NoAnon'));
 	}
 
 	if($current_user->user_id != sanitize($_POST['user'], 3)) {
-		error($main_smarty->get_config_vars('PLIGG_Visual_Vote_BadUser'). $current_user->user_id . '-'. sanitize($_POST['user'], 3));
+		error($main_smarty->get_config_vars('PLIKLI_Visual_Vote_BadUser'). $current_user->user_id . '-'. sanitize($_POST['user'], 3));
 	}
 
 	$md5=md5(sanitize($_POST['user'], 3).$comment->randkey);
 	if($md5 !== sanitize($_POST['md5'], 3)){
-		error($main_smarty->get_config_vars('PLIGG_Visual_Vote_BadKey'));
+		error($main_smarty->get_config_vars('PLIKLI_Visual_Vote_BadKey'));
 	}
 
 	$value = sanitize($_POST['value'], 3);
-	if(sanitize($_POST['unvote'], 3) == 'true') {
+	if(isset($_POST['unvote']) && sanitize($_POST['unvote'], 3) == 'true') {
 	    $comment->remove_vote($current_user->user_id, $value);
 	} else {
 		if($comment->votes($current_user->user_id, $value<0 ? '<0' : '>0') <> 0 ||
 		   // DB 11/10/08
 		   (votes_per_ip > 0 && $comment->votes_from_ip() >= votes_per_ip)) {
 		   /////
-			error($main_smarty->get_config_vars('PLIGG_Visual_Vote_AlreadyVoted'));
+			error($main_smarty->get_config_vars('PLIKLI_Visual_Vote_AlreadyVoted'));
 		}
 		
 		if($value < -10 || $value > 10){

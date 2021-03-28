@@ -4,42 +4,51 @@ date_default_timezone_set('UTC');
 if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
 
 function mailer_start(){
-	// Usually a module will define Pligg_Mailer
+	// Usually a module will define Plikli_Mailer
 	// If defined, then include call the function thats starts (includes) it
 
-	if(defined('Pligg_Mailer') && function_exists(Pligg_Mailer . '_mailer_start')){
-		call_user_func(Pligg_Mailer . '_mailer_start');
+	if(defined('Plikli_Mailer') && function_exists(Plikli_Mailer . '_mailer_start')){
+		call_user_func(Plikli_Mailer . '_mailer_start');
 	} else {
 		include_once(mnminclude.'mailer.php');
 	}
 }
 
 function check_if_table_exists($table) {
-	// checks to see if a table in the database exists
-	$result = mysql_query('select * from ' . $table);
-	if (!$result) {
-		return false;
+	/* Redwine: creating a mysqli connection */
+	$handle = new mysqli(EZSQL_DB_HOST,EZSQL_DB_USER,EZSQL_DB_PASSWORD,EZSQL_DB_NAME);
+	/* check connection */
+	if (mysqli_connect_errno()) {
+		printf("Connect failed: %s\n", mysqli_connect_error());
+		exit();
 	}
-	return true;
+	
+	$result = $handle->query("SHOW TABLES LIKE '".$table."';");
+	$numRows = $result->num_rows;
+	if ($numRows < 1) {
+		return false;
+	}else{
+		return true;
+	}
 }
 
-function pligg_version(){
-	// returns the version of Pligg that's installed 
-	$ver = get_misc_data('pligg_version');
+function plikli_version(){
+	// returns the version of Plikli that's installed 
+	$ver = get_misc_data('plikli_version');
 	return $ver;
 }
 
-function pligg_hash(){
-	// returns the version of Pligg that's installed 
+function plikli_hash(){
+	// returns the hash from the misc_table 
 	$hash = get_misc_data('hash');
 	return $hash;
 }
 
 
-function pligg_validate(){
+function plikli_validate(){
 	// returns the value for register validation 
 	$vars = array('validate' => misc_validate);
-	check_actions('pligg_validate', $vars);
+	check_actions('plikli_validate', $vars);
 
 	return $vars['validate'];
 }
@@ -112,7 +121,8 @@ function email_exists($email) {
 
 function check_email($email) {
 	// checks to see if email is valid
-	return preg_match('/^[a-zA-Z0-9!#\\$%&\'\\*\\+\\-\\/=\\?\\^_`\\{\\|\\}~\\.]+@[a-zA-Z0-9_\\-\\.]+\.[a-zA-Z]{2,4}$/', $email);
+	/* Redwine: fixed the regex to account for new domains up to 15 characters long */
+	return preg_match('/^[a-zA-Z0-9!#\\$%&\'\\*\\+\\-\\/=\\?\\^_`\\{\\|\\}~\\.]+@[a-zA-Z0-9_\\-\\.]+\.[a-zA-Z]{2,15}$/', $email);
 
 }
 
@@ -166,20 +176,20 @@ function txt_time_diff($from, $now=0){
 	$diff=$diff%3600;
 	$minutes=intval($diff/60);
 
-	if($days>1) $txt  .= " $days ".$main_smarty->get_config_vars('PLIGG_Visual_Story_Times_Days');
-	else if ($days==1) $txt  .= " $days ".$main_smarty->get_config_vars('PLIGG_Visual_Story_Times_Day');
+	if($days>1) $txt  .= " $days ".$main_smarty->get_config_vars('PLIKLI_Visual_Story_Times_Days');
+	else if ($days==1) $txt  .= " $days ".$main_smarty->get_config_vars('PLIKLI_Visual_Story_Times_Day');
 
 	if($days < 2){
-		if($hours>1) $txt .= " $hours ".$main_smarty->get_config_vars('PLIGG_Visual_Story_Times_Hours');
-		else if ($hours==1) $txt  .= " $hours ".$main_smarty->get_config_vars('PLIGG_Visual_Story_Times_Hour');
+		if($hours>1) $txt .= " $hours ".$main_smarty->get_config_vars('PLIKLI_Visual_Story_Times_Hours');
+		else if ($hours==1) $txt  .= " $hours ".$main_smarty->get_config_vars('PLIKLI_Visual_Story_Times_Hour');
 	
 		if($hours < 3){
-			if($minutes>1) $txt .= " $minutes ".$main_smarty->get_config_vars('PLIGG_Visual_Story_Times_Minutes');
-			else if ($minutes==1) $txt  .= " $minutes ".$main_smarty->get_config_vars('PLIGG_Visual_Story_Times_Minute');
+			if($minutes>1) $txt .= " $minutes ".$main_smarty->get_config_vars('PLIKLI_Visual_Story_Times_Minutes');
+			else if ($minutes==1) $txt  .= " $minutes ".$main_smarty->get_config_vars('PLIKLI_Visual_Story_Times_Minute');
 		}
 	}
 	
-	if($txt=='') $txt = ' '. $main_smarty->get_config_vars('PLIGG_Visual_Story_Times_FewSeconds') . ' ';
+	if($txt=='') $txt = ' '. $main_smarty->get_config_vars('PLIKLI_Visual_Story_Times_FewSeconds') . ' ';
 	return $txt;
 }
 
@@ -194,11 +204,13 @@ function save_text_to_html($string) {
 	$string = strip_tags(trim($string));
 	$string= htmlspecialchars($string);
 //	$string= text_to_html($string);
-	$string = preg_replace("/[\r\n]{2,}/", "<br /><br />\n", $string);
+/* Redwine: modifying the conversion of the return and newline because they were converted to double breaks. */
+	$string = nl2br($string);
 	return $string;
 }
 
 function text_to_html($string) {
+/* Redwine: This was a suggested fix to address an issue where links wouldn't end at a line break within comments and stories when the Links module is enabled. See https://github.com/Pligg/pligg-cms/commit/93e3fd6381ae2613acb78332e7a09c5d4315e654 */
     return preg_replace('/([hf][tps]{2,4}:\/\/[^ \t\n\r]+[^ .\<br \/\>\t,\n\r\(\)"\'])/', '<a href="$1">$1</a>', $string);
 }
 
@@ -237,7 +249,7 @@ function get_date($epoch) {
 }
 
 function get_base_url($url){
-	// get base of URL. For example, get_base_url will return www.pligg.com if the URL was www.pligg.com/support/
+	// get base of URL. For example, get_base_url will return www.plikli.com if the URL was www.plikli.com/support/
    $req = $url;
   
    $pos = strpos($req, '://');
@@ -281,17 +293,29 @@ function makeUrlFriendly($output, $isPage=false) {
 	if ($isPage===true) return $output;
    
 	// check to see if the story title already exists. If so, add an integer to the end of the title
-	$n = $db->get_var("SELECT COUNT(*) FROM " . table_links . " WHERE link_title_url like '$output%'" .
+	$n = $db->get_var("SELECT `link_title_url` FROM " . table_links . " WHERE link_title_url like '$output%'" .
 				($isPage > 0 ? " AND link_id!=$isPage" : ''));
-	if ($n > 0)
-		return $output . '-' . ($n+1);
-	else
+	if ($n) {
+		$numbers = array();
+		$title_array =  object_2_array($n);
+		foreach($title_array as $key => $val) {
+			foreach($val as $ntitle) {
+				$end_number = substr($ntitle, -1);
+				if (is_numeric($end_number)) {
+					$numbers[] = $end_number;
+				}
+			}
+		}
+		while( in_array( ($num = rand(1,9)), $numbers ) );
+		return $output . '-' . ($num);
+	}else{
 		return $output;
+	}
 }
 
 function utils_makeUrlFriendly($output)
 {
-	if ($output == '') return $input;
+	//if ($output == '') return $input; ?????
 
 	//$input = remove_error_creating_chars($input);
 	$output = utf8_substr($output, 0, 240);
@@ -302,8 +326,13 @@ function utils_makeUrlFriendly($output)
       		$translations = parse_ini_file(mnmpath.'languages/translit.txt');
   		$output = strtr($output, $translations);
 	} 
-		
-	$output = preg_replace("/\s/e" , "_" , $output); 	// Replace spaces with underscores
+	/* Redwine: the preg_replace to replace spaces with underscores used with the \e modifiyer is generating a notice even in PHP version 5.4.3.
+	   We really don't need the \e modifiyer which is deprecated as of PHP 5.5.0, and REMOVED as of PHP 7.0.0
+	   In addition, the pattern will not remove multiple consecutive spaces and replaces each space with the underscore; we end up with "Hello____there!"
+	   but when we change it to /\s+/ then it removes the multiple spaces and replaces them with one underscore!
+	*/	
+	//$output = preg_replace("/\s/e" , "_" , $output); 	// Replace spaces with underscores
+	$output = preg_replace ("/\s+/" , "_" , $output);
 	$output = str_replace("_", "-", $output); 	
 	$output = str_replace("&amp;", "", $output); 	 
 	$output = str_replace("__", "_", $output); 	 
@@ -422,39 +451,55 @@ function loghack($page, $extradata, $silent=false){
 }
 
 function checkforfield($fieldname, $table) {
-	// checks to see if field exists in table
-	$result = mysql_query('select * from ' . $table . ' LIMIT 1');
+	/* Redwine: creating a mysqli connection */
+	$handle = new mysqli(EZSQL_DB_HOST,EZSQL_DB_USER,EZSQL_DB_PASSWORD,EZSQL_DB_NAME);
+	/* check connection */
+	if (mysqli_connect_errno()) {
+		printf("Connect failed: %s\n", mysqli_connect_error());
+		exit();
+	}
+	$result = $handle->query('select * from ' . $table . ' LIMIT 1');
 	if (!$result) {
 		echo "<HR />ERROR! The table " . $table . " is missing! Are you sure you should be doing an upgrade?<HR />";
 		return true;
-	}
-	$i = 0;
-	while ($i < mysql_num_fields($result)) {
-	   $meta = mysql_fetch_field($result, $i);
-	   if (!$meta) {
+	}else{
+		$meta = mysqli_fetch_fields($result);
+		if (!$meta) {
 		   echo "No information available<br />\n";
-	   }
-	   else {
-			if(strtolower($meta->name) == strtolower($fieldname)){
-				return true;
+		}else{
+			foreach($meta as $val) {
+				if(strtolower($val->name) == strtolower($fieldname)){
+					return true;
+				}
 			}
-	   }
-	   $i++;
+			return false;
+		}
 	}
-	return false;
+	$handle->close();
 }
 
 function checkforindex($indexname, $table) {
 	// checks to see if field exists in table
-	$result = mysql_query('SHOW INDEX from ' . $table);
+	/* Redwine: creating a mysqli connection */
+	$handle = new mysqli(EZSQL_DB_HOST,EZSQL_DB_USER,EZSQL_DB_PASSWORD,EZSQL_DB_NAME);
+	/* check connection */
+	if (mysqli_connect_errno()) {
+		printf("Connect failed: %s\n", mysqli_connect_error());
+		exit();
+	}
+	$query = "SHOW INDEX FROM " . $table;
+	$result = $handle->query($query);
 	if (!$result) {
 		echo "<HR />ERROR! The table " . $table . " is missing! Are you sure you should be doing an upgrade?<HR />";
 		return true;
+	}else{
+		foreach($result as $row) {
+			if(strtolower($row['Column_name']) == strtolower($indexname))
+			return true;
+		}
 	}
-	while ($row = mysql_fetch_array($result))
-	    if(strtolower($row['Key_name']) == strtolower($indexname))
-		return true;
 	return false;
+	$handle->close();
 }
 
 function object_2_array($result, $cur_depth = 0, $depth_limit = 1000) {
@@ -484,5 +529,12 @@ function phpnum() {
 	// returns the php version number
 	$version = explode('.', phpversion());
 	return (int) $version[0];
+}
+/* Redwine: created thi below function to be used to repair and optimize tables that is done throughout the code. */
+function Repair_Optmize_Table($handle,$dbname,$table) {
+    // Repairs and Optimizes a table
+    global $handle;
+    $handle->query("REPAIR TABLE " . $table);
+	$handle->query("OPTIMIZE TABLE " . $table);
 }
 ?>

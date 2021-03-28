@@ -11,23 +11,24 @@ if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
 		$new_search = $new_search['rows'];
 		$the_results = $new_search;
 	} else {
-		
-		// used in the index and new pages
-		$ls_debug = false;
-		if($ls_debug == true){echo '--' . sanitize($linksum_count,3) . '--<br />';}
-		if($linksum_count == "SELECT count(*) FROM " . table_links . " WHERE  link_status='published'  "){
-			if($ls_debug == true){echo 'p';}
-			$rows = $cached_totals['published'];
-		}	elseif ($linksum_count == "SELECT count(*) FROM " . table_links . " WHERE  link_status='new'  ") {
-			if($ls_debug == true){echo 'u';}
-			$rows = $cached_totals['new'];
-    } else {
-    	if($ls_debug == true){echo 'r';}
-			$rows = $db->get_var($linksum_count);
+		if (!empty($linksum_count)) {
+			// used in the index and new pages
+			$ls_debug = false;
+			if($ls_debug == true){echo '--' . sanitize($linksum_count,3) . '--<br />';}
+			if($linksum_count == "SELECT count(*) FROM " . table_links . " WHERE  link_status='published'  "){
+				if($ls_debug == true){echo 'p';}
+				$rows = $cached_totals['published'];
+			}	elseif ($linksum_count == "SELECT count(*) FROM " . table_links . " WHERE  link_status='new'  ") {
+				if($ls_debug == true){echo 'u';}
+				$rows = $cached_totals['new'];
+			} else {
+				if($ls_debug == true){echo 'r';}
+					$rows = $db->get_var($linksum_count);
+				}
+				if($ls_debug == true){echo '<br />' . sanitize($rows,3) . '<br />';}
+				$links = $db->get_col($linksum_sql);
+				$the_results = $links;
 		}
-		if($ls_debug == true){echo '<br />' . sanitize($rows,3) . '<br />';}
-		$links = $db->get_col($linksum_sql);
-		$the_results = $links;
 	}
 	
 	
@@ -43,7 +44,7 @@ if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
 			$main_smarty->assign('searchOrder', $db->escape($_GET['order']));
 		}
 	
-		if($catID!=0)
+		if(isset($catID) && $catID !=0)
 			$main_smarty->assign('catID', $catID);
 	}
 	

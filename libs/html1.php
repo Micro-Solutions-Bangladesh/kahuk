@@ -128,7 +128,10 @@ function cat_safe_name($cat_id) {
 
 function sanitize($var, $santype = 1, $allowable_tags = ''){
 
-	if ($santype == 1) {
+	if ($santype == 0) {
+		return htmlspecialchars($var,ENT_QUOTES,'UTF-8');
+	}
+	elseif ($santype == 1) {
 		return strip_tags($var, $allowable_tags = '');
 	}
 	elseif ($santype == 2) {
@@ -138,10 +141,26 @@ function sanitize($var, $santype = 1, $allowable_tags = ''){
 		return addslashes(strip_tags($var, $allowable_tags));
 	}
 	elseif ($santype == 4) {
-		return stripslashes(preg_replace('/<([^>]+)>/es', "'<'.sanitize('\\1',5).'>'",strip_tags($var, $allowable_tags)));
+		/*** Redwine: As of PHP 5.5.0, the preg_replace() emitts an error E_DEPRECATED level when passing in the "\e" modifier
+			As of PHP 7.0.0 E_WARNING is emited in this case and "\e" modifier has no effect.
+		***/
+		//return stripslashes(preg_replace('/<([^>]+)>/es', "'<'.sanitize('\\1',5).'>'",strip_tags($var, $allowable_tags)));
+		// Substituting preg_replace with preg_replace_callback 
+		return stripslashes(preg_replace_callback('/<([^>]+)>/is', 
+	function($m) { 
+		return '<'.sanitize($m[1],5).'>';
+		}, strip_tags($var, $allowable_tags)));
 	}
 	elseif ($santype == 5) {
-		return preg_replace('/\son\w+\s*=/is','',$var);
+		/*** Redwine: As of PHP 5.5.0, the preg_replace() emitts an error E_DEPRECATED level when passing in the "\e" modifier
+			As of PHP 7.0.0 E_WARNING is emited in this case and "\e" modifier has no effect.
+		***/
+		//return preg_replace('/\son\w+\s*=/is','',$var);
+		// Substituting preg_replace with preg_replace_callback 
+		return preg_replace_callback('/\son\w+\s*=/is',
+	function($m) {
+		return '';
+		},$var);
 	}
 }
 
@@ -183,7 +202,8 @@ function get_avatar($size = "large", $avatarsource, $user_name = "", $user_email
 		if(isset($user->login)){$user_email = $user->login;}
 	}
 	$user = "";
-	
+/* Redwine declared $imgsize below to eliminate all the Notice: Undefined variable: */
+$imgsize = '';
 	if ($size == "large")
 		$imgsize = Avatar_Large;
 	elseif ($size == "small")
@@ -192,17 +212,17 @@ function get_avatar($size = "large", $avatarsource, $user_name = "", $user_email
 		$imgsize = 'original';
 
 	// use the user uploaded avatars ?
-	$avatars = array( 'large' => my_base_url . my_pligg_base . Default_Gravatar_Large,
-			  'small' => my_base_url . my_pligg_base . Default_Gravatar_Small
+	$avatars = array( 'large' => my_base_url . my_plikli_base . Default_Gravatar_Large,
+			  'small' => my_base_url . my_plikli_base . Default_Gravatar_Small
 			);
 	if(Enable_User_Upload_Avatar == true && $avatarsource == "useruploaded"){
 	    if ($imgsize) {
-		$imgsrc = my_base_url . my_pligg_base . '/avatars/user_uploaded/' . $user_id . "_" . $imgsize . ".jpg";
+		$imgsrc = my_base_url . my_plikli_base . '/avatars/user_uploaded/' . $user_id . "_" . $imgsize . ".jpg";
 		if (file_exists(mnmpath.'avatars/user_uploaded/'.$user_id . "_" . $imgsize . ".jpg"))
 		    return latest_avatar($imgsrc, mnmpath.'avatars/user_uploaded/'.$user_id . "_" . $imgsize . ".jpg");
 		elseif (file_exists(mnmpath.'avatars/user_uploaded/'. $user_name . "_" . $imgsize . ".jpg"))
 		{
-		    $imgsrc = my_base_url . my_pligg_base . '/avatars/user_uploaded/' . $user_name . "_" . $imgsize . ".jpg";
+		    $imgsrc = my_base_url . my_plikli_base . '/avatars/user_uploaded/' . $user_name . "_" . $imgsize . ".jpg";
 		    return latest_avatar($imgsrc, mnmpath.'avatars/user_uploaded/'.$user_name . "_" . $imgsize . ".jpg");
 		}
 	    } else {
@@ -211,7 +231,7 @@ function get_avatar($size = "large", $avatarsource, $user_name = "", $user_email
         	    while (($file = readdir($dh)) !== false)
 			if (preg_match("/^$user_id\_(.+)\.jpg\$/", $file, $m))
 			{
-			    $imgsrc = my_base_url . my_pligg_base . '/avatars/user_uploaded/' . $file;
+			    $imgsrc = my_base_url . my_plikli_base . '/avatars/user_uploaded/' . $file;
 			    $avatars[$m[1]] = latest_avatar($imgsrc, $dir . $file);
 			    if ($m[1] == Avatar_Large)
 				$avatars['large'] = $avatars[$m[1]];
@@ -225,8 +245,8 @@ function get_avatar($size = "large", $avatarsource, $user_name = "", $user_email
 	} elseif (!$imgsize) 
 	    return $avatars;
 	
-	if ($size == "large") {return my_base_url . my_pligg_base . Default_Gravatar_Large;}
-	if ($size == "small") {return my_base_url . my_pligg_base . Default_Gravatar_Small;}
+	if ($size == "large") {return my_base_url . my_plikli_base . Default_Gravatar_Large;}
+	if ($size == "small") {return my_base_url . my_plikli_base . Default_Gravatar_Small;}
 }
 
 function do_sidebar($var_smarty, $navwhere = '') {
@@ -252,7 +272,7 @@ function do_sidebar($var_smarty, $navwhere = '') {
 	$_caching = $var_smarty->cache; 	// get the current cache settings
 	$var_smarty->cache = true; 			// cache has to be on otherwise is_cached will always be false
 	$var_smarty->cache_lifetime = -1;   // lifetime has to be set to something otherwise is_cached will always be false
-	// $thetpl = $var_smarty->get_template_vars('the_template') . '/categories.tpl';
+	 $thetpl = $var_smarty->get_template_vars('the_template') . '/categories.tpl';
 
 	// check to see if the category sidebar module is already cached
 	// if it is, use it
@@ -262,7 +282,7 @@ function do_sidebar($var_smarty, $navwhere = '') {
 	}else{
 		$thecat = '';
 	}
-	if ($var_smarty->is_cached($thetpl, 'sidebar|category|'.$thecat)) {
+	if (isset($var_smarty) && is_object($var_smarty) && $var_smarty->is_cached($thetpl, 'sidebar|category|'.$thecat)) {
 		$var_smarty->assign('cat_array', 'x'); // this is needed. sidebar.tpl won't include the category module if cat_array doesnt have some data
 	}else{
         if(isset($_GET['category'])){
@@ -272,7 +292,7 @@ function do_sidebar($var_smarty, $navwhere = '') {
 		}
 	
 		$var_smarty->assign('UrlMethod', urlmethod);
-
+		if (!empty($catID)) {
 		foreach($the_cats as $cat){
 			if($cat->category_id == $catID && $cat->category_lang == $dblang && $cat->category_parent == 0)
 			{ 
@@ -280,36 +300,41 @@ function do_sidebar($var_smarty, $navwhere = '') {
 				$globals['category_name'] = $cat->category_name;
 			}
 		}
-	
+		}
 		$pos = strrpos($_SERVER["SCRIPT_NAME"], "/");
 		$script_name = substr($_SERVER["SCRIPT_NAME"], $pos + 1, 100);
 		$script_name = str_replace(".php", "", $script_name);
 	
 		include_once('dbtree.php');
-		$login_user = $db->escape(sanitize($_COOKIE['mnm_user'],3));
+		/* Redwine: added isset and initialized $sqlGeticategory to eliminate the Notice undefined mnm_user and sqlGeticategory in case the user is not logged in. */
+		$login_user = $db->escape(sanitize(isset($_COOKIE['mnm_user']),3));
+		$sqlGeticategory = "";
 		if($login_user)
 		{
 		/////// for user set category----sorojit.
 		    $sqlGeticategory = $db->get_var("SELECT user_categories from " . table_users . " where user_login = '$login_user';");
-		    if ($sqlGeticategory)
-			$sqlGeticategory = " AND category__auto_id NOT IN ($sqlGeticategory) ";
+		    if (!empty($sqlGeticategory)) {
+				$sqlGeticategory = " AND category__auto_id NOT IN ($sqlGeticategory) ";
+			}
 		}
 			$right = array();
 			$array1 = "SELECT * from " . table_categories . " where category__auto_id>0 $sqlGeticategory ORDER BY lft";
-			$result1 = mysql_query($array1);
-			while ($row = mysql_fetch_object($result1)) {
+			/* Redwine: mysql_ extension is deprecated. */
+			$result1 = $db->get_results($array1);
+			//while ($row = mysql_fetch_object($result1)) {
+			foreach($result1 as $row) {
 			    $a[]=$row;  
 			}
 			$result = $a;
 			$i = 0;
 			$lastspacer = 0;
 			$array = array();
-			
+
 			foreach($result as $row)
 			{
 				if (count($right)>0) {
 					// check if we should remove a node from the stack
-					while ($right[count($right)-1]<$row->rgt) {
+					while ($right && end($right)<$row->rgt) {
 						if (array_pop($right) == NULL) {
 							break;  // We've reached the top of the category chain
 						}
@@ -374,22 +399,7 @@ function force_authentication() {
 	// requires user to login before viewing the page
 	global $current_user;
 	if(!$current_user->authenticated) {
-		function curPageURL() {
-			$pageURL = 'http';
-			if ($_SERVER["HTTPS"] == "on") {
-				$pageURL .= "s";
-			}
-			$pageURL .= "://";
-			if ($_SERVER["SERVER_PORT"] != "80") {
-				$pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
-			} else {
-				$pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
-			}
-			return $pageURL;
-		}
-		$current_url = curPageURL();
-
-		if (strpos($current_url,'/admin/') !== false) {
+		if (strpos($_SERVER["REQUEST_URI"],'/admin/') !== false) {
 			// Admin panel login
 			header("Location: " . getmyurl('admin_login', $_SERVER['REQUEST_URI']));
 			die;
@@ -426,13 +436,13 @@ function do_pages($total, $page_size, $thepage, $fetch = false) {
 
 			if($current==1) {
 				// There are no previous pages, so don't show the "previous" link.
-				//$output .= '<li class="disabled"><span>&#171; '.$main_smarty->get_config_vars("PLIGG_Visual_Page_Previous"). '</span></li>';
+				//$output .= '<li class="disabled"><span>&#171; '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Previous"). '</span></li>';
 			} else {
 				$i = $current-1;
 				if ((pagename == "index" || pagename == "published")  && $i==1)
-					$output .= '<li><a href="'.($query ? '?' : './').$query.'">&#171; '.$main_smarty->get_config_vars("PLIGG_Visual_Page_Previous").'</a></li>';
+					$output .= '<li><a href="'.($query ? '?' : './').$query.'">&#171; '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Previous").'</a></li>';
 				else
-					$output .= '<li><a href="?page='.$i.$query.'">&#171; '.$main_smarty->get_config_vars("PLIGG_Visual_Page_Previous").'</a></li>';
+					$output .= '<li><a href="?page='.$i.$query.'">&#171; '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Previous").'</a></li>';
 			}
 
 			if($start>1) {
@@ -461,10 +471,10 @@ function do_pages($total, $page_size, $thepage, $fetch = false) {
 			
 			if($current<$total_pages) {
 				$i = $current+1;
-				$output .= '<li><a href="?page='.$i.$query.'"> '.$main_smarty->get_config_vars("PLIGG_Visual_Page_Next"). ' &#187;' . '</a></li>';
+				$output .= '<li><a href="?page='.$i.$query.'"> '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Next"). ' &#187;' . '</a></li>';
 			} else {
 				// There are no pages left, so don't add a "next" link.
-				//$output .= '<li><a href="?page='.$i.$query.'">'.$main_smarty->get_config_vars("PLIGG_Visual_Page_Next"). ' &#187;' . '</a></li>';
+				//$output .= '<li><a href="?page='.$i.$query.'">'.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Next"). ' &#187;' . '</a></li>';
 			}
 			$output .= "</ul></div>\n";
 		}	
@@ -483,7 +493,8 @@ function do_pages($total, $page_size, $thepage, $fetch = false) {
 			$query=preg_replace('/&/', '', $query);							//whack any ampersands	//	
 			$query=preg_replace('/module\/pagestatistics/', '', $query);
 			$query=preg_replace('/search\/(.*)/', '$1'. '/', $query);
-			if($thepage!=group_story)
+			/* Redwine: added quotes to group_story because it was assumed as a constant and generating Notice:  Use of undefined constant group_story. */
+			if($thepage!="group_story")
 			$query=preg_replace('/(?<!s)category\/(.*)/', '$1'. '/', $query);
 			$query=preg_replace('/\/+/','/',$query);
 			$query=preg_replace('/^\//','',$query);
@@ -493,54 +504,54 @@ function do_pages($total, $page_size, $thepage, $fetch = false) {
 
 			if($current==1) {
 				// There are no previous pages, so don't show the "previous" link.
-				//$output .= '<li class="disabled"><span>&#171; '.$main_smarty->get_config_vars("PLIGG_Visual_Page_Previous"). '</span></li>';
+				//$output .= '<li class="disabled"><span>&#171; '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Previous"). '</span></li>';
 			} else {
 				$i = $current-1;
 				if (pagename == "admin_users") {
-					$output .= '<li><a href="'.my_pligg_base.'/admin/'.pagename.'.php?page='.$i.'">&#171; '.$main_smarty->get_config_vars("PLIGG_Visual_Page_Previous").'</a></li>';
+					$output .= '<li><a href="'.my_plikli_base.'/admin/'.pagename.'.php?page='.$i.'">&#171; '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Previous").'</a></li>';
 				}
 				elseif (pagename == "admin_links") {
-					$output .= '<li><a href="'.my_pligg_base.'/admin/'.pagename.'.php?page='.$i.'">&#171; '.$main_smarty->get_config_vars("PLIGG_Visual_Page_Previous").'</a></li>';
+					$output .= '<li><a href="'.my_plikli_base.'/admin/'.pagename.'.php?page='.$i.'">&#171; '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Previous").'</a></li>';
 				}
 				elseif (pagename == "index" || pagename == "published" ) {
-					$output .= '<li><a href="'.my_pligg_base.'/'.$query.($i>1 ? '/page/'.$i : '').'">&#171; '.$main_smarty->get_config_vars("PLIGG_Visual_Page_Previous").'</a></li>';
+					$output .= '<li><a href="'.my_plikli_base.'/'.$query.($i>1 ? '/page/'.$i : '').'">&#171; '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Previous").'</a></li>';
 				}
 				elseif (pagename == "live_published") {
-					$output .= '<li><a href="'.my_pligg_base.'/live/published/'.$query.'/page/'.$i.'">&#171; '.$main_smarty->get_config_vars("PLIGG_Visual_Page_Previous").'</a></li>';
+					$output .= '<li><a href="'.my_plikli_base.'/live/published/'.$query.'/page/'.$i.'">&#171; '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Previous").'</a></li>';
 				}
 				elseif (pagename == "live_unpublished") {
-					$output .= '<li><a href="'.my_pligg_base.'/live/new/'.$query.'/page/'.$i.'">&#171; '.$main_smarty->get_config_vars("PLIGG_Visual_Page_Previous").'</a></li>';
+					$output .= '<li><a href="'.my_plikli_base.'/live/new/'.$query.'/page/'.$i.'">&#171; '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Previous").'</a></li>';
 				}
 				elseif (pagename == "live_comments") {
-					$output .= '<li><a href="'.my_pligg_base.'/live/comments/'.$query.'/page/'.$i.'">&#171; '.$main_smarty->get_config_vars("PLIGG_Visual_Page_Previous").'</a></li>';
+					$output .= '<li><a href="'.my_plikli_base.'/live/comments/'.$query.'/page/'.$i.'">&#171; '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Previous").'</a></li>';
 				}
 				else {
-					$output .= '<li><a href="'.my_pligg_base.'/'.pagename.'/'.$query.'/page/'.$i.'">&#171; '.$main_smarty->get_config_vars("PLIGG_Visual_Page_Previous").'</a></li>';
+					$output .= '<li><a href="'.my_plikli_base.'/'.pagename.'/'.$query.'/page/'.$i.'">&#171; '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Previous").'</a></li>';
 				}
 			}
 
 			if($start>1) {
 				$i = 1;
 				if (pagename == "admin_users") {
-					$output .= '<li><a href="'.my_pligg_base.'/admin/'.pagename.'.php?page='.$i.'">'.$i.'</a></li>';
+					$output .= '<li><a href="'.my_plikli_base.'/admin/'.pagename.'.php?page='.$i.'">'.$i.'</a></li>';
 				}
 				elseif (pagename == "admin_links") {
-					$output .= '<li><a href="'.my_pligg_base.'/admin/'.pagename.'.php?page='.$i.'">'.$i.'</a></li>';
+					$output .= '<li><a href="'.my_plikli_base.'/admin/'.pagename.'.php?page='.$i.'">'.$i.'</a></li>';
 				}
 				elseif (pagename == "index" || pagename == "published" ) {
-					$output .= '<li><a href="'.my_pligg_base.'/'.$query.'">'.$i.'</a></li>';
+					$output .= '<li><a href="'.my_plikli_base.'/'.$query.'">'.$i.'</a></li>';
 				}
 				elseif (pagename == "live_published") {
-					$output .= '<li><a href="'.my_pligg_base.'/live/published/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
+					$output .= '<li><a href="'.my_plikli_base.'/live/published/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
 				}
 				elseif (pagename == "live_unpublished") {
-					$output .= '<li><a href="'.my_pligg_base.'/live/new/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
+					$output .= '<li><a href="'.my_plikli_base.'/live/new/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
 				}
 				elseif (pagename == "live_comments") {
-					$output .= '<li><a href="'.my_pligg_base.'/live/comments/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
+					$output .= '<li><a href="'.my_plikli_base.'/live/comments/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
 				}
 				else {
-					$output .= '<li><a href="'.my_pligg_base.'/'.pagename.'/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
+					$output .= '<li><a href="'.my_plikli_base.'/'.pagename.'/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
 				}
 				$output .= '<li class="active"><a href="#">...</a></li>';
 			}
@@ -549,25 +560,25 @@ function do_pages($total, $page_size, $thepage, $fetch = false) {
 					$output .= '<li class="active"><a href="#">'.$i.'</a></li>';	} 
 				else {
 					if (pagename == "admin_users") {
-						$output .= '<li><a href="'.my_pligg_base.'/admin/'.pagename.'.php?page='.$i.'">'.$i.'</a></li>';
+						$output .= '<li><a href="'.my_plikli_base.'/admin/'.pagename.'.php?page='.$i.'">'.$i.'</a></li>';
 					}
 					elseif (pagename == "admin_links") {
-						$output .= '<li><a href="'.my_pligg_base.'/admin/'.pagename.'.php?page='.$i.'">'.$i.'</a></li>';
+						$output .= '<li><a href="'.my_plikli_base.'/admin/'.pagename.'.php?page='.$i.'">'.$i.'</a></li>';
 					}
 					elseif (pagename == "index" || pagename == "published" ) {
-						$output .= '<li><a href="'.my_pligg_base.'/'.$query.($i>1 ? '/page/'.$i : '').'">'.$i.'</a></li>';
+						$output .= '<li><a href="'.my_plikli_base.'/'.$query.($i>1 ? '/page/'.$i : '').'">'.$i.'</a></li>';
 					}
 					elseif (pagename == "live_published") {
-						$output .= '<li><a href="'.my_pligg_base.'/live/published/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
+						$output .= '<li><a href="'.my_plikli_base.'/live/published/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
 					}
 					elseif (pagename == "live_unpublished") {
-						$output .= '<li><a href="'.my_pligg_base.'/live/new/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
+						$output .= '<li><a href="'.my_plikli_base.'/live/new/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
 					}
 					elseif (pagename == "live_comments") {
-						$output .= '<li><a href="'.my_pligg_base.'/live/comments/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
+						$output .= '<li><a href="'.my_plikli_base.'/live/comments/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
 					}
 					else {
-						$output .= '<li><a href="'.my_pligg_base.'/'.pagename.'/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
+						$output .= '<li><a href="'.my_plikli_base.'/'.pagename.'/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
 					}
 				}	
 			}
@@ -576,54 +587,54 @@ function do_pages($total, $page_size, $thepage, $fetch = false) {
 				$i = $total_pages;
 				$output .= '<li class="active"><a href="#">...</a></li>';
 				if ($pagename == "admin_users") {
-					$output .= '<li><a href="'.my_pligg_base.'/admin/'.pagename.'.php?page='.$i.'">'.$i.'</a></li>';
+					$output .= '<li><a href="'.my_plikli_base.'/admin/'.pagename.'.php?page='.$i.'">'.$i.'</a></li>';
 				}
 				elseif (pagename == "admin_links") {
-					$output .= '<li><a href="'.my_pligg_base.'/admin/'.pagename.'.php?page='.$i.'">'.$i.'</a></li>';
+					$output .= '<li><a href="'.my_plikli_base.'/admin/'.pagename.'.php?page='.$i.'">'.$i.'</a></li>';
 				}
 				elseif (pagename == "index" || pagename == "published" ) {
-					$output .= '<li><a href="'.my_pligg_base.'/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
+					$output .= '<li><a href="'.my_plikli_base.'/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
 				}
 				elseif (pagename == "live_published") {
-					$output .= '<li><a href="'.my_pligg_base.'/live/published/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
+					$output .= '<li><a href="'.my_plikli_base.'/live/published/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
 				}
 				elseif (pagename == "live_unpublished") {
-					$output .= '<li><a href="'.my_pligg_base.'/live/new/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
+					$output .= '<li><a href="'.my_plikli_base.'/live/new/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
 				}
 				elseif (pagename == "live_comments") {
-					$output .= '<li><a href="'.my_pligg_base.'/live/comments/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
+					$output .= '<li><a href="'.my_plikli_base.'/live/comments/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
 				}
 				else {
-					$output .= '<li><a href="'.my_pligg_base.'/'.pagename.'/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
+					$output .= '<li><a href="'.my_plikli_base.'/'.pagename.'/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
 				}
 			}
 			
 			if($current<$total_pages) {
 				$i = $current+1;
 				if (pagename == "admin_users") {
-					$output .= '<li><a href="'.my_pligg_base.'/admin/'.pagename.'.php?page='.$i.'"> '.$main_smarty->get_config_vars("PLIGG_Visual_Page_Next"). ' &#187;' . '</a></li>';
+					$output .= '<li><a href="'.my_plikli_base.'/admin/'.pagename.'.php?page='.$i.'"> '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Next"). ' &#187;' . '</a></li>';
 				}
 				elseif (pagename == "admin_links") {
-					$output .= '<li><a href="'.my_pligg_base.'/admin/'.pagename.'.php?page='.$i.'"> '.$main_smarty->get_config_vars("PLIGG_Visual_Page_Next"). ' &#187;' . '</a></li>';
+					$output .= '<li><a href="'.my_plikli_base.'/admin/'.pagename.'.php?page='.$i.'"> '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Next"). ' &#187;' . '</a></li>';
 				}
 				elseif (pagename == "live_published") {
-					$output .= '<li><a href="'.my_pligg_base.'/live/published/'.$query.'/page/'.$i.'"> '.$main_smarty->get_config_vars("PLIGG_Visual_Page_Next"). ' &#187;' . '</a></li>'; 
+					$output .= '<li><a href="'.my_plikli_base.'/live/published/'.$query.'/page/'.$i.'"> '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Next"). ' &#187;' . '</a></li>'; 
 				}
 				elseif (pagename == "live_unpublished") {
-					$output .= '<li><a href="'.my_pligg_base.'/live/new/'.$query.'/page/'.$i.'"> '.$main_smarty->get_config_vars("PLIGG_Visual_Page_Next"). ' &#187;' . '</a></li>'; 
+					$output .= '<li><a href="'.my_plikli_base.'/live/new/'.$query.'/page/'.$i.'"> '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Next"). ' &#187;' . '</a></li>'; 
 				}
 				elseif (pagename == "live_comments") {
-					$output .= '<li><a href="'.my_pligg_base.'/live/comments/'.$query.'/page/'.$i.'"> '.$main_smarty->get_config_vars("PLIGG_Visual_Page_Next"). ' &#187;' . '</a></li>'; 
+					$output .= '<li><a href="'.my_plikli_base.'/live/comments/'.$query.'/page/'.$i.'"> '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Next"). ' &#187;' . '</a></li>'; 
 				}
 				elseif (pagename == "index" || pagename == "published" ) {
-					$output .= '<li><a href="'.my_pligg_base.'/'.$query.'/page/'.$i.'"> '.$main_smarty->get_config_vars("PLIGG_Visual_Page_Next"). ' &#187;' . '</a></li>'; 
+					$output .= '<li><a href="'.my_plikli_base.'/'.$query.'/page/'.$i.'"> '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Next"). ' &#187;' . '</a></li>'; 
 				} 
 				else {
-					$output .= '<li><a href="'.my_pligg_base.'/'.pagename.'/'.$query.'/page/'.$i.'"> '.$main_smarty->get_config_vars("PLIGG_Visual_Page_Next"). ' &#187;' . '</a></li>'; 
+					$output .= '<li><a href="'.my_plikli_base.'/'.pagename.'/'.$query.'/page/'.$i.'"> '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Next"). ' &#187;' . '</a></li>'; 
 				} 
 			}		
 			else {
-				$output .= '<li class="active"><a href="#">'.$main_smarty->get_config_vars("PLIGG_Visual_Page_Next"). ' &#187;' . '</a></li>';	}
+				$output .= '<li class="active"><a href="#">'.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Next"). ' &#187;' . '</a></li>';	}
 			
 			$output .= "</ul></div>";
 			$output = str_replace("/group_story/","/groups/",$output);
@@ -644,6 +655,36 @@ function generateHash($plainText, $salt = null){
         $salt = substr($salt, 0, SALT_LENGTH); 
 	}		
     return $salt . sha1($salt . $plainText);
+}
+
+function generatePassHash($plainText){
+	if (!function_exists('password_hash')) {
+		require "password.php";
+		$salt = substr(md5(uniqid(rand(), true)), 0, SALT_LENGTH);
+		return 'bcrypt:' . $salt . password_hash (sha1 ($salt . $plainText) , PASSWORD_BCRYPT);
+	}else{
+		$salt = substr(md5(uniqid(rand(), true)), 0, SALT_LENGTH);
+		return 'bcrypt:' . $salt . password_hash (sha1 ($salt . $plainText) , PASSWORD_BCRYPT);
+	}
+}
+
+function verifyPassHash($plainText, $hashedPass){
+    $hashTrim = substr($hashedPass, (SALT_LENGTH + 7));
+    $salt = substr($hashedPass, 7, SALT_LENGTH);
+	if (!function_exists('password_verify')) {
+		require "password.php";
+		if(password_verify(sha1($salt.$plainText), $hashTrim)){
+			return true;
+		} else{
+			return false;
+		}
+	}else{
+		if(password_verify(sha1($salt.$plainText), $hashTrim)){
+			return true;
+		} else{
+			return false;
+		}
+	}
 }
 
 function getmyFullurl($x, $var1="", $var2="", $var3="") {
@@ -693,7 +734,7 @@ function getmyurl($x, $var1="", $var2="", $var3="") {
 		elseif ($x == "search_url") $ret = "/search.php?search=" . $var1;
 		elseif ($x == "admin_login") $ret = "/admin/admin_login.php?return=" . $var1;
 		elseif ($x == "login") $ret = "/login.php?return=" . $var1;
-		elseif ($x == "logout") $ret = "/login.php?op=logout&return=" . $var1;
+		elseif ($x == "logout") $ret = "/login.php?op=logout&return=".my_plikli_base; //return=" . $var1; /*Redwine: making both URL method 1 and 2 consistent by setting the return to the root.*/
 		elseif ($x == "user_edit") $ret = "/profile.php?login=$var1";
 		elseif ($x == "register") $ret = "/register.php";
 		elseif ($x == "category") $ret = "/index.php?category=" . $var1;
@@ -764,7 +805,8 @@ function getmyurl($x, $var1="", $var2="", $var3="") {
 		elseif ($x == "group_sort") $ret = "/groups.php?sortby=".$var1.$var2;
 		elseif ($x == "user_add_links_private") $ret = "/user_add_remove_links.php?action=addprivate&amp;link=" . $var1;
 		elseif ($x == "user_add_links_public") $ret = "/user_add_remove_links.php?action=addpublic&amp;link=" . $var1;
-		elseif ($x == "group_story_links_publish") $ret = "/join_group.php?action=publish&amp;link=" . $var1;
+/* Redwine: Roles and permissions and Groups fixes */
+		elseif ($x == "group_story_links_publish") $ret = "/join_group.php?action=published&amp;link=" . $var1;
 		elseif ($x == "group_story_links_new") $ret = "/join_group.php?action=new&amp;link=" . $var1;
 		elseif ($x == "group_story_links_discard") $ret = "/join_group.php?action=discard&amp;link=" . $var1;
 		elseif ($x == "admin_categories_tasks") $ret = "/admin_categories_tasks.php?action=" . $var1;
@@ -799,7 +841,7 @@ function getmyurl($x, $var1="", $var2="", $var3="") {
 		elseif ($x == "search_url") $ret = "/search/" . urlencode(str_replace('/','|',$var1)) . "/";
 		elseif ($x == "admin_login") $ret = "/admin/admin_login.php?return=" . urlencode($var1);
 		elseif ($x == "login") $ret = "/login.php?return=" . urlencode($var1);
-		elseif ($x == "logout") $ret = "/login.php?op=logout&return=".my_pligg_base;
+		elseif ($x == "logout") $ret = "/login.php?op=logout&return=".my_plikli_base;
 		elseif ($x == "register") $ret = "/register/";
 		elseif ($x == "submit") $ret = "/submit/";
 		elseif ($x == "story") $ret = "/story/" . $var1 . "/";
@@ -873,7 +915,7 @@ function getmyurl($x, $var1="", $var2="", $var3="") {
 		elseif ($x == "admin_categories_tasks") $ret = "/admin_categories_tasks/action/" . $var1 . "/";
 	}
 
-	return my_pligg_base . preg_replace('/\/+/', '/', $ret);
+	return my_plikli_base . preg_replace('/\/+/', '/', $ret);
 }
 
 function SetSmartyURLs($main_smarty) {
@@ -885,7 +927,7 @@ function SetSmartyURLs($main_smarty) {
 	}
 	$main_smarty->assign('URL_logout', htmlentities(getmyurl("logout", $_SERVER['REQUEST_URI'])));
 	
-	$main_smarty->assign('URL_home', getmyurl("pligg_index"));	
+	$main_smarty->assign('URL_home', getmyurl("plikli_index"));	
 	$main_smarty->assign('URL_register', getmyurl("register"));
 	$main_smarty->assign('URL_root', getmyurl("root"));
 	$main_smarty->assign('URL_index', getmyurl("index"));
@@ -1080,14 +1122,14 @@ function close_tags($html)
 //
 function check_referrer($post_url=false)
 {
-	global $my_base_url, $my_pligg_base, $xsfr_first_page, $_GET, $_POST;
+	global $my_base_url, $my_plikli_base, $xsfr_first_page, $_GET, $_POST;
 
 	if (sizeof($_GET)>0 || sizeof($_POST)>0)
 	{
 
-		if ($_SERVER['HTTP_REFERER'])
+		if (isset($_SERVER['HTTP_REFERER']))
 		{
-			$base = $my_pligg_base;
+			$base = $my_plikli_base;
 
 			if (!$base) $base = '/';
 			$_SERVER['HTTP_REFERER'] = sanitize($_SERVER['HTTP_REFERER'],3);

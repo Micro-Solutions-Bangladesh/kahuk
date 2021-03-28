@@ -11,16 +11,19 @@ include(mnminclude.'link.php');
 include(mnminclude.'tags.php');
 include(mnminclude.'user.php');
 include(mnminclude.'smartyvariables.php');
-
-if (!$_COOKIE['referrer']){
+/* Redwine: added isset to eliminate the Notice Undefined index: referrer and url. */
+if (!isset($_COOKIE['referrer'])){
 	if(empty($_POST['phase']) && (!empty($_GET['url']))) {
 		if(!empty($_GET['url']))
 		{
 			$_POST['url'] = $_GET['url'];
 		}
 	}
-	$url = htmlspecialchars(sanitize($_POST['url'], 3));
-	check_referrer($url);
+	if (isset($_POST['url'])) {
+		$url = htmlspecialchars(sanitize($_POST['url']), 3);
+		check_referrer($url);
+	}
+	
 }
 
 // html tags allowed during submit
@@ -33,14 +36,11 @@ if (checklevel('admin')) {
 }
 $main_smarty->assign('Story_Content_Tags_To_Allow', htmlspecialchars($Story_Content_Tags_To_Allow));
 
-#print_r($_SESSION);
-#exit;
-
 // breadcrumbs and page titles
-$navwhere['text1'] = $main_smarty->get_config_vars('PLIGG_Visual_Breadcrumb_Submit');
+$navwhere['text1'] = $main_smarty->get_config_vars('PLIKLI_Visual_Breadcrumb_Submit');
 $navwhere['link1'] = getmyurl('submit', '');
 $main_smarty->assign('navbar_where', $navwhere);
-$main_smarty->assign('posttitle', $main_smarty->get_config_vars('PLIGG_Visual_Breadcrumb_Submit'));
+$main_smarty->assign('posttitle', $main_smarty->get_config_vars('PLIKLI_Visual_Breadcrumb_Submit'));
 $main_smarty = do_sidebar($main_smarty);
 
 //to check anonymous mode activated
@@ -67,7 +67,7 @@ $vars = '';
 check_actions('submit_post_authentication', $vars);
 
 // this is for direct links from weblogs
-if(empty($_POST['phase']) && (!empty($_GET['url']) || is_numeric($_GET['id']))) {
+if(empty($_POST['phase']) && (!empty($_GET['url']) || (!empty($_GET['id']) && is_numeric($_GET['id'])))) {
 	$_POST['phase'] = 1;
 	if(!empty($_GET['url'])) 
 	{
@@ -82,7 +82,7 @@ if(empty($_POST['phase']) && (!empty($_GET['url']) || is_numeric($_GET['id']))) 
 		$main_smarty->assign('pagename', pagename);
 		$main_smarty->assign('submit_error', 'badkey');
 		$main_smarty->assign('tpl_center', $the_template . '/submit_errors_center');
-		$main_smarty->display($the_template . '/pligg.tpl');
+		$main_smarty->display($the_template . '/plikli.tpl');
 		die();
 	    }
 	    $_POST['url'] = $row['link_url'];
@@ -129,7 +129,7 @@ function do_submit0() {
 	$main_smarty->assign('tpl_center', $the_template . '/submit_step_1_center');
 	$vars = '';
 	check_actions('do_submit0', $vars);
-	$main_smarty->display($the_template . '/pligg.tpl');
+	$main_smarty->display($the_template . '/plikli.tpl');
 }
 
 // submit step 1
@@ -157,23 +157,24 @@ function do_submit1() {
 	}
 	
 	$edit = false;
-	if (is_numeric($_GET['id']))
+	if (isset($_GET['id']) && is_numeric($_GET['id']))
 	{
 	    $linkres->id = $_GET['id'];
 	    $linkres->read(FALSE);
-	    $trackback=$_GET['trackback'];
+	    if (isset($trackback)) $trackback=$_GET['trackback'];
 	}
 	else
 	{
 	    $linkres->get($url);
-	    if ($_POST['title'])
-	    	$linkres->title = stripslashes(sanitize($_POST['title'], 4, $Story_Content_Tags_To_Allow));
-	    if ($_POST['tags'])
+	    if (isset($_POST['title']) && !empty($_POST['title']))
+	    	$linkres->title = $db->escape(stripslashes(sanitize(trim($_POST['title']), 4, $Story_Content_Tags_To_Allow)));
+	    if (isset($_POST['tags']) && !empty($_POST['tags']))
 	    	$linkres->tags = stripslashes(sanitize($_POST['tags'], 4));
-	    if ($_POST['description'])
+			$linkres->tags = preg_replace('/[^\p{L}\p{N}_\s\,]/u', '', $linkres->tags);
+	    if (isset($_POST['description']) && !empty($_POST['description']))
 	    	$linkres->content = stripslashes(sanitize($_POST['description'], 4, $Story_Content_Tags_To_Allow));
 
-	    if ($_POST['category'])
+	    if (isset($_POST['category']) && !empty($_POST['category']))
 	    {
 		$cats = explode(',',$_POST['category']);
 		foreach ($cats as $cat)
@@ -194,7 +195,8 @@ function do_submit1() {
 	$main_smarty->assign('Submit_Require_A_URL', Submit_Require_A_URL);
 
 	// check if URL is valid format
-	$pattern = '/^(([\w]+:)?\/\/)?(([\d\w]|%[a-fA-f\d]{2,2})+(:([\d\w]|%[a-fA-f\d]{2,2})+)?@)?([\d\w]([-\d\w]{0,253}[\d\w])?\.)+[\w]{2,4}(:[\d]+)?(\/([-+_~.,\d\w]|%[a-fA-f\d]{2,2})*)*(\?(&?([-+_~.,\d\w]|%[a-fA-f\d]{2,2})=?)*)?(#([-+_~.,\/\d\w]|%[a-fA-f\d]{2,2})*)?$/'; 
+	/* Redwine: fixed the regex to account for new domains up to 15 characters long */
+	$pattern = '/^(([\w]+:)?\/\/)?(([\d\w]|%[a-fA-f\d]{2,2})+(:([\d\w]|%[a-fA-f\d]{2,2})+)?@)?([\d\w]([-\d\w]{0,253}[\d\w])?\.)+[\w]{2,15}(:[\d]+)?(\/([-+_~.,\d\w]|%[a-fA-f\d]{2,2})*)*(\?(&?([-+_~.,\d\w]|%[a-fA-f\d]{2,2})=?)*)?(#([-+_~.,\/\d\w]|%[a-fA-f\d]{2,2})*)?$/'; 
 #	$pattern = '/^(([\w]+:)?\/\/)?(([\d\w]|%[a-fA-f\d]{2,2})+(:([\d\w]|%[a-fA-f\d]{2,2})+)?@)?([\d\w]([-\d\w]{0,253}[\d\w])?\.)+[\w]{2,4}(:[\d]+)?(\/([-+_~.,\d\w]|%[a-fA-f\d]{2,2})*)*(\??(&?([-+_~.,\d\w]|%[a-fA-f\d]{2,2})=?)*)?(#([-+_~.,\/\d\w]|%[a-fA-f\d]{2,2})*)?$/'; 
 #	$pattern = '/^(([\w]+:)?\/\/)?(([\d\w]|%[a-fA-f\d]{2,2})+(:([\d\w]|%[a-fA-f\d]{2,2})+)?@)?(\d\w?)+[\w]{2,4}(:[\d]+)?(([\/#!+-~.,\d\w]+|%[a-fA-f\d]{2,2}))(\??(&?([-+~.,\d\w]|%[a-fA-f\d]{2,2})=?))?(#([-+_~.,\/\d\w]|%[a-fA-f\d]{2,2}))?$/';
 
@@ -218,7 +220,7 @@ function do_submit1() {
 	if(!$linkres->valid) {
 		$main_smarty->assign('submit_error', 'invalidurl');
 		$main_smarty->assign('tpl_center', $the_template . '/submit_errors_center');
-		$main_smarty->display($the_template . '/pligg.tpl');
+		$main_smarty->display($the_template . '/plikli.tpl');
 		return;
 	}
 	
@@ -231,7 +233,7 @@ function do_submit1() {
 			define('pagename', 'submit'); 
 		     	$main_smarty->assign('pagename', pagename);
 			
-			$main_smarty->display($the_template . '/pligg.tpl');
+			$main_smarty->display($the_template . '/plikli.tpl');
 			return;
 		}
 	}
@@ -281,6 +283,7 @@ function do_submit1() {
 	$main_smarty->assign('submit_category', $linkres->category);
 	$main_smarty->assign('submit_additional_cats', $linkres->additional_cats);
 	$main_smarty->assign('tags_words', $linkres->tags);
+	$main_smarty->assign('og_twitter_image', $linkres->og_twitter_image);
 
 	include_once(mnminclude.'dbtree.php');
 	$array = tree_to_array(0, table_categories, FALSE);
@@ -299,6 +302,7 @@ function do_submit1() {
 	//to display group drop down
 	if(enable_group == "true")
 	{
+/* Redwine: Roles and permissions and Groups fixes (already implemented https://github.com/redwinefireplace/plikli-cms/commit/65ed15efb51c1c0fc714e11863c6c332a66bb2ca. Fix: Banned and inactive group members could still see the group when submitting a story. */
 		$output = '';
 		$group_membered = $db->get_results("SELECT group_id,group_name FROM " . table_groups . " 
 			LEFT JOIN ".table_group_member." ON member_group_id=group_id
@@ -309,8 +313,8 @@ function do_submit1() {
 		
 		if ($group_membered)
 		{
-			$output .= "<select name='link_group_id' tabindex='3' class='form-control submit_group_select'>";
-			$output .= "<option value = ''>".$main_smarty->get_config_vars('PLIGG_Visual_Group_Select_Group')."</option>";
+			$output .= "<select id='link_group_id' name='link_group_id' tabindex='3' class='form-control submit_group_select'>";
+			$output .= "<option value = ''>".$main_smarty->get_config_vars('PLIKLI_Visual_Group_Select_Group')."</option>";
 			foreach($group_membered as $results)
 			{
 				$output .= "<option value = ".$results->group_id. ($linkres->link_group_id ? ' selected' : '') . ">".$results->group_name."</option>";
@@ -323,6 +327,14 @@ function do_submit1() {
 		$vars = '';
 		check_actions('register_showform', $vars);
 	}
+	//Redwine: detect if ckeditor module is installed to know which textarea to hide.
+	$isCKEditor = $db->get_row("SELECT * FROM ".table_modules." WHERE `folder`='ckeditor'",ARRAY_A);
+	    if ($isCKEditor['folder']) {
+			$main_smarty->assign('isCKEditor', 'ckeditorinstalled');
+		}else{
+			$main_smarty->assign('isCKEditor', 'ckeditornotinstalled');
+		}
+	
 	
 	$main_smarty->assign('tpl_extra_fields', $the_template . '/submit_extra_fields');
 	$main_smarty->assign('tpl_center', $the_template . '/submit_step_2_center');
@@ -333,7 +345,7 @@ function do_submit1() {
 	$vars = '';
 	check_actions('do_submit1', $vars);
 	$_SESSION['step'] = 1;
-	$main_smarty->display($the_template . '/pligg.tpl');
+	$main_smarty->display($the_template . '/plikli.tpl');
 }
 
 // submit step 2
@@ -354,16 +366,16 @@ function do_submit2() {
 	
 	check_actions('submit2_check_errors', $vars);
 	
-	if($vars['error'] == true){
+	/*if($vars['error'] == true){
 		// No action
-	}
+	}*/
 
 	$linkres=new Link;
 	$linkres->id = sanitize($_POST['id'], 3);
 	
 	if($_SESSION['step']!=1)die('Wrong step');
 	if(!is_numeric($linkres->id))die();
-	if(!$linkres->verify_ownership($current_user->user_id))	die($main_smarty->get_config_vars('PLIGG_Visual_Submit2Errors_NoAccess'));
+	if(!$linkres->verify_ownership($current_user->user_id))	die($main_smarty->get_config_vars('PLIKLI_Visual_Submit2Errors_NoAccess'));
 		
 	$linkres->read(FALSE);
 
@@ -384,7 +396,7 @@ function do_submit2() {
 	$thecat = get_cached_category_data('category_id', $linkres->category);
 	$main_smarty->assign('request_category_name', $thecat->category_name);
 
-	$linkres->title = stripslashes(sanitize($_POST['title'], 3));
+	$linkres->title = stripslashes(sanitize(trim($_POST['title']), 3));
 	$linkres->title_url = makeUrlFriendly($linkres->title, $linkres->id);
 	$linkres->tags = tags_normalize_string(stripslashes(sanitize($_POST['tags'], 3)));
 	$linkres->content = close_tags(stripslashes(sanitize($_POST['bodytext'], 4, $Story_Content_Tags_To_Allow)));
@@ -428,6 +440,7 @@ function do_submit2() {
 	}
 
 	$linkres->store();
+/* Redwine: Tag data inserted later in the submission process so that incomplete stories don't add extra data to the tag db tables. https://github.com/Pligg/pligg-cms/commit/2930e716be8f9ce3fcf71ba9289fc280f8f2f4e7 */
 
 	if (link_errors($linkres)) {
 		return;
@@ -461,7 +474,7 @@ function do_submit2() {
 	$vars = '';
 	check_actions('submit_step_3_after_first_store', $vars);
 	
-	if ($vars['error'] == true && link_catcha_errors('captcha_error')){
+	if (!empty($vars['error']) && $vars['error'] == true && link_catcha_errors('captcha_error')){
 		return;
 	}
 	
@@ -510,13 +523,13 @@ function do_submit2() {
 	if (Submit_Complete_Step2){
 	    do_submit3();
 	} else {
-	    $main_smarty->display($the_template . '/pligg.tpl');
+	    $main_smarty->display($the_template . '/plikli.tpl');
 	}
 }
 
 // submit step 3
 function do_submit3() {
-	global $db, $dblang;
+	global $db, $dblang, $current_user;
 
 	$linkres=new Link;
 	$linkres->id = sanitize($_POST['id'], 3);
@@ -525,14 +538,116 @@ function do_submit3() {
 	if(!Submit_Complete_Step2 && $_SESSION['step']!=2)die('Wrong step');
 	
 	$linkres->read();
+	if (isset($_REQUEST['draft'])) {
+		totals_adjust_count($linkres->status, -1);
+		totals_adjust_count('draft', 1);
+		$linkres->status = 'draft';
+	}elseif (isset($_REQUEST['date_schedule']) && $_REQUEST['date_schedule'] != '') {
 
+		
+/*********************************
+Redwine: the user's scheduled date, given that it is only composed from the date portion without the time. In order to accurately make a date of it, we have to go through the following process to avoid the discrepancy resulting from the scheduled date entered and the computed date , which is done based on the server timezone calculated by the GMT time.
+*********************************/
+
+/* Redwine: now is the the Epoch time in seconds of the current time function */
+$now = time();
+
+/* Redwine: make a full date time of the Epoch time  */
+$current_date_time = date('Y-m-d H:i:s', $now);
+//echo "<br />current_date_time is<br />$current_date_time<br />";
+
+/* Redwine: current date is the epoch time $now converted to date without the time portion */
+$currentDate = date('Y-m-d', $now);
+
+
+/* Redwine: make_current_date is used to calculate the days difference below. */
+$make_current_date = date_create($currentDate);
+
+/* Redwine: This is the scheduled date entered by the user (notice that no time portion) */
+$scheduled = $_REQUEST['date_schedule'];
+/* Redwine: we create a date of it. It would be like this 2017-08-27 00:00:00 */
+$scheduled_date = date_create($scheduled);
+
+/*Redwine: the object(DateTime) is an array
+object(DateTime)[2]
+  public 'date' => string '2017-08-27 00:00:00' (length=19)
+  public 'timezone_type' => int 3
+  public 'timezone' => string 'UTC' (length=3)
+  
+  we are interrested in the 'date' string.
+*/
+$scheduled_current_date = '';
+foreach($scheduled_date as $key => $value) {
+	if ($key == 'date') {
+		$scheduled_current_date = $value;
+	}
+}
+
+
+/*Redwine: convert the date string to a date object. */
+$make_scheduled_date = date_create($scheduled_current_date);
+
+/*Redwine: caculating the date difference (returns an object) 
+object(DateInterval)[4]
+  public 'y' => int 0
+  public 'm' => int 0
+  public 'd' => int 1
+  public 'h' => int 0
+  public 'i' => int 0
+  public 's' => int 0
+  public 'invert' => int 1
+  public 'days' => int 1 	*** we are interrested in this one ***
+*/
+$days_diff = date_diff($make_scheduled_date,$make_current_date);
+
+/*Redwine: now we make a new date from the current_date_time calculated above, added to it the days difference. 
+NOTE: this calculated date is based on the server timezone calculated by the GMT time.
+*/
+$new_scheduled_date = date('Y-m-d H:i:s', strtotime($current_date_time. " + $days_diff->days days"));
+
+/*Redwine: if we leave it at the step above, we end up with a discrepancy. Ex: the user enters 2017-08-29. after calculation all the above steps, and based on the time portion of the day he is submitting, the scheduled date ends up being 2017-08-28.
+So, we have to also make a date based on the user's timezone detected by the javascript.
+*/
+
+/*Redwine: we create the user's timezone and we make a new DateTime object based on time() of the new timezone
+The end result is a full date equivalent to the server's time() added to it the days difference. EX: the time() converted to a date object was 2017-08-27 13:45:01 and the days difference was +1 day (the user's scheduled date) then the final scheduled date will be 2017-08-28 13:45:01. This final scheduled date is the $_REQUEST['date_schedule'] from the submit_step_2_center.tpl and passed on to /submit.php do_submit3(), which in turn sends it to be the date to assign to link_date and link_published_date in /libs/link.php
+*/
+$userTimeZone = $_REQUEST['timezone'];
+
+$userDateTimeZone = new DateTimeZone($userTimeZone);
+$userDateTime = new DateTime("now", $userDateTimeZone);
+
+$new_accurate_scheduled_date = '';
+foreach($userDateTime as $key => $value) {
+	if ($key == 'date') {
+		$new_accurate_scheduled_date = $value;
+	}
+}
+
+/*Redwine: the below code will bring the user's scheduled date to be equal to the current date created from the time() function. */
+$userDateTime = $userDateTime->format('Y-m-d H:i:s');
+
+/*Redwine: now we add the days difference calculated above to make it a full user's scheduled accurate date */
+$new_accurate_scheduled_date = date('Y-m-d H:i:s', strtotime($userDateTime. " + $days_diff->days days"));		
+		
+$new_accurate_scheduled_date = strtotime($new_accurate_scheduled_date);		
+		
+		
+		
+		totals_adjust_count($linkres->status, -1);
+		totals_adjust_count('scheduled', 1);
+		$linkres->status = 'scheduled';
+		$linkres->published_date = $new_accurate_scheduled_date;
+		$linkres->date = $new_accurate_scheduled_date;
+	}else{
 	totals_adjust_count($linkres->status, -1);
 	totals_adjust_count('new', 1);
 
 	$linkres->status='new';
-
+	}
 	$vars = array('linkres'=>&$linkres);
 	check_actions('do_submit3', $vars);
+/* Redwine: Tag data inserted later in the submission process so that incomplete stories don't add extra data to the tag db tables. https://github.com/Pligg/pligg-cms/commit/2930e716be8f9ce3fcf71ba9289fc280f8f2f4e7 */
 	$linkres->status = $vars['linkres']->status;
 	if ($vars['linkres']->status=='discard')
 	{
@@ -548,7 +663,7 @@ function do_submit3() {
 
 	$linkres->store_basic();
 	$linkres->check_should_publish();
-
+/* Redwine: Tag data inserted later in the submission process so that incomplete stories don't add extra data to the tag db tables. https://github.com/Pligg/pligg-cms/commit/2930e716be8f9ce3fcf71ba9289fc280f8f2f4e7 */
 	tags_insert_string($linkres->id, $dblang, $linkres->tags);
 	
 	if(isset($_POST['trackback']) && sanitize($_POST['trackback'], 3) != '') {
@@ -564,10 +679,27 @@ function do_submit3() {
 
 	$vars = array('linkres'=>$linkres);
 	check_actions('submit_pre_redirect', $vars);
-	if ($vars['redirect']) {
+	if (isset($vars['redirect'])) {
 	    header('Location: '.$vars['redirect']);
 	} elseif($linkres->link_group_id == 0){
-		header("Location: " . getmyurl('new'));
+		/* Redwine: Making sure that the index or New page load appropriately depensing on the settings.
+		If votes to publish, in the dashboard voting section is set to 0 or 1, and auto vote in the submit section is set to true, then the story will automatically appear in the published page. Users may get confused with that when the new.php page loads and it's empty. */
+
+		if ($linkres->status == 'draft') {
+			$redirect_url = getmyurl('user2', $current_user->user_login, 'draft');
+			
+			$redirect_url = $my_base_url.str_replace("&amp;", "&", $redirect_url);
+			header("Location: " . $redirect_url);
+		}elseif ($linkres->status == 'scheduled') {
+			$redirect_url = getmyurl('user2', $current_user->user_login, 'scheduled');
+			$redirect_url = $my_base_url.str_replace("&amp;", "&", $redirect_url);
+			//echo $redirect_url;die();
+			header("Location: " . $redirect_url);
+		}elseif ( ((int) votes_to_publish == 0 || (int) votes_to_publish == 1 && auto_vote == true) && $linkres->status != 'draft') {
+			header("Location: " . getmyurl('root'));
+		}else{
+			header("Location: " . getmyurl('new'));
+		}
 	} else {
 		$redirect = getmyurl("group_story", $linkres->link_group_id);
 		header("Location: $redirect");
@@ -603,18 +735,18 @@ function link_errors($linkres)
 		$main_smarty->assign('submit_error', 'long_content');
 		$error = true;
 	}
-	
-	if(utf8_strlen($linkres->tags) < minTagsLength && $linkres->tags!="" ) {
+	/* Redwine: obsolete code. the constant minTagsLength is not even in the config table. */
+	/*if(utf8_strlen($linkres->tags) < minTagsLength && $linkres->tags!="" ) {
 		$main_smarty->assign('submit_error', 'short_tags');
 		$error = true;
-	}
+	}*/
 	
 	if(utf8_strlen($linkres->tags) > maxTagsLength) {
 		$main_smarty->assign('submit_error', 'long_tags');
 		$error = true;
 	}
 	
-  	if (utf8_strlen($linkres->summary) > maxSummaryLength ) { 
+  	if (utf8_strlen($linkres->link_summary) > maxSummaryLength ) { 
 		$main_smarty->assign('submit_error', 'long_summary');
 		$error = true;
 	}
@@ -636,7 +768,7 @@ function link_errors($linkres)
 	if($error == true){
 		$main_smarty->assign('link_id', $linkres->id);
 		$main_smarty->assign('tpl_center', $the_template . '/submit_errors_center');
-		$main_smarty->display($the_template . '/pligg.tpl');
+		$main_smarty->display($the_template . '/plikli.tpl');
 		die();
 	}
 	
@@ -651,7 +783,7 @@ function link_catcha_errors($linkerror)
 	if($linkerror == 'captcha_error') { // if no category is selected
 		$main_smarty->assign('submit_error', 'register_captcha_error');
 		$main_smarty->assign('tpl_center', $the_template . '/submit_errors_center');
-		$main_smarty->display($the_template . '/pligg.tpl');
+		$main_smarty->display($the_template . '/plikli.tpl');
 #		$main_smarty->display($the_template . '/submit_errors.tpl');
 		$error = true;
 	}

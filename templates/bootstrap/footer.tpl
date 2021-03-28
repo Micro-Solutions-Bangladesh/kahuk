@@ -3,24 +3,23 @@
 *************************************}
 <!-- footer.tpl -->
 <div id="footer">
-	{checkActionsTpl location="tpl_pligg_footer_start"}
+	{checkActionsTpl location="tpl_plikli_footer_start"}
 	<span class="subtext"> 
-		Copyright &copy; {php} echo date('Y'); {/php} {#PLIGG_Visual_Name#}
-		| <a href="{$URL_advancedsearch}">{#PLIGG_Visual_Search_Advanced#}</a> 
+		Copyright &copy; {php} echo date('Y'); {/php} {#PLIKLI_Visual_Name#}
+		| <a href="{$URL_advancedsearch}">{#PLIKLI_Visual_Search_Advanced#}</a> 
 		{if $Enable_Live}
-			| <a href="{$URL_live}">{#PLIGG_Visual_Live#}</a>
+			| <a href="{$URL_live}">{#PLIKLI_Visual_Live#}</a>
 		{/if}
 		{if $Enable_Tags}
-			| <a href="{$URL_tagcloud}">{#PLIGG_Visual_Tags#}</a>
+			| <a href="{$URL_tagcloud}">{#PLIKLI_Visual_Tags#}</a>
 		{/if}
-		| <a href="{$URL_topusers}">{#PLIGG_Visual_Top_Users#}</a>
-		| Made wtih <a href="http://pligg.com/" target="_blank">Pligg CMS</a> 
-		| <a href="http://pligg.com/hosting/" target="_blank">Web Host Promotions</a> 
-		{if $URL_rss_page}
-			| <a href="{$URL_rss_page}" target="_blank">{$pagename|capitalize} RSS Feed</a>
+		| <a href="{$URL_topusers}">{#PLIKLI_Visual_Top_Users#}</a>
+		| Made with <a href="https://www.plikli.com/" target="_blank" rel="noopener noreferrer">Plikli CMS</a> 
+		{if !empty($URL_rss_page)}
+			| <a href="{$URL_rss_page}" target="_blank" rel="noopener noreferrer">{$pagename|capitalize} RSS Feed</a>
 		{/if}
-		| <a href="{$my_base_url}{$my_pligg_base}/rssfeeds.php">{#PLIGG_Visual_RSS_Feeds#}</a> 
+		| <a href="{$my_base_url}{$my_plikli_base}/rssfeeds.php">{#PLIKLI_Visual_RSS_Feeds#}</a> 
 	</span>
-	{checkActionsTpl location="tpl_pligg_footer_end"}
+	{checkActionsTpl location="tpl_plikli_footer_end"}
 </div>
 <!--/footer.tpl -->

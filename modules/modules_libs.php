@@ -107,7 +107,7 @@ function check_actions($location, &$vars)
 {
 	global $module_actions;
 	$vars['location'] = $location;
-	if($module_actions[$location]){
+	if(!empty($module_actions[$location])){
 		uasort($module_actions[$location], 'actioncmp');
 		foreach ( $module_actions[$location] as $kk => $vv ) {
 			call_user_func_array($kk, array(&$vars));
@@ -129,7 +129,7 @@ function check_actions_tpl($location,&$smarty)
     	global $module_actions_tpl, $main_smarty, $thetemp;
     
     	$smarty->assign("location",$location);
-	if($module_actions_tpl[$location]){
+	if(!empty($module_actions_tpl[$location])){
 		uasort($module_actions_tpl[$location], 'actioncmp');
 		//$weight=sort_cloumn($module_actions_tpl[$location]);
 		//array_multisort($weight, SORT_ASC,  $module_actions_tpl[$location]);

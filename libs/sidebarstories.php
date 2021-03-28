@@ -25,7 +25,7 @@ class SidebarStories {
 			$thecat = get_cached_category_data('category_safe_name', $this->category);
 			$search->category = $thecat->category_id;
 		}
-		$search->doSearch();
+		$search->doSearch($search->pagesize);
 	
 		$linksum_sql = $search->sql;
 	

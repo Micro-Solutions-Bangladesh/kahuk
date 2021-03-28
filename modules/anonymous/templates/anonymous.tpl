@@ -1,1 +1,1 @@
-{config_load file=anonymous_pligg_lang_conf}
+{config_load file=anonymous_plikli_lang_conf}

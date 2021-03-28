@@ -16,7 +16,7 @@ class Search {
 //	var $search_subcats = true; // search it's subcategories? 
 	var $search_extra_fields = true; // search the extra_fields (if enabled)
 	var $url = '';
-	
+	var $ords = '';
 	//extra params for advance search
 	var $adv = false;
 	var $s_story = 0;
@@ -27,7 +27,7 @@ class Search {
 	var $s_cat = 0;	
 	var $s_comments = 0;	
 	var $s_date = 0;
-	
+	var $s_date_to = 0;
   
 	function doSearch($limit) {
 		
@@ -67,6 +67,9 @@ class Search {
 				$from_where .= " AND link_published_date > DATE_SUB(NOW(),INTERVAL 7 DAY) "; 
 			elseif ($this->filterToTimeFrame == 'month') 
 				$from_where .= " AND link_published_date > DATE_SUB(NOW(),INTERVAL 1 MONTH) "; 
+/*Redwine: add an additional Sort by from the sort button to sort the stories of the current month*/
+			elseif ($this->filterToTimeFrame == 'curmonth') 
+				$from_where .= " AND MONTH(link_date) = MONTH(CURDATE()) AND YEAR(link_date) = YEAR(CURDATE()) ";
 			elseif ($this->filterToTimeFrame == 'year') 
 				$from_where .= " AND link_published_date > DATE_SUB(NOW(),INTERVAL 1 YEAR) "; 
 			else if($this->filterToTimeFrame == 'upvoted'){
@@ -81,7 +84,6 @@ class Search {
 				
 				$this->searchTerm = "commented";
 			}	
-				
 		} else {
 			
 			if ($this->filterToTimeFrame == 'today') 
@@ -92,6 +94,9 @@ class Search {
 				$from_where .= " AND link_date > DATE_SUB(NOW(),INTERVAL 7 DAY) "; 
 			elseif ($this->filterToTimeFrame == 'month') 
 				$from_where .= " AND link_date > DATE_SUB(NOW(),INTERVAL 1 MONTH) "; 
+/* Redwine: add an additional Sort by from the sort button to sort the stories of the current month */
+			elseif ($this->filterToTimeFrame == 'curmonth') 
+				$from_where .= " AND MONTH(link_date) = MONTH(CURDATE()) AND YEAR(link_date) = YEAR(CURDATE()) ";
 			elseif ($this->filterToTimeFrame == 'year') 
 				$from_where .= " AND link_date > DATE_SUB(NOW(),INTERVAL 1 YEAR) "; 
 			else if($this->filterToTimeFrame == 'upvoted'){
@@ -109,7 +114,8 @@ class Search {
 		}
 		
 		/////sorojit: for user selected category display
-		if($_COOKIE['mnm_user'])
+		/* Redwine: added isset to eliminate the Notice Undefined index: mnm_user when the user is not logged in. */
+		if(isset($_COOKIE['mnm_user']))
 		{
 			$user_login = $db->escape(sanitize($_COOKIE['mnm_user'],3));
 			$sqlGeticategory = $db->get_var("SELECT user_categories from " . table_users . " where user_login = '$user_login';");
@@ -120,15 +126,18 @@ class Search {
 					$from_where .= " AND ac_cat_id NOT IN ($sqlGeticategory)"; 
 			}
 		}
+		
 		//should we filter to just this category?
 		if(isset($this->category))
 		{
 			//$catId = $db->get_var("SELECT category_id from " . table_categories . " where category_name = '" . $this->category . "';");
 //			$catId = get_category_id($this->category);
 			$catId = $this->category;
+			$child_cat_sql = '';
 			if($catId){
 				$child_cats = '';
-				// do we also search the subcategories? 
+				// do we also search the subcategories?
+/* Redwine: Fix applied to fix the "Show subcategories" feature in Admin Panel -> Settings -> Miscellenaous -> Show subcategories. See https://github.com/Pligg/pligg-cms/commit/2fcf3bac73246ca27de9e9f23f865153632fe4aa */
 				if( Independent_Subcategories == true){
 					$child_array = '';
 
@@ -171,6 +180,7 @@ class Search {
 		    foreach($groups as $group)
 			$group_ids[] = $group->member_group_id;
 		    $group_list = join(",",$group_ids);
+			//$from_where = str_replace("WHERE", "", $from_where);
 		    $from_where .= " AND (".table_groups.".group_privacy!='private' OR ISNULL(".table_groups.".group_privacy) OR ".table_groups.".group_id IN($group_list)) ";
 		}
 		else
@@ -185,29 +195,63 @@ class Search {
 		if($this->searchTerm == "" && $this->url == ""){
 			// like when on the index or new pages.
 			$this->sql = "SELECT link_id, link_votes, link_karma, link_comments $from_where $search_clause GROUP BY link_id $this->orderBy LIMIT $this->offset, $limit";
+			####### Redwine: Fixed the sort by Upvoted, Downvoted and Commented. See https://github.com/Pligg/pligg-cms/commit/53545f49abdee4349d603692a1d6bdb2d6ff4fd6 .This is the first attempt to fix the bugs in the below 3 sorts methods. We will tidy and optimize the code later when we determine that 
+			####### it is bugs free ~ redwinefireplace #######
+			####### We are constructing the entire query at once, taking into consideration:
+			####### Fixed the sort by Upvoted, Downvoted and Commented.
+			####### 1- Now the pagination is accurate and no more blank pages.
+			####### 2- Each of the above sort reflects the result of the page from where they were requested (I.e. from index page, returns the results of 
+			####### links with 'published' status. and from New page, with status = 'new.
+			####### 3- Private groups links no longer show in the result unless the logged in user is a member in those groups. It is filtered in the
+			####### if ($group_list) { statement that creates a list of groups ids in which the user is member. ~ redwinefireplace
 		} else if($this->searchTerm == 'upvoted'){
 			$usrclause = "";
 			$group = "GROUP BY link_id";
 			if($catId) {
-				$this->sql = "SELECT DISTINCT * FROM " . table_links . ", " . table_votes . " WHERE ".$usrclause." vote_link_id=link_id AND vote_value > 0  AND (link_status='published' OR link_status='new') AND link_category=$catId ".$group." ORDER BY link_votes DESC LIMIT $this->offset, $limit"; //link_date
+				$from_where = "FROM " . table_links. " LEFT JOIN " . table_categories . " ON " . table_links . ".link_category =" . table_categories. ".category_id LEFT JOIN " . table_votes . " ON (" . table_links . ".link_id =" . table_votes. ".vote_link_id AND " . table_votes. ".vote_value > 0)  LEFT JOIN " . table_groups. " ON " . table_links. ".link_group_id =" . table_groups . ".group_id LEFT JOIN " . table_additional_categories . " ON " . table_additional_categories . ".ac_link_id=" . table_links. ".link_id WHERE " . table_links. ".link_status='" . $this->filterToStatus . "' AND " . table_links. ".link_votes >0 AND (" . table_links . ".link_category=" .$catId . " OR " . table_additional_categories . ".ac_cat_id =" . $catId . ") AND " . table_votes . ".vote_type='links' AND (" . table_groups . ".group_privacy!='private' OR ISNULL(" . table_groups . ".group_privacy))";
+				if ($group_list) {
+					$from_where = str_replace("ISNULL(".table_groups.".group_privacy))", "ISNULL(".table_groups.".group_privacy) OR ".table_groups.".group_id IN($group_list))", $from_where);
+				}
+				$this->sql = "SELECT DISTINCT * $from_where $group ORDER BY link_votes DESC LIMIT $this->offset, $limit";
 			}else{
-				$this->sql = "SELECT DISTINCT * FROM " . table_links . ", " . table_votes . " WHERE ".$usrclause." vote_link_id=link_id AND vote_value > 0  AND (link_status='published' OR link_status='new') ".$group." ORDER BY link_votes DESC LIMIT $this->offset, $limit"; //link_date
+				$from_where = "FROM " . table_links. " LEFT JOIN " . table_votes . " ON (" . table_links . ".link_id =" . table_votes. ".vote_link_id AND " . table_votes. ".vote_value > 0)  LEFT JOIN " . table_groups. " ON " . table_links. ".link_group_id =" . table_groups . ".group_id LEFT JOIN " . table_additional_categories . " ON " . table_additional_categories . ".ac_link_id=" . table_links. ".link_id WHERE " . table_links. ".link_status='" . $this->filterToStatus . "' AND " . table_links. ".link_votes >0 AND " . table_votes . ".vote_type='links' AND (" . table_groups . ".group_privacy!='private' OR ISNULL(" . table_groups . ".group_privacy))";
+				if ($group_list) {
+					$from_where = str_replace("ISNULL(".table_groups.".group_privacy))", "ISNULL(".table_groups.".group_privacy) OR ".table_groups.".group_id IN($group_list))", $from_where);
+				}
+				$this->sql = "SELECT DISTINCT * $from_where $group ORDER BY link_votes DESC LIMIT $this->offset, $limit";
 			}
 		} else if($this->searchTerm == 'downvoted'){
 			$usrclause = "";
 			$group = "GROUP BY link_id";
 			if($catId) {
-				$this->sql = "SELECT DISTINCT * FROM " . table_links . ", " . table_votes . " WHERE ".$usrclause." vote_link_id=link_id AND vote_value < 0  AND (link_status='published' OR link_status='new') AND link_category=$catId ".$group." ORDER BY link_votes ASC LIMIT $this->offset, $limit"; //link_date
+				$from_where = "FROM " . table_links. " LEFT JOIN " . table_categories . " ON " . table_links . ".link_category =" . table_categories. ".category_id LEFT JOIN " . table_votes . " ON (" . table_links . ".link_id =" . table_votes. ".vote_link_id AND " . table_votes. ".vote_value < 0)  LEFT JOIN " . table_groups. " ON " . table_links. ".link_group_id =" . table_groups . ".group_id LEFT JOIN " . table_additional_categories . " ON " . table_additional_categories . ".ac_link_id=" . table_links. ".link_id WHERE " . table_links. ".link_status='" . $this->filterToStatus . "' AND (" . table_links . ".link_category=" .$catId . " OR " . table_additional_categories . ".ac_cat_id =" . $catId . ") AND " . table_votes . ".vote_type='links' AND (" . table_groups . ".group_privacy!='private' OR ISNULL(" . table_groups . ".group_privacy))";
+				if ($group_list) {
+					$from_where = str_replace("ISNULL(".table_groups.".group_privacy))", "ISNULL(".table_groups.".group_privacy) OR ".table_groups.".group_id IN($group_list))", $from_where);
+				}
+				$this->sql = "SELECT DISTINCT * $from_where $group ORDER BY link_votes ASC LIMIT $this->offset, $limit";
 			}else{
-				$this->sql = "SELECT DISTINCT * FROM " . table_links . ", " . table_votes . " WHERE ".$usrclause." vote_link_id=link_id AND vote_value < 0  AND (link_status='published' OR link_status='new') ".$group." ORDER BY link_votes ASC LIMIT $this->offset, $limit"; //link_date    
+				$from_where = "FROM " . table_links. " LEFT JOIN " . table_votes . " ON (" . table_links . ".link_id =" . table_votes. ".vote_link_id AND " . table_votes. ".vote_value < 0)  LEFT JOIN " . table_groups. " ON " . table_links. ".link_group_id =" . table_groups . ".group_id LEFT JOIN " . table_additional_categories . " ON " . table_additional_categories . ".ac_link_id=" . table_links. ".link_id WHERE " . table_links. ".link_status='" . $this->filterToStatus . "' AND " . table_votes . ".vote_type='links' AND (" . table_groups . ".group_privacy!='private' OR ISNULL(" . table_groups . ".group_privacy))";
+				if ($group_list) {
+					$from_where = str_replace("ISNULL(".table_groups.".group_privacy))", "ISNULL(".table_groups.".group_privacy) OR ".table_groups.".group_id IN($group_list))", $from_where);
+				}
+				$this->sql = "SELECT DISTINCT * $from_where $group ORDER BY link_votes ASC LIMIT $this->offset, $limit";
 			}
 		} else if($this->searchTerm == "commented"){
 			$usrclause = "";
 			$group = "GROUP BY link_id";
 			if($catId) {
-				$this->sql = "SELECT DISTINCT * FROM " . table_links . ", " . table_comments . " WHERE comment_status='published' ".$usrclause." AND comment_link_id=link_id AND (link_status='published' OR link_status='new') AND link_category=$catId ".$group." ORDER BY link_comments DESC LIMIT $this->offset, $limit";
+				$from_where = "FROM " . table_links. " LEFT JOIN " . table_categories . " ON " . table_links . ".link_category =" . table_categories. ".category_id LEFT JOIN " . table_comments . " ON " . table_links . ".link_id =" . table_comments. ".comment_link_id LEFT JOIN " . table_groups. " ON " . table_links. ".link_group_id =" . table_groups . ".group_id LEFT JOIN " . table_additional_categories . " ON " . table_additional_categories . ".ac_link_id=" . table_links. ".link_id WHERE " . table_links. ".link_status='" . $this->filterToStatus . "' AND (" . table_links . ".link_category=" .$catId . " OR " . table_additional_categories . ".ac_cat_id =" . $catId . ") AND " . table_comments . ".comment_status='published' AND (" . table_groups . ".group_privacy!='private' OR ISNULL(" . table_groups . ".group_privacy))";
+				if ($group_list) {
+					$from_where = str_replace("ISNULL(".table_groups.".group_privacy))", "ISNULL(".table_groups.".group_privacy) OR ".table_groups.".group_id IN($group_list))", $from_where);
+				}
+				$this->sql = "SELECT DISTINCT * $from_where $group ORDER BY link_comments DESC LIMIT $this->offset, $limit";
 			}else{
-				$this->sql = "SELECT DISTINCT * FROM " . table_links . ", " . table_comments . " WHERE comment_status='published' ".$usrclause." AND comment_link_id=link_id AND (link_status='published' OR link_status='new') ".$group." ORDER BY link_comments DESC LIMIT $this->offset, $limit";
+				
+				$from_where = "FROM " . table_links. " LEFT JOIN " . table_comments . " ON " . table_links . ".link_id =" . table_comments. ".comment_link_id LEFT JOIN " . table_groups. " ON " . table_links. ".link_group_id =" . table_groups . ".group_id LEFT JOIN " . table_additional_categories . " ON " . table_additional_categories . ".ac_link_id=" . table_links. ".link_id WHERE " . table_links. ".link_status='" . $this->filterToStatus . "' AND " . table_comments . ".comment_status='published' AND (" . table_groups . ".group_privacy!='private' OR ISNULL(" . table_groups . ".group_privacy))";
+				if ($group_list) {
+					$from_where = str_replace("ISNULL(".table_groups.".group_privacy))", "ISNULL(".table_groups.".group_privacy) OR ".table_groups.".group_id IN($group_list))", $from_where);
+				}
+				$this->sql = "SELECT DISTINCT * $from_where $group ORDER BY link_comments DESC LIMIT $this->offset, $limit";
 			}
 		}
 		else{
@@ -216,11 +260,12 @@ class Search {
 		
 		###### START Advanced Search ######
 		if($this->adv){
-			$from_where = table_links;
+			$from_where = " FROM " .table_links;
 			$search_clause = 'WHERE ';
 			$search_params = array();
 			$search_AND_params = array();
-			$query = "SELECT ".table_links.".link_id AS link_id, ".table_links.".link_date AS link_date, ".table_links.".link_published_date AS link_published_date FROM ";
+			$addparam = '';
+			$query = "SELECT ".table_links.".link_id AS link_id, ".table_links.".link_date AS link_date, ".table_links.".link_published_date AS link_published_date ";
 
 			// always check groups (to hide private groups)
 			$from_where .= " LEFT JOIN ".table_groups." ON ".table_links.".link_group_id = ".table_groups.".group_id ";
@@ -244,11 +289,14 @@ class Search {
 			$bufferOrig = $this->searchTerm;
 				
 			//search category
+/* Redwine: When you select a category from the advanced search page, it will now return results from that category and all sub-categories belonging to it. See https://github.com/Pligg/pligg-cms/commit/39944ed20275cea802c266b4969881af7310ba01 */
 			if( $this->s_cat != 0 ){
+				$mult_sql = '';
 				$catId = $this->s_cat;
 				if($catId){
 					$child_cats = '';
 					// do we also search the subcategories? 
+/* Redwine: Fix applied to fix the "Show subcategories" feature in Admin Panel -> Settings -> Miscellenaous -> Show subcategories. See https://github.com/Pligg/pligg-cms/commit/2fcf3bac73246ca27de9e9f23f865153632fe4aa */
 					if( Independent_Subcategories == true){
 						$child_array = '';
 						// get a list of all children and put them in $child_array.
@@ -333,9 +381,17 @@ class Search {
 			//search by date
 			if( $this->s_date ){
 				$this->s_date = date('Y-m-d',strtotime($this->s_date));
-#				$from_where .= " WHERE DATE(link_date)='{$this->s_date}' ";
+				/* Rediwne: we have to comment the line below becausse it was rendering the query with an error. */
+				//$from_where .= " WHERE DATE(link_date)='{$this->s_date}' ";
+				if ( !$this->s_date_to ){
 				$search_AND_params[] = " DATE(".table_links.".link_date)='{$this->s_date}' ";
-#				$this->searchTerm = $bufferOrig;				
+				}
+				$this->searchTerm = $bufferOrig;				
+			}		
+			if( $this->s_date_to ){
+				$this->s_date_to = date('Y-m-d',strtotime($this->s_date_to));
+				$search_AND_params[] = " DATE(".table_links.".link_date) >='{$this->s_date}' AND DATE(".table_links.".link_date) <= '{$this->s_date_to}' ";
+				$this->searchTerm = $bufferOrig;				
 			}		
 
 			if(Voting_Method == 2)
@@ -346,20 +402,21 @@ class Search {
 			    	$from_where .= " LEFT JOIN ".table_additional_categories. " ON ac_link_id=link_id";
 
 			if( $this->status != '' && $this->status != 'all' ){
-				$search_params[] = " ".table_links.".link_status = '{$this->status}' ";
+				/* Bug caught and submitted by HICKS along with the fix: modifying search_params[] TO search_AND_params[] */
+				$search_AND_params[] = " ".table_links.".link_status = '{$this->status}' ";
 			}
 			
 			if (sizeof($search_params))
-			    $search_clause = '('.implode( ' OR ', $search_params ).' ) ';
+			    $search_clause .= '('.implode( ' OR ', $search_params ).' ) ';
 			else
-			    $search_clause = '1';
+			    $search_clause .= '1';
 			if (sizeof($search_AND_params)>0)
 				$search_clause .= ' AND ('.implode( ' AND ', $search_AND_params ).' ) ';
-			$this->sql = $query.' '.$from_where.' WHERE '.$search_clause." AND ".table_links.".link_status IN ('published','new')";
+			$this->sql = $query.' '.$from_where.' '.$search_clause." AND ".table_links.".link_status IN ('published','new')";
 			$this->searchTerm = $buffKeyword;
 		}
 
-		#echo $this->sql."<br><br>";
+		
 		###### END Advanced Search ######
 		
 		
@@ -405,7 +462,7 @@ class Search {
 		
 		// search tags
 		$this->isTag = true;
-		$this->doSearch();
+		$this->doSearch($this->pagesize);
 		$links = $db->get_results($this->sql);
 		if ($links) {
 			foreach($links as $link_id) {
@@ -421,7 +478,7 @@ class Search {
 		if($original_isTag !== true){
 			// search links
 			$this->isTag = false;
-			$this->doSearch();
+			$this->doSearch($this->pagesize);
 			$links = $db->get_results($this->sql);
 			if ($links) {
 				foreach($links as $link_id) {
@@ -435,7 +492,7 @@ class Search {
 			}
 		}
 		
-		if($newfoundlinks){
+		if(!empty($newfoundlinks)){
 			if (Voting_Method == 3)
 				$rating_column = 'link_karma';
 			else
@@ -474,10 +531,10 @@ class Search {
 			}			
 		}
 		
-		$returnme['rows'] = $results;
-		$returnme['count'] = count($sortarray);
+		if (!empty($results)) $returnme['rows'] = $results;
+		if (!empty($sortarray)) $returnme['count'] = count($sortarray);
 		
-		return $returnme;
+		if (!empty($returnme)) return $returnme;
 	}
 
 	function get_search_clause($option='') {
@@ -496,7 +553,7 @@ class Search {
 					$x = explode(",",$words);
 					$sq = "(";
 					foreach($x as $k=>$v){
-					 $sq .= "tag_words = '".trim($x[$k])."'";
+					 $sq .= "`tag_words` = '".trim($x[$k])."'";
 					 if($k != (count($x) - 1))$sq .= " OR ";
 					}
 					$sq .= ")";
@@ -513,11 +570,14 @@ class Search {
 				if($SearchMethod == 3){
 					$SearchMethod = $this->determine_search_method($words);
 				}
-				if($SearchMethod == 1){
+				$matchfields = '';
+				
+				/*Redwine: to enhance the search result, I commented out the if($SearchMethod == 1){ & if($SearchMethod == 2){ statements. So the search conditions apply now to both.*/
+				/*if($SearchMethod == 1){
 					// use SQL "against" for searching
 					// doesn't work with "stopwords" or less than 4 characters
 
-					$matchfields = '';
+					
 					if($this->search_extra_fields == true){
 						if(Enable_Extra_Fields){
 							if(Enable_Extra_Field_1 == true && Field_1_Searchable == true){$matchfields .= ', `link_field1`';}
@@ -544,8 +604,8 @@ class Search {
 						$words = '+'.join(" +",$m[1]);
 					$where = " AND MATCH (link_title, link_content, link_tags $matchfields) AGAINST ('$words' IN BOOLEAN MODE) ";
 
-				}
-				if($SearchMethod == 2){
+				}*/
+				//if($SearchMethod == 2){
 					// use % for searching
 
 					if($this->search_extra_fields == true){
@@ -575,8 +635,7 @@ class Search {
 					$where .= $this->explode_search('link_content', $words) . " ) OR (";
 					$where .= $this->explode_search('link_tags', $words);
 					$where .= ") $matchfields) ";
-					
-				}
+				//}
 			}
 			return $where;
 		} else {
@@ -660,8 +719,8 @@ class Search {
 			else
 				$this->orderBy = $order_clauses['newest'];
 		}
-		
-		$timeFrames = array ('today', 'yesterday', 'week', 'month', 'year', 'alltime','upvoted', 'downvoted', 'commented');
+/* Redwine: add an additional Sort by from the sort button to sort the stories of the current month */
+		$timeFrames = array ('today', 'yesterday', 'week', 'month', 'curmonth', 'year', 'alltime','upvoted', 'downvoted', 'commented');
 		if ( in_array ($setmek, $timeFrames) ) {
 			if ($setmek == 'alltime')
 				$this->filterToTimeFrame = '';

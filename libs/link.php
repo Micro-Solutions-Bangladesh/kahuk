@@ -11,6 +11,7 @@ class Link {
 	var $valid = true;
 	var $date = false;
 	var $published_date = 0;
+	var $scheduled_date = 0;
 	var $modified = 0;
 	var $url = '';
 	var $url_title = '';
@@ -27,6 +28,7 @@ class Link {
 	var $title_url = '';
 	var $tags = '';
 	var $content = '';
+	var $link_summary = '';
 	var $html = true;
 	var $trackback = false;
 	var $read = true;
@@ -56,7 +58,10 @@ class Link {
 	var $check_friends = true; // see if the author is a friend of the logged in user.  sidebarstories doesn't need this information (so don't waste time on it)
 	var $vote_from_this_ip=0; // if disable multiple vote from the same ip
 	var $report_from_this_ip=0; // if disable multiple vote from the same ip
-
+	/* Redwine: initialized a new variable $is_rtl to hold the value 0 or 1 when returned from the script that checks whether the content is left-to-right or right-to-left language.  and the uploaded_image to be used for the Open Graph Protocol*/
+	var $is_rtl = 0;
+	var $uploaded_image = '';
+	var $og_twitter_image = '';
 	function get($url) {
 		$url=trim($url);
 
@@ -66,8 +71,13 @@ class Link {
 		}
 		if(Validate_URL != false){
 			if($url != 'http://' && $url != ''){
-				$r = new PliggHTTPRequest($url);
+				$r = new PlikliHTTPRequest($url);
 				$xxx = $r->DownloadToString();
+				/* Redwine: to fix the bug that wasn't getting the url of some site that do not allow fopen or fsockopen. This way, the submitted url will be the url of the link */
+				if ($xxx == '') {
+					$this->valid = true;
+					$this->url=$url;
+				}
 			} else {
 				$this->url='http://';
 				$xxx = '';
@@ -90,25 +100,84 @@ class Link {
 
 		$this->valid = true;
 		$this->url=$url;
-		if(preg_match('/<title>(.+)<\/title>/', $this->html, $matches)) {
+		/***********
+		Redwine: added the "s" modifier to also match a new line in case the closing tag is on another line. Also added code to remove the piped site name from the title (I.e. "| sitename" or "- sitename"
+		Also added the "?" to better grab the content of the title tag because we encountered a couple of sites that use non-standard html coding by having many title tag on the page.
+		***********/
+		if(preg_match('/<title>(.+?)<\/title>/si', $this->html, $matches)) {
 			$this->url_title=trim($matches[1]);
+			$this->url_title = preg_replace('/\|?-?~?[^|-~]*$/', '', $this->url_title);
 		}
-		if(preg_match("'<meta name=\"description\" content=\"([^<]*?)\"\s?/?>'i", $this->html, $matches)) {
+		if (!$this->url_title) {
+			if(preg_match("'<meta\s+property=[\"\']og:title[\"\']\s+content=[\"\']([^<]*?)[\"\']\s{0,}\/?\s{0,}>'si", $this->html, $matches)) {
+			$this->url_title=trim($matches[1]);
+			}
+		}
+		/* Redwine: enhanced the preg_match patern to match any quotes, single or double. Also some sites have the meta content attribute preceding the name attribute. 
+		We are also grabbing the Facebook and Twitter opengraph to make sure we find the needed meta. */
+		
+		/* finding the image of the article to be used when submitting a story on Plikli. */
+		if(preg_match("'<meta\s+(name|property)=[\"\'](og:image|twitter:image|twitter:image:src)[\"\']\s+content=[\"\']([^<]*?)[\"\'](?:\s+itemprop=[\"\'][^<]*?[\"\'])?\s{0,}\/?\s{0,}>'si", $this->html, $matches)) {
+			$this->og_twitter_image=$matches[3];
+		}elseif(preg_match("'<meta\s+(name|property)=[\"\'](og:image|twitter:image|twitter:image:src)[\"\'](?:\s+itemprop=[\"\'][^<]*?[\"\'])?\s+content=[\"\']([^<]*?)[\"\']\s{0,}\/?\s{0,}>'si", $this->html, $matches)) {
+			$this->og_twitter_image=$matches[3];
+		}elseif(preg_match("'<meta\s+content=[\"\']([^<]*?)[\"\']\s+(?:itemprop=[\"\'][^<]*?[\"\']\s+)?(name|property)=[\"\'](og:image|twitter:image|twitter:image:src)[\"\']\s{0,}\/?\s{0,}>'si", $this->html, $matches)) {
+			$this->og_twitter_image=$matches[1];
+		}elseif(preg_match("'<meta\s+(?:itemprop=[\"\'][^<]*?[\"\']\s+)?content=[\"\']([^<]*?)[\"\']\s+(name|property)=[\"\'](og:image|twitter:image|twitter:image:src)[\"\']\s{0,}\/?\s{0,}>'si", $this->html, $matches)) {
+			$this->og_twitter_image=$matches[1];
+		}elseif(preg_match("'<meta\s+(?:itemprop=[\"\'][^<]*?[\"\']\s+)?(name|property)=[\"\'](og:image|twitter:image|twitter:image:src)[\"\']\s+content=[\"\']([^<]*?)[\"\']\s{0,}\/?\s{0,}>'si", $this->html, $matches)) {
+			$this->og_twitter_image=$matches[3];
+		}elseif(preg_match("'<meta\s+content=[\"\']([^<]*?)[\"\']\s+(name|property)=[\"\'](og:image|twitter:image|twitter:image:src)[\"\']\s+(?:itemprop=[\"\'][^<]*?[\"\'])?\s{0,}\/?\s{0,}>'si", $this->html, $matches)) {
+			$this->og_twitter_image=$matches[1];
+		}
+		
+		/* finding the description of the article to be used when submitting a story on Plikli. */
+		if(preg_match("'<meta\s+name=[\"\']description[\"\']\s+content=[\"\']([^<]*?)[\"\']\s{0,}\/?\s{0,}>'si", $this->html, $matches)) {
 			$this->url_description=$matches[1];
+		}elseif(preg_match("'<meta\s+content=[\"\']([^<]*?)[\"\']\s+name=[\"\']description[\"\']\s{0,}\/?\s{0,}>'si", $this->html, $matches)) {
+			$this->url_description=$matches[1];
+		}elseif(preg_match("'<meta\s+(?:(name|property)=[\"\'](og:description|twitter:description)[\"\']\s+)?(?:property=[\"\'](og:description|twitter:description)[\"\'])?(?:\s+itemprop=[\"\'][^<]*?[\"\'])?\s+content=[\"\']([^<]*?)[\"\']\s?/?>'si", $this->html, $matches)) {
+			$this->url_description=$matches[4];
+		}elseif(preg_match("'<meta\s+(?:property=[\"\'](og:description|twitter:description)[\"\']\s+)?(?:(name|property)=[\"\'](og:description|twitter:description)[\"\'])?(?:\s+itemprop=[\"\'][^<]*?[\"\'])?\s+content=[\"\']([^<]*?)[\"\']\s?/?>'si", $this->html, $matches)) {
+			$this->url_description=$matches[4];
+		}elseif(preg_match("'<meta\s+(?:itemprop=[\"\'][^<]*?[\"\']\s+)?(?:property=[\"\'](og:description|twitter:description)[\"\']\s+)?(?:(name|property)=[\"\'](og:description|twitter:description)[\"\'])?\s+content=[\"\']([^<]*?)[\"\']\s?/?>'si", $this->html, $matches)) {
+			$this->url_description=$matches[4];
 		}else{
 			// Fall back on the first <p> tag content
-			$start = strpos($this->html, '<p>');
-			$end = strpos($this->html, '</p>', $start);
-			$paragraph = substr($this->html, $start, $end-$start+4);
-			$paragraph = html_entity_decode(strip_tags($paragraph));
+			/* Redwine: If the meta description was not found, then we global main_smarty to pull the settings of Story_Content_Tags_To_Allow to use to filter for the allowed hml tags, used below. */
+			global $main_smarty;
+			/***** 
+				Redwine: we match the first <p> element and if is found, then we need the Story_Content_Tags_To_Allow to use in case html tags are allowed and defined. Example:
+				
+				submitting https://www.cheatography.com/davechild/cheat-sheets/regular-expressions/ will populate this in the textarea:
+				<p class="subdesc">A quick reference guide for regular expressions (regex), including symbols, ranges, grouping, assertions and some sample patterns to get you started.</p>
+				
+				Now assuming we have allowed these tags in the dashboard: <strong><br><font><img><p>
+				then when we use the code on line 129 the textarea content will be filtered to this:
+				
+				<p class="subdesc">A quick reference guide for regular expressions (regex), including symbols, ranges, grouping, assertions and some sample patterns to get you started.</p>
+				
+				Notice that the <a> and <b> were filtered out.
+			*****/
+			/* Redwine the original had just <p> to match. I changed it to also match the p tag with its attributes if any. */
+			if (preg_match('%(<p[^>]*>.*?</p>)%iu', $this->html, $regs)) {
+				$paragraph = $regs[1];
+				$allowedhtml = $main_smarty->get_template_vars('Story_Content_Tags_To_Allow');
+				if ($allowedhtml == "") {
+					$paragraph = strip_tags($paragraph);
+				}else{
+					$paragraph = close_tags(stripslashes(sanitize($paragraph, 4, html_entity_decode($allowedhtml))));
+				}
+			}
 			// Make sure that it's over 100 characters in length
-			if (strlen($paragraph)>100){
+			/* Redwine: I have no idea why they used 100 below. I changed it to compare with the Minimum Story Length set in the Dashboard which is a constant minStoryLength */
+			if (strlen($paragraph)>minStoryLength){
 				$this->url_description=$paragraph;
 			}
 		}
 		
 		// Detect trackbacks
-		if (sanitize($_POST['trackback'], 3) != '') {
+		if (isset($_POST['trackback']) && sanitize($_POST['trackback'], 3) != '') {
 			$this->trackback=trim(sanitize($_POST['trackback'], 3));
 		} elseif (preg_match('/trackback:ping="([^"]+)"/i', $this->html, $matches) ||
 			preg_match('/trackback:ping +rdf:resource="([^>]+)"/i', $this->html, $matches) ||
@@ -145,7 +214,7 @@ class Link {
 		$link_title = $db->escape($this->title);
 		$link_title_url = $db->escape($this->title_url);
 		if($link_title_url == ""){$link_title_url = makeUrlFriendly($this->title, $this->id);}
-		$link_tags = $db->escape($this->tags);
+		$link_tags = preg_replace('/[^\p{L}\p{N}_\s\,]/u', '', $this->tags); //$db->escape($this->tags);
 		$link_content = $db->escape($this->content);
 		$link_field1 = $db->escape($this->link_field1);
 		$link_field2 = $db->escape($this->link_field2);
@@ -197,7 +266,8 @@ class Link {
 		$link_randkey = $this->randkey;
 		$link_category = $this->category;
 		$link_date = $this->date;
-		if($this->published_date == 0){$this->published_date = 943941600;}
+/* Redwine: fix to the published date defaulting to 943941600 (Tue, 30 Nov 1999 06:00:00 GMT) */
+		if($this->published_date == 0){$this->published_date = $this->date;}
 		$link_published_date = $this->published_date;
 		$link_group_id = $this->link_group_id;
 
@@ -206,7 +276,7 @@ class Link {
 		
 
 		if($this->id===0) {
-		
+/* Redwine: Fixed the negative votes to discard a story as per Admin Panel -> Settings -> Voting -> Negative votes to remove submission. See https://github.com/Pligg/pligg-cms/commit/d05ccab49c8efbc7b0ba69b2ad6e96056652296b */		
 			$sql = "INSERT IGNORE INTO " . table_links . " (link_author, link_status, link_randkey, link_category, link_date, link_published_date, link_votes, link_karma, link_title, link_content ,link_group_id) VALUES ($link_author, '$link_status', $link_randkey, $link_category, FROM_UNIXTIME($link_date), FROM_UNIXTIME($link_published_date), $link_votes, $link_karma, '', '',$link_group_id)";
 				
 			if($this->debug == true){
@@ -215,8 +285,8 @@ class Link {
 			$db->query($sql);
 			$this->id = $db->insert_id;
 		} else {
-
-			$sql = "UPDATE " . table_links . " set `link_reports`=$link_reports, `link_comments`=$link_comments, link_author=$link_author, link_status='$link_status', link_randkey=$link_randkey, link_category='$link_category', link_modified=NULL, link_date=FROM_UNIXTIME($link_date), link_published_date=FROM_UNIXTIME($link_published_date), link_votes=$link_votes, link_karma=$link_karma, link_group_id=$link_group_id WHERE link_id=$this->id";
+/* Redwine: With php 5.6, we started having more errors and warnings as it is not tolerant like the previous versions. in the below UPDATE query, the link_modified=NULL was causing an error and therefore the story was discarded. It did not need updating because it is timestamp field. So i removed it from the query. */
+			$sql = "UPDATE " . table_links . " set `link_reports`=$link_reports, `link_comments`=$link_comments, link_author=$link_author, link_status='$link_status', link_randkey=$link_randkey, link_category='$link_category', link_date=FROM_UNIXTIME($link_date), link_published_date=FROM_UNIXTIME($link_published_date), link_votes=$link_votes, link_karma=$link_karma, link_group_id=$link_group_id WHERE link_id=$this->id";
 			if($this->debug == true){
 				echo '<hr>store_basic:Update:' . $sql . '<hr>';
 			}
@@ -262,11 +332,17 @@ class Link {
 			$this->url= $link->link_url;
 			$this->url= str_replace('&amp;', '&', $link->link_url);  
 			$this->url_title=$link->link_url_title;
-			$this->url_description=$link->link_url_description;
+			//$this->url_description=$link->link_url_description;
 			$this->title=$link->link_title;
 			$this->title_url=$link->link_title_url;
 			$this->tags=$link->link_tags;
-			$this->content=$link->link_content;     
+			$this->content=$link->link_content; 
+			/* Redwine: a value 0 or 1 will be returned from the script that checks whether the content is left-to-right or right-to-left language. This varibale will be passed to /templates/bootstrap/link_summary.tpl and used on line 214 to apply dir="rtl" when applicable. As per http://php.net/manual/en/regexp.reference.unicode.php and https://www.w3.org/International/questions/qa-scripts#which */
+			if (preg_match('/\p{Arabic}/u', $this->title) == 1 || preg_match('/\p{Hebrew}/u', $this->title) == 1 || preg_match('/\p{Nko}/u', $this->title) == 1 || preg_match('/\p{Syloti_Nagri}/u', $this->title) == 1 || preg_match('/\p{Thaana}/u', $this->title) == 1) {
+				$this->is_rtl = 1;
+			}else{
+				$this->is_rtl = 0;
+			} 		
 // DB 01/08/09
 			$this->date=strtotime($link->link_date);
 //			$date=$link->link_date;
@@ -366,7 +442,7 @@ class Link {
 		// DB 09/03/08
 		if(!is_numeric($this->id)){return false;}
 		/////
-		include_once('../internal/Smarty.class.php');
+		include_once(mnminternal.'Smarty.class.php');
 
 		$main_smarty = new Smarty;
 		$main_smarty->compile_check=false;
@@ -379,8 +455,8 @@ class Link {
 		$main_smarty->cache_dir = mnmpath."cache/";
 
 		$main_smarty->config_dir = "";
-		$main_smarty->assign('pligg_language', pligg_language);
-		$main_smarty->config_load(lang_loc . "/languages/lang_" . pligg_language . ".conf");
+		$main_smarty->assign('plikli_language', plikli_language);
+		$main_smarty->config_load(lang_loc . "/languages/lang_" . plikli_language . ".conf");
 		
         $anonymous_can_vote = $db->get_var('SELECT var_value from ' . table_config . ' where var_name = "anonymous_vote";');
         $main_smarty->assign('anonymous_vote', $anonymous_can_vote);
@@ -392,6 +468,7 @@ class Link {
 		$main_smarty = $this->fill_smarty($main_smarty, $type);
 
 		$main_smarty->assign('use_title_as_link', use_title_as_link);
+		$main_smarty->assign('link_nofollow', link_nofollow);
 		$main_smarty->assign('open_in_new_window', open_in_new_window);
 		$main_smarty->assign('the_template', The_Template);
 
@@ -440,7 +517,7 @@ class Link {
 			$parsed = parse_url($this->url);
 			if(isset($parsed['scheme'])){$url_short = $parsed['scheme'] . "://" . $parsed['host'];}
 		}
-		$title_short = htmlspecialchars(utf8_wordwrap($this->title, 30, " ", 1));
+		$title_short = utf8_wordwrap($this->title, 30, " ", 1);
 
 		$smarty->assign('viewtype', $type);
 		$smarty->assign('URL_tagcloud', getmyurl("tagcloud"));
@@ -472,13 +549,17 @@ class Link {
 		$smarty->assign('story_comment_count', $this->comments());
 		$smarty->assign('story_status', $this->status);
 		$smarty->assign('story_karma', $this->karma);
-		
+		$smarty->assign('is_rtl', $this->is_rtl);
+		$smarty->assign('og_twitter_image', $this->og_twitter_image);
+		/* Redwine: modifications to reinstate the read more feature, done to the if $type == summary code. 
+			If we remove the conditional statement on line 557 below, then we won't get the read more functionality! */
+		$smarty->assign('maxSummaryLength', StorySummary_ContentTruncate);
 		if($type == "summary"){
-			if($this->link_summary == ""){
+			//if($this->link_summary == ""){
 				$smarty->assign('story_content', $this->truncate_content());
-			} else {
-				$smarty->assign('story_content', $this->link_summary);
-			}
+			//} else {
+			//	$smarty->assign('story_content', $this->link_summary);
+			//}
 		}
 		if($type == "full"){
 			$smarty->assign('story_content', $this->content);
@@ -487,7 +568,9 @@ class Link {
 		if($this->get_author_info == true){
 			$smarty->assign('link_submitter', $this->username());
 			$smarty->assign('submitter_profile_url', getmyurl('user', $this->username));
+			if (array_search($this->userkarma, $ranklist)) {
 			$smarty->assign('submitter_rank', $ranklist[$this->userkarma]);
+			}
 			$smarty->assign('user_extra_fields', $this->extra_field);
 		}
 		
@@ -540,6 +623,7 @@ class Link {
 			}
 		}
 		$smarty->assign('get_group_membered', $this->get_group_membered()); 
+		$smarty->assign('get_group_shared_membered', $this->get_group_shared_membered());
 		if($this->status == "published"){$smarty->assign('category_url', getmyurl("maincategory", $catvar));}
 		if($this->status == "new"){$smarty->assign('category_url', getmyurl("newcategory", $catvar));}
 		if($this->status == "discard"){$smarty->assign('category_url', getmyurl("discardedcategory", $catvar));}
@@ -548,7 +632,7 @@ class Link {
 		$smarty->assign('user_logged_in', $current_user->user_login);
 		$smarty->assign('randmd5', md5($current_user->user_id.$this->randkey));
 		$smarty->assign('user_id', $this->author);
-		$smarty->assign('current_user_id', $current_user_id);
+		$smarty->assign('current_user_id', $current_user->user_id);
 
 		if(Enable_Extra_Fields){
 			$main_smarty = $smarty; include mnminclude.'extra_fields_smarty.php'; $smarty=$main_smarty;
@@ -569,17 +653,57 @@ class Link {
 			$smarty->assign('link_field15', $this->link_field15);
 		}
 		$smarty->assign('link_group_id', $this->link_group_id);
-		$smarty->assign('instpath', my_base_url . my_pligg_base . "/");		
+		$smarty->assign('instpath', my_base_url . my_plikli_base . "/");		
 		$smarty->assign('UseAvatars', do_we_use_avatars());
 		$smarty->assign('Avatar', $avatars = get_avatar('all', "", "", "", $this->userid));
 		$smarty->assign('Avatar_ImgSrc', $avatars['large']);
 		$smarty->assign('Avatar_ImgSrcs', $avatars['small']);
+/* Redwine: Roles and permissions and Groups fixes */	
+		// Get the Group creator/Admin/Moderator to use the assigned permissions, when $this->link_group_id is greater than 0 
+		$is_gr_Creator = 0;
+		$is_gr_Admin = 0;
+		$is_gr_Moderator = 0;
+		if ($this->link_group_id > 0) {
+			$g_creator = $db->get_row("SELECT group_creator FROM " . table_groups . " WHERE group_id =". $this->link_group_id);
+			if ($g_creator->group_creator == $current_user->user_id) {
+				$is_gr_Creator = 1;
+			}
+			$ismember = $db->get_row("SELECT member_role FROM " . table_group_member . " WHERE member_group_id =". $this->link_group_id . " AND member_user_id =".$current_user->user_id . " AND member_status ='active'");
+			if (!empty($ismember)) {
+				if ($ismember->member_role != "") {
+					if ($ismember->member_role == "admin") {
+						$is_gr_Admin = 1;
+					}elseif ($ismember->member_role == "moderator") {
+						$is_gr_Moderator = 1;
+					}
+				}
+			}
+		}else{
+			//Redwine: we want to find out if the user is a group admin to use it in the group unshare, because we want to allow group admins and group link sharer to unshare it.
+			
+			$ismember = $db->get_var("SELECT  distinct t1.member_role
+			FROM `".table_group_member."` t1
+			LEFT JOIN `".table_group_shared."` t2
+			ON t1.member_group_id=t2.share_group_id WHERE t1.member_group_id IN (SELECT `share_group_id` from `". table_group_shared."` where `share_link_id` = ".$this->id.")");
 
-		$canIhaveAccess = 0;
-		$canIhaveAccess = $canIhaveAccess + checklevel('admin');
-		$canIhaveAccess = $canIhaveAccess + checklevel('moderator');
-		if($canIhaveAccess == 1)
-			{$smarty->assign('isadmin', 'yes');}
+			if (!empty($ismember)) {
+				if ($ismember != "") {
+					if ($ismember == "admin") {
+						$is_gr_Admin = 1;
+					}
+				}
+		}
+		}
+		//Rediwne: find if the link was shared by a group member
+		$link_sharer = $db->get_var("SELECT `share_user_id` FROM `" . table_group_shared."` WHERE `share_link_id` = " .$this->id . " AND `share_user_id` = ". $current_user->user_id);
+		$smarty->assign('is_gr_Creator', $is_gr_Creator);
+		$smarty->assign('is_gr_Admin', $is_gr_Admin);
+		$smarty->assign('is_gr_Moderator', $is_gr_Moderator);
+		$smarty->assign('is_link_sharer', $link_sharer);
+		/*Redwine: Roles and permissions and Groups fixes. We need the user_level to determine the site wide Admin & Moderators to give access according to their permissions */
+		global $main_smarty;
+			$smarty->assign('isAdmin', $main_smarty->get_template_vars('isAdmin'));
+			$smarty->assign('isModerator', $main_smarty->get_template_vars('isModerator'));
 
 		if($this->check_friends == true){
 			// For Friends //
@@ -601,14 +725,15 @@ class Link {
 				$smarty->assign('Allow_Friends', Allow_Friends);
 			// --- //
 		}
-		if($current_user->user_id != '')
+		/* Redwine: commented the block from line 639 to 647 because it is related to block 649 to 663 that was commented and therefore obsolete, and generating a notice. */
+		/*if($current_user->user_id != '')
 		{
 			$vars = array('author_id' => $this->author,'link_id' => $this->id);
 			check_actions('friends_activity_function', $vars);
 			if($vars['value'] == true){
 				$smarty->assign('friendvoted', 1);
 			}	
-		}
+		}*/
 		/*
 		//for friends voting activity
 		include_once(mnminclude.'friend.php');
@@ -687,7 +812,7 @@ class Link {
 			// for pages like index, this ->display was being called for each story
 			// which was sometimes 15+ times per page. this way it's just called once
 			$smarty->display('blank.tpl'); //this is just to load the lang file so we can pull from it in php
-			define('alltagtext', $smarty->get_config_vars('PLIGG_Visual_Tags_All_Tags')); 			
+			define('alltagtext', $smarty->get_config_vars('PLIKLI_Visual_Tags_All_Tags')); 			
 		}
 		$alltagtext = alltagtext;
 	
@@ -706,9 +831,9 @@ class Link {
  				{
  					if(isset($tag_array[$i])){
 						if ( $URLMethod == 1 ) { 
-						    $tags_url_array[$i] = my_pligg_base . "/search.php?search=".urlencode(trim($tag_array[$i]))."&amp;tag=true";
+						    $tags_url_array[$i] = my_plikli_base . "/search.php?search=".urlencode(trim($tag_array[$i]))."&amp;tag=true";
 						} elseif ( $URLMethod == 2) {
-						    $tags_url_array[$i] = my_pligg_base . "/tag/" . urlencode(trim($tag_array[$i]));
+						    $tags_url_array[$i] = my_plikli_base . "/tag/" . urlencode(trim($tag_array[$i]));
 				    }
 				  }
  				}
@@ -726,12 +851,17 @@ class Link {
 		$smarty->assign('enable_group', enable_group);
 		$smarty->assign('pagename', pagename);
 		$smarty->assign('my_base_url', my_base_url);
-		$smarty->assign('my_pligg_base', my_pligg_base);
+		$smarty->assign('my_plikli_base', my_plikli_base);
 		$smarty->assign('Default_Gravatar_Large', Default_Gravatar_Large);
 			
 		//$link_index++;
 		$vars['smarty'] = $smarty;
 		check_actions('lib_link_summary_fill_smarty', $vars);
+		/*** Redwine: Assigning the return value from upload_main.php  to uploaded_image variable to be used in the Open Graph Protocol ***/
+		$this->uploaded_image = $vars['smarty']->_vars['uploaded_image'];
+		/*** Redwine: populating the session and assigning it to smarty. ***/
+		$_SESSION['uploaded_image'] = $this->uploaded_image;
+		$smarty->assign('uploaded_image', $uploaded_image);
 
 		return $smarty;
 	}
@@ -742,26 +872,50 @@ class Link {
 	{
 		global $db, $main_smarty, $rows,$current_user;
 		$current_userid = $current_user->user_id;
-		if (!isset($this->group_membered) && $current_userid)
-//		    $this->group_membered = $db->get_results("SELECT group_id,group_name FROM " . table_groups . " WHERE group_creator = $current_userid and group_status = 'Enable'");
-		    $this->group_membered = $db->get_results("SELECT DISTINCT group_id,group_name FROM " . table_groups . " LEFT JOIN ".table_group_member." ON member_group_id=group_id AND member_user_id = $current_userid WHERE group_status = 'Enable' AND member_status='active'");
+		/***********
+		Redwine: 1- modified the query to exclude members that are banned or flagged and inactive.
+		2- to also accurately get what a group member can share. the modifications will only pull the groups where a group member can share a story that has not been shared by the user or any other group member; a story will not be shared twice to the same group.
+		***********/
+		if ($current_userid)
+			$this->group_membered = $db->get_results("SELECT  DISTINCT t1.group_id,t1.group_name FROM `" . table_groups . "` t1 LEFT JOIN `" .table_group_member."` t2 ON t2.member_group_id=t1.group_id and t2.member_user_id = $current_userid left join   `".table_group_shared."` t3 on t3.share_user_id = t2.member_user_id WHERE t2.member_user_id = $current_userid AND t2.member_role !='banned' AND t2.member_role !='flagged' AND t2.member_status !='inactive' AND t1.group_id NOT IN (SELECT `share_group_id` from `" .table_group_shared."` where `share_link_id` = ".$this->id.")");
 
 		$output = '';
-		if ($this->group_membered)
+		/* Redwine: added !empty to eliminate the Undefined property: Link::$group_membered. */
+		if (!empty($this->group_membered)) {
+			if ($this->group_membered != NULL) {
 			foreach($this->group_membered as $results)
-				$output .= "<a class='group_member_share' href='".my_base_url.my_pligg_base."/group_share.php?link_id=".$this->id."&group_id=".$results->group_id."&user_id=".$current_user->user_id."' >".$results->group_name."</a><br />";
+				$output .= "<a class='group_member_share' href='".my_base_url.my_plikli_base."/group_share.php?link_id=".$this->id."&group_id=".$results->group_id."&user_id=".$current_user->user_id."' >".$results->group_name."</a><br />";
+			}
+		}
+
+		return $output;
+
+	}
+	/*Redwine: I created get_group_shared_membered function to allow a group member who shared a story to unshare it. Group admins also have the same privilege to unshare a story shared by group members.*/
+	function get_group_shared_membered()
+	{
+		global $db, $main_smarty, $rows,$current_user;
+		$current_userid = $current_user->user_id;
+		if (!isset($this->group_shared_membered) && $current_userid)
+		    $this->group_shared_membered = $db->get_results("SELECT DISTINCT t1.group_id,t1.group_name FROM `" . table_groups . "` t1 LEFT JOIN `".table_group_member."` t2 ON t2.member_group_id=t1.group_id AND t2.member_user_id = $current_userid LEFT JOIN `".table_group_shared."` t3 ON t3.share_group_id = t1.group_id WHERE t2.member_user_id = $current_userid AND t2.member_role !='banned' AND t2.member_role !='flagged' AND t2.member_status !='inactive' AND group_status = 'Enable' AND `share_user_id` = $current_userid AND `share_link_id` = " . $this->id);
+
+		$output = '';
+		if (!empty($this->group_shared_membered))
+			foreach($this->group_shared_membered as $results)
+				$output .= "<a class='group_member_share' href='".my_base_url.my_plikli_base."/group_share.php?link_id=".$this->id."&group_id=".$results->group_id."&user_id=".$current_user->user_id."&action=unshare'>".$results->group_name."</a><br />";
 
 		return $output;
 
 	}
 	//--------------------------------------
+	/* Redwine: modifications to reinstate the read more feature, done to the truncate_content function */
 	function truncate_content(){
 		if(utf8_strlen($this->content) > StorySummary_ContentTruncate){
-			
+			if (!use_title_as_link) {$url_read = $this->get_internal_url(); }else{$url_read = $this->url;}
 			 if(Auto_scroll==true){
 				global $main_smarty;
 				$content=	close_tags(utf8_substr($this->content, 0, StorySummary_ContentTruncate));
-				$content.="<div class=\"read_more_article\" storyid=\"".$this->id."\" > ".$main_smarty->get_config_vars('PLIGG_Visual_Read_More')."</div>" ;
+				$content.="<div class=\"read_more_article\" storyid=\"".$this->id."\" ><a href=".$url_read."> ".$main_smarty->get_config_vars('PLIKLI_Visual_Read_More')."</a></div>" ;
 				$content.="<div class=\"read_more_story".$this->id." hide\" >";
 				$content.=close_tags(utf8_substr($this->content, StorySummary_ContentTruncate,utf8_strlen($this->content) ));
 				$content.="</div>";
@@ -974,8 +1128,9 @@ class Link {
 			$this->store_basic();
 			$this->check_should_publish();
 			
-			$vars = array('vote' => $this);
-			check_actions('link_insert_vote_post', $vars);		
+			/* Redwine: fix to some bugs in the Karma system. This code was to update the user_karma with the value of "Voted on an article" when the auto vote is set to true upon story submission. It was causing double update of the user_karma upon voting. We provisioned a new code in /module/karma_main.php in the karma_do_submit3 function. https://github.com/Pligg/pligg-cms/commit/737770202d22ec938465fe66e52f2ae7cdcf5240 */
+			//$vars = array('vote' => $this);
+			//check_actions('link_insert_vote_post', $vars);		
 			
 			return true;
 		}
@@ -1026,7 +1181,7 @@ class Link {
 				}
 			}
 		}
-
+/* Redwine: Fixed the negative votes to discard a story as per Admin Panel -> Settings -> Voting -> Negative votes to remove submission. See https://github.com/Pligg/pligg-cms/commit/d05ccab49c8efbc7b0ba69b2ad6e96056652296b */
 		/*
 		if(($this->status == 'new' || $this->status == 'discard') && buries_to_spam>0 && $this->reports>=buries_to_spam) {
 			$this->status='discard';
@@ -1048,7 +1203,7 @@ class Link {
 				return $cat->category_votes; 
 		}
 
-		return $main_smarty->get_config_vars('PLIGG_Visual_Submit3Errors_NoCategory');
+		return $main_smarty->get_config_vars('PLIKLI_Visual_Submit3Errors_NoCategory');
 	}
 
 	function category_karma() {
@@ -1059,7 +1214,7 @@ class Link {
 				return $cat->category_karma; 
 		}
 
-		return $main_smarty->get_config_vars('PLIGG_Visual_Submit3Errors_NoCategory');
+		return $main_smarty->get_config_vars('PLIKLI_Visual_Submit3Errors_NoCategory');
 	}
 
 	function category_name($id=0) {
@@ -1076,7 +1231,7 @@ class Link {
 			}
 		}
 
-		return $main_smarty->get_config_vars('PLIGG_Visual_Submit3Errors_NoCategory');
+		return $main_smarty->get_config_vars('PLIKLI_Visual_Submit3Errors_NoCategory');
 	}
 
 	function category_safe_name($id=0) {
@@ -1140,6 +1295,8 @@ class Link {
 		if(!is_numeric($this->id)){return false;}
 		/////
 		$this->comments = $db->get_var("SELECT count(*) FROM " . table_comments . " WHERE comment_status='published' AND comment_link_id = $this->id");
+		/* Redwine:added the return value of the link_comment column, otherwise it was not storing it */
+		return $this->comments;
 	}
 
 
@@ -1159,7 +1316,7 @@ class Link {
 	function evaluate_formulas ()
 	{
 		global $db;
-		
+/* Redwine: Fixed the negative votes to discard a story as per Admin Panel -> Settings -> Voting -> Negative votes to remove submission. See https://github.com/Pligg/pligg-cms/commit/d05ccab49c8efbc7b0ba69b2ad6e96056652296b */		
 		if (buries_to_spam == 1) {
 			$res = $db->get_results("select * from " . table_formulas . " where type = 'report' and enabled = 1;");
 			if (!$res) return;
@@ -1241,7 +1398,7 @@ class Link {
 				{
 				$domain_to_test = $test_domain . ".multi.surbl.org";
 				if( strstr(gethostbyname($domain_to_test),'127.0.0'))
-					{ logSpam( "surbl rejected $test_domain");  return true; }
+					{ $this->logSpam( "surbl rejected $test_domain");  return true; }
 				}
 			}
 		$retVal = $this->check_spam_rules($MAIN_SPAM_RULESET, strtoupper($text));
@@ -1299,7 +1456,7 @@ class Link {
 	}
 
 }
-class PliggHTTPRequest
+class PlikliHTTPRequest
 {
    var $_fp;        // HTTP socket
    var $_url;        // full URL
@@ -1338,7 +1495,7 @@ class PliggHTTPRequest
    }
 
    // constructor
-   function PliggHTTPRequest($url)
+   function __construct($url)
    {
 		$this->_url = $url;
 		$this->_scan_url();
@@ -1356,9 +1513,11 @@ class PliggHTTPRequest
 
 	// fetch
 	$this->_fp = fsockopen(($this->_protocol == 'https' ? 'tls://' : '') . $this->_host, $this->_port, $errno, $errstr, 20);
+	$this->_fp = fsockopen(($this->_protocol == 'https' ? 'ssl://' : '') . $this->_host, $this->_port, $errno, $errstr, 20);
 	if(!$this->_fp)
 		return("BADURL");
 	fwrite($this->_fp, $req);
+		$response = '';
        while(is_resource($this->_fp) && $this->_fp && !feof($this->_fp))
            $response .= fread($this->_fp, 1024);
        fclose($this->_fp);
@@ -1382,7 +1541,7 @@ class PliggHTTPRequest
        // redirection?
        if(isset($headers['location']))
        {
-           $http = new PliggHTTPRequest($headers['location']);
+           $http = new PlikliHTTPRequest($headers['location']);
            return($http->DownloadToString($http));
        }
        else

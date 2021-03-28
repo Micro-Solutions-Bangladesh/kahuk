@@ -466,8 +466,8 @@ class PHPMailer {
       if($i != 0) { $to .= ', '; }
       $to .= $this->AddrFormat($this->to[$i]);
     }
-
-    $toArr = split(',', $to);
+/* Redwine: using php explode() instead of the deprecated split() which generates warnings. */
+    $toArr = explode(',', $to);
 
     $params = sprintf("-oi -f %s", $this->Sender);
     if ($this->Sender != '' && strlen(ini_get('safe_mode')) < 1) {
@@ -1720,7 +1720,8 @@ class PHPMailer {
           $directory = dirname($url);
           ($directory == '.')?$directory='':'';
           $cid = 'cid:' . md5($filename);
-          $fileParts = split("\.", $filename);
+/* Redwine: using php explode() instead of the deprecated split() which generates warnings. */
+          $fileParts = explode("\.", $filename);
           $ext = $fileParts[1];
           $mimeType = $this->_mime_types($ext);
           if ( strlen($basedir) > 1 && substr($basedir,-1) != '/') { $basedir .= '/'; }

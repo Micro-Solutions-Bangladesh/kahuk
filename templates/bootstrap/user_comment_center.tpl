@@ -11,7 +11,7 @@
 		{$link_shakebox_votes}
 		<div class="user_comment_story_votebox">
 			<div class="user_comment_story_vote">
-				{checkActionsTpl location="tpl_pligg_story_votebox_start"}
+				{checkActionsTpl location="tpl_plikli_story_votebox_start"}
 				<div class="user_comment_story_votenumber">
 					{$link_shakebox_votes}
 				</div>
@@ -37,7 +37,7 @@
 					{/if}
 					<!-- Votes: {$link_shakebox_currentuser_votes} Buries: {$link_shakebox_currentuser_reports} -->
 				</div><!-- /.votebutton -->
-				{checkActionsTpl location="tpl_pligg_story_votebox_end"}
+				{checkActionsTpl location="tpl_plikli_story_votebox_end"}
 			</div><!-- /.vote -->
 		</div><!-- /.votebox -->
 	</span>
@@ -53,7 +53,7 @@
 		<a href="{$submitter_profile_url}">{$link_submitter}</a>
 	</span>
 	<span class="user_comment_story_timestamp">
-		{$link_submit_timeago} {#PLIGG_Visual_Comment_Ago#}
+		{$link_submit_timeago} {#PLIKLI_Visual_Comment_Ago#}
 	</span>
 
 	<div class="user_comment_data">
@@ -65,11 +65,12 @@
 				<a href="{$user_view_url}">{$user_username}</a>
 			</span>
 			<span class="user_comment_timestamp">
-				{$comment_age} {#PLIGG_Visual_Comment_Ago#}
+				{$comment_age} {#PLIKLI_Visual_Comment_Ago#}
 			</span>
 		</div>
 		<div class="user_comment_content">
-			{if $Enable_Comment_Voting eq 1}
+{* Redwine: Fix the Negative votes to remove comment in Admin Panel -> Settings -> Comments -> Negative votes to remove comment. See  https://github.com/Pligg/pligg-cms/commit/68a52f2e77cec7f95d5775444d213d1a6419e121 *}
+			{if $Enable_Comment_Voting eq true}
 				{if $comment_user_vote_count eq 0 && $current_userid neq $comment_author}
 					<span id="ratebuttons-{$comment_id}">	  
 						<a href="javascript:{$link_shakebox_javascript_voten}" style='text-decoration:none;'>- </a> 

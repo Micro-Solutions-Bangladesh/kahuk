@@ -12,7 +12,7 @@ include(mnminclude.'smartyvariables.php');
 $main_smarty = do_sidebar($main_smarty);
 
 // breadcrumbs and page title
-$navwhere['text1'] = Feeds;
+$navwhere['text1'] = 'Feeds';
 $navwhere['link1'] = getmyurl('about', $dblang);
 $main_smarty->assign('navbar_where', $navwhere);
 
@@ -22,6 +22,6 @@ $main_smarty->assign('pagename', pagename);
 
 // show the template
 $main_smarty->assign('tpl_center', $the_template . '/rss_feeds_center');
-$main_smarty->display($the_template . '/pligg.tpl');
+$main_smarty->display($the_template . '/plikli.tpl');
 
 ?>

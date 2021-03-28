@@ -16,10 +16,33 @@ if(isset($_REQUEST['id'])){$requestID = strip_tags($_REQUEST['id']);}
 if(!is_numeric($requestID)){$requestID = 0;}
 if(isset($_REQUEST['title'])){$requestTitle = $db->escape(strip_tags($_REQUEST['title']));}
 
-//check group admin
-$canIhaveAccess = checklevel('admin') || checklevel('moderator');
+/* Redwine: Roles and permissions and Groups fixes. We need the user_level to determine the site wide Admin & Moderators to give access according to their permissions */
+global $main_smarty;
+$isAdmin = $main_smarty->get_template_vars('isAdmin');
+$isModerator = $main_smarty->get_template_vars('isModerator');
+$main_smarty->assign('isAdmin', $isAdmin);
+$main_smarty->assign('isModerator', $isModerator);
 
-if($current_user->user_id != get_group_creator($requestID) && $canIhaveAccess != 1)
+/* Redwine: Roles and permissions and Groups fixes. Check if the logged in user is the group creator */
+$is_gr_creator = 0;
+$gr_creator = get_group_creator($requestID);
+if ($gr_creator == $current_user->user_id) {
+	$is_gr_creator = 1;
+}
+$main_smarty->assign('is_gr_creator', $is_gr_creator);
+
+//check if the logged in user is the group Admin or Moderator
+$role = get_group_roles($requestID);
+$is_gr_Admin = 0;
+$is_gr_Moderator = 0;
+if ($role == "admin") {
+	$is_gr_Admin = 1;
+}elseif ($role == "moderator") {
+	$is_gr_Moderator = 1;
+}
+$main_smarty->assign('is_gr_Admin', $is_gr_Admin);
+$main_smarty->assign('is_gr_Moderator', $is_gr_Moderator);
+if($is_gr_creator != 1 && $isAdmin != 1 && $isModerator != 1 && $is_gr_Admin != 1 && $is_gr_Moderator != 1)
 {
 	//page redirect
 	$redirect = '';
@@ -35,10 +58,15 @@ $main_smarty->assign('pagename', pagename);
 $CSRF = new csrf();
 
 // uploading avatar
-if($_POST["avatar"] == "uploaded")
+if(isset($_POST["avatar"]) && $_POST["avatar"] == "uploaded")
 {
-    $CSRF->check_expired('edit_group');
-    if ($CSRF->check_valid(sanitize($_POST['token'], 3), 'edit_group')){
+    // Redwine: if TOKEN is empty, no need to continue, just display the invalid token error.
+	if (empty($_POST['token'])) {
+		$CSRF->show_invalid_error(1);
+		exit;
+	}
+	// Redwine: if valid TOKEN, proceed. A valid integer must be equal to 2.
+    if ($CSRF->check_valid(sanitize($_POST['token'], 3), 'edit_group') == 2){
 		$user_image_path = "avatars/groups_uploaded" . "/";
 		$user_image_apath = "/" . $user_image_path;
 		$allowedFileTypes = array("image/jpeg","image/gif","image/png",'image/x-png','image/pjpeg');
@@ -92,37 +120,50 @@ if($_POST["avatar"] == "uploaded")
 }
 elseif(isset($_POST["action"]))
 {
-    $CSRF->check_expired('edit_group');
-    if ($CSRF->check_valid(sanitize($_POST['token'], 3), 'edit_group')){
+    // Redwine: if TOKEN is empty, no need to continue, just display the invalid token error.
+	if (empty($_POST['token'])) {
+		$CSRF->show_invalid_error(1);
+		exit;
+	}
+	// Redwine: if valid TOKEN, proceed. A valid integer must be equal to 2.
+    if ($CSRF->check_valid(sanitize($_POST['token'], 3), 'edit_group') == 2){
 	if(isset($_POST['group_title'])){
-		$group_title = mysql_real_escape_string(stripslashes(strip_tags(trim($_POST['group_title']))));
+		$group_title = $db->escape(stripslashes(strip_tags(trim($_POST['group_title']))));
+		$group_title = preg_replace('/[^\p{L}\p{N}-_\s]/u', ' ', $group_title);
 	}
 	if(isset($_POST['group_description'])){
-		$group_description = mysql_real_escape_string(stripslashes(strip_tags(trim($_POST['group_description']))));
+		$group_description = $db->escape(stripslashes(strip_tags(trim($_POST['group_description']))));
 	}
 	if(isset($_POST['group_vote_to_publish'])){
-		$group_vote_to_publish = mysql_real_escape_string(stripslashes(strip_tags(trim($_POST['group_vote_to_publish']))));
+		$group_vote_to_publish = $db->escape(stripslashes(strip_tags(trim($_POST['group_vote_to_publish']))));
 	}
-	if($_POST['group_notify_email']>0) $group_notify_email = 1;
-	else $group_notify_email = 0;
+	if(isset($_POST['group_notify_email']) && $_POST['group_notify_email']>0) {
+		$group_notify_email = 1;
+	}else{
+		$group_notify_email = 0;
+	}
 	$group_name = $group_title;
 	$group_safename = makeUrlFriendly($group_title, true);
 	if(isset($_POST['group_privacy']))
 		$group_privacy = $db->escape(sanitize($_POST['group_privacy'],3));
 	
-	if (!$group_title) $errors = $main_smarty->get_config_vars('PLIGG_Visual_Group_Empty_Title');
-	elseif ($group_vote_to_publish<=0) $errors = $main_smarty->get_config_vars('PLIGG_Visual_Group_Empty_Votes');
+	if (!$group_title) $errors = $main_smarty->get_config_vars('PLIKLI_Visual_Group_Empty_Title');
+	elseif ($group_vote_to_publish<=0) $errors = $main_smarty->get_config_vars('PLIKLI_Visual_Group_Empty_Votes');
 	else
 	{
 		$exists = $db->get_var("select COUNT(*) from ".table_groups." WHERE group_name='$group_name' AND group_id != '$requestID'");
-	 	if ($exists) $errors = $main_smarty->get_config_vars('PLIGG_Visual_Group_Title_Exists');
+	 	if ($exists) $errors = $main_smarty->get_config_vars('PLIKLI_Visual_Group_Title_Exists');
 	}
 
-	if (!$errors && 
+	if (empty($errors) && 
 	    $db->query("update ". table_groups ." set group_name = '".$group_title."', group_safename='$group_safename', group_description = '".$group_description."', group_privacy = '".$group_privacy."', group_vote_to_publish = '".$group_vote_to_publish."', group_notify_email=$group_notify_email where group_id = '".$requestID."'"))
-		$errors = $main_smarty->get_config_vars('PLIGG_Visual_Group_Saved_Changes');
+		$errors = $main_smarty->get_config_vars('PLIKLI_Visual_Group_Saved_Changes');
 
-	$main_smarty->assign("errors",$errors);
+		if (!empty($errors) && 
+			$db->query("update ". table_groups ." set group_name = '".$group_title."', group_safename='$group_safename', group_description = '".$group_description."', group_privacy = '".$group_privacy."', group_vote_to_publish = '".$group_vote_to_publish."', group_notify_email=$group_notify_email where group_id = '".$requestID."'")) {
+			$errors = $main_smarty->get_config_vars('PLIKLI_Visual_Group_Saved_Changes');
+			$main_smarty->assign("errors",$errors);
+		}
     } else {
     	$CSRF->show_invalid_error(1);
 	exit;
@@ -135,7 +176,7 @@ if(isset($requestID))
 	group_display($requestID);
 
 $main_smarty->assign('tpl_center', $the_template . '/edit_group_center');
-$main_smarty->display($the_template . '/pligg.tpl');
+$main_smarty->display($the_template . '/plikli.tpl');
 
 function cleanit($value)
 {

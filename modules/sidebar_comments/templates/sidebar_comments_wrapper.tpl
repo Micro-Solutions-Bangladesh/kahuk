@@ -1,6 +1,3 @@
-<div class="headline">
-	<div class="sectiontitle">{#PLIGG_Visual_Latest_Comments#}</div>
-</div>
-<div class="boxcontent" id="sidebar-comments">
-	{$sc_body}
-</div>
+{checkActionsTpl location="tpl_sidebar_wrapper_start"}
+{include file=$the_template"/default_mods/sidebar_comments_wrapper.tpl"}
+{checkActionsTpl location="tpl_sidebar_wrapper_end"}

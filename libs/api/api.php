@@ -1,13 +1,13 @@
 <?php
 	/*
 	############### About  ###################
-	Script name : Pligg API (mini)
+	Script name : Plikli API (mini)
 	Version : 0.1 
 	Developer : Thawatchai Fhaipolsan (powerpc)
 	Email : inside3d at hotmail.com
 	Website : http://www.jum.name
 	Forum : http://forum.articles-host.com
-	Download Pligg API website at http://api.jum.name
+	Download Plikli API website at http://api.jum.name
 	Release date : 27/09/08
 	*/
 	
@@ -43,7 +43,7 @@
 	if($fn == 'ping'){
 		echo "Active";
 	}else if($fn == 'version'){
-		echo "Pligg API Version ".$version;
+		echo "Plikli API Version ".$version;
 	}else if($fn == 'login'){
 		if($username == '' || $password == ''){
 			echo "Input Error!";
@@ -71,24 +71,13 @@
 	}else if($fn == 'list' || $fn == 'cate' || $fn == 'category'){
 		echo categorylist($username,$password);
 	}else{
-		$gogo = 'http://api.jum.name/?action=check&ref='.curPageURL();
+		$gogo = 'http://api.jum.name/?action=check&ref=' . $my_base_url . $_SERVER["REQUEST_URI"];
 		if(is_valid_url($gogo))
-			echo "Pligg API Version $version <br>Powered by <a href=\"http://api.jum.name\">Jum.name</a>";
+			echo "Plikli API Version $version <br>Powered by <a href=\"http://api.jum.name\">Jum.name</a>";
 		else
 			echo "Connection error!, <br>Try again <a href=\"".$_SERVER['PHP_SELF']."\">here</a>.";
 	}
 	
-	function curPageURL() {
-		 $pageURL = 'http';
-		 if ($_SERVER["HTTPS"] == "on") {$pageURL .= "s";}
-		 	$pageURL .= "://";
-		 if ($_SERVER["SERVER_PORT"] != "80") {
-		  	$pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
-		 } else {
-		  	$pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
-		 }
-		 return $pageURL;
-	}
 
 	function sanitize($var, $santype = 1){
 		if ($santype == 1) {return strip_tags($var);}

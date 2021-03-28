@@ -8,24 +8,14 @@ include(mnminclude.'html1.php');
 include(mnminclude.'link.php');
 include(mnminclude.'smartyvariables.php');
 
-/*echo "<pre>";
-print_r($_REQUEST);
-echo "</pre>";*/
-//die;
-
 check_referrer();
 
-// sidebar
-$main_smarty = do_sidebar($main_smarty);
-// require user to log in
 force_authentication();
 
 // restrict access to admins
 $canIhaveAccess = 0;
 $canIhaveAccess = $canIhaveAccess + checklevel('admin');
 if($canIhaveAccess == 0){	
-//	$main_smarty->assign('tpl_center', '/templates/admin/admin_access_denied');
-//	$main_smarty->display($template_dir . '/admin/admin.tpl');		
 	header("Location: " . getmyurl('login', $_SERVER['REQUEST_URI']));
 	die();
 }
@@ -46,14 +36,14 @@ function dowork(){
 			$action = "view";
 		}
 		if($action == "view"){
-			$config = new pliggconfig;
+			$config = new plikliconfig;
 			if(isset($_REQUEST['page'])){
 				$config->var_page = $_REQUEST['page'];
 				$config->showpage();
 			}
 		}
 		if($action == "save"){
-			$config = new pliggconfig;
+			$config = new plikliconfig;
 			$config->var_id = substr($_REQUEST['var_id'], 6, 10);
 			$config->var_value = $_REQUEST['var_value'];
 			$config->store();
@@ -72,9 +62,7 @@ if(isset($_REQUEST['link_id'])){
 	$linkres = new Link;
 	$linkres->id = $link_id;
 	$linkres->read();
-	//echo $linkres->status;
 	totals_adjust_count($linkres->status, -1);
-	//$linkres->store_basic();
 	
     // module system hook
 	$vars = array('link_id' => $linkres->id);
@@ -83,50 +71,44 @@ if(isset($_REQUEST['link_id'])){
 	/*********find out the page slug dynamically ***********/
 	$linkslugvalue =  $db->get_results("SELECT ".table_links.".link_category, ".table_categories.".category_safe_name FROM ".table_categories." LEFT JOIN ".table_links. " ON ".table_links.".link_category = ".table_categories.".category__auto_id WHERE ".table_links.".link_id = '".$link_id."' LIMIT 0,1");
 	
-	
 	$linkslug = '';
 	foreach($linkslugvalue as $slug)
 		$linkslug = $slug->category_safe_name;
 
-	if($linkslug != ''){
+	$delete_referrer = $_SERVER["HTTP_REFERER"];
 		
-		$redirectUrl = $linkslug;
+if ($URLMethod == 1) {
+	$delete_referrer_no_query= strtok($_SERVER["HTTP_REFERER"],'?');
+	if (strstr($delete_referrer, 'group_story.php')) {
+		$redirectUrl = $delete_referrer;
+	}elseif (strstr($delete_referrer, 'story.php')) {
+		if ($linkres->status == 'new') {
+			$redirectUrl = $my_base_url.$my_plikli_base . "/".$linkres->status.".php?category=$linkslug";
+		}else{
+			$redirectUrl = $my_base_url.$my_plikli_base . "/?category=$linkslug";
 	}
-	if(isset($_REQUEST['pnme']) and $_REQUEST['pnme'] != 'story' and $_REQUEST['pnme'] != 'published'){
-		
-		$arr = explode("/", substr($_SERVER['HTTP_REFERER'],0, -1));
-		
-		if(end($arr) != ''){
-			$secndlnk = end($arr);
-			array_pop($arr);
-			$firstlnk = end($arr);
-			
-			if($secndlnk != ''){
-				$redirectUrl = $firstlnk."/".$secndlnk;
 			} else{
-				$redirectUrl = $firstlnk;
+		$redirectUrl = $delete_referrer;
+	}
+}elseif ($URLMethod == 2) {
+	/*Redwine: the first part of the below conditional stattement: strstr($delete_referrer, "story.php?title=".$linkres->title_url) is to account for when an Admin is discarding a story; the links are in url method 1 and having the link safe title instead of the link id!*/
+	if (strstr($delete_referrer, "story.php?title=".$linkres->title_url) || strstr($delete_referrer, "/$linkslug/".$linkres->title_url)) {
+		if ($linkres->status == 'new') {
+			$redirectUrl = $my_base_url.$my_plikli_base . "/".$linkres->status."/$linkslug/";
+		}else{
+			$redirectUrl = $my_base_url.$my_plikli_base . "/$linkslug/";
 			}
+	}else{
+		$redirectUrl = $delete_referrer;
 		}
 	} 
-	if(isset($_REQUEST['pnme']) and $_REQUEST['pnme'] != 'story' and $_REQUEST['pnme'] != 'published' and $_REQUEST['pnme'] != 'group_story'){
 		
-		$redirectUrl = $_REQUEST['pnme'].'/'.$linkslug;
-	}
-	if(isset($_REQUEST['pnme']) and $_REQUEST['pnme'] == 'index'){
-		$redirectUrl = $linkslug;
-	}
 	$link_delete = $db->query(" Delete from ".table_links." where link_id =".$linkres->id);
-	//echo $link_delete."<br />";
 	$vote_delete = $db->query(" Delete from ".table_votes." where vote_link_id =".$linkres->id);
-	//echo $vote_delete."<br />";
 	$comment_delete = $db->query(" Delete from ".table_comments." where comment_link_id =".$linkres->id);
-	//echo $comment_delete."<br />";
 	$tag_delete = $db->query(" Delete from ".table_tags." where tag_link_id =".$linkres->id);
-	//echo $tag_delete."<br />";
 	$saved_delete = $db->query(" Delete from ".table_saved_links." where saved_link_id =".$linkres->id);
-	//echo $saved_delete."<br />";
 	$trackback_delete = $db->query(" Delete from ".table_trackbacks." where trackback_link_id =".$linkres->id);
-	//echo $trackback_delete."<br />";
 
 	$db->query("DELETE FROM ".table_additional_categories." WHERE ac_link_id =".$linkres->id);
 
@@ -135,12 +117,10 @@ if(isset($_REQUEST['link_id'])){
 	# Redwine - Sidebar tag cache fix
 	$db->query($sql="INSERT INTO ".table_tag_cache." select tag_words, count(DISTINCT link_id) as count FROM ".table_tags.", ".table_links." WHERE tag_lang='en' and link_id = tag_link_id and (link_status='published' OR link_status='new') GROUP BY tag_words order by count desc");
 
-    if ($_SERVER['HTTP_REFERER'] && strpos($_SERVER['HTTP_REFERER'], $my_base_url.$my_pligg_base) === 0){
-		
-	  	header('Location: '.$my_pligg_base.'/'.$redirectUrl);
-	}
-	else{
-		header('Location: '.$my_pligg_base.'/'.$redirectUrl);
+	if ($_SERVER['HTTP_REFERER'] && strpos($_SERVER['HTTP_REFERER'], $my_base_url.$my_plikli_base)  !== false){
+		header('Location: '.$redirectUrl);
+	}else{
+		header('Location: '.$my_base_url.$my_plikli_base);
 	}
 }
 
@@ -157,10 +137,12 @@ if(isset($_REQUEST['comment_id'])){
 	
 	$db->query('DELETE FROM `' . table_comments . '` WHERE `comment_id` = "'.$comment_id.'"');
 	$comments = $db->get_results($sql="SELECT comment_id FROM " . table_comments . " WHERE `comment_parent` = '$comment_id'");
-	foreach($comments as $comment)
-	{
-	   	$vars = array('comment_id' => $comment->comment_id);
-	   	check_actions('comment_deleted', $vars);
+	if (!empty($comments)) {
+		foreach($comments as $comment)
+		{
+			$vars = array('comment_id' => $comment->comment_id);
+			check_actions('comment_deleted', $vars);
+		}
 	}
 	$db->query('DELETE FROM `' . table_comments . '` WHERE `comment_parent` = "'.$comment_id.'"');
 	$link = new Link;
@@ -170,9 +152,9 @@ if(isset($_REQUEST['comment_id'])){
 	$link->store();
 	$link='';
 	
-	if ($_SERVER['HTTP_REFERER'] && strpos($_SERVER['HTTP_REFERER'], $my_base_url.$my_pligg_base)===0)
+	if ($_SERVER['HTTP_REFERER'] && strpos($_SERVER['HTTP_REFERER'], $my_base_url.$my_plikli_base)===0)
 	    header('Location: '.$_SERVER['HTTP_REFERER']);
 	else
-	    header('Location: '.$my_base_url.$my_pligg_base);
+	    header('Location: '.$redirectUrl);
 }
 ?>

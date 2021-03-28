@@ -11,7 +11,7 @@ function karma_showpage(){
 	include_once(mnminclude.'tags.php');
 	include_once(mnminclude.'smartyvariables.php');
 	
-	$main_smarty = do_sidebar($main_smarty);
+	//$main_smarty = do_sidebar($main_smarty);
 
 	force_authentication();
 	$canIhaveAccess = 0;
@@ -20,7 +20,7 @@ function karma_showpage(){
 	if($canIhaveAccess == 1)
 	{	
 		// Save settings
-		if ($_POST['submit'])
+		if (isset($_POST['submit']))
 		{
 			misc_data_update('karma_submit_story', sanitize($_REQUEST['karma_submit_story'], 3));
 			misc_data_update('karma_submit_comment', sanitize($_REQUEST['karma_submit_comment'], 3));
@@ -42,21 +42,21 @@ function karma_showpage(){
 			$main_smarty->assign('error', $error);
 		}
 		// breadcrumbs
-			$navwhere['text1'] = $main_smarty->get_config_vars('PLIGG_Visual_Header_AdminPanel');
+			$navwhere['text1'] = $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel');
 			$navwhere['link1'] = getmyurl('admin', '');
 			$navwhere['text2'] = "Modify Karma";
-			$navwhere['link2'] = my_pligg_base . "/module.php?module=karma";
+			$navwhere['link2'] = my_plikli_base . "/module.php?module=karma";
 			$main_smarty->assign('navbar_where', $navwhere);
-			$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('PLIGG_Visual_Header_AdminPanel'));
+			$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel'));
 		// breadcrumbs
 		define('modulename', 'karma'); 
 		$main_smarty->assign('modulename', modulename);
 		
-		define('pagename', 'admin_modify_karma'); 
+		if (!defined('pagename')) define('pagename', 'admin_modify_karma'); 
 		$main_smarty->assign('pagename', pagename);
-		$main_smarty->assign('settings', str_replace('"','&#034;',get_karma_settings()));
+		$main_smarty->assign('karma_settings', str_replace('"','&#034;',get_karma_settings()));
 		$main_smarty->assign('tpl_center', karma_tpl_path . 'karma_main');
-		$main_smarty->display($template_dir . '/admin/admin.tpl');
+		$main_smarty->display('/admin/admin.tpl');
 	}
 	else
 	{
@@ -69,8 +69,13 @@ function karma_do_submit3(&$vars)
 	global $db, $current_user;
 
 
-	$settings = get_karma_settings();
-        $db->query("UPDATE " . table_users . " SET user_karma=user_karma+'{$settings['submit_story']}' WHERE user_id={$current_user->user_id}");
+	$karma_settings = get_karma_settings();
+	/* Redwine: fix to some bugs in the Karma system. To also update the user_karma with the value of "Voted on an article" when the auto vote is set to true upon story submission. https://github.com/Pligg/pligg-cms/commit/737770202d22ec938465fe66e52f2ae7cdcf5240 */
+	if (auto_vote == true) {
+        $db->query("UPDATE " . table_users . " SET user_karma=user_karma+'{$karma_settings['submit_story']}' + '{$karma_settings['story_vote']}' WHERE user_id={$current_user->user_id}");
+	}else{
+		$db->query("UPDATE " . table_users . " SET user_karma=user_karma+'{$karma_settings['submit_story']}' WHERE user_id={$current_user->user_id}");
+	}
 
 /*	// Check if other module turned the story to 'discard' or 'spam' state
 	$linkres = $vars['linkres'];
@@ -92,8 +97,8 @@ function karma_comment_submit(&$vars)
 {
 	global $db, $current_user;
 
-	$settings = get_karma_settings();
-        $db->query($sql="UPDATE " . table_users . " SET user_karma=user_karma+'{$settings['submit_comment']}' WHERE user_id={$current_user->user_id}");
+	$karma_settings = get_karma_settings();
+        $db->query($sql="UPDATE " . table_users . " SET user_karma=user_karma+'{$karma_settings['submit_comment']}' WHERE user_id={$current_user->user_id}");
 }
 
 function karma_published(&$vars)
@@ -104,30 +109,30 @@ function karma_published(&$vars)
 	if (!$link_id) return;
 	$user_id = $db->get_var("SELECT link_author FROM ".table_links." WHERE link_id='".$db->escape($link_id)."'");
 
-	$settings = get_karma_settings();
-        $db->query("UPDATE " . table_users . " SET user_karma=user_karma+'{$settings['story_publish']}' WHERE user_id=$user_id");
+	$karma_settings = get_karma_settings();
+        $db->query("UPDATE " . table_users . " SET user_karma=user_karma+'{$karma_settings['story_publish']}' WHERE user_id=$user_id");
 }
 
 function karma_vote(&$vars)
 {
 	global $db, $current_user;
-	$settings = get_karma_settings();
-        $db->query($sql="UPDATE " . table_users . " SET user_karma=user_karma+'{$settings['story_vote']}' WHERE user_id={$current_user->user_id}");
+	$karma_settings = get_karma_settings();
+        $db->query($sql="UPDATE " . table_users . " SET user_karma=user_karma+'{$karma_settings['story_vote']}' WHERE user_id={$current_user->user_id}");
 }
 
 function karma_unvote(&$vars)
 {
 	global $db, $current_user;
-	$settings = get_karma_settings();
-        $db->query($sql="UPDATE " . table_users . " SET user_karma=user_karma+'{$settings['story_vote_remove']}' WHERE user_id={$current_user->user_id}");
+	$karma_settings = get_karma_settings();
+        $db->query($sql="UPDATE " . table_users . " SET user_karma=user_karma+'{$karma_settings['story_vote_remove']}' WHERE user_id={$current_user->user_id}");
 }
 
 function karma_comment_vote(&$vars)
 {
 	global $db, $current_user;
 
-	$settings = get_karma_settings();
-        $db->query("UPDATE " . table_users . " SET user_karma=user_karma+'{$settings['comment_vote']}' WHERE user_id={$current_user->user_id}");
+	$karma_settings = get_karma_settings();
+        $db->query("UPDATE " . table_users . " SET user_karma=user_karma+'{$karma_settings['comment_vote']}' WHERE user_id={$current_user->user_id}");
 }
 
 function karma_story_discard(&$vars)
@@ -138,8 +143,8 @@ function karma_story_discard(&$vars)
 	if (!$link_id) return;
 	$user_id = $db->get_var("SELECT link_author FROM ".table_links." WHERE link_id='".$db->escape($link_id)."'");
 
-	$settings = get_karma_settings();
-        $db->query("UPDATE " . table_users . " SET user_karma=user_karma+'{$settings['story_discard']}' WHERE user_id='$user_id'");
+	$karma_settings = get_karma_settings();
+        $db->query("UPDATE " . table_users . " SET user_karma=user_karma+'{$karma_settings['story_discard']}' WHERE user_id='$user_id'");
 }
 
 function karma_story_spam(&$vars)
@@ -150,8 +155,8 @@ function karma_story_spam(&$vars)
 	if (!$link_id) return;
 	$user_id = $db->get_var("SELECT link_author FROM ".table_links." WHERE link_id='".$db->escape($link_id)."'");
 
-	$settings = get_karma_settings();
-        $db->query("UPDATE " . table_users . " SET user_karma=user_karma+'{$settings['story_spam']}' WHERE user_id='$user_id'");
+	$karma_settings = get_karma_settings();
+        $db->query("UPDATE " . table_users . " SET user_karma=user_karma+'{$karma_settings['story_spam']}' WHERE user_id='$user_id'");
 }
 
 function karma_comment_spam(&$vars)
@@ -162,8 +167,8 @@ function karma_comment_spam(&$vars)
 	if (!$comment_id) return;
 	$user_id = $db->get_var("SELECT comment_user_id FROM ".table_comments." WHERE comment_id='".$db->escape($comment_id)."'");
 
-	$settings = get_karma_settings();
-        $db->query($sql="UPDATE " . table_users . " SET user_karma=user_karma+'{$settings['story_spam']}' WHERE user_id='$user_id'");
+	$karma_settings = get_karma_settings();
+        $db->query($sql="UPDATE " . table_users . " SET user_karma=user_karma+'{$karma_settings['story_spam']}' WHERE user_id='$user_id'");
 }
 
 function karma_comment_deleted(&$vars)
@@ -175,8 +180,8 @@ function karma_comment_deleted(&$vars)
 
 	$user_id = $db->get_var("SELECT comment_user_id FROM ".table_comments." WHERE comment_id='".$db->escape($comment_id)."'");
 
-	$settings = get_karma_settings();
-    $db->query($sql="UPDATE " . table_users . " SET user_karma=user_karma+'{$settings['comment_delete']}' WHERE user_id='$user_id'");
+	$karma_settings = get_karma_settings();
+    $db->query($sql="UPDATE " . table_users . " SET user_karma=user_karma+'{$karma_settings['comment_delete']}' WHERE user_id='$user_id'");
 }
 
 

@@ -22,10 +22,10 @@ if(isset($_REQUEST['category'])){
 	$thecat = $thecat->category_name;
 	if (!$thecat)
 	{
-		header("Location: $my_pligg_base/error_404.php");
+		header("Location: $my_plikli_base/error_404.php");
 //		header("Location: error_404.php");
 //		$main_smarty->assign('tpl_center', 'error_404_center');
-//		$main_smarty->display($the_template . '/pligg.tpl');		
+//		$main_smarty->display($the_template . '/plikli.tpl');		
 		die();
 	}
 	$main_smarty->assign('category', $thecat);
@@ -55,7 +55,7 @@ $search->do_setmek();
 if(isset($thecat)){$search->category = $catID;}
 
 // do the search
-$search->doSearch();
+$search->doSearch($search->pagesize);
 
 // setup the links
 if(isset($_GET['category'])){
@@ -64,6 +64,8 @@ if(isset($_GET['category'])){
 	$main_smarty->assign('index_url_yesterday', getmyurl('new_sort', 'yesterday', sanitize($_GET['category'],2)));
 	$main_smarty->assign('index_url_week', getmyurl('new_sort', 'week', sanitize($_GET['category'],2)));
 	$main_smarty->assign('index_url_month', getmyurl('new_sort', 'month', sanitize($_GET['category'],2)));
+/*Redwine: add an additional Sort by from the sort button to sort the stories of the current month*/
+	$main_smarty->assign('index_url_curmonth', getmyurl('new_sort', 'curmonth', sanitize($_GET['category'],2)));
 	$main_smarty->assign('index_url_year', getmyurl('new_sort', 'year', sanitize($_GET['category'],2)));
 	$main_smarty->assign('index_url_alltime', getmyurl('new_sort', 'alltime', sanitize($_GET['category'],2)));
 	$main_smarty->assign('index_url_upvoted', getmyurl('new_sort', 'upvoted', sanitize($_GET['category'],2)));
@@ -76,6 +78,8 @@ if(isset($_GET['category'])){
 	$main_smarty->assign('index_url_yesterday', getmyurl('new_sort', 'yesterday'));
 	$main_smarty->assign('index_url_week', getmyurl('new_sort', 'week'));
 	$main_smarty->assign('index_url_month', getmyurl('new_sort', 'month'));
+/*Redwine: add an additional Sort by from the sort button to sort the stories of the current month*/  
+	$main_smarty->assign('index_url_curmonth', getmyurl('new_sort', 'curmonth'));
 	$main_smarty->assign('index_url_year', getmyurl('new_sort', 'year'));
 	$main_smarty->assign('index_url_alltime', getmyurl('new_sort', 'alltime'));
 	$main_smarty->assign('index_url_upvoted', getmyurl('new_sort', 'upvoted'));
@@ -93,25 +97,25 @@ if(isset($_REQUEST['category'])) {
 	$main_smarty->assign('meta_keywords', $category_data->category_keywords);
 
 	// breadcrumbs and page title for the category we're looking at
-	$main_smarty->assign('title', ''.$main_smarty->get_config_vars('PLIGG_Visual_Pligg_Queued') .$thecat . '');
-	$navwhere['text1'] = $main_smarty->get_config_vars('PLIGG_Visual_Pligg_Queued');
+	$main_smarty->assign('title', ''.$main_smarty->get_config_vars('PLIKLI_Visual_Plikli_Queued') .$thecat . '');
+	$navwhere['text1'] = $main_smarty->get_config_vars('PLIKLI_Visual_Plikli_Queued');
 	$navwhere['link1'] = getmyurl('new', '');
 	$navwhere['text2'] = $thecat;	
 	$main_smarty->assign('navbar_where', $navwhere);
 	$main_smarty->assign('pretitle', $thecat );
-	$main_smarty->assign('posttitle', $main_smarty->get_config_vars('PLIGG_Visual_Pligg_Queued'));
-	$main_smarty->assign('page_header', $thecat . $main_smarty->get_config_vars('PLIGG_Visual_Pligg_Queued'));
+	$main_smarty->assign('posttitle', $main_smarty->get_config_vars('PLIKLI_Visual_Plikli_Queued'));
+	$main_smarty->assign('page_header', $thecat . $main_smarty->get_config_vars('PLIKLI_Visual_Plikli_Queued'));
 } 
 else {
-	$navwhere['text1'] = $main_smarty->get_config_vars('PLIGG_Visual_Breadcrumb_Queued');
+	$navwhere['text1'] = $main_smarty->get_config_vars('PLIKLI_Visual_Breadcrumb_Queued');
 	$navwhere['link1'] = getmyurl('new', '');
 	$main_smarty->assign('navbar_where', $navwhere);
-	$main_smarty->assign('posttitle', $main_smarty->get_config_vars('PLIGG_Visual_Breadcrumb_Queued'));
-	$main_smarty->assign('page_header', $main_smarty->get_config_vars('PLIGG_Visual_Pligg_Queued'));
+	$main_smarty->assign('posttitle', $main_smarty->get_config_vars('PLIKLI_Visual_Breadcrumb_Queued'));
+	$main_smarty->assign('page_header', $main_smarty->get_config_vars('PLIKLI_Visual_Plikli_Queued'));
 }
-
-$main_smarty->assign('URL_rss_page', getmyurl('rsspage', $category_data->category_safe_name, 'new'));
-
+if (!empty($category_data )) {
+	$main_smarty->assign('URL_rss_page', getmyurl('rsspage', $category_data->category_safe_name, 'new'));
+}
 // sidebar
 $main_smarty = do_sidebar($main_smarty);
 
@@ -135,5 +139,5 @@ if(Auto_scroll==2 || Auto_scroll==3){
 
 // show the template
 $main_smarty->assign('tpl_center', $the_template . '/new_center');
-$main_smarty->display($the_template . '/pligg.tpl');
+$main_smarty->display($the_template . '/plikli.tpl');
 ?>

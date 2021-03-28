@@ -103,24 +103,18 @@ var $DBHost = EZSQL_DB_HOST;
 	 *	@return Int 3	If the database cannot be selected When connection to the Database done outside of the class
 	 *	@return Int 4	If Conection var is not correct
 	*/
-	function KMessaging($connect = false,$selectDB = false,$con = '')
+	function __construct($connect = false,$selectDB = false,$con = '')
 	{		
+		global $con;
 		if($connect)
 		{
-			$con = @mysql_connect($this->DBHost,$this->DBUser,$this->DBPass);
-			if($con)
-				if(!@mysql_select_db($this->DBName,$con))
-					return 1;
-			else 
-				return 2;
-		}elseif ($selectDB)
-		{
-			if( strlen($con) > 0 )
-				if(!@mysql_select_db($this->DBName,$con))
-					return 3;
-			else 
-				return 4;
+			$con = new mysqli($this->DBHost,$this->DBUser,$this->DBPass,$this->DBName);
+			if (mysqli_connect_errno()) {
+				printf("Connect failed: %s\n", mysqli_connect_error());
+				exit();
+			}
 		}
+		
 	}
 	
 	/**
@@ -141,6 +135,7 @@ var $DBHost = EZSQL_DB_HOST;
 	*/
 	function SendMessage($title ,$body ,$sender ,$receiver ,$senderLevel)
 	{
+		global $con;
 		if( strlen($title) == 0 )
 			return 1;
 		if( strlen($body) == 0 )
@@ -153,7 +148,7 @@ var $DBHost = EZSQL_DB_HOST;
 			return 5;
 		$sql = "INSERT INTO ".$this->tblName." (title,body,sender,receiver,senderLevel,readed) VALUES ('$title','$body',$sender,$receiver,$senderLevel,0)";
 		//echo $sql;
-		$result = mysql_query($sql);
+		$result = $con->query($sql);
 		if($result)
 			return 0;
 		else 	
@@ -168,12 +163,13 @@ var $DBHost = EZSQL_DB_HOST;
 	*/
 	function GetTitle($msgId)
 	{
+		global $con;
 		if(strlen($msgId) == 0)
 			return 1;
-		$result = mysql_query("SELECT title FROM ".$this->tblName." WHERE idMsg=$msgId");
-		if(mysql_num_rows($result) == 0)
+		$result = $con->query("SELECT title FROM ".$this->tblName." WHERE idMsg=$msgId");
+		if($result->num_rows == 0)
 			return 2;
-		$row = mysql_fetch_object($result);
+		$row = $result->fetch_object();
 		return $row->title;
 	}
 	
@@ -186,12 +182,13 @@ var $DBHost = EZSQL_DB_HOST;
 	*/
 	function GetBody($msgId)
 	{
+		global $con;
 		if(strlen($msgId) == 0)
 			return 1;
-		$result = mysql_query("SELECT body FROM ".$this->tblName." WHERE idMsg=$msgId");
-		if(mysql_num_rows($result) == 0)
+		$result = $con->query("SELECT body FROM ".$this->tblName." WHERE idMsg=$msgId");
+		if($result->num_rows == 0)
 			return 2;
-		$row = mysql_fetch_object($result);
+		$row = $result->fetch_object();
 		return $row->body;
 	}
 	/**
@@ -203,12 +200,13 @@ var $DBHost = EZSQL_DB_HOST;
 	*/
 	function GetSenderID($msgId)
 	{
+		global $con;
 		if(strlen($msgId) == 0)
 			return 1;
-		$result = mysql_query("SELECT sender FROM ".$this->tblName." WHERE idMsg=$msgId");
-		if(mysql_num_rows($result) == 0)
+		$result = $con->query("SELECT sender FROM ".$this->tblName." WHERE idMsg=$msgId");
+		if($result->num_rows == 0)
 			return 2;
-		$row = mysql_fetch_object($result);
+		$row = $result->fetch_object();
 		return $row->sender;
 	}
 	/**
@@ -220,12 +218,13 @@ var $DBHost = EZSQL_DB_HOST;
 	*/
 	function GetReceiverID($msgId)
 	{
+		global $con;
 		if(strlen($msgId) == 0)
 			return 1;
-		$result = mysql_query("SELECT receiver FROM ".$this->tblName." WHERE idMsg=$msgId");
-		if(mysql_num_rows($result) == 0)
+		$result = $con->query("SELECT receiver FROM ".$this->tblName." WHERE idMsg=$msgId");
+		if($result->num_rows == 0)
 			return 2;
-		$row = mysql_fetch_object($result);
+		$row = $result->fetch_object();
 		return $row->receiver;
 	}
 	/**
@@ -236,12 +235,13 @@ var $DBHost = EZSQL_DB_HOST;
 	* @desc This function is used to return the send date of a especific message
 	*/
 	function GetSendDate( $msgId ){
+		global $con;
 		if(strlen($msgId) == 0)
 			return 1;
-		$result = mysql_query("SELECT date FROM ".$this->tblName." WHERE idMsg=$msgId");
-		if(mysql_num_rows($result) == 0)
+		$result = $con->query("SELECT date FROM ".$this->tblName." WHERE idMsg=$msgId");
+		if($result->num_rows == 0)
 			return 2;
-		$row = mysql_fetch_object($result);
+		$row = $result->fetch_object();
 		return $row->date;
 	}
 	/**
@@ -253,13 +253,14 @@ var $DBHost = EZSQL_DB_HOST;
 	*/
 	function GetMessage($msgId)
 	{
+		global $con;
 		$message = array();
 		if(strlen($msgId) == 0)
 			return 1;
-		$result = mysql_query("SELECT * FROM ".$this->tblName." WHERE idMsg=$msgId");
-		if(mysql_num_rows($result) == 0)
+		$result = $con->query("SELECT * FROM ".$this->tblName." WHERE idMsg=$msgId");
+		if($result->num_rows == 0)
 			return 2;
-		$row = mysql_fetch_object($result);
+		$row = $result->fetch_object();
 		$message['id'] = $row->idMsg;
 		$message['receiver'] = $row->receiver;
 		$message['sender'] = $row->sender;
@@ -280,9 +281,10 @@ var $DBHost = EZSQL_DB_HOST;
 	*/
 	function MarkAsRead($msgId)
 	{
+		global $con;
 		if(strlen($msgId) == 0)
 			return 1;
-		$result = mysql_query("UPDATE ".$this->tblName." SET readed=readed|1 WHERE idMsg=$msgId");
+		$result = $con->query("UPDATE ".$this->tblName." SET readed=readed|1 WHERE idMsg=$msgId");
 		if($result)
 			return 0;
 		else 
@@ -311,6 +313,7 @@ var $DBHost = EZSQL_DB_HOST;
 	*/
 	function GetAllmessages($sort = 0, $receiver = '', $sender = '', $filter = 0)
 	{
+	global $con;	
 		switch( $sort )
 		{
 			case 0:
@@ -353,15 +356,15 @@ var $DBHost = EZSQL_DB_HOST;
 		
 		$sql = "SELECT * FROM ".$this->tblName." WHERE $where ORDER BY $order";
 		//echo $sql;
-		$result = @mysql_query($sql);
+		$result = $con->query($sql);
 		
 		if( !$result )
 			return 1;
-		$num = mysql_num_rows($result);
+		$num = $result->num_rows;
 		$message = '';
 		for($i = 0 ; $i < $num ; $i++ )
 		{
-			$row = mysql_fetch_object($result);
+			$row = $result->fetch_object();
 			$message[$i]['id'] = $row->idMsg;
 			$message[$i]['receiver'] = $row->receiver;
 			$message[$i]['sender'] = $row->sender;
@@ -391,14 +394,15 @@ var $DBHost = EZSQL_DB_HOST;
 	*/
 	function DeleteMessage($msgId,$who=0)
 	{
+		global $con;
 		if(strlen($msgId) == 0)
 			return 1;
 		if ($who==1)
-		    $result = mysql_query("UPDATE ".$this->tblName." SET readed=readed|2 WHERE idMsg=$msgId");
+		    $result = $con->query("UPDATE ".$this->tblName." SET readed=readed|2 WHERE idMsg=$msgId");
 		elseif ($who==2)
-		    $result = mysql_query("UPDATE ".$this->tblName." SET readed=readed|4 WHERE idMsg=$msgId");
+		    $result = $con->query("UPDATE ".$this->tblName." SET readed=readed|4 WHERE idMsg=$msgId");
 		elseif ($who==0)
-		    $result = mysql_query("DELETE FROM ".$this->tblName." WHERE idMsg=$msgId");
+		    $result = $con->query("DELETE FROM ".$this->tblName." WHERE idMsg=$msgId");
 		if($result)
 			return 0;
 		else 

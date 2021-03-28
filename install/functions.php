@@ -29,6 +29,7 @@ function Message( $message, $good )
 //end old functions
 
 function DisplayErrors($errors) {
+	$output = '';
 	foreach ($errors as $error) {
 		$output.="<div class='alert alert-error'><strong>Error:</strong> $error</div>\n";
 	}
@@ -37,15 +38,18 @@ function DisplayErrors($errors) {
 
 function checkfortable($table)
 {
-	$result = mysql_query('select * from ' . $table);
-	if (!$result) {
+	global $handle;
+	$result = $handle->query("SHOW TABLES LIKE '".$table."';");
+	$numRows = $result->num_rows;
+	if ($numRows < 1) {
 		return false;
-	}
+	}else{
 	return true;
+	}
 }
 
 function check_lang_conf($version) {
-	$file = '../libs/lang_english.conf';
+	$file = '../languages/lang_english.conf';
 	$data=file_get_contents($file);
 	$lines=explode("\n",$data);
 	foreach ($lines as $line) {
@@ -66,7 +70,7 @@ function getfiles($dirname=".") {
 	if($handle = opendir($dirname)) {
 	   while(false !== ($file = readdir($handle))){
 			if(preg_match('/'.$pattern.'/i', $file)){
-				echo "<li>$file</li>";
+				echo "<li><input type=\"checkbox\" name=\"language[]\" id=\"color\" value=\"$file\">$file</li>";
 			}
 	   }
 		closedir($handle);
@@ -74,4 +78,23 @@ function getfiles($dirname=".") {
 	return($files);
 }
 
+function CheckmysqlServerVersion() {
+	global $handle;
+	$theMySqlVersion = $handle->server_info;
+	return $theMySqlVersion;
+}
+
+function CheckIfFileExists ($file, $default) {
+	if (!file_exists($file)) {
+		if (file_exists($default)) {
+			rename("$default", "$file");
+			chmod("$file", 0666);
+			return true;
+		}else{
+			return false;
+		}
+	}else{
+		return true;
+	}
+}
 ?>

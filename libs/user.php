@@ -34,7 +34,7 @@ class User {
 	var $extra = '';
 	
 
-	function User($id=0) {
+	function __construct($id=0) {
 		if ($id>0) {
 			$this->id = $id;
 			$this->read();
@@ -42,7 +42,7 @@ class User {
 	}
 
 function Create(){
-		global $db, $main_smarty,$the_template,$my_base_url,$my_pligg_base;
+		global $db, $main_smarty,$the_template,$my_base_url,$my_plikli_base;
 		
 		if($this->username == ''){return false;}
 		if($this->pass == ''){return false;}
@@ -53,23 +53,23 @@ function Create(){
 
 			require_once(mnminclude.'check_behind_proxy.php');
 			$userip=check_ip_behind_proxy();
-			$saltedpass=generateHash($this->pass);
+			$saltedpass=generatePassHash($this->pass);
 			
-			if(pligg_validate()){
+			if(plikli_validate()){
 				if ($db->query("INSERT IGNORE INTO " . table_users . " (user_login, user_email, user_pass, user_date, user_ip,user_categories) VALUES ('".$this->username."', '".$this->email."', '".$saltedpass."', now(), '".$userip."', '')")) {
 				
 					$result = $db->get_row("SELECT user_email, user_pass, user_karma, user_lastlogin FROM " . table_users . " WHERE user_login = '".$this->username."'");
-					$encode = md5($this->email . $result->user_karma .  $this->username. pligg_hash().$main_smarty->get_config_vars('PLIGG_Visual_Name'));
+					$encode = md5($this->email . $result->user_karma .  $this->username. plikli_hash().$main_smarty->get_config_vars('PLIKLI_Visual_Name'));
 
 					$username = $this->username;
 					$password = $this->pass;
 					
 					$my_base_url=$my_base_url;
-					$my_pligg_base=$my_pligg_base;
+					$my_plikli_base=$my_plikli_base;
 					
-					$domain = $main_smarty->get_config_vars('PLIGG_Visual_Name');			
-					$validation = my_base_url . my_pligg_base . "/validation.php?code=$encode&uid=".$this->username;
-					$str = $main_smarty->get_config_vars('PLIGG_PassEmail_verification_message');
+					$domain = $main_smarty->get_config_vars('PLIKLI_Visual_Name');			
+					$validation = my_base_url . my_plikli_base . "/validation.php?code=$encode&uid=".$this->username;
+					$str = $main_smarty->get_config_vars('PLIKLI_PassEmail_verification_message');
 					eval('$str = "'.str_replace('"','\"',$str).'";');
 					$message = "$str";
 
@@ -79,12 +79,12 @@ function Create(){
 						require("class.phpmailer4.php");
 
 					$mail = new PHPMailer();
-					$mail->From = $main_smarty->get_config_vars('PLIGG_PassEmail_From');
-					$mail->FromName = $main_smarty->get_config_vars('PLIGG_PassEmail_Name');
+					$mail->From = $main_smarty->get_config_vars('PLIKLI_PassEmail_From');
+					$mail->FromName = $main_smarty->get_config_vars('PLIKLI_PassEmail_Name');
 					$mail->AddAddress($this->email);
-					$mail->AddReplyTo($main_smarty->get_config_vars('PLIGG_PassEmail_From'));
+					$mail->AddReplyTo($main_smarty->get_config_vars('PLIKLI_PassEmail_From'));
 					$mail->IsHTML(false);
-					$mail->Subject = $main_smarty->get_config_vars('PLIGG_PassEmail_Subject_verification');
+					$mail->Subject = $main_smarty->get_config_vars('PLIKLI_PassEmail_Subject_verification');
 					$mail->CharSet = 'utf-8';
 					$mail->Body = $message;
 				
@@ -136,7 +136,7 @@ function Create(){
 		$user_pinterest = $db->escape(htmlentities($this->pinterest));
 		$user_avatar_source = $db->escape($this->avatar_source);
 		if (strlen($user_pass) < 49){
-			$saltedpass=generateHash($user_pass);}
+			$saltedpass=generatePassHash($user_pass);}
 		else{
 			$saltedpass=$user_pass;}
 			
@@ -286,9 +286,15 @@ function Create(){
 		    foreach ($users as $dbuser)
 		    {
 				$ranklist[$dbuser[0]] = $rank;
-				$rank += $dbuser[1];
+				$rank++;
+				
 		    }
-		$main_smarty->assign('user_rank', $ranklist[$this->karma]);
+		/* Redwine: added Key check to eliminate the php warning about undefined index in case the user has negative karma. */
+		if (array_key_exists($this->karma, $ranklist)) {
+			$main_smarty->assign('user_rank', $ranklist[$this->karma]);
+		}else{
+			$main_smarty->assign('user_rank', "");
+		}
 
 /*		global $db;
 		$groups = $db->get_results($sql="SELECT * FROM " . table_group_member . "  	
@@ -350,6 +356,7 @@ function user_group_read($user_id,$order_by='')
 						AND group_status = 'Enable'
 						ORDER BY $order_by");
 	if ($groups) {
+		$group_display = '';
 		foreach($groups as $groupid){
 			$group_display .= "<tr><td><a href='".getmyurl("group_story_title", $groupid->group_safename)."'>".$groupid->group_name."</a></td><td style='text-align:center;'>".$groupid->group_members."</td></tr>"; 
 		}
@@ -357,7 +364,47 @@ function user_group_read($user_id,$order_by='')
 	}	
 	return true;
 }
+/* Redwine: The killspam function was not working properly as some blocks of code were skipped. The best solution was to move the skipped code to a separate function that is called from killspam() and returns the value. This resulted in accurately recalculating the comments for every link the spammer commented on and also adjusting the votes count */
+function adjustVotesCount($id) {
+global $db;
+require_once(mnminclude.'link.php');
+require_once(mnminclude.'votes.php');
+	/* Redwine: used union query to make sure that all the comments of the spammer are also included, because it is very possible that he commented on more links than he voted */
+		$results = $db->get_results("SELECT `vote_link_id`, `vote_user_id` FROM " . table_votes . " WHERE `vote_user_id` = $id UNION SELECT `comment_link_id`, `comment_user_id` FROM " . table_comments . " WHERE `comment_user_id` = $id");
+		if ($results) {
+			$db->query('DELETE FROM `' . table_votes . "` WHERE `vote_user_id` = $id");
+			$db->query("DELETE FROM `" . table_comments . "` WHERE `comment_user_id` =$id");
+			foreach ($results as $result)
+			{
+			
+			$link = new Link;
+			$link->id=$result->vote_link_id;
+			$link->read();
 
+			$vote = new Vote;
+			$vote->type='links';
+			$vote->link=$result->vote_link_id;
+
+			if(Voting_Method == 1){
+				$link->votes=$vote->count();
+				$link->reports = $link->count_all_votes("<0");
+			} elseif(Voting_Method == 2) {
+				$link->votes=$vote->rating();
+				$link->votecount=$vote->count();
+				$link->reports = $link->count_all_votes("<0");
+			}
+			elseif(Voting_Method == 3){
+				$link->votes=$vote->count();
+				$link->karma = $vote->karma();
+				$link->reports = $link->count_all_votes("<0");
+			}
+			$link->recalc_comments();
+			$link->store_basic();
+			$link->check_should_publish();
+			}
+		}
+	return;
+}
 function killspam($id)
 {
 	global $db;
@@ -369,67 +416,20 @@ function killspam($id)
 	$user= $db->get_row('SELECT * FROM ' . table_users ." where user_id=$id");
 	if (!$user->user_id) return;
 	canIChangeUser($user->user_level);
-
+	adjustVotesCount($id);
 	$db->query('UPDATE `' . table_users . "` SET user_enabled=0, `user_pass` = '63205e60098a9758101eeff9df0912ccaaca6fca3e50cdce3', user_level = 'Spammer' WHERE `user_id` = $id");
-	$results = $db->get_results($sql="SELECT comment_id, comment_link_id FROM `" . table_comments . "` WHERE `comment_user_id` = $id");
-	if ($results)
-	    foreach ($results as $result)
-	    {
-		$db->query($sql='UPDATE `' . table_comments . '` SET `comment_status` = "spam" WHERE `comment_id` = "'.$result->comment_id.'"');
-
-	   	$vars = array('comment_id' => $result->comment_id);
-	   	check_actions('comment_spam', $vars);
-
-		$link = new Link;
-		$link->id=$result->comment_link_id;
-		$link->read();
-
-		$link->recalc_comments();
-		$link->store();
-	    }
 
 	ban_ip($user->user_ip,$user->user_lastip);
+	/* Redwine: LINE 396 checks if the user is a group(s) creator **** obsolete query */
+	//$results = $db->get_results("SELECT * FROM `" . table_groups . "` WHERE group_creator = '$id'"); /**** OBSOLETE ****/
+	/* Redwine: Deletes the user from the table group_member **** as is, it only deletes the user from group_member where the user is the group creator and keeps them as members in other groups if they joined multiple groups. */
+	/* Redwine: we have to remove the query above and the iteration through its result in order and change the delete query to ensure that the spam user is removed from all groups that he created or just a member in */
+		$db->query('DELETE FROM `' . table_group_member . '` WHERE member_user_id = '.$id);
+		$db->query('DELETE FROM `' . table_group_shared . '` WHERE share_user_id = '.$id);
 
-	$results = $db->get_results("SELECT * FROM `" . table_groups . "` WHERE group_creator = '$id'");
-	if ($results)
-	    foreach ($results as $result)
-	    {
-		$db->query('DELETE FROM `' . table_group_member . '` WHERE member_group_id = '.$result->group_id);
-		$db->query('DELETE FROM `' . table_group_shared . '` WHERE share_group_id = '.$result->group_id);
-	    }
 	$db->query("DELETE FROM `" . table_groups . "` WHERE group_creator = '$id'");
 
-	$results = $db->get_results("SELECT vote_id,vote_link_id FROM `" . table_votes . "` WHERE `vote_user_id` = $id");
-	if ($results)
-	    foreach ($results as $result)
-	    {
-		$db->query('DELETE FROM `' . table_votes . '` WHERE `vote_id` = "'.$result->vote_id.'"');
-		$link = new Link;
-		$link->id=$result->vote_link_id;
-		$link->read();
-
-		$vote = new Vote;
-		$vote->type='links';
-		$vote->link=$result->vote_link_id;
-
-		if(Voting_Method == 1){
-			$link->votes=$vote->count();
-			$link->reports = $link->count_all_votes("<0");
-		} elseif(Voting_Method == 2) {
-			$link->votes=$vote->rating();
-			$link->votecount=$vote->count();
-			$link->reports = $link->count_all_votes("<0");
-		}
-		elseif(Voting_Method == 3){
-			$link->votes=$vote->count();
-			$link->karma = $vote->karma();
-			$link->reports = $link->count_all_votes("<0");
-		}
-		$link->store_basic();
-		$link->check_should_publish();
-	    }
-
-	$results = $db->get_results($sql="SELECT link_id, link_url FROM `" . table_links . "` WHERE `link_author` = $id");
+	$results = $db->get_results("SELECT link_id, link_url FROM `" . table_links . "` WHERE `link_author` = $id");
 	global $USER_SPAM_RULESET, $FRIENDLY_DOMAINS;
 	$filename = mnmpath.$USER_SPAM_RULESET;
 	$lines = file($filename,FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
@@ -458,10 +458,12 @@ function killspam($id)
 		   } 
 		}
 	}
-	$db->query($sql='UPDATE `' . table_links . '` SET `link_status` = "spam" WHERE `link_author` = "'.$id.'"');
+/* Redwine: the query was not working because of $db->query($sql='UPDATE. the $sql= inside the the query construction was breaking it */
+	$db->query('UPDATE `' . table_links . '` SET `link_status` = "spam" WHERE `link_author` = "'.$id.'"');
 	$db->query('DELETE FROM `' . table_saved_links . '` WHERE `saved_user_id` = "'.$id.'"');
 	$db->query('DELETE FROM `' . table_trackbacks . '` WHERE `trackback_user_id` = "'.$id.'"');
-	$db->query('DELETE FROM `' . table_friends . '` WHERE `friend_id` = "'.$id.'"');
+/* Redwine: the query was wrong and referencing the friend_id instead of friend_from and friend_to */
+	$db->query('DELETE FROM `' . table_friends . "` WHERE `friend_from` = $id OR `friend_to` = $id");
 	$db->query('DELETE FROM `' . table_messages . "` WHERE `sender`=$id OR `receiver`=$id");
 }		
 

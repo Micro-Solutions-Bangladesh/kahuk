@@ -2,7 +2,7 @@
 
 if(!defined('mnminclude')){header('Location: ../error_404.php');}
 
-class pliggconfig {
+class plikliconfig {
 	var $id = 0;
 	var $var_page = 0;
 	var $var_name = 0;
@@ -14,7 +14,7 @@ class pliggconfig {
 	var $EditInPlaceCode = '';
 
 	function showpage(){
-		global $db, $my_pligg_base;
+		global $db, $my_plikli_base;
 		
 		?>
 			<div class="admin_config_content">
@@ -27,10 +27,10 @@ class pliggconfig {
 			echo '<table class="table table-bordered table-striped">';
 			echo '<thead><tr>';
 			echo '<th>Title</th>';
-			echo '<th>'.$main_smarty->get_config_vars(PLIGG_Visual_Config_Description).'</th>';
-			echo '<th style="min-width:120px">'.$main_smarty->get_config_vars(PLIGG_Visual_Config_Value).'</th>';
-			echo '<th style="width:120px;">'.$main_smarty->get_config_vars(PLIGG_Visual_Config_Default_Value).'</th>';
-			echo '<th style="width:120px;">'.$main_smarty->get_config_vars(PLIGG_Visual_Config_Expected_Values).'</th>';
+			echo '<th>'.$main_smarty->get_config_vars(PLIKLI_Visual_Config_Description).'</th>';
+			echo '<th style="min-width:120px">'.$main_smarty->get_config_vars(PLIKLI_Visual_Config_Value).'</th>';
+			echo '<th style="width:120px;">'.$main_smarty->get_config_vars(PLIKLI_Visual_Config_Default_Value).'</th>';
+			echo '<th style="width:120px;">'.$main_smarty->get_config_vars(PLIKLI_Visual_Config_Expected_Values).'</th>';
 			echo '</tr></thead><tbody>';
 			
 			foreach($configs as $config) {
@@ -65,13 +65,13 @@ class pliggconfig {
 		
 	function store($loud = true){
 		global $db;
-		if(strtolower($this->var_value) == 'true'){$this->var_value = 'true';}
-		if(strtolower($this->var_value) == 'false'){$this->var_value = 'false';}
-		$sql = "UPDATE " . table_config . " set var_value = '".$this->var_value."' where var_id = ".$this->var_id;
+		if(strtolower(trim($this->var_value)) == 'true'){$this->var_value = 'true';}
+		if(strtolower(trim($this->var_value)) == 'false'){$this->var_value = 'false';}
+		$sql = "UPDATE " . table_config . " set var_value = '".$db->escape(trim($this->var_value))."' where var_id = ".$db->escape(sanitize($this->var_id,3));
 		$db->query($sql);
 		$this->create_file();
 
-		$content = $this->var_value;
+		$content = trim($this->var_value);
 		if($loud == true){
 			print(htmlspecialchars($content));
 		}
@@ -81,15 +81,30 @@ class pliggconfig {
 		
 	function print_summary(){
 		global $db, $main_smarty;
-
+		/* Redwine: in some instances, the trailing space is left. we want to make sure to trim it.*/
+		$this->var_value = trim($this->var_value);
 		echo '<span id="var_'.$this->var_id.'_span"><form onsubmit="return false">';
 		echo '<tr>';
 		echo "<td>".translate($this->var_title)."</td>";
 		echo "<td>".translate($this->var_desc)."</td><td>";
 		
-		if($this->var_name == '$my_base_url'){echo translate("It looks like this should be set to")." <strong>"."http://" . $_SERVER["HTTP_HOST"]."</strong><br>";}
+		$gethttphost = $_SERVER["HTTP_HOST"];
+		$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http') . '://';	
+		$port = strpos($gethttphost, ':');
+		if ($port !== false){ 
+			$httphost = substr($gethttphost, 0, $port);
+		}else{
+			$httphost = $gethttphost;
+		}	
+		$standardport = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 443 : 80); 
+		$waitTimeoutInSeconds = 1; 
+		if($fp = fsockopen($httphost,$standardport,$errCode,$errStr,$waitTimeoutInSeconds)){   
+			$expected_base_url = $protocol . $httphost;
+		}
+		fclose($fp);
+		if($this->var_name == '$my_base_url'){echo translate("It looks like this should be set to") . " <strong>" . $expected_base_url ."</strong> ";}
 		
-		if($this->var_name == '$my_pligg_base'){
+		if($this->var_name == '$my_plikli_base'){
 			$pos = strrpos($_SERVER["SCRIPT_NAME"], "/admin/");
 			$path = substr($_SERVER["SCRIPT_NAME"], 0, $pos);
 			if ($path == "/" || $path == ""){$path = translate("Nothing - Leave it blank");}
@@ -148,9 +163,9 @@ class pliggconfig {
 			fwrite($handle, "<?php\n");
 			$usersql = $db->get_results('SELECT * FROM ' . table_prefix . 'config');
 			foreach($usersql as $row) {
-				$value = $row->var_enclosein . $row->var_value. $row->var_enclosein;
+				$value = $row->var_enclosein . trim($row->var_value). $row->var_enclosein;
 				
-				$write_vars = array('table_prefix', '$my_base_url', '$my_pligg_base', '$dblang', '$language' );
+				$write_vars = array('table_prefix', '$my_base_url', '$my_plikli_base', '$dblang', '$language' );
 				
 				if(in_array($row->var_name, $write_vars)){
 				

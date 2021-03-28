@@ -1,10 +1,3 @@
-{if $ss_body ne ''}
-<div class="headline">
-	<div class="sectiontitle"><a href="{$my_base_url}{$my_pligg_base}{if $pagename eq "index"}/new.php{/if}">{$ss_header}</a></div>
-</div>
-<div class="boxcontent">
-	<ul class="sidebar-stories">
-		{$ss_body}
-	</ul>
-</div>
-{/if}
+{checkActionsTpl location="tpl_sidebar_stories_start"}
+{include file=$the_template"/default_mods/sidebar_stories_wrapper.tpl"}
+{checkActionsTpl location="tpl_sidebar_stories_end"}

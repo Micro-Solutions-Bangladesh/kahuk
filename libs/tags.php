@@ -20,13 +20,14 @@ function tags_insert_string($link, $lang, $string, $date = 0) {
 		$db->query("delete from " . table_tags . " where tag_link_id = $link");
 		foreach ($words as $word) {
 			$word=trim($word);
-			if (!$inserted[$word] && !empty($word)) {
+/* Redwine: fix bug that was not insterting the tags in the tables. */
+			if ($inserted[$word] == false && !empty($word)) {
 				$db->query("insert IGNORE into " . table_tags . " (tag_link_id, tag_lang, tag_words, tag_date) values ($link, '$lang', '$word', from_unixtime($date))");
 				$inserted[$word] = true;
 			}
 		}
 		$db->query("TRUNCATE TABLE ".table_tag_cache);
-		$db->query($sql="INSERT INTO ".table_tag_cache." select tag_words, count(DISTINCT link_id) as count FROM ".table_tags.", ".table_links." WHERE tag_lang='en' and link_id = tag_link_id and (link_status='published' OR link_status='new') GROUP BY tag_words order by count desc");
+		$db->query("INSERT INTO ".table_tag_cache." select tag_words, count(DISTINCT link_id) as count FROM ".table_tags.", ".table_links." WHERE tag_lang='en' and link_id = tag_link_id and (link_status='published' OR link_status='new') GROUP BY tag_words order by count desc");
 
 		return true;
 	}
@@ -80,6 +81,7 @@ class TagCloud {
 		$catId = $this->filterCategory;
 		$child_cats = '';
 		// do we also search the subcategories? 
+/* Redwine: Fix applied to fix the "Show subcategories" feature in Admin Panel -> Settings -> Miscellenaous -> Show subcategories. See https://github.com/Pligg/pligg-cms/commit/2fcf3bac73246ca27de9e9f23f865153632fe4aa */
 		if( Independent_Subcategories == true){
 			$child_array = '';
 
@@ -112,7 +114,8 @@ class TagCloud {
             if(isset($catId)){
                 $child_cats = '';
                 // do we also search the subcategories? 
-		if (! Independent_Subcategories){
+/* Redwine: Fix applied to fix the "Show subcategories" feature in Admin Panel -> Settings -> Miscellenaous -> Show subcategories. See https://github.com/Pligg/pligg-cms/commit/2fcf3bac73246ca27de9e9f23f865153632fe4aa */
+		if( Independent_Subcategories == true){
                     $child_array = '';
                     // get a list of all children and put them in $child_array.
                     children_id_to_array($child_array, table_categories, $catId);

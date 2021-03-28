@@ -1,9 +1,9 @@
 <?php
 	$module_info['name'] = 'Upload';
 	$module_info['desc'] = 'Attach images and files to an article';
-	$module_info['version'] = 2.00;
-	$module_info['update_url'] = 'http://pligg.com/downloads/module/upload-module/version/';
-	$module_info['homepage_url'] = 'http://pligg.com/downloads/module/upload-module/';
+	$module_info['version'] = 2.0;
+	$module_info['update_url'] = '';
+	$module_info['homepage_url'] = 'https://www.plikli.com/mods/upload.zip';
 	$module_info['settings_url'] = '../module.php?module=upload';
 	// this is where you set the modules "name" and "version" that is required
 	// if more that one module is required then just make a copy of that line
@@ -11,24 +11,28 @@
 	$module_info['db_add_table'][]=array(
 	'name' => table_prefix . "files",
 	'sql' => "CREATE TABLE `".table_prefix . "files` (
-	  `file_id` int(11) NOT NULL auto_increment,
-	  `file_name` varchar(255) default NULL,
-	  `file_size` varchar(20) default NULL,
-	  `file_user_id` int(11) NOT NULL,
-	  `file_link_id` int(11) NOT NULL,
-	  `file_orig_id` int(11) NOT NULL,
-	  `file_real_size` int(11) NOT NULL,
-	  `file_number` tinyint(4) NOT NULL,
-	  `file_ispicture` tinyint(4) NOT NULL,
+		`file_id` int(11) NOT NULL auto_increment,
+		`file_name` varchar(255) default NULL,
+		`file_size` varchar(20) default NULL,
+		`file_user_id` int(11) NOT NULL,
+		`file_link_id` int(11) NOT NULL,
+		`file_orig_id` int(11) NOT NULL DEFAULT '0',
+		`file_real_size` int(11) NOT NULL,
+		`file_number` tinyint(4) NOT NULL DEFAULT '0',
+		`file_ispicture` tinyint(4) NOT NULL DEFAULT '0',
+		`file_fields` text NOT NULL,
+		`file_hide_thumb` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
+		`file_hide_file` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
+		`file_comment_id` int(11) NOT NULL DEFAULT '0',
 	  PRIMARY KEY  (`file_id`)
-	) ENGINE=MyISAM ");
+	) ENGINE = MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci");
 
 	// these are seperate because most people will have the tables already
 	// created from a previous install
-	$module_info['db_add_field'][]=array(table_prefix . 'files', 'file_fields', 'TEXT',  '', '', 0, '');
+	/*$module_info['db_add_field'][]=array(table_prefix . 'files', 'file_fields', 'TEXT',  '', '', 0, '');
 	$module_info['db_add_field'][]=array(table_prefix . 'files', 'file_hide_thumb', 'TINYINT',  1, "UNSIGNED", 0, '0');
 	$module_info['db_add_field'][]=array(table_prefix . 'files', 'file_hide_file', 'TINYINT',  1, "UNSIGNED", 0, '0');
-	$module_info['db_add_field'][]=array(table_prefix . 'files', 'file_comment_id', 'INT',  11, '', 0, '0');
+	$module_info['db_add_field'][]=array(table_prefix . 'files', 'file_comment_id', 'INT',  11, '', 0, '0');*/
 
 	if (get_misc_data('upload_thumb')=='')
 	{
@@ -48,7 +52,7 @@
 		misc_data_update('upload_maxnumber', '1');
 		misc_data_update('upload_extensions', 'jpg jpeg png gif');
 		misc_data_update('upload_defsize', '200x200');
-		misc_data_update('upload_fileplace', 'tpl_pligg_story_who_voted_start');
+		misc_data_update('upload_fileplace', 'upload_story_list_custom');
 	}
 
 ?>

@@ -30,8 +30,8 @@ if(isset($_REQUEST["role"])){
 	$group_details=$db->get_row($grup_sql);
 	
 	
-	//echo $redirect = getmyurl("group_story", $id);
-	$redirect =  getmyurl('group_story2', $group_details->group_safename, 'members');
+	/* Redwine: Roles and permissions and Groups fixes. For the redirect to work properly, we have to replace the &amp; with & */
+	$redirect =  str_replace("&amp;","&",getmyurl('group_story2', $group_details->group_safename, 'members'));
 	header("Location: $redirect");
 	//$db->query("UPDATE " . table_group_member . " set member_role='".$role."' WHERE member_user_id 	=".$userid." and member_group_id 	=".$id."");
 	die;

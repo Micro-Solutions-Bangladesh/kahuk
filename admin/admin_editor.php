@@ -20,26 +20,24 @@ $canIhaveAccess = $canIhaveAccess + checklevel('admin');
 
 if($canIhaveAccess == 0){	
 //	$main_smarty->assign('tpl_center', '/admin/access_denied');
-//	$main_smarty->display($template_dir . '/admin/admin.tpl');			
+//	$main_smarty->display('/admin/admin.tpl');			
 	header("Location: " . getmyurl('admin_login', $_SERVER['REQUEST_URI']));
 	die();
 }
 
 // breadcrumbs and page title
-$navwhere['text1'] = $main_smarty->get_config_vars('PLIGG_Visual_Header_AdminPanel');
+$navwhere['text1'] = $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel');
 $navwhere['link1'] = getmyurl('admin', '');
-$navwhere['text2'] = $main_smarty->get_config_vars('PLIGG_Visual_Header_AdminPanel_Editor');
+$navwhere['text2'] = $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel_Editor');
 $main_smarty->assign('navbar_where', $navwhere);
-$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('PLIGG_Visual_Header_AdminPanel'));
+$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel'));
 
 // pagename
 define('pagename', 'admin_editor'); 
 $main_smarty->assign('pagename', pagename);
 
-// read the mysql database to get the pligg version
-$sql = "SELECT data FROM " . table_misc_data . " WHERE name = 'pligg_version'";
-$pligg_version = $db->get_var($sql);
-$main_smarty->assign('version_number', $pligg_version); 
+// read the mysql database to get the plikli version
+/* Redwine: plikli version query removed and added to /libs/smartyvriables.php */
 
 $filedir = "../templates/".The_Template;
 #echo $filedir;
@@ -63,6 +61,15 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST')
 }
 elseif ($_POST["the_file"])
 {
+	/* Redwine: added sanitization and removing ".." from the name of the file and making sure that nothing can be loaded to edit other than the allowed file extensions TPL and CSS. */
+	$_POST["the_file"] = sanitize ($_POST["the_file"],3);
+	$dir_name = dirname($_POST["the_file"]);
+	$base_name = basename($_POST["the_file"]);
+	$base_name = str_replace('..', '', $base_name);
+	$_POST["the_file"] = $dir_name . "/" . $base_name;
+	$ext = substr(strrchr($_POST["the_file"], '.'), 1);
+	if (!empty($ext)) {
+		if (in_array($ext,$valid_ext)) {
     $file2open = fopen($_POST["the_file"], "r");
     if ($file2open) {
 	    $current_data = @fread($file2open, filesize($_POST["the_file"]));
@@ -72,6 +79,14 @@ elseif ($_POST["the_file"])
     } else 
 	    $main_smarty->assign('error', 1);
     $main_smarty->assign('the_file', sanitize($_POST['the_file'],3));
+		}else{
+			header("Location: admin_editor.php");
+			die();
+		}
+	}else{
+		header("Location: admin_editor.php");
+		die();
+	}
 }
 elseif ($_POST["save"])
 {
@@ -97,7 +112,7 @@ elseif ($_POST["save"])
 
 // show the template
 $main_smarty->assign('tpl_center', '/admin/template_editor');
-$main_smarty->display($template_dir . '/admin/admin.tpl');	
+$main_smarty->display('/admin/admin.tpl');	
 
 	
 function directoryToArray($directory, $recursive) {

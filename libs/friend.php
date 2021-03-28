@@ -16,7 +16,7 @@ class Friend {
 
 		$friend_status = $this->get_friend_status($friend);
 		if ($friend_status == 'following'){die("there was an error");}
-		header('Location: ' .my_base_url.my_pligg_base. '/user.php?login='.$user_login);
+		header('Location: ' .my_base_url.my_plikli_base. '/user.php?login='.$current_user->user_login);
 	}
 	
 	function add($friend)
@@ -25,7 +25,7 @@ class Friend {
 		if (!is_numeric($friend)) die();
 		
 		if ($current_user->user_id == 0) {
-        echo "<span class='success' style='border:solid1px#269900;padding:2px2px2px2px'>Please <a href=" .my_base_url.my_pligg_base. "/login.php?return=/user.php?view=addfriend>login</a></span><br/>";
+        echo "<span class='success' style='border:solid1px#269900;padding:2px2px2px2px'>Please <a href=" .my_base_url.my_plikli_base. "/login.php?return=/user.php?view=addfriend>login</a></span><br/>";
         return;
         }
 		
@@ -36,7 +36,7 @@ class Friend {
 
 			$friend_status = $this->get_friend_status($friend);
 			if ($friend_status == ''){die("there was an error");}
-			header('Location: ' .my_base_url.my_pligg_base. '/user.php?login='.$user_login);
+			header('Location: ' .my_base_url.my_plikli_base. '/user.php?login='.$current_user->user_login);
 		}
 	}
 	
@@ -50,11 +50,13 @@ class Friend {
 						INNER JOIN " . table_users . " ON " . table_friends . ".friend_to = " . table_users . ".user_id 
 						WHERE " . table_friends . ".friend_from=$user_id AND " . table_users . ".user_id != $user_id AND user_enabled=1",
 					     ARRAY_A);
-		foreach ($friends as &$friend) 
-		    if ($db->get_var($sql="SELECT friend_id FROM " . table_friends . " WHERE friend_to=$friend[user_id] AND friend_from='{$current_user->user_id}'")) 
-			$friend['following'] = true;
-		foreach ($friends as &$friend) {
-			$friend['is_mutual'] = $this->get_friend_status($friend['user_id']);
+		if (!empty($friends)) {
+			foreach ($friends as &$friend) 
+				if ($db->get_var($sql="SELECT friend_id FROM " . table_friends . " WHERE friend_to=$friend[user_id] AND friend_from='{$current_user->user_id}'")) 
+				$friend['following'] = true;
+			foreach ($friends as &$friend) {
+				$friend['is_mutual'] = $this->get_friend_status($friend['user_id']);
+			}
 		}
 		return $friends;
 
@@ -69,6 +71,7 @@ class Friend {
 						INNER JOIN " . table_users . " ON " . table_friends . ".friend_from = " . table_users . ".user_id 
 						WHERE " . table_friends . ".friend_to=$user_id AND " . table_users . ".user_id != $user_id  AND user_enabled=1",
 					     ARRAY_A);
+		if (!empty($friends)) {				 
 		foreach ($friends as &$friend) 
 		    if ($db->get_var("SELECT friend_id FROM " . table_friends . " WHERE friend_from=$user_id AND friend_to=$friend[user_id]"))
 			$friend['is_friend'] = true;
@@ -76,6 +79,7 @@ class Friend {
 			$friend['is_mutual'] = $this->get_friend_status($friend['user_id']);
 		}
 		return $friends;
+		}
 	}
 
 	function get_friend_status($friend)

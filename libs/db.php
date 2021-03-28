@@ -51,11 +51,11 @@ if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
 							<div class="col-md-12">
 								<legend>Error establishing a database connection!</legend>
 								<ol>
-									<li>Have you run the <a href = "./install/install.php">Pligg Installer</a> yet?</li>
-									<li>Does the file /libs/dbconnect.php exist?</li>
+									<li>Run the <a href = "./install/troubleshooter.php">Plikli Installer</a> Troubleshooter</a> to fix all errors and set all the required files and persmissions!</li>
+									<!--<li>Does the file /libs/dbconnect.php exist?</li>
 									<li>Does the above file have the correct database username and password combination?</li>
 									<li>Are you sure that you have typed the correct hostname? Typically this value is set to "localhost".</li>
-									<li>Are you sure that the database server is running?</li>
+									<li>Are you sure that the database server is running?</li>-->
 								</ol>
 							</div>
 						</div><!--/.row-->
@@ -63,7 +63,7 @@ if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
 				</div><!--/.container-->
 				<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 				<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
-				<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/smoothness/jquery-ui.css" media="all" rel="stylesheet" type="text/css" />
+				<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/smoothness/jquery-ui.css" media="all" rel="stylesheet" type="text/css" />
 				<!--[if lt IE 7]>
 				<script type="text/javascript" src="./templates/admin/js/jquery/jquery.dropdown.js"></script>
 				<![endif]-->
@@ -106,7 +106,7 @@ if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
 									<li>Does the above file have the correct database username and password combination?</li>
 									<li>Are you sure that you have typed the correct hostname? Typically this value is set to "localhost".</li>
 									<li>Are you sure that the database server is running?</li>
-									<li>Have you run the <a href = "./install/install.php">Pligg Installer</a> yet?</li>
+									<li>Have you run the <a href = "./install/install.php">Plikli Installer</a> yet?</li>
 								</ol>
 							</div>
 						</div><!--/.row-->
@@ -114,7 +114,7 @@ if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
 				</div><!--/.container-->
 				<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 				<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
-				<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/smoothness/jquery-ui.css" media="all" rel="stylesheet" type="text/css" />
+				<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/smoothness/jquery-ui.css" media="all" rel="stylesheet" type="text/css" />
 				<!--[if lt IE 7]>
 				<script type="text/javascript" src="./templates/admin/js/jquery/jquery.dropdown.js"></script>
 				<![endif]-->
@@ -159,7 +159,7 @@ if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
 				</div><!--/.container-->
 				<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 				<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
-				<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/smoothness/jquery-ui.css" media="all" rel="stylesheet" type="text/css" />
+				<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/smoothness/jquery-ui.css" media="all" rel="stylesheet" type="text/css" />
 				<!--[if lt IE 7]>
 				<script type="text/javascript" src="./templates/admin/js/jquery/jquery.dropdown.js"></script>
 				<![endif]-->
@@ -204,7 +204,7 @@ if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
 				</div><!--/.container-->
 				<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 				<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
-				<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/smoothness/jquery-ui.css" media="all" rel="stylesheet" type="text/css" />
+				<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/smoothness/jquery-ui.css" media="all" rel="stylesheet" type="text/css" />
 				<!--[if lt IE 7]>
 				<script type="text/javascript" src="./templates/admin/js/jquery/jquery.dropdown.js"></script>
 				<![endif]-->
@@ -249,7 +249,7 @@ if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
 				</div><!--/.container-->
 				<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 				<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
-				<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/smoothness/jquery-ui.css" media="all" rel="stylesheet" type="text/css" />
+				<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/smoothness/jquery-ui.css" media="all" rel="stylesheet" type="text/css" />
 				<!--[if lt IE 7]>
 				<script type="text/javascript" src="./templates/admin/js/jquery/jquery.dropdown.js"></script>
 				<![endif]-->
@@ -262,7 +262,7 @@ if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
 	*  ezSQL Database specific class - mySQL
 	*/
 
-	if ( ! function_exists ('mysql_connect') ) die('<b>Fatal Error:</b> ezSQL_mysql requires mySQL Lib to be compiled and or linked in to the PHP engine');
+	if ( ! function_exists ('mysqli_connect') ) die('<b>Fatal Error:</b> ezSQL_mysql requires mySQL Lib to be compiled and or linked in to the PHP engine');
 	if ( ! class_exists ('ezSQLcore') ) die('<b>Fatal Error:</b> ezSQL_mysql requires ezSQLcore (ez_sql_core.php) to be included/loaded before it can be used');
 
 	class ezSQL_mysql extends ezSQLcore
@@ -278,7 +278,7 @@ if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
 		*  same time as initialising the ezSQL_mysql class
 		*/
 
-		function ezSQL_mysql($dbuser='', $dbpassword='', $dbname='', $dbhost='localhost')
+		function __construct($dbuser='', $dbpassword='', $dbname='', $dbhost='localhost')
 		{
 			$this->dbuser = $dbuser;
 			$this->dbpassword = $dbpassword;
@@ -316,7 +316,7 @@ if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
 				die($ezsql_mysql_str[1]);
 			}
 			// Try to establish the server database handle
-			else if ( ! $this->dbh = @mysql_connect($dbhost,$dbuser,$dbpassword,true) )
+			else if ( ! $this->dbh = @mysqli_connect($dbhost,$dbuser,$dbpassword) )
 			{
 				$this->register_error($ezsql_mysql_str[2].' in '.__FILE__.' on line '.__LINE__);
 				$this->show_errors ? trigger_error($ezsql_mysql_str[2],E_USER_WARNING) : null;
@@ -329,11 +329,11 @@ if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
 					fclose($fh);
 				}
 
-				mysql_query ("SET time_zone = '".date("P")."'");
-				mysql_query( 'set names utf8' );
-				mysql_query ("set character_set_client='utf8'");
-				mysql_query ("set character_set_results='utf8'");
-				mysql_query ("set collation_connection='utf8_general_ci'");
+				mysqli_query ($this->dbh, "SET time_zone = '".date("P")."'");
+				mysqli_query( $this->dbh, 'set names utf8' );
+				mysqli_query ($this->dbh, "set character_set_client='utf8'");
+				mysqli_query ($this->dbh, "set character_set_results='utf8'");
+				mysqli_query ($this->dbh, "set collation_connection='utf8_general_ci'");
 				
 				$this->dbuser = $dbuser;
 				$this->dbpassword = $dbpassword;
@@ -367,10 +367,10 @@ if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
 			}
 
 			// Try to connect to the database
-			else if ( !@mysql_select_db($dbname,$this->dbh) )
+			else if ( !@mysqli_select_db($this->dbh, $dbname) )
 			{
 				// Try to get error supplied by mysql if not use our own
-				if ( !$str = @mysql_error($this->dbh))
+				if ( !$str = @mysqli_error($this->dbh))
 					  $str = $ezsql_mysql_str[5];
 
 				$this->register_error($str.' in '.__FILE__.' on line '.__LINE__);
@@ -397,7 +397,7 @@ if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
 				$this->connect($this->dbuser, $this->dbpassword, $this->dbhost);
 				$this->select($this->dbname);
 			}
-			return mysql_real_escape_string($str, $this->dbh);
+			return mysqli_real_escape_string($this->dbh, $str);
 		}
 
 		/**********************************************************************
@@ -411,7 +411,7 @@ if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
 		}
 
 		/**********************************************************************
-		*  Perform mySQL query and try to detirmin result value
+		*  Perform mySQL query and try to determine result value
 		*/
 
 		function query($query)
@@ -456,7 +456,7 @@ if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
 			}
       
 			// Perform the query via std mysql_query function..
-			$this->result = @mysql_query($query,$this->dbh);
+			$this->result = @mysqli_query($this->dbh, $query);
 
 			if($this->log_to_file){
 				$mtime = microtime(); 
@@ -465,18 +465,21 @@ if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
 				$endtime = $mtime; 
 				$totaltime = ($endtime - $starttime); 
 				//if($totaltime > 0.001) {echo '<hr />' . $totaltime . ' - ' . $query . '<hr />';}
-				
+				$display = date('Y-m-d h:i:s',time());
 				$fh=fopen($this->logpath,"a");
-				fwrite($fh,$totaltime . ' - ' . $query . "\n");
+				fwrite($fh,$display . ' - ' . $totaltime . ' - ' . $query . "\n");
 				fclose($fh);
 			}
 			
 			// If there is an error then take note of it..
-			if ( $str = @mysql_error($this->dbh) )
+			if ( $str = @mysqli_error($this->dbh) )
 			{
 				$is_insert = true;
 				$this->register_error($str);
 				$this->show_errors ? trigger_error($str,E_USER_WARNING) : null;
+				$fh=fopen($this->log_qry_error,"a");
+				fwrite($fh,$totaltime . ' - ' . $query . "\n");
+				fclose($fh);
 				return false;
 			}
 
@@ -484,12 +487,12 @@ if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
 			$is_insert = false;
 			if ( preg_match("/^(insert|delete|update|replace)\s+/i",$query) )
 			{
-				$this->rows_affected = @mysql_affected_rows();
+				$this->rows_affected = @mysqli_affected_rows($this->dbh);
 
 				// Take note of the insert_id
 				if ( preg_match("/^(insert|replace)\s+/i",$query) )
 				{
-					$this->insert_id = @mysql_insert_id($this->dbh);
+					$this->insert_id = @mysqli_insert_id($this->dbh);
 				}
 
 				// Return number fo rows affected
@@ -501,22 +504,22 @@ if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
 
 				// Take note of column info
 				$i=0;
-				while ($i < @mysql_num_fields($this->result))
+				while ($i < @mysqli_num_fields($this->result))
 				{
-					$this->col_info[$i] = @mysql_fetch_field($this->result);
+					$this->col_info[$i] = @mysqli_fetch_field($this->result);
 					$i++;
 				}
 
 				// Store Query Results
 				$num_rows=0;
-				while ( $row = @mysql_fetch_object($this->result) )
+				while ( $row = @mysqli_fetch_object($this->result) )
 				{
 					// Store relults as an objects within main array
 					$this->last_result[$num_rows] = $row;
 					$num_rows++;
 				}
 
-				@mysql_free_result($this->result);
+				@mysqli_free_result($this->result);
 
 				// Log number of rows the query returned
 				$this->num_rows = $num_rows;

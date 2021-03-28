@@ -1,11 +1,11 @@
 <?php
-class PliggDoc{
+class PlikliDoc{
 	
 	var $js;
 	var $all_script;
 	var $top;
 	
-	function PliggDoc(){
+	function __construct(){
 		$this->js=array();
 		$this->all_script="";
 		$this->top=0;
@@ -46,6 +46,6 @@ class PliggDoc{
 	}
 }
 
-$PliggDoc= new PliggDoc();
+$PlikliDoc= new PlikliDoc();
 
 ?>
