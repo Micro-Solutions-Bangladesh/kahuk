@@ -93,5 +93,5 @@ Once you read the readme page, proceed to "Troubleshooter" in the navigation men
 
 ## Task Lists
 
-- [x] Our very first task is to rename the *plikli cms*. for this purpose, we have a fresh copy of *plikli cms* in a saperate branch to rename it to *kahuk cms*.
-- [x] Once we complete renaming the cms into *plikli cms*, we will go for further update.
+- [] Our very first task is to rename the *plikli cms*. for this purpose, we have a fresh copy of *plikli cms* in a saperate branch to rename it to *kahuk cms*.
+- [] Once we complete renaming the cms into *plikli cms*, we will go for further update.
