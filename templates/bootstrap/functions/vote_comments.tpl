@@ -71,4 +71,3 @@ function cunvote (user, id, htmlid, md5, value)
 }
 {/literal}
 </script>
-

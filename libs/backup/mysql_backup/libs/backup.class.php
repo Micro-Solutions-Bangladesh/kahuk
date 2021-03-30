@@ -129,11 +129,12 @@ DROP TABLE IF EXISTS " . $val[0] . ";
                 while ($line = $this -> fetch_array($qresult)) {
                     unset($fields, $values);
 					$j = 0;
-                    while (list($col_name, $col_value) = each($line)) {
+                    while (list($col_name, $col_value) = current($line)) {
                         if (!is_int($col_name)) {
                             $fields .= "`$col_name`,";
 							$values .= "'" . $this->escape_string($col_value) . "',";
                         } 
+                        next($line);
                     } 
 
                     $fields = substr($fields, 0, strlen($fields)-1);
@@ -216,11 +217,12 @@ DROP TABLE IF EXISTS " . $val[0] . ";
                 while ($line = $this -> fetch_array($qresult)) {
                     unset($fields, $values);
 					$j = 0;
-                    while (list($col_name, $col_value) = each($line)) {
+                    while (list($col_name, $col_value) = current($line)) {
                         if (!is_int($col_name)) {
                             $fields .= "`$col_name`,";
 							$values .= "'" . $this->escape_string($col_value) . "',";
                         } 
+                        next($line);
                     } 
 
                     $fields = substr($fields, 0, strlen($fields)-1);

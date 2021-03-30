@@ -1,3 +1,4 @@
+
 {if $user_logged_in}
 	<div class="headline">
 		<div class="sectiontitle">Saved Stories</div>

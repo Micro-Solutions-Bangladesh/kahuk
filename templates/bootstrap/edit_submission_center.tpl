@@ -105,18 +105,20 @@
 	<span class="field-description">{#PLIKLI_Visual_Submit2_CatInstruct#}</span>
 	<br />
 	{if $Multiple_Categories}
-{* Redwine: to apply the proper CSS Class depending on whether the multi categories is set or not *}
+        {* Redwine: to apply the proper CSS Class depending on whether the multi categories is set or not *}
 		<div class="controls select-category{if $Multiple_Categories} multi-select-category{/if}">
 		{section name=thecat loop=$submit_cat_array}
 			{$submit_cat_array[thecat].spacercount|repeat_count:'&nbsp;&nbsp;&nbsp;&nbsp;'}
-				 <input type="checkbox" class="form-control" name="category[]" value="{$submit_cat_array[thecat].auto_id}" {if $submit_cat_array[thecat].auto_id == $submit_category  || in_array($submit_cat_array[thecat].auto_id,$submit_additional_cats)}checked{/if}> {$submit_cat_array[thecat].name}<br />							
+				 <input type="checkbox" class="form-control" name="category[]" value="{$submit_cat_array[thecat].auto_id}" {if $submit_cat_array[thecat].auto_id == $submit_category  || in_array($submit_cat_array[thecat].auto_id,$submit_additional_cats)}checked{/if}> {$submit_cat_array[thecat].name}<br />
+                     {*Redwine: I added the code below to save an array of the riginal categories used for the article, to accurately get the difference if the categories were edited by the Admin, to include in the notification email in editlink.php*}
+                 {if $submit_cat_array[thecat].auto_id == $submit_category  || in_array($submit_cat_array[thecat].auto_id,$submit_additional_cats)}<input type="hidden" name="additionalCats[]" value="{$submit_cat_array[thecat].auto_id}">{/if}
 		{/section}
-{* Redwine: to apply the proper CSS Class depending on whether the multi categories is set or not *}
+        {* Redwine: to apply the proper CSS Class depending on whether the multi categories is set or not *}
 		</div>
 	{else}
-		<select class="form-control" {if $Multiple_Categories}name="category[]" multiple size=10{else}name="category"{/if}>
+		<select class="form-control"name="category">
 			{section name=thecat loop=$submit_cat_array}
-				<option value = "{$submit_cat_array[thecat].auto_id}"{if $submit_cat_array[thecat].auto_id eq $submit_category || in_array($submit_cat_array[thecat].auto_id,$submit_additional_cats)} selected="selected"{/if}>
+				<option value = "{$submit_cat_array[thecat].auto_id}"{if $submit_cat_array[thecat].auto_id eq $submit_category} selected{/if}>
 				{if $submit_cat_array[thecat].spacercount lt $lastspacer}{$submit_cat_array[thecat].spacerdiff|repeat_count:''}{/if}
 				{if $submit_cat_array[thecat].spacercount gt $lastspacer}{/if}
 				{$submit_cat_array[thecat].spacercount|repeat_count:'&nbsp;&nbsp;&nbsp;'}

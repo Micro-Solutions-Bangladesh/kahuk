@@ -182,4 +182,3 @@ function utf8_compliant($str) {
     // some valid sequences
     return (preg_match('/^.{1}/us',$str,$ar) == 1);
 }
-

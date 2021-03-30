@@ -86,22 +86,22 @@ if ($URLMethod == 1) {
 			$redirectUrl = $my_base_url.$my_plikli_base . "/".$linkres->status.".php?category=$linkslug";
 		}else{
 			$redirectUrl = $my_base_url.$my_plikli_base . "/?category=$linkslug";
-	}
-			} else{
+		}
+	}else{
 		$redirectUrl = $delete_referrer;
 	}
 }elseif ($URLMethod == 2) {
-	/*Redwine: the first part of the below conditional stattement: strstr($delete_referrer, "story.php?title=".$linkres->title_url) is to account for when an Admin is discarding a story; the links are in url method 1 and having the link safe title instead of the link id!*/
+	/*Redwine: the first part of the below conditional statement: strstr($delete_referrer, "story.php?title=".$linkres->title_url) is to account for when an Admin is discarding a story; the links are in url method 1 and having the link safe title instead of the link id!*/
 	if (strstr($delete_referrer, "story.php?title=".$linkres->title_url) || strstr($delete_referrer, "/$linkslug/".$linkres->title_url)) {
 		if ($linkres->status == 'new') {
 			$redirectUrl = $my_base_url.$my_plikli_base . "/".$linkres->status."/$linkslug/";
-		}else{
+		} else {
 			$redirectUrl = $my_base_url.$my_plikli_base . "/$linkslug/";
-			}
-	}else{
-		$redirectUrl = $delete_referrer;
 		}
-	} 
+	} else {
+		$redirectUrl = $delete_referrer;
+	}
+} 
 		
 	$link_delete = $db->query(" Delete from ".table_links." where link_id =".$linkres->id);
 	$vote_delete = $db->query(" Delete from ".table_votes." where vote_link_id =".$linkres->id);

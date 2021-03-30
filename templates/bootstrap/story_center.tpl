@@ -2,6 +2,16 @@
 ****** Story Wrapper Template *******
 *************************************}
 <!-- story_center.tpl -->
+{* Redwine: The below code is to check if the SMTP testing settings are true. If true, it will display the email message sent to users. *}
+{if $allow_smtp_testing eq '1'  && $smtp_fake_email eq '1' && $notifyStatus neq ''}
+	<span style="font-style: italic;">You are viewing the email message for the purpose of testing SMTP email sending.<br />
+	{$notifyStatus}
+	</span>
+	<br /><hr />
+{/if}
+
+
+{* Redwine: END SMTP testing settings. *}
 {* Redwine: Spam Trigger Module was not working as intended. Fix provided by modifying 8 files.">Spam Trigger Module was not working as intended. https://github.com/Pligg/pligg-cms/commit/2faf855793814f82d7c61a8745a93998c13967e0 *}
 {checkActionsTpl location="tpl_plikli_content_start"}
 {$the_story}
@@ -127,4 +137,3 @@ var story_link="{$story_url}";
 	{checkActionsTpl location="tpl_plikli_story_tab_end_content"}
 </div>
 <!--/story_center.tpl -->
-

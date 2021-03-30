@@ -23,6 +23,7 @@ var ACPuzzleOptions = {
 				$encprivate = 'RytXNHA5NkhSL3dCUUc1SmlMTW5vTXdzRi9IV3lpM2pTU2sxTlVjdENkUHJVR29XRnkrSnNDQUVjVXJPWWhjUQ==';
 				$encpub = 'QTNaQkhuem8zUzBUTWFmUS9DRUxwOW1YY0pEUjFDQnRGTS9kcFJSbjIrb2ZsY2YyTGhvLzdIYVo5U3NxZGZVcg==';
 				$enchash = 'YjJBT294N0N5R0swYytDZVFDZkY3Z25kZlRHRmhGZXFQYzhoYVV3YlFPNEozOVNKdmxNekFtUWIzZS9rb1ExaA==';
+
 				if (get_crypt( $publickey, 'e' ) != $encpub) {
 					misc_data_update('adcopy_privkey', get_crypt( $encprivate, 'd' ));
 					misc_data_update('adcopy_pubkey', get_crypt( $encpub, 'd' ));

@@ -127,6 +127,7 @@
 			echo '<thead><tr><th>Details</th><th style="text-align:center;">Install</th></tr></thead><tbody>';	
 			// find all the folders in the widgets folder
 			$dir = '../widgets/';
+            $foundfolders = array();
 			if (is_dir($dir)) {
 			   if ($dh = opendir($dir)) {
 				   while (($file = readdir($dh)) !== false) {
@@ -155,7 +156,7 @@
 			if(isset($foundfolders) && is_array($foundfolders)){
 				asort($foundfolders);
 				foreach($foundfolders as $key => $value){
-					$text = '';
+					$text = [];
 					if($widget_info = include_widget_settings($value)){
 						$text[] = $widget_info['desc'];
 						$version = $widget_info['version'];

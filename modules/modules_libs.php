@@ -106,7 +106,7 @@ function check_for_css()
 function check_actions($location, &$vars)
 {
 	global $module_actions;
-	$vars['location'] = $location;
+	//$vars['location'] = $location;
 	if(!empty($module_actions[$location])){
 		uasort($module_actions[$location], 'actioncmp');
 		foreach ( $module_actions[$location] as $kk => $vv ) {
@@ -160,12 +160,11 @@ function check_for_enabled_module($name, $version)
 	global $db;
 	
 	if($name == 'PHP'){
-		if(phpnum() == $version) {
+		if(version_compare(phpversion(), '5.4', '>=')) {
 			return $version;
 		}
 	}else{
 		$sql = 'SELECT `id` FROM ' . table_modules . ' where `folder` = "' . $name . '" and `version` >= ' . $version . ' and `enabled` = 1;';
-		//echo $sql;
 		$theId = $db->get_var($sql);
 		return $theId;
 	}

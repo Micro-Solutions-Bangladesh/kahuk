@@ -116,7 +116,7 @@
 									<tr>
 										<td>
 											<a href="{$profileURL}"><img src="{$friend_avatar}" style="text-decoration:none;border:0;"/></a>
-											<a href="{$profileURL}">{$myfriend.user_login}</a>
+											<a href="{$profileURL}">{$myfriend.user_login}</a> {checkActionsTpl location="tpl_plikli_profile_friend_following"}
 										</td>
 										{if $user_authenticated eq true && $myfriend.is_mutual eq 'mutual'}
 											<td style="text-align:center">

@@ -52,7 +52,7 @@ if ($current_user->authenticated == true) {
 		$Story_Content_Tags_To_Allow = Story_Content_Tags_To_Allow_Normal;
 	}
 	$main_smarty->assign('Story_Content_Tags_To_Allow', htmlspecialchars($Story_Content_Tags_To_Allow));
-	define(Story_Content_Tags_To_Allow, htmlspecialchars($Story_Content_Tags_To_Allow));
+	define('Story_Content_Tags_To_Allow', htmlspecialchars($Story_Content_Tags_To_Allow));
 	$current_user_level = $current_user->user_level; /* Redwine: user_level is not part oof the $current_user array when user is not auhtenticated (logged in), hence this variable to be used on line 74. otherwise, generating a Notice in case user is not authenticated. */
 }else{
 	$main_smarty->assign('user_level', "");
@@ -542,7 +542,7 @@ if(time() >= strtotime($check_for_update)) {
 
 $res_update_mod=$db->get_results('SELECT folder from ' . table_modules . ' where latest_version>version order by weight asc;');
 $num_update_mod=0;
-if(count($res_update_mod)>0){
+if($res_update_mod) {
 foreach($res_update_mod as $modules_folders){
 	if (file_exists(mnmmodules . $modules_folders->folder))
 			$num_update_mod++;
@@ -561,7 +561,7 @@ $main_smarty->assign('un_no_module_update_require', $data_for_update_uninstall_m
 
 function update_module_update_date($update_new_date){
 	$date = strtotime($update_new_date);
-	$date = strtotime("+7 day", $date);
+	$date = strtotime("+1 day", $date);
 	misc_data_update('modules_update_date',date('Y/m/d', $date));
 }
 

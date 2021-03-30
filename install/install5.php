@@ -84,25 +84,11 @@ if (!$errors) {
 		}
 	}
 	
-	// Add user IP address to approved IP list, so they are never blocked for bad logins
-	function get_ip_address() {
-		foreach (array('HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED', 'HTTP_X_CLUSTER_CLIENT_IP', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED', 'REMOTE_ADDR') as $key) {
-			if (array_key_exists($key, $_SERVER) === true) {
-				foreach (explode(',', $_SERVER[$key]) as $ip) {
-					if (filter_var($ip, FILTER_VALIDATE_IP) !== false) {
-						return $ip;
-					}
-				}
-			}
-		}
-	}
 	$approvedips = '../logs/approvedips.log';
 	if (file_exists($approvedips)) {
 		$user_ip = get_ip_address();
 		if ($user_ip){
-			$filedata = "$user_ip \n";
-			// print $filedata;
-			// echo 'IP: '.get_ip_address();
+			$filedata = "$user_ip\n";
 			
 			// Write to the approvedips log file
 			$ip_file = fopen($approvedips, "w");
@@ -124,11 +110,48 @@ if (!$errors) {
 	<div class="donext" style="direction:'.$site_direction.'"><ol>
 		' . $lang['WhatToDoList'] . '
 	</ol></div>';
-	
+
 	if ($_POST['sitetitle'] != ''){
 		// Change the site title (PLIKLI_Visual_Name) in the language file
-		
 	}
+    
+    $url = 'https://plikli.com/upgrade/cms.php';
+    $userips = $_SERVER['SERVER_ADDR'];
+    $fields = array(
+        'status'   => 'install',
+        'mysqlserver'   => $_SESSION['mysqlserver'],
+        'mysqlclient'   => CheckmysqlClientVersion(),
+        'myphp'         => phpversion(),
+        'mycms'         => 'Plikli',
+        'myversion'     => $lang['plikli_version'],
+        'userhost'      => urlencode($my_base_url),
+        'userdomain'    => urlencode($my_plikli_base),
+        'userips'       => urlencode(get_ip_address()),
+        'date'          => strtotime(date('Y-m-d H:i:s'))
+    );
+
+    foreach($fields as $key=>$value) { $fields_string .= $key.'='.$value.'&'; }
+    rtrim($fields_string, '&');
+    
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+    curl_setopt($ch,CURLOPT_POST, count($fields));
+    curl_setopt($ch,CURLOPT_POSTFIELDS, $fields_string);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+
+    $result = curl_exec($ch);
+    if (curl_errno($ch)) {
+        return;
+    } else {
+        $resultStatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        if ($resultStatus == 200) {
+
+        } else {
+            return;
+        }
+    }
+    curl_close($ch);
 }
 
 if (isset($errors)) {
@@ -137,17 +160,7 @@ if (isset($errors)) {
 }
 
 echo $output;
-if ($_SERVER['SERVER_NAME'] == 'localhost') {
-	echo file_get_contents("https://www.plikli.com/upgrade/congrats-installation-done.html");
-}else{
-	$url = "https://www.plikli.com/upgrade/congrats-installation-done.html";
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_URL, $url);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-	$data = curl_exec($ch);
-	curl_close($ch);
-	echo $data;
-}
+
 echo '</ul></div></fieldset><br />';
 
 echo '</div>';

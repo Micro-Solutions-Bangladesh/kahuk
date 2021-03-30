@@ -67,4 +67,4 @@
 		});
 		
 	{/literal}
-	</script>
+</script>

@@ -15,7 +15,7 @@ function submit_list_form(){
 		$('.enabled_disable:checked').each(function(i){
 			usernames += $(this).attr("usernameval")+", ";
 		});
-		if(confirm("Are you sure that you want to killspam these users: "+usernames)){
+		if(confirm("CAUTION: Using killspam will change the user's status to sapmmer and deletes all his activity (submissions, coments, groups, etc and blacklists all the domains of the stories submitted! If you want to mark A PARTICULAR COMMENT, use the gear that appears on the right side of the comment and select \"Delete\" OR from the Comments admin page, select Moderated or Discard\r\rAre you sure that you want to killspam these users: "+usernames)){
         
 		} else {
 			return false;
@@ -153,7 +153,7 @@ function validate_all_user_action(){
 			<tr {if $template_comments[id].comment_status=='moderated'}class="tr_moderated"{/if}>
 				<td style="text-align:center;"><input type="checkbox" name="comment[{$template_comments[id].comment_id}]" class="enabled_disable"  value="1" usernameval="{$template_comments[id].comment_author}"/></td>
 				{checkActionsTpl location="tpl_plikli_admin_comments_td_start"}
-				<td><a href="{$my_base_url}{$my_plikli_base}/admin/admin_users.php?mode=view&user={$template_comments[id].comment_author}" title="{$template_comments[id].comment_author}'s Profile" id="comment-{$template_comments[id].comment_id}-author">{$template_comments[id].comment_author}</a></td>
+				<td><a href="{$my_base_url}{$my_plikli_base}/admin/admin_users.php?mode=view&user={$template_comments[id].comment_author}" title="{$template_comments[id].comment_author}'s Profile" id="comment-{$template_comments[id].comment_id}-author">{$template_comments[id].comment_author}</a> {checkActionsTpl location="tpl_plikli_admin_comments_extra"}</td>
 				<td style="text-align:justify;">
 					<a href="{$my_base_url}{$my_plikli_base}/edit.php?id={$template_comments[id].comment_link_id}&commentid={$template_comments[id].comment_id}"><i class="fa fa-edit" title="{#PLIKLI_Visual_AdminPanel_Page_Edit#}" alt="{#PLIKLI_Visual_AdminPanel_Page_Edit#}"></i></a>
 					<a href="{$my_base_url}{$my_plikli_base}/story.php?id={$template_comments[id].comment_link_id}#c{$template_comments[id].comment_id}" title="{$template_comments[id].comment_content_long|truncate:50:"...":true}">{$template_comments[id].comment_content}</a>

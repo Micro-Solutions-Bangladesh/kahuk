@@ -1,6 +1,6 @@
 <?php
 // header
-	$lang['plikli_version'] = '4.1.0';
+	$lang['plikli_version'] = '4.1.5';
 	$lang['installer'] = 'Installer';
 	$lang['Welcome'] = 'Välkommen';
 	$lang['Install'] = 'Install';

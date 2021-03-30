@@ -1,70 +1,19 @@
 <?php
 session_start();
-//include('../config.php');
+
 include('db-mysqli.php');
-echo '<style type="text/css">
-h2 {
-margin:0 0 5px 0;
-line-height:30px;
-}
-.language_list li {
-display:inline-block;
-clear:both;
-margin:0 0 8px 0;
-text-align:left;
-padding:3px 3px 2px 10px;
-}
-.language_list {
-margin:0;
-padding:0;
-}
-.well {
-background-color: #0073AA;
-border:none;
-}
-fieldset {
-width:100%;
--webkit-border-radius: 8px;
--moz-border-radius: 8px;
-border-radius: 8px;
-background-color: #0073AA;
-color:#ffffff;
--webkit-box-shadow: 7px 7px 5px 0px rgba(50, 50, 50, 0.75);
--moz-box-shadow:    7px 7px 5px 0px rgba(50, 50, 50, 0.75);
-box-shadow:         7px 7px 5px 0px rgba(50, 50, 50, 0.75);
-padding-bottom: 10px;
-}
-legend {
-width: auto;
-background: #FF9;
-color:#000000;
-font-weight:bold;
-border: solid 1px black;
--webkit-border-radius: 8px;
--moz-border-radius: 8px;
-border-radius: 8px;
-padding: 6px;
-font-size: 0.9em;
-}
-.iconalign {vertical-align: bottom;}
-.alert-danger, .alert-error {
-background-color: #FF0000;
-border-color: #F4A2AD;
-color: #ffffff;
-margin: 0 10px 0 10px;
-padding:5px;
-}
-li{margin-left:30px;}
-a:link, a:hover, a:visited, a:active{color:#000000}
-.btn-primary, btn {margin-left:10px}
-.warn-delete{color:#ffe000;font-weight:bold}
-</style>';
+
+$warnings_alter_table = array();
+$warnings = array();
+$warnings_rename = array();
 
 //get the name of the directory from where the upgrade is running.
 $arr_script = explode("/", $_SERVER['SCRIPT_NAME']);
 $upgrade_folder = $arr_script[1];
 
-// ********************************
+$notok = 'notok.png';
+$ok = 'ok.png';
+
 /**********************************
 Redwine: checking for the MySQL Server version. If it is older than 5.0.3, then `link_url` varchar will be the maximum of 255; otherwise, we set it to 512 to accommodate long urlencoded.
 **********************************/
@@ -73,7 +22,7 @@ $replacement = '';
 $mysqlServerVersion = $handle->server_info;
 $mysqlServerVersion = preg_replace($pattern, $replacement, $mysqlServerVersion);
 if (strpos($mysqlServerVersion, '-') > 0){ 
-$mysqlServerVersion = strstr($mysqlServerVersion, '-', true);
+	$mysqlServerVersion = strstr($mysqlServerVersion, '-', true);
 }else{
 	$mysqlServerVersion = $mysqlServerVersion;
 }
@@ -84,32 +33,240 @@ if ($mysqlServerVersion < '5.0.3') {
 	$urllength = '512';
 }
 
+/* 
+ALTER the database collation and character set
+*/
+echo '<fieldset><legend>Alter DATABASE</legend><ul>';
+$sql_alter_DB = $handle->query("ALTER DATABASE '" . EZSQL_DB_NAME. "' CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;");
+$result = $handle->query($sql_alter_DB);
+if (!$result) {
+    $marks = $notok;
+}else{
+    $marks = $ok;
+}
+echo '<li>Altered DATABASE '.EZSQL_DB_NAME . ' Collation <img src="'.$marks.'" class="iconalign" /></li>';
+echo '</ul></fieldset><br />'; 
 
-$notok = 'notok.png';
-$ok = 'ok.png';
-$warnings = array();
-$warnings_rename = array();
+/* 
+First round, ALTER specific tables to change some columns
+*/
+echo '<fieldset><legend>ALTER specific tables to change some columns</legend><ul>';
+$sql_alter_date = $handle->query("alter table `" . table_prefix . "links` change `link_date` `link_date` timestamp NULL DEFAULT NULL;");
 
-echo '<fieldset><legend>modifying link_url in Links table.</legend><ul>';
-	$sql = "ALTER TABLE  `" . table_prefix."links`  
-	CHANGE  `link_url`  `link_url` VARCHAR( $urllength ) NOT NULL DEFAULT '';";
-	$sql_alter_links - $handle->query($sql);
-	printf("Affected rows (UPDATE): %d\n", $handle->affected_rows);
-	echo '<li>Updated links Table link_url to VARCHAR '.$urllength.'</li>';
-	
+if (!$sql_alter_date) {
+    $marks = $notok;
+}else{
+    $marks = $ok;
+}
+echo '<li>Altered Table '. table_prefix . 'links` changed link_date to NULL DEFAULT NULL <img src="'.$marks.'" class="iconalign" /></li>';
+
+$sql_alter_link_published_date = $handle->query("alter table `" . table_prefix . "links` change `link_published_date` `link_published_date` timestamp NULL DEFAULT NULL;");
+
+if (!$sql_alter_link_published_date) {
+    $marks = $notok;
+}else{
+    $marks = $ok;
+}
+echo '<li>Altered Table '. table_prefix . 'links` changed link_published_date to NULL DEFAULT NULL <img src="'.$marks.'" class="iconalign" /></li>';
+
+$sql_alter_user_lastlogin = $handle->query("alter table `" . table_prefix . "users` change `user_lastlogin` `user_lastlogin` timestamp NULL DEFAULT NULL;");
+
+if (!$sql_alter_user_lastlogin) {
+    $marks = $notok;
+}else{
+    $marks = $ok;
+}
+echo '<li>Altered Table '. table_prefix . 'users` changed user_lastlogin to NULL DEFAULT NULL <img src="'.$marks.'" class="iconalign" /></li>';
+
+$sql_update_link_date = $handle->query("UPDATE `" . table_prefix . "links` set `link_published_date` = NULL WHERE `link_published_date` = '0000-00-00 00:00:00';");
+
+if (!$sql_update_link_date) {
+    $marks = $notok;
+}else{
+    $marks = $ok;
+}
+echo '<li>Updated Table '. table_prefix . 'links` set link_published_date to NULL <img src="'.$marks.'" class="iconalign" /></li>';
+
+$sql_update_user_lastlogin = $handle->query("UPDATE `" . table_prefix . "users` set `user_lastlogin` = NULL WHERE `user_lastlogin` = '0000-00-00 00:00:00';");
+
+if (!$sql_update_user_lastlogin) {
+    $marks = $notok;
+}else{
+    $marks = $ok;
+}
+echo '<li>Updated Table '. table_prefix . 'users` set `user_lastlogin` to NULL <img src="'.$marks.'" class="iconalign" /></li>';
+
+$sql_alter_tag_cache = $handle->query("ALTER TABLE  `" . table_prefix . "tag_cache` ADD PRIMARY KEY(`tag_words`);");
+
+if (!$sql_alter_tag_cache) {
+    $marks = $notok;
+}else{
+    $marks = $ok;
+}
+echo '<li>Altered '.table_prefix . 'tag_cache` table to ADD PRIMARY KEY(`tag_words`) <img src="'.$marks.'" class="iconalign" /></li>';
 echo '</ul></fieldset><br />';
 
+/* 
+Get the tables size to know which one will be processed. We do this because due to the extensive altering of tables and columns and setting indexes, the server timed out when processing large tables.
+So, we automatically process tables with fair sizes and the for the rest, the user has to manually execute the MySQL statements in the phpmyadmin. 
+*/
+$dbs = $handle->query("SELECT CONCAT(GROUP_CONCAT(table_name) , ';' ) AS statement FROM information_schema.tables WHERE table_schema = '" . EZSQL_DB_NAME. "' AND table_name LIKE  '" .table_prefix."%';");
+if (!$dbs) { return -1; }
+$arraytables = $dbs->fetch_array(MYSQLI_ASSOC);
+		$arraytables['statement'] = str_replace(";","",$arraytables['statement']);
+		$mytables = explode(",",$arraytables['statement']);
+$size = 0;
+$TTLsize = 0;
+$not_to_include = array();
+foreach ($mytables as $tname) {
+    $r = $handle->query("SHOW TABLE STATUS FROM ".EZSQL_DB_NAME." LIKE '".$tname."'");
+    $data = $r->fetch_array(MYSQLI_ASSOC);
+    $size = ($data['Index_length'] + $data['Data_length']);
+    $TTLsize += $size; //($data['Index_length'] + $data['Data_length']);
+    if ($size >= 50000000) {
+        $not_to_include[] = $tname;
+    }
+}
+		
+/* 
+We process the tables that are NOT in the array not_to_include
+*/
+echo '<fieldset><legend>Converting all the Tables to utf8mb4_unicode_ci and Engine MyISAM</legend><ul>';
+		foreach ($mytables as $tname) {
+        if (!in_array($tname, $not_to_include)) {
+            $sql_alter_tables = $handle->query("ALTER TABLE  `" . $tname . "` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;");
+			if (!$sql_alter_tables) {
+				$marks = $notok;
+			}else{
+				$marks = $ok;
+			}
+			echo '<li>Converted Table '. $tname . ' TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci and ENGINE = MyISAM <img src="'.$marks.'" class="iconalign" /></li>';
+
+            if ($tname == table_prefix."story_views") {
+				$sql = "ALTER TABLE  `" . $tname . "` ADD PRIMARY KEY(`view_link_id`);";
+				$sql_alter_story_views = $handle->query($sql);
+				if (!$sql_alter_story_views) {
+					$marks = $notok;
+				}else{
+					$marks = $ok;
+				}
+				echo '<li>Altered '.$tname . ' table to ADD PRIMARY KEY(`view_link_id`) <img src="'.$marks.'" class="iconalign" /></li>';
+			}
+            
+            if ($tname == table_prefix."links") {
+                $sql = "ALTER TABLE  `" . table_prefix."links` CHANGE  `link_url`  `link_url` VARCHAR( $urllength ) NOT NULL DEFAULT '';";
+                $sql_alter_links - $handle->query($sql);
+                printf("Affected rows (UPDATE): %d\n", $handle->affected_rows);
+                echo '<li>Updated links Table link_url to VARCHAR '.$urllength.'</li>';
+                
+                $sql = "ALTER TABLE `" . table_prefix."links` DROP INDEX `link_url`, ADD INDEX `link_url` (`link_url`(50)) USING BTREE;";
+				$sql_alter_key_linkurl = $handle->query($sql);
+				if (!$sql_alter_key_linkurl) {
+					$marks = $notok;
+				}else{
+					$marks = $ok;
+				}
+				echo '<li>Altered '.$tname . ' table modified key link_url <img src="'.$marks.'" class="iconalign" /></li>';
+                
+                $sql = "ALTER TABLE `" . table_prefix."links` DROP INDEX `link_title_url`, ADD INDEX `link_title_url` (`link_title_url`(50)) USING BTREE;";
+				$sql_alter_key_linktitleurl = $handle->query($sql);
+				if (!$sql_alter_key_linktitleurl) {
+					$marks = $notok;
+				}else{
+					$marks = $ok;
+				}
+				echo '<li>Altered '.$tname . ' table modified key link_title_url <img src="'.$marks.'" class="iconalign" /></li>';
+			}
+            
+            if ($tname == table_prefix."redirects") {
+                $sql = "ALTER TABLE `" . table_prefix."redirects` DROP INDEX `redirect_old`, ADD INDEX `redirect_old` (`redirect_old`(50)) USING BTREE;";
+				$sql_alter_key_redirect_old = $handle->query($sql);
+				if (!$sql_alter_key_redirect_old) {
+					$marks = $notok;
+				}else{
+					$marks = $ok;
+				}
+				echo '<li>Altered '.$tname . ' table modified key redirect_old <img src="'.$marks.'" class="iconalign" /></li>';
+            }
+            
+            if ($tname == table_prefix."old_urls") {
+                $sql = "ALTER TABLE `" . table_prefix."old_urls` DROP INDEX `old_title_url`, ADD INDEX `old_title_url` (`old_title_url`(50)) USING BTREE;";
+				$sql_alter_key_old_title_url = $handle->query($sql);
+				if (!$sql_alter_key_old_title_url) {
+					$marks = $notok;
+				}else{
+					$marks = $ok;
+				}
+				echo '<li>Altered '.$tname . ' table modified key old_title_url <img src="'.$marks.'" class="iconalign" /></li>';
+            }             
+                
+            if ($tname == table_prefix."comments") {
+                $sql = "ALTER TABLE `" . table_prefix."comments` CHANGE `comment_content` `comment_content` LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;";
+                $sql_alter_comments_content = $handle->query($sql);
+                if (!$sql_alter_comments_content) {
+                    $marks = $notok;
+                }else{
+                    $marks = $ok;
+                }
+                echo '<li>Altered '.$tname . ' table CHANGE `comment_content` type <img src="'.$marks.'" class="iconalign" /></li>';
+        }
+	}else{
+            foreach ($not_to_include as $item) {
+                $warnings_alter_table[] = "ALTER TABLE  `" . table_prefix."links` CHANGE  `link_url`  `link_url` VARCHAR( $urllength ) NOT NULL DEFAULT '';<br />";             
+                
+                if ($item == table_prefix."links") {
+                    $warnings_alter_table[] = "ALTER TABLE  `" . $item . "` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;<br />";
+                    
+                    $warnings_alter_table[] = "ALTER TABLE `" . table_prefix."links` DROP INDEX `link_url`, ADD INDEX `link_url` (`link_url`(50)) USING BTREE;<br />";
+                    
+                    $warnings_alter_table[] = "ALTER TABLE `" . table_prefix."links` DROP INDEX `link_title_url`, ADD INDEX `link_title_url` (`link_title_url`(50)) USING BTREE;<br />";
+	}
+
+                if ($item == table_prefix."story_views") {
+                    $warnings_alter_table[] = "ALTER TABLE  `" . $item . "` ADD PRIMARY KEY(`view_link_id`);<br />";
+                }
+                
+                if ($item == table_prefix."redirects") {
+                    $warnings_alter_table[] = "ALTER TABLE `" . table_prefix."redirects` DROP INDEX `redirect_old`, ADD INDEX `redirect_old` (`redirect_old`(50)) USING BTREE;<br />";
+                }
+	
+                if ($item == table_prefix."old_urls") {
+                    $warnings_alter_table[] = "ALTER TABLE `" . table_prefix."old_urls` DROP INDEX `old_title_url`, ADD INDEX `old_title_url` (`old_title_url`(50)) USING BTREE;<br />";
+                }
+                
+                if ($item == table_prefix."comments") {
+                    $warnings_alter_table[] = "ALTER TABLE `" . table_prefix."comments` CHANGE `comment_content` `comment_content` LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;<br />";
+                }
+            }
+        }
+    }
+echo '</ul></fieldset><br />';
+
+/*
+Work on the config table
+*/
 echo '<fieldset><legend>MODIFICATIONS TO THE CONFIG Table.</legend><ul>';
-	//Inserting new rows 
 	$sql = "INSERT INTO `" . table_prefix."config` (`var_id`, `var_page`, `var_name`, `var_value`, `var_defaultvalue`, `var_optiontext`, `var_title`, `var_desc`, `var_method`, `var_enclosein`)VALUES
-			(NULL, 'Misc', 'validate_password', 'true', 'true', 'true / false', 'Validate user password', 'Validate user password, when registering/password reset, to check if it is safe and not pwned?<br />If you set to true, then a check is done using HIBP API. If the provided password has been pwned, the registration is not submitted until they provide a different password!.<br /><a href=\"https://haveibeenpwned.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Have I Been Pwned?</a>', 'define', '');";
+            (NULL, 'Location Installed', 'allow_smtp_testing', 'false', 'false', 'true / false', 'Allow SMTP Testing?', 'If you want to test email sending on LOCALHOST, using SMTP, set it to true!', 'define', ''),
+            (NULL, 'Location Installed', 'smtp_host', '', '', 'Text', 'SMTP Host', 'Enter the mail host of your domain email account. Check the settings in cPanne -> email account.', 'define', ''),
+            (NULL, 'Location Installed', 'smtp_port', '587', '', 'Text', 'Port number to use.', 'Use this port number for the SMTP testing. Check the settings in cPanne -> email account.', 'define', ''),
+            (NULL, 'Location Installed', 'smtp_pass', '', '', 'Text', 'Enter the domain email account password.', 'Use the password of your domain email account. Check the settings in cPanne -> email account.', 'define', ''),
+            (NULL, 'Location Installed', 'smtp_fake_email', 'false', 'false', 'true / false', 'Want to use a FAKE email?', 'If you want to test the email sending with a fake email address, without actually sending it to a true email, and have the message display on the page, set it to true.<br />The recipient\'s email will be the fake email entered upon creating the account.<br /><strong style=\"color:#ff0000;\">DO NOT SET IT TO TRUE WHEN ON THE PRODUCTION SITE!</strong>', 'define', ''),
+			(NULL, 'Logo', 'Default_Site_OG_Image', '', '', 'Path to the Site OpenGraph og:image', 'OpenGraph og:image', '<strong><u>IMPORTANT: CREATE THE Default</u> location of the Site OpenGraph og:image</strong>.<br />Example:<br />/NAME-OF-IMAGE.(png|JPG)<br />The recommended sizes to use:<br />Use images that are at least 1080 pixels in width for best display on high resolution devices (ratio 1.91:1) Most recommended is 1200 X 630. For square image, at the minimum you should use images that are 600 pixels in width and height (ratio 1:1).<br />Check the link <a href=\"https://developers.facebook.com/docs/sharing/best-practices/#images\" target=\"_blank\">Sharing Best Practices</a>', 'define', ''''),
+			(NULL, 'Logo', 'Default_OG_Image_Width', '1200', '1200', 'Most recommended', 'OpenGraph og:image width', '<strong>IMPORTANT: ENTER THE Default WIDTH of the OpenGraph Image</strong>.<br />Example: 1200<br />', 'define', ''''),
+			(NULL, 'Logo', 'Default_OG_Image_Height', '630', '630', 'Most recommended', 'OpenGraph og:image height', '<strong>IMPORTANT: ENTER THE Default HEIGHT of the OpenGraph Image</strong>.<br />Example: 600<br />', 'define', ''''),
+			(NULL, 'Logo', 'Default_Site_Twitter_Image', '', '', 'Path to the Site Twitter Image', 'Twitter:image', '<strong><u>IMPORTANT: CREATE THE Default</u> location of the Site Twitter Card Image</strong>.<br />Example:<br />/NAME-OF-IMAGE.(png|JPG)<br />The recommended sizes to use:<br />You should not use a generic image such as your website logo, author photo, or other image that spans multiple pages. Images for this Card support an aspect ratio of 2:1 with minimum dimensions of 300x157 or maximum of 4096x4096 pixels. Images must be less than 5MB in size. JPG, PNG, WEBP and GIF formats are supported<br />Check the link <a href=\"https://developer.twitter.com/en/docs/tweets/optimize-with-cards/overview/summary-card-with-large-image\" target=\"_blank\">Summary Card with Large Image</a>', 'define', ''''),
+
+			(NULL, 'Misc', 'validate_password', 'true', 'true', 'true / false', 'Validate user password', 'Validate user password, when registering/password reset, to check if it is safe and not pwned?<br />If you set to true, then a check is done using HIBP API. If the provided password has been pwned, the registration is not submitted until they provide a different password!.<br /><a href=\"https://haveibeenpwned.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Have I Been Pwned?</a>', 'define', ''),
+			(NULL, 'Misc', 'what_is_plikli', 'true', 'true', 'true / false', 'Display What is Plikli in the sidebar?', 'Set it to false if you do not want it to display.<br /><strong>If you want it to display but with your own content, Keep it set to true and edit the language file where the entry is PLIKLI_Visual_What_Is_Plikli and PLIKLI_Visual_What_Is_Plikli_Text under the Sidebar section.<br /><a href=\"../admin/module.php?module=admin_language\" target=\"_blank\" rel=\"noopener noreferrer\">Modify Language</a>', 'normal', ''''),
+            (NULL, 'Template', 'Use_New_Story_Layout', 'false', 'false', 'true / false', 'Use the new Story layout?', 'If you want to use the new Story layout, set this to true.', 'define', '');";
 	$sql_new_config = $handle->query($sql);
 	if (!$sql_new_config) {
 		$marks = $notok;
 	}else{
 		$marks = $ok;
 	}
-	$warnings[] = "Added new settings to the CONFIG Table:<ol><strong>Under Miscellenaeous<li>validate_password with HIBP API</li></ol>";
+	$warnings[] = "Added new settings to the CONFIG Table:<ol>Under Location Installed<li>SMTP settings to test sending email.</li>Under Logo Section<li>Path to the Site OpenGraph Image</li><li>OpenGraph og:image width</li><li>OpenGraph og:image height</li><li>Path to the Site Twitter Image</li><strong>Under Miscellaneous<li>validate_password with HIBP API</li><li>Display or not What is Plikli in the sidebar.</li><li>Under Template Settings, Use the new Story layout?.</li></ol>";
 	printf("Affected rows (INSERT): %d\n", $handle->affected_rows);
 	echo '<li>INSERTED new settings in the CONFIG Table (read the notes at the end of the upgrade process) <img src="'.$marks.'" class="iconalign" /></li>';	
 	
@@ -123,8 +280,41 @@ echo '<fieldset><legend>MODIFICATIONS TO THE CONFIG Table.</legend><ul>';
 	}
 	printf("Affected rows (UPDATE): %d\n", $handle->affected_rows);
 	echo '<li>Updated dblang description <img src="'.$marks.'" class="iconalign" /></li>';
+    
+    // Update Draft description
+	$sql = "UPDATE `" . table_prefix."config` set `var_desc` = 'Set it to true to allow users to save draft articles.<br /><strong>For this feature to work, you have to keep the \"Complete submission on Submit Step 2?\" setting to its default TRUE.</strong>' WHERE `var_name` =  'Allow_Draft';";
+	$sql_draft = $handle->query($sql);
+	if (!$sql_draft) {
+		$marks = $notok;
+	}else{
+		$marks = $ok;
+	}
+	printf("Affected rows (UPDATE): %d\n", $handle->affected_rows);
+	echo '<li>Updated Allow Draft description <img src="'.$marks.'" class="iconalign" /></li>';
+    
+    // Update Scheduled description
+	$sql = "UPDATE `" . table_prefix."config` set `var_desc` = 'Set it to true to allow users to save scheduled articles.<br /><strong>If you set to true, then you MUST install the <u>scheduled_posts</u> Module. AND you have to keep the \"Complete submission on Submit Step 2?\" setting to its default TRUE.</strong>' WHERE `var_name` =  'Allow_Scheduled';";
+	$sql_scheduled = $handle->query($sql);
+	if (!$sql_scheduled) {
+		$marks = $notok;
+	}else{
+		$marks = $ok;
+	}
+	printf("Affected rows (UPDATE): %d\n", $handle->affected_rows);
+	echo '<li>Updated Allow Scheduled description <img src="'.$marks.'" class="iconalign" /></li>';
+
+	// Update Complete submission on Submit Step 2? desc.
+	$sql = "UPDATE `" . table_prefix."config` SET `var_desc` ='If set to false, the user will be presented with a third step where they can preview and submit the story. <br /><strong>HOWEVER, IF YOU HAVE ALLOW DRAFT AND ALLOW SCHEDULED FEATURES SET TO TRUE, THEY WON\'T WORK!</strong>' where `var_name` = 'Submit_Complete_Step2';";
+	$sql_submit_step2 = $handle->query($sql);
+	if (!sql_submit_step2) {
+		$marks = $notok;
+	}else{
+		$marks = $ok;
+	}
+	printf("Affected rows (UPDATE): %d\n", $handle->affected_rows);
+	echo '<li>Updated description of "Complete submission on Submit Step 2" <img src="'.$marks.'" class="iconalign" /></li>';
+
 echo '</ul></fieldset><br />';
-//end work on CONFIG Table
 
 echo '<fieldset><legend>modifying user_password column in Users table.</legend><ul>';
 	$sql = "ALTER TABLE  `" . table_prefix."users`  
@@ -134,7 +324,9 @@ echo '<fieldset><legend>modifying user_password column in Users table.</legend><
 	echo '<li>Updated user_password column in Users table to VARCHAR(80)</li>';
 echo '</ul></fieldset><br />';
 
-//start work on misc_data table, setting all captcha and solvemedia entries
+/* 
+start work on misc_data table
+*/
 echo '<fieldset><legend>Updating the misc_data table. If an entry needs updating it is marked <img src="ok.png" class="iconalign" />; else, it is marked <img src="notok.png" class="iconalign" /></legend><ul>';
 	$sql = "select * from `" . table_prefix."misc_data` where name like '%adcopy%'";
 	$sql_adcopy = $handle->query($sql);
@@ -324,9 +516,10 @@ echo '<fieldset><legend>Updating the misc_data table. If an entry needs updating
 	}
 	echo '<li>'.printf("Affected rows (DELETED reCaptcha data): %d\n", $handle->affected_rows).' <img src="'.$marks.'" class="iconalign" /></li>';
 echo '</ul></fieldset><br />';	
-//end work on misc_data table, setting all captcha and solvemedia entries
 
-//start work on misc_data table
+/* 
+Renaming some values in the misc_data table to work with Plikli
+*/
 echo '<fieldset><legend>Renaming some values in the misc_data table to work with Plikli.</legend><ul>';	
 		// Update CMS version.
 			$sql = "UPDATE `" . table_prefix."misc_data` SET `data` = '". $lang['plikli_version'] ."'  WHERE `name` = 'plikli_version';";
@@ -398,10 +591,11 @@ echo '<fieldset><legend>Renaming some values in the misc_data table to work with
 	}
 	printf("Affected rows (INSERT): %d\n", $handle->affected_rows);
 	echo '<li>Inserted the update URL for Plikli CMS <img src="'.$marks.'" class="iconalign" /></li>';
-		
 echo '</ul></fieldset><br />';
 
-/* Redwine: checking if we have to detect certain settings and modules or not, to give further instructions. */
+/* 
+Redwine: checking if we have to detect certain settings and modules or not, to give further instructions.
+*/
 //get the CMS folder name
 $sql = "SELECT `var_value` FROM `" . table_prefix."config` WHERE `var_name` = '\$my_plikli_base';";
 $sql_get_base_folder = $handle->query($sql);
@@ -511,7 +705,7 @@ $folder_path = $fetched['var_value'];
 			echo '<li>Updated email in the Users table for '.$module['folder'] . ' user <img src="'.$marks.'" class="iconalign" /></li>';
 		}
 		if ($module['folder'] == 'rss_import') {
-			$sql = "ALTER TABLE `" . table_prefix."feed_link` CHANGE `kliqqi_field` `plikli_field` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;";
+			$sql = "ALTER TABLE `" . table_prefix."feed_link` CHANGE `kliqqi_field` `plikli_field` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL;";
 			$sql_alter_feed_link = $handle->query($sql);
 			if (!$sql_alter_feed_link) {
 				$marks = $notok;
@@ -521,10 +715,23 @@ $folder_path = $fetched['var_value'];
 			}
 			printf("Affected rows (ALTERED): %d\n", $handle->affected_rows);
 		}
+		if ($module['folder'] == 'xml_sitemaps') {
+			$sql = "UPDATE `" . table_prefix."config` SET `var_name` = 'XmlSitemaps_Links_navigation' WHERE `var_title` = 'Sitemap links page';";
+			$sql_sitepmap_nav = $handle->query($sql);
+			if (!$sql_sitepmap_nav) {
+				$marks = $notok;
+			}else{
+				$marks = $ok;
+			}
+			printf("Affected rows (UPDATE): %d\n", $handle->affected_rows);
+			echo '<li>Updated variable name for the sitemap navigation for '.$module['folder'] . ' <img src="'.$marks.'" class="iconalign" /></li>';
+		}
 	}
 	echo '</ul></fieldset><br />';	
 
-		// Checking some settings to determine if further manual action is required.
+/* 
+Checking some settings to determine if further manual action is required.
+*/
 	echo '<fieldset><legend>Checking if Allow users to change language is set to 1 and if validate user email is set to true in your config table</legend><ul>';
 		$sql = "SELECT `var_value` FROM `" . table_prefix."config` WHERE `var_name` = 'user_language';";
 		$sql_get_user_language = $handle->query($sql);
@@ -680,7 +887,6 @@ $folder_path = $fetched['var_value'];
 		echo "<br />";
 		$warnings_rename[] = "you have to manually rename the current folder from:<br />". $path . " to " . $_SERVER["DOCUMENT_ROOT"] . "/".$result['var_value'];
 	}
-	
 	echo '</ul></fieldset><br />';
 	
 	//check the CMS version & name 
@@ -786,26 +992,35 @@ echo '<fieldset><legend>Additional Instructions to follow!</legend><div class="a
 		echo $output;
 	}
 echo '</ul></div></fieldset><br />';
+
+echo '<fieldset><legend>Additional Instructions to follow!</legend><div class="alert alert-danger"><ul>';
+	echo '<li><span style="background-color:#ffffff;color:#000000;font-weight:bold;">The upgrade process was successful. PLEASE PAY SPECIAL ATTENTION THE ADDITIONAL INSTRUCTIONS BELOW!</span></li><br />';
+    
+    $output = '';
+	if ($warnings_alter_table) {
+		foreach ($warnings_alter_table as $warning_alter) {
+			$output.="<li>$warning_alter</li><br />";
+		}
+		echo '<div style="padding:5px;background-color: #e69f0d;font-weight:bold;">YOU HAVE TO MANUALLY RUN THE FOLLWOING MYSQL STATEMENTS IN THE PHPMYADMIN<br />'.$output.'</div>';
+	}
+    
+	$output = '';
+	if ($warnings) {
+		foreach ($warnings as $warning) {
+			$output.="<li>$warning</li><br />";
+		}
+		echo $output;
+	}
+echo '</ul></div></fieldset><br />';
+
 echo '<fieldset><legend>Renaming Directories Instructions!</legend><div class="alert alert-danger"><ul>';
 	echo '<li><span style="background-color:#ffffff;color:#000000;font-weight:bold;">The upgrade process was successful. PLEASE PAY SPECIAL ATTENTION THE ADDITIONAL INSTRUCTIONS BELOW!</span></li>';
 	$output = '';
-	if ($warnings) {
+	if ($warnings_rename) {
 		foreach ($warnings_rename as $warning_rename) {
 			$output.="<li>$warning_rename</li><br />";
 		}
 		echo $output;
 	}
-//end of no errors
-if ($_SERVER['SERVER_NAME'] == 'localhost') {
-	echo file_get_contents("https://www.plikli.com/upgrade/congrats-upgrade-done.html");
-}else{
-	$url = "https://www.plikli.com/upgrade/congrats-upgrade-done.html";
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_URL, $url);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-	$data = curl_exec($ch);
-	curl_close($ch);
-	echo $data;
-}
 echo '</ul></div></fieldset><br />';
-?>
+?>      

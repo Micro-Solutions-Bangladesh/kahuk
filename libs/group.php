@@ -30,10 +30,10 @@ function joinGroup($group_id,$privacy)
 	if($privacy != 'public')
 	{
 		$creator_id = get_group_creator($group_id);
-		$to = get_group_user_email($creator_id);
+		$AddAddress = get_group_user_email($creator_id);
 
 		$subject = $main_smarty->get_config_vars('PLIKLI_Visual_Group_Email_Subject');
-		$body = sprintf(  $main_smarty->get_config_vars('PLIKLI_Visual_Group_Email_Body'),
+		$message = sprintf(  $main_smarty->get_config_vars('PLIKLI_Visual_Group_Email_Body'),
 					my_base_url.getmyurl("user", $current_user->user_login),
 					$current_user->user_login,
 					my_base_url.my_plikli_base."/join_group.php?activate=true&group_id=".$group_id."&user_id=".$current_user->user_id,
@@ -41,7 +41,26 @@ function joinGroup($group_id,$privacy)
 		$headers = 'From: ' . $main_smarty->get_config_vars("PLIKLI_PassEmail_From") . "\r\n";
 		$headers .= "Content-type: text/html; charset=utf-8\r\n";
 
-		mail($to, $subject, $body, $headers);
+		/***************************
+		Redwine: if we are testing the smtp email send, WITH A FAKE EMAIL ADDRESS, the SESSION variable will allow us to print the email message when the register_complete.php is loaded, so that the account that is created can be validated and activated.
+		***************************/
+		if (allow_smtp_testing == 1 && smtp_fake_email == 1) {
+			$_SESSION['validationEmail'] = $message;
+		}
+
+		//Redwine: require the file for email sending.
+        require_once('phpmailer/sendEmail.php');
+        
+		if(!$mail->Send())
+		{
+			$errorSending = $main_smarty->get_config_vars('PLIKLI_Visual_Login_Delivery_Failed');
+		}else{
+			$errorSending = $main_smarty->get_config_vars("PLIKLI_PassEmail_SendSuccess");
+			if (allow_smtp_testing == 1 && smtp_fake_email == 1) {
+				$errorSending .= "<br /><hr /><br />$message";
+			}
+		}
+		$_SESSION['errorSending'] = $errorSending;
 	}
 }
 function unjoinGroup($group_id,$privacy)

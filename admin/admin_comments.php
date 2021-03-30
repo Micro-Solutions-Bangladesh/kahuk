@@ -129,8 +129,10 @@ if($canIhaveAccess == 1) {
 			'comment_date' => $dbfiltered->comment_date
 		  );
 		}
-	  }
+		check_actions('comment_extra', $vars);
 	  $main_smarty->assign('template_comments', $template_comments);
+	  }
+	  
 	}
 	
 	// breadcrumbs and page title

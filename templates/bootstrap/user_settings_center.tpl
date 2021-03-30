@@ -137,7 +137,9 @@ function checkBreachedPassword() {
 				</thead>
 				<tbody>
 					{php}
-					if (user_language)
+                    global $main_smarty;
+                    $user_language = $main_smarty->get_template_vars('user_language');
+					if ($user_language)
 					{
 					{/php}
 						{*if count($languages) gt 1*}
@@ -170,7 +172,7 @@ function checkBreachedPassword() {
 					<tr>
 						<td><label>{#PLIKLI_Visual_User_Setting_Categories#}:</label></td>
 						<td>
-						{foreach from=$category item=cat name="cate"}
+						{foreach from=$category item=cat}
 							<input type="checkbox" name="chack[]" value="{$cat.category__auto_id}" {if !in_array($cat.category__auto_id,$user_category)} checked="checked"{/if}>
 							{$cat.category_name}<br/>
 						{/foreach}

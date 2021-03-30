@@ -38,8 +38,9 @@
 	'sql' => "CREATE TABLE IF NOT EXISTS `".table_prefix . "story_views` (
 			  `view_link_id` int(11) NOT NULL DEFAULT '0',
 				  `view_link_count` int(11) NOT NULL DEFAULT '0',
+              PRIMARY KEY (`view_link_id`),
 			  KEY `view_link_id` (`view_link_id`)
-			) ENGINE=MyISAM DEFAULT CHARSET=utf8");
+			) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4");
 	
 		if (get_misc_data('total_views_place')=='') {
 		global $db;

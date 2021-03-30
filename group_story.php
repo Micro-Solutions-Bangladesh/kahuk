@@ -241,6 +241,20 @@ header("Location: $redirect");
 }
 $CSRF->create('edit_group', true, true);
 
+/***************************
+Redwine: if we are testing the smtp email send, WITH A FAKE EMAIL ADDRESS, the SESSION variable will allow us to print the email message when the register_complete.php is loaded, so that the account that is created can be validated and activated.
+***************************/
+if (allow_smtp_testing == 1 && smtp_fake_email == 1) {
+	$main_smarty->assign('groupInvitation', $_SESSION['groupInvitation']);
+	unset($_SESSION['groupInvitation']);
+}
+
+//Redwine: for the private group joining email
+if (allow_smtp_testing == 1 && smtp_fake_email == 1) {
+	$main_smarty->assign('errorSending', $_SESSION['errorSending']);
+	unset($_SESSION['errorSending']);
+}
+
 $main_smarty->assign('tpl_center', $the_template . '/group_story_center');
 $main_smarty->display($the_template . '/plikli.tpl');
 

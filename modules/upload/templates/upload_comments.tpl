@@ -76,7 +76,16 @@ var choose_url = '{#PLIKLI_Upload_Choose_URL#}';
     		{/if}
     	    {/if}
     	    {if strstr($upload_external,'url')}
-		{#PLIKLI_Upload_Link#}: <input type='text' name='upload_urls[]' id='url_{$number}' value='http://' !onchange='submitUploadForm(this.form)'>
+                {php}
+                    //checking the site's protocol
+                    if (strpos(my_base_url, 'https') !== false) { {/php}                
+                        {#PLIKLI_Upload_Link#}: <input type='text' name='upload_urls[]' id='url_{$number}' value='https://' !onchange='submitUploadForm(this.form)'>
+                    {php}
+                        } else { {/php}
+                        {#PLIKLI_Upload_Link#}: <input type='text' name='upload_urls[]' id='url_{$number}' value='http://' !onchange='submitUploadForm(this.form)'>
+                    {php}
+                        }
+                    {/php}
     	    {/if}
 	    {foreach from=$additional_fields item=field key=i}
 	    <br />{$field}{php}if ($this->_vars['mandatory'][$this->_vars['i']+1] > 0) echo "<font color=red>*</font>";{/php}: <input type='text' size='57' name='field{php}echo $this->_vars['i']+1;{/php}' {php}if ($this->_vars['mandatory'][$this->_vars['i']+1] > 0) echo "id='mandatory'";{/php} value='{php}echo $values['field'.($this->_vars['i']+1)];{/php}'>

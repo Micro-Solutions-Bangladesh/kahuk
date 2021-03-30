@@ -60,19 +60,19 @@ a:link, a:hover, a:visited, a:active{color:#000000}
 </style>';
 if($language == 'arabic'){
 	include_once('./languages/lang_arabic.php');
-} elseif($language == 'catalan'){
+}elseif($language == 'catalan'){
 	include_once('./languages/lang_catalan.php');
-} elseif($language == 'chinese_simplified'){
+}elseif($language == 'chinese_simplified'){
 	include_once('./languages/lang_chinese_simplified.php');
-} elseif($language == 'french'){
+}elseif($language == 'french'){
 	include_once('./languages/lang_french.php');
-} elseif($language == 'german'){
+}elseif($language == 'german'){
 	include_once('./languages/lang_german.php');
-} elseif($language == 'italian'){
+}elseif($language == 'italian'){
 	include_once('./languages/lang_italian.php');
-} elseif($language == 'russian'){
+}elseif($language == 'russian'){
 	include_once('./languages/lang_russian.php');
-} elseif($language == 'thai'){
+}elseif($language == 'thai'){
 	include_once('./languages/lang_thai.php');
 } elseif($language == 'spanish'){
 	include_once('./languages/lang_spanish.php');
@@ -89,6 +89,11 @@ if($language == 'arabic'){
 if($_GET['language'] == '' && $_GET['step'] == ''){
 	$data = file_get_contents('./languages/language_list_install.html');
 	if(strpos($data, '<!--Plikli Language Select-->') > 0){
+
+if ($protocol == 'http://') {
+    echo '<div class="alert-danger">We detected that the protocol is '.$protocol.'. If you have or plan on installing an SSL certificate, we recommend that you do so before installing Plikli CMS!<br />You can still proceed with the installation and when you install the SSL certificate, check the help section for the steps you have to follow afterwards.</div>';
+}
+       
 		echo $data;
 	} else {
 	    echo '<fieldset><legend>ATTENTION!</legend><div class="alert-danger">';

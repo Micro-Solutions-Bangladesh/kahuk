@@ -409,7 +409,6 @@ font-size:1.0em;
 padding:2px 10px 0 10px;
 /* Redwine: to prevent long urls from pushing the page to the right. Now the content wraps properly */
 word-wrap:break-word;
-/*margin-left: 73px;*/
 max-width: 720px;
 margin-top: 5px;
 text-align: justify;
@@ -497,8 +496,8 @@ color: #ffffff !important;
 color:#005580;
 cursor:pointer;
 }
-.read_more_article:after {
-content: "...";
+.read_more_article:after {/*
+content: "...";*/
 }
 
 /**************** VOTE ******************/

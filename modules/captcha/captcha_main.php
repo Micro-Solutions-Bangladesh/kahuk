@@ -122,39 +122,39 @@ function captcha_register(&$vars){
 }
 
 function captcha_register_check_errors(&$vars){
-		global $main_smarty, $the_template, $captcha_checked;
-		if ($captcha_checked) return;
-		$captcha_checked = true;
+	global $main_smarty, $the_template, $captcha_checked;
+	if ($captcha_checked) return;
+	$captcha_checked = true;
 
-		$captcha = get_misc_data('captcha_method');
-/*Redwine: Default and only method is solvemedia*/
-		if($captcha == ''){$captcha = 'solvemedia';}
+	$captcha = get_misc_data('captcha_method');
+	/*Redwine: Default and only method is solvemedia*/
+	if($captcha == ''){$captcha = 'solvemedia';}
 
-		if (isset($vars['username'])) {
-			$username = $vars['username'];
-		}else{
-			$username = '';
-		}
-		if (isset($vars['email'])) {
-			$email = $vars['email'];
-		}else{
-			$email = '';
-		}
-		if (isset($vars['password'])) {
-			$password = $vars['password'];
-		}else{
-			$password = '';
-		}
-		$main_smarty->assign('username', $username);
-		$main_smarty->assign('email', $email);
-		$main_smarty->assign('password', $password);
+	if (isset($vars['username'])) {
+		$username = $vars['username'];
+	}else{
+		$username = '';
+	}
+	if (isset($vars['email'])) {
+		$email = $vars['email'];
+	}else{
+		$email = '';
+	}
+	if (isset($vars['password'])) {
+		$password = $vars['password'];
+	}else{
+		$password = '';
+	}
+	$main_smarty->assign('username', $username);
+	$main_smarty->assign('email', $email);
+	$main_smarty->assign('password', $password);
 
-		include_once(captcha_captchas_path . '/' . $captcha . '/main.php');
-		if(captcha_check($vars)){
-		} else {
-			/*Redwine: needed to be able to issue a warning when solvemedia is bypassed*/
-			$vars['error'] = 'register_captcha_error';
-			$vars['error'] = true;
+	include_once(captcha_captchas_path . '/' . $captcha . '/main.php');
+	if(captcha_check($vars)){
+	} else {
+		/*Redwine: needed to be able to issue a warning when solvemedia is bypassed*/
+		$vars['error'] = 'register_captcha_error';
+		$vars['error'] = true;
 		}
 }
 ?>

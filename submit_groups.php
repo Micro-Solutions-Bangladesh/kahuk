@@ -120,11 +120,7 @@ if(enable_group == "true" && (group_submit_level == $current_user_level || group
 		
 		if(isset($_POST['group_mailer']))
 		{
-			if(phpnum() == 4) {
-				require_once(mnminclude.'class.phpmailer4.php');
-			} else {
-				require_once(mnminclude.'class.phpmailer5.php');
-			}
+						
 			if(isset($_POST['group_mailer']))
 			{
 				Global $db,$current_user;
@@ -142,27 +138,25 @@ if(enable_group == "true" && (group_submit_level == $current_user_level || group
 				
 				foreach ($v1 as $t)
 				{
-					/* Redwine: the two lines below are useless. */
-					//$str='';
-					//$from = "email@example.com";
 					$subject = $main_smarty->get_config_vars('PLIKLI_InvitationEmail_Subject');
-					$to = $t;
+					$AddAddress = $t;
 					
 					$message = sprintf($main_smarty->get_config_vars('PLIKLI_InvitationEmail_Message'),"<a href='".my_base_url.my_plikli_base."/group_story.php?id=".$in_id."'>".$group_name."</a>","<a href='".my_base_url.my_plikli_base."/user.php?login=".$username."'>".$username."</a>");
 					
-					//echo $to.":".$site_mail.":".$subject."$message<br/>";
 					/* Redwine: the $mail->From = $site_mail is wrong, because $site_mail is defined nowhere! We must set it to the value defined in the language file. The same applies to $mail->AddReplyTo */
-					$mail = new PHPMailer();
-					$mail->From = $main_smarty->get_config_vars('PLIKLI_PassEmail_From');
-					$mail->FromName = $main_smarty->get_config_vars('PLIKLI_PassEmail_Name');
-					$mail->AddAddress($to);
-					$mail->AddReplyTo($main_smarty->get_config_vars('PLIKLI_PassEmail_From'));
-					$mail->IsHTML(true);
-					$mail->Subject = $subject;
-					$mail->Body = $message;
-					$mail->CharSet = 'utf-8';
-					$mail->Send();
+					
+					//Redwine: require the file for email sending.
+                    require_once('libs/phpmailer/sendEmail.php');
+                    
+					if(!$mail->Send())
+					{
+						$errors .= $main_smarty->get_config_vars('PLIKLI_Visual_Login_Delivery_Failed'). " To: $AddAddress<br />";
+					}else{
+						$errors .= $main_smarty->get_config_vars("PLIKLI_Visual_Group_Email_Invitation")." To: $AddAddress<br /><hr />$message";
+					}
 				}
+                //Redwine: this will print the message on the page, if allow smtp is set to true.
+				$_SESSION['groupInvitation'] = $errors;
 			}
 		}
 		if($result)

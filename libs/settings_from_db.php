@@ -20,9 +20,11 @@ if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
 	foreach($usersql as $row) {
 		$value = $row->var_value;
 		if ($row->var_method == "normal"){
+			/*Redwine: the var_method normal are only assigned a smarty varibale. SEE NOTE AT THE BOTTOM OF THE FILE. ACCESSIBLE FROM EVERY PAGE / FILE.*/
 			$plikli_vars[$row->var_name] = $value;
 			if ($main_smarty) $main_smarty->assign(str_replace("$","",$row->var_name), $value);
 		}elseif ($row->var_method == "define"){
+			/*Redwine: all the var_method define are assigned a smarty variable and defined as well. ACCESSIBLE FROM EVERY PAGE / FILE.*/
 			if($row->var_name != 'table_prefix'){
 				$thenewval = $value;
 				if($row->var_enclosein == ""){
@@ -45,10 +47,20 @@ if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
 	}
 	$db->cache_queries = false;
 
-// if you have a better way of doing this, please let us know
-// other than converting these to a "define" which we will eventually do
-
 define('StorySummary_ContentTruncate', maxSummaryLength);
+
+/*
+	*Redwine: the below variable settings are taken from the config table with var_method = normal
+	* with the exception of"
+	* $my_base_url
+	* $my_plikli_base
+	* $dblang
+	* $language
+	* that are set in /settings.php
+	* THESE VARIABLES ARE ACCESSIBLE FROM EVERY PAGE / FILE.
+	* THESE VARIABLES ARE ONLY ACCESSIBLE AS VARIABLES AND NOT AS DEFINED.
+*/
+$maintenance_mode = $plikli_vars['$maintenance_mode'] ;
 $URLMethod = $plikli_vars['$URLMethod'] ;
 $trackbackURL = $plikli_vars['$trackbackURL'];
 $tags_min_pts = $plikli_vars['$tags_min_pts'];
@@ -63,5 +75,4 @@ $anon_karma = $plikli_vars['$anon_karma'];
 $page_size = $plikli_vars['$page_size'];
 $top_users_size = $plikli_vars['$top_users_size'];
 $thetemp = $plikli_vars['$thetemp'];
-
-?>
+$user_language = $plikli_vars['user_language'];

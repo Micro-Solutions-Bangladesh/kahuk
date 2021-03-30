@@ -148,6 +148,7 @@ if($canIhaveAccess == 1) {
 				);
 			}
 		}
+		check_actions('link_extra', $vars);
 		$main_smarty->assign('template_stories', $template_stories);
 	}
 
@@ -179,7 +180,7 @@ if($canIhaveAccess == 1) {
 							check_actions('link_published', $vars);
 						}
 						elseif ($admin_acction == "new") {
-							$db->query('UPDATE `' . table_links . '` SET `link_status` = "new", link_published_date=0 WHERE `link_id` = "'.$key.'"');
+							$db->query('UPDATE `' . table_links . '` SET `link_status` = "new", link_published_date=NULL WHERE `link_id` = "'.$key.'"');
 						}
 						elseif ($admin_acction == "moderated") {
 							$db->query('UPDATE `' . table_links . '` SET `link_status` = "moderated", link_published_date=0 WHERE `link_id` = "'.$key.'"');

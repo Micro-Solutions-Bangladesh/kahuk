@@ -100,4 +100,3 @@ $main_smarty->assign('tpl_center', '/admin/page_edit');
 $main_smarty->display('/admin/admin.tpl');	
 
 ?>
-

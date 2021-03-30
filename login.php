@@ -28,7 +28,7 @@ $_REQUEST = $_POST = $sanitezedPOST;
 
 $sanitezedGET = array();
 foreach ($_GET as $key => $value) {
-			$sanitezedGET[$key] = filter_var($value, FILTER_SANITIZE_STRING);
+		$sanitezedGET[$key] = filter_var($value, FILTER_SANITIZE_STRING);
 }
 $_GET = $sanitezedGET;
 
@@ -77,43 +77,45 @@ if( (isset($_POST["processlogin"]) && is_numeric($_POST["processlogin"])) || (is
 		require_once(mnminclude.'check_behind_proxy.php');
 		$lastip=check_ip_behind_proxy();
 		$login=$db->get_row("SELECT *, UNIX_TIMESTAMP()-UNIX_TIMESTAMP(login_time) AS time FROM " . table_login_attempts . " WHERE login_ip='$lastip'");
-		//if (!empty($login)) {
-			if ($login->login_id)
+		
+		
+		if ($login->login_id)
+		{
+			$login_id = $login->login_id;
+			if ($login->time < 3) $errorMsg=sprintf($main_smarty->get_config_vars('PLIKLI_Visual_Login_Error'),3);
+			elseif ($login->login_count>=3)
 			{
-				$login_id = $login->login_id;
-				if ($login->time < 3) $errorMsg=sprintf($main_smarty->get_config_vars('PLIKLI_Visual_Login_Error'),3);
-				elseif ($login->login_count>=3)
-				{
-				if ($login->time < min(60*pow(2,$login->login_count-3),3600))
-					$errorMsg=sprintf($main_smarty->get_config_vars('PLIKLI_Login_Incorrect_Attempts'),$login->login_count,min(60*pow(2,$login->login_count-3),3600)-$login->time);
-				}
+			if ($login->time < min(60*pow(2,$login->login_count-3),3600))
+				$errorMsg=sprintf($main_smarty->get_config_vars('PLIKLI_Login_Incorrect_Attempts'),$login->login_count,min(60*pow(2,$login->login_count-3),3600)-$login->time);
 			}
-			elseif (!is_ip_approved($lastip))
-			{
-				$db->query("INSERT INTO ".table_login_attempts." SET login_username = '$dbusername', login_time=NOW(), login_ip='$lastip'");
-				$login_id = $db->insert_id;
-				if (!$login_id) $errorMsg=sprintf($main_smarty->get_config_vars('PLIKLI_Visual_Login_Error'),3);
-			}
-		//}
+		//Redwine: if no entry in table_login_attempts, we insert one to monitor the login attempts. 
+		}
+		else
+		{
+			$db->query("INSERT INTO ".table_login_attempts." SET login_username = '$dbusername', login_time=NOW(), login_ip='$lastip'");
+			$login_id = $db->insert_id;
+			if (!$login_id) $errorMsg=sprintf($main_smarty->get_config_vars('PLIKLI_Visual_Login_Error'),3);
+		}
+
 		if (!$errorMsg)
 		{
 		    if($current_user->Authenticate($username, $password, $persistent) == false) {
 		    
 		    	$db->query("UPDATE ".table_login_attempts." SET login_username='$dbusername', login_count=login_count+1, login_time=NOW() WHERE login_id=".$login_id);
 
-			$user=$db->get_row("SELECT * FROM " . table_users . " WHERE user_login = '$username' or user_email= '$username'");
-			if (plikli_validate() && $user->user_lastlogin == "0000-00-00 00:00:00") {
-				$errorMsg=$main_smarty->get_config_vars('PLIKLI_Visual_Resend_Email') .
-					"<form method='post'>
-						<div class='input-append notvalidated'>
-							<input type='text' class='col-md-2' name='email'> 
-							<input type='submit' class='btn btn-default' value='Send'>
-							<input type='hidden' name='processlogin' value='5'/>
-						</div>
-					</form>";
-			} else {
-				$errorMsg = $main_smarty->get_config_vars('PLIKLI_Visual_Login_Error');
-		    }
+				$user=$db->get_row("SELECT * FROM " . table_users . " WHERE user_login = '$username' or user_email= '$username'");
+				if (plikli_validate() && $user->user_lastlogin == NULL) {
+					$errorMsg=$main_smarty->get_config_vars('PLIKLI_Visual_Resend_Email') .
+						"<form method='post'>
+							<div class='input-append notvalidated'>
+								<input type='text' class='col-md-2' name='email'> 
+								<input type='submit' class='btn btn-default' value='Send'>
+								<input type='hidden' name='processlogin' value='5'/>
+							</div>
+						</form>";
+				} else {
+					$errorMsg = $main_smarty->get_config_vars('PLIKLI_Visual_Login_Error');
+				}
 		    } else {
 			$sql = "DELETE FROM " . table_login_attempts . " WHERE login_ip='$lastip' ";
 			$db->query($sql);
@@ -125,7 +127,6 @@ if( (isset($_POST["processlogin"]) && is_numeric($_POST["processlogin"])) || (is
 			}
 			
 			define('logindetails', $username . ";" . $password . ";" . $return);
-
 			$vars = '';
 			check_actions('login_success_pre_redirect', $vars);
 
@@ -146,39 +147,34 @@ if( (isset($_POST["processlogin"]) && is_numeric($_POST["processlogin"])) || (is
 			$user = $db->get_row("SELECT * FROM `" . table_users . "` where `user_email` = '".$email."' AND user_level!='Spammer' AND user_enabled=1");
 			if($user){
 				$username = $user->user_login;
-				/*Redwine: we want a string of combined fields that are unknow to other than the Admin, which will be used as an identifier when the user tries to validate and reset the password.*/
-				$combined = $user->user_modification . $user->user_email . $user->user_lastlogin . $user->user_ip . $user->user_lastip . $user->last_reset_request;
+
+				$combined = create_token();
 				//Redwine: we want to use the salt with the function generateHash to strengthen it.
-				$salt = substr(md5(uniqid(rand(), true)), 0, SALT_LENGTH);
+				$salt = substr(md5(uniqid(rand(), true)), 0, 32);
 				//Redwine: saltedlogin is the hashed $combined and that will be saved in the users table and serves as the identifier.
-				$saltedlogin = generateHash($combined, $salt);
-	
-				$to = $user->user_email;
+				$saltedlogin = hash('sha256', $combined);
+				$AddAddress = $user->user_email;
 				$subject = $main_smarty->get_config_vars("PLIKLI_Visual_Name").' '.$main_smarty->get_config_vars("PLIKLI_PassEmail_Subject");
 			
 				$times= time();		
 						
-				$body = sprintf($main_smarty->get_config_vars("PLIKLI_PassEmail_Body"), $salt, $main_smarty->get_config_vars("PLIKLI_Visual_Name")); 
-				$body .="\n \n";
-				$body .= $my_base_url . $my_plikli_base . '/recover.php?id=' .base64_encode($username). '&n=' . $saltedlogin;
+				$message = sprintf($main_smarty->get_config_vars("PLIKLI_PassEmail_Body"), $salt, $main_smarty->get_config_vars("PLIKLI_Visual_Name")); 
+				$message .="\n \n";
+				$message .= $my_base_url . $my_plikli_base . '/recover.php?id=' .urlsafe_base64_encode($username). '&n=' . urlsafe_base64_encode($saltedlogin);
 	
 				$headers = 'From: ' . $main_smarty->get_config_vars("PLIKLI_PassEmail_From") . "\r\n";
 				$headers .= "Content-type: text/html; charset=utf-8\r\n";
-	
-			
-				if(phpnum()>=5)
-				    require("libs/class.phpmailer5.php");
 				
-				$mail = new PHPMailer();
-				$mail->From = $main_smarty->get_config_vars('PLIKLI_PassEmail_From');
-				$mail->FromName = $main_smarty->get_config_vars('PLIKLI_PassEmail_Name');
-				$mail->AddAddress($to);
-				$mail->AddReplyTo($main_smarty->get_config_vars('PLIKLI_PassEmail_From'));
-				$mail->IsHTML(true);
-				$mail->Subject = $subject;
-				$mail->CharSet = 'utf-8';
-				$mail->Body = $body;
+				/***************************
+				Redwine: if we are testing the smtp email send, WITH A FAKE EMAIL ADDRESS, the SESSION variable will allow us to print the email message when the register_complete.php is loaded, so that the account that is created can be validated and activated.
+				***************************/
+				if (allow_smtp_testing == 1 && smtp_fake_email == 1) {
+					$main_smarty->assign('validationEmail', $message);
+				}
 
+				//Redwine: require the file for email sending.
+                require('libs/phpmailer/sendEmail.php');
+                    
 				if(!$mail->Send()) {
 				    $errorMsg = $main_smarty->get_config_vars('PLIKLI_Visual_Login_Delivery_Failed');
 				} else {
@@ -224,7 +220,8 @@ if( (isset($_POST["processlogin"]) && is_numeric($_POST["processlogin"])) || (is
 			} 
 		}
 	}
-
+    
+    /*Redwine: When a user logins and they did not validate their email/registration yet, they get a special message with an input box "Your email is not validated yet. Please enter your email address here to resend confirmation message:" */
 	if($_POST["processlogin"] == 5 && plikli_validate()) { // resend confirmation email
 	    $email = sanitize($db->escape(trim($_POST['email'])),4);
 	    if (check_email($email)){
@@ -235,36 +232,32 @@ if( (isset($_POST["processlogin"]) && is_numeric($_POST["processlogin"])) || (is
 
 				$domain = $main_smarty->get_config_vars('PLIKLI_Visual_Name');			
 				$validation = my_base_url . my_plikli_base . "/validation.php?code=$encode&uid=".urlencode($user->user_login)."&email=".urlencode($_POST['email']);
-				$str = $main_smarty->get_config_vars('PLIKLI_PassEmail_verification_message');
+                /*Redwine: fixed the $str to correctly print the username in the message.*/
+				$str = sprintf($main_smarty->get_config_vars('PLIKLI_PassEmail_verification_message'), $user->user_login, $main_smarty->get_config_vars('PLIKLI_PassEmail_From'));
 				eval('$str = "'.str_replace('"','\"',$str).'";');
 				$message = "$str";
-
-				if(phpnum()>=5)
-					require("libs/class.phpmailer5.php");
-				else
-					require("libs/class.phpmailer4.php");
-				$mail = new PHPMailer();
-				$mail->From = $main_smarty->get_config_vars('PLIKLI_PassEmail_From');
-				$mail->FromName = $main_smarty->get_config_vars('PLIKLI_PassEmail_Name');
-				$mail->AddAddress($_POST['email']);
-				$mail->AddReplyTo($main_smarty->get_config_vars('PLIKLI_PassEmail_From'));
-				$mail->IsHTML(false);
-				$mail->Subject = $main_smarty->get_config_vars('PLIKLI_PassEmail_Subject_verification');
-				$mail->Body = $message;
-				$mail->CharSet = 'utf-8';
-
-#print_r($mail);					
-				if(!$mail->Send())
-					return false;
-
+                $AddAddress = $_POST['email'];
+                $subject = $main_smarty->get_config_vars('PLIKLI_Validate_user_email_Title');
+				
+                //Redwine: require the file for email sending.
+                require('libs/phpmailer/sendEmail.php');
+					
+				if(!$mail->Send()) {
+					$errorMsg = $main_smarty->get_config_vars('PLIKLI_Visual_Login_Delivery_Failed');
+                } else {
+                    $errorMsg = $main_smarty->get_config_vars('PLIKLI_Visual_Email_Sent');
+                    if (allow_smtp_testing == 1 && smtp_fake_email == 1) {
+                        $errorMsg .= "<br /><hr /><br />$message";
+                    }
+                }
 			}
-			$errorMsg = $main_smarty->get_config_vars('PLIKLI_Visual_Email_Sent');
+			
 		}else{
 			$errorMsg = $main_smarty->get_config_vars('PLIKLI_Visual_Register_Error_BadEmail');
 		}
 	}
 }   
-    
+
 // pagename
 define('pagename', 'login'); 
 $main_smarty->assign('pagename', pagename);

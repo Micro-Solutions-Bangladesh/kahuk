@@ -101,6 +101,7 @@ if($plikli_regfrom != ''){
 
 }
 
+//Redwine: the hook below is so far for captcha. can always be used for any other suitable module!
 $vars = '';
 check_actions('register_showform', $vars);
 
@@ -172,11 +173,6 @@ function register_check_errors($username, $email, $password, $password2){
 		if ($vars['password_error'])
 		    $form_password_error[] = $vars['password_error'];
 			$main_smarty->assign('form_password_error', $form_password_error);
-/*Redwine: addded a condition to check for captcha errors because it was not checking and when captcha is not solved, users were returned to the registration page without knowing why!*/
-		if ($vars['register_captcha_error'])
-			$form_captcha_error[] = $vars['register_captcha_error'];
-			$main_smarty->assign('form_captcha_error', $form_captcha_error);
-			
 	}
 
 	if (!empty($error)) return $error;

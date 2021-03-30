@@ -109,8 +109,6 @@ if (!$errors) {
 		$cms_name = $_SESSION['cms_name'];
 
 	echo '<p>'.$lang['UpgradingTables'] . '<ul>';
-
-
 			if ($cms_name == 'pligg_version' && $old_version == '122') {
 				echo "<li>upgrading from Pligg $old_version to Plikli " . $lang['plikli_version'] . "</li></ul></fieldset>";
 				include_once('plikli4-p122.php');
@@ -130,7 +128,44 @@ if (!$errors) {
 			}elseif ($cms_name == 'plikli_version' && $old_version == '400') {
 				echo "<li>upgrading from Plikli $old_version to Plikli " . $lang['plikli_version'] . "</li></ul></fieldset>";
 				include_once('plikli410-plikli400.php');
+			}elseif ($cms_name == 'plikli_version' && $old_version == '410') {
+				echo "<li>upgrading from Plikli $old_version to Plikli " . $lang['plikli_version'] . "</li></ul></fieldset>";
+				include_once('plikli415-plikli410.php');
 			}
+
+    define("mnmmods", __DIR__.'/../modules/');
+    $updMods = array('admin_language' => 'admin_language.zip', 'captcha' => 'captcha.zip');
+
+    foreach ($updMods as $key => $value) {
+        $ch = curl_init();
+        $fp = fopen (mnmmods."$value", 'w+');
+        $ch = curl_init("https://plikli.com/upgrade/$value");
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 50);
+        curl_setopt($ch, CURLOPT_FILE, $fp);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($ch, CURLOPT_ENCODING, "");
+        curl_exec($ch);
+        curl_close($ch);
+        fclose($fp);
+
+        if(filesize(mnmmods."$value") == 0) {
+            echo "<li>" . $key . " module was not downloaded! <a href=\"https://plikli.com/upgrade/$value\">Download $key</a> Module, unzip it to the modules folder.</li>";
+        } else {
+            $zip = new ZipArchive;
+            $res = $zip->open(mnmmods."$value");
+            if ($res === TRUE) {
+              $zip->extractTo(mnmmods."$key/");
+              $zip->close();
+              echo '<li>' .$key. ' module updated!</li>';
+            } else {
+                echo "<li>" . $key . " module was not updated! <a href=\"https://plikli.com/upgrade/$value\">Download $key</a> Module, unzip it to the modules folder.</li>";
+            }
+        }
+        unlink(mnmmods."$value");
+	}
+
 
 		echo '<fieldset><legend>Recalculating Totals, clearing the cache and creating the settings.php file</legend><ul><li>Regenerating the totals table</li>';
 	totals_regenerate();
@@ -154,6 +189,43 @@ if (!$errors) {
     }
 //end of no errors
 
+    $url = 'https://plikli.com/upgrade/cms.php';
+    $userips = $_SERVER['SERVER_ADDR'];
+    $fields = array(
+        'status'   => 'upgrade',
+        'mysqlserver'   => $_SESSION['mysqlserver'],
+        'mysqlclient'   => CheckmysqlClientVersion(),
+        'myphp'         => phpversion(),
+        'mycms'         => $_SESSION['cms_name'],
+        'myversion'     => $_SESSION['old_version'],
+        'userhost'      => urlencode($my_base_url),
+        'userdomain'    => urlencode($my_plikli_base),
+        'userips'       => urlencode(get_ip_address()),
+        'date'          => strtotime(date('Y-m-d H:i:s'))
+    );
+
+    foreach($fields as $key=>$value) { $fields_string .= $key.'='.$value.'&'; }
+    rtrim($fields_string, '&');
+    
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+    curl_setopt($ch,CURLOPT_POST, count($fields));
+    curl_setopt($ch,CURLOPT_POSTFIELDS, $fields_string);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+
+    $result = curl_exec($ch);
+    if (curl_errno($ch)) {
+        return;
+    } else {
+        $resultStatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        if ($resultStatus == 200) {
+
+        } else {
+            return;
+        }
+    }
+    curl_close($ch);
 }
 else {
 	echo DisplayErrors($errors);

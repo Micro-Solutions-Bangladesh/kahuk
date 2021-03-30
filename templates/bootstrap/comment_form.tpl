@@ -5,8 +5,10 @@
 {if $Enable_Comments neq '1'}
 <div class="alert alert-danger">{$disable_Comments_message}</div>
 {else}
+
 <a name="discuss"></a>
 {checkActionsTpl location="tpl_plikli_story_comments_start"}
+
 <form action="" method="post" id="thisform" name="mycomment_form">
 <div class="form-horizontal">
 	<fieldset>

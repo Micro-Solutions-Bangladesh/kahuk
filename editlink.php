@@ -87,42 +87,81 @@ if ($link) {
 			$linkres->id=$link_id = sanitize($_POST['id'], 3);
 			if(!is_numeric($link_id)) die();
 			$linkres->read();
-
+			$org_tags = $linkres->tags;
 			// if notify link submitter is selected
 				if(isset($_POST["notify"])) {
 					if(sanitize($_POST["notify"], 3) == "yes") {
 					$link_author = $db->get_col("SELECT link_author FROM " . table_links . " WHERE link_id=".$theid.";");
 					$user = $db->get_row("SELECT * FROM " . table_users . " WHERE user_id=".$link_author[0].";");
 
-					$to = $user->user_email;
+					$AddAddress = $user->user_email;
 					$subject = $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_Subject');
-					$body = $user->user_login . ", \r\n\r\n" . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_AdminMadeChange') . "\r\n";
-					$body = $body . $my_base_url . getmyurl('story', sanitize($_POST['id'], 3)) . "\r\n\r\n";
+					$message = $user->user_login . ", \r\n\r\n" . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_AdminMadeChange') . "\r\n";
+					$message = $message . $my_base_url . getmyurl('story', sanitize($_POST['id'], 3)) . "\r\n\r\n";
+
+                    if (!is_array($_POST["category"])) {   
 						if ($linkres->category != sanitize($_POST["category"], 3)){
-							$body = $body . $main_smarty->get_config_vars('PLIKLI_Visual_Submit2_Category') . " change\r\n\r\n" . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_PreviousText') . ": " . GetCatName($linkres->category) . "\r\n\r\n" . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_NewText') . ": " . GetCatName(sanitize($_POST["category"], 3)) . "\r\n\r\n";
+							$message = $message . $main_smarty->get_config_vars('PLIKLI_Visual_Submit2_Category') . " change\r\n\r\n" . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_PreviousText') . ": <strong>" . GetCatName($linkres->category) . "</strong>\r\n\r\n" . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_NewText') . ": <strong>" . GetCatName(sanitize($_POST["category"], 3)) . "</strong>\r\n\r\n";
 						}
+                    } else {
+                        //get the originally selected categories.
+                        $previousCats = '';
+                        $count = 0;
+
+                        foreach ($_POST["additionalCats"] as $key => $value) {
+                            $count++;
+                            if ($count == sizeof($_POST["additionalCats"])) {
+                                $previousCats .= "<strong>" . GetCatName($value) . "</strong>";
+                            } else {
+                                $previousCats .= "<strong>" . GetCatName($value) . "</strong>, ";
+                            }
+                        }
+                        //get the new selected categories.
+                        $newCats = '';
+                        $count = 0;
+                        
+                        foreach ($_POST["category"] as $key => $value) {
+                            $count++;
+                            if ($count == sizeof($_POST["category"])) {
+                                $newCats .= "<strong>" . GetCatName($value). "</strong>";
+                            } else {
+                                $newCats .= "<strong>" . GetCatName($value) . "</strong>, ";
+                            }
+                        }
+                        $message = $message . $main_smarty->get_config_vars('PLIKLI_Visual_Submit2_Category') . " change\r\n\r\n" . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_PreviousText') . ": " . $previousCats . "\r\n\r\n" . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_NewText') . ": " . $newCats . "\r\n\r\n";
+                    }
 						if ($linkres->title != sanitize(trim($_POST["title"]), 4, $Story_Content_Tags_To_Allow)){
-							$body = $body . $main_smarty->get_config_vars('PLIKLI_Visual_Submit2_Title') . " change\r\n\r\n" . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_PreviousText') . ": " . $linkres->title . "\r\n\r\n" . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_NewText') . ": " . sanitize(trim($_POST["title"]), 3) . "\r\n\r\n";
+							$message = $message . $main_smarty->get_config_vars('PLIKLI_Visual_Submit2_Title') . " change\r\n\r\n" . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_PreviousText') . ": " . $linkres->title . "\r\n\r\n" . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_NewText') . ": " . sanitize(trim($_POST["title"]), 3) . "\r\n\r\n";
 						}      
 					
 						if ($linkres->content != close_tags(sanitize($_POST["bodytext"], 4, $Story_Content_Tags_To_Allow))) {
-							$body = $body . $main_smarty->get_config_vars('PLIKLI_Visual_Submit2_Description') . " change\r\n\r\n" . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_PreviousText') . ": " . $linkres->content . "\r\n\r\n" . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_NewText') . ": " . close_tags(sanitize($_POST["bodytext"], 3)) . "\r\n\r\n";
+							$message = $message . $main_smarty->get_config_vars('PLIKLI_Visual_Submit2_Description') . " change\r\n\r\n" . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_PreviousText') . ": " . $linkres->content . "\r\n\r\n" . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_NewText') . ": " . close_tags(sanitize($_POST["bodytext"], 3)) . "\r\n\r\n";
 						}
 						if ($linkres->tags != tags_normalize_string(sanitize($_POST['tags'], 3))){
-							$body = $body . $main_smarty->get_config_vars('PLIKLI_Visual_Submit2_Tags') . " change\r\n\r\n" . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_PreviousText') . ": " . $linkres->tags . "\r\n\r\n" . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_NewText') . ": " . tags_normalize_string(sanitize($_POST['tags'], 3)) . "\r\n\r\n";
+							$message = $message . $main_smarty->get_config_vars('PLIKLI_Visual_Submit2_Tags') . " change\r\n\r\n" . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_PreviousText') . ": " . $linkres->tags . "\r\n\r\n" . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_NewText') . ": " . tags_normalize_string(sanitize($_POST['tags'], 3)) . "\r\n\r\n";
 						}
-					$body = $body . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_ReasonText') . ": ";
+					$message = $message . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_ReasonText') . ": ";
 						if (sanitize($_POST["reason"], 3) == "other") {
-							$body = $body . sanitize($_POST["otherreason"], 3);
+							$message = $message . sanitize($_POST["otherreason"], 3);
 						}else{
-							$body = $body . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Reason_' . sanitize($_POST["reason"], 3));
+							$message = $message . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Reason_' . sanitize($_POST["reason"], 3));
 						}
+
 					$headers = 'From: ' . $main_smarty->get_config_vars("PLIKLI_PassEmail_From") . "\r\n";
 					$headers .= "Content-type: text/plain; charset=utf-8\r\n";
-						if (!mail($to, $subject, $body, $headers)) {
-						echo '<br /><div class="error">'.$main_smarty->get_config_vars('PLIKLI_PassEmail_SendFail').'</div>';
-						die;
+					
+					//Redwine: require the file for email sending.
+                    require('libs/phpmailer/sendEmail.php');
+
+					if(!$mail->Send()) {
+						$notifyStatus = $main_smarty->get_config_vars('PLIKLI_Visual_Login_Delivery_Failed');
+					} else {
+						$notifyStatus = $main_smarty->get_config_vars("PLIKLI_PassEmail_SendSuccess");
+						if (allow_smtp_testing == 1 && smtp_fake_email == 1) {
+							$notifyStatus .= "<br /><hr /><br />$message";
+						}
 					}
+					$_SESSION['notifyStatus'] = $notifyStatus;
 				}
 			}
 
@@ -164,8 +203,8 @@ if ($link) {
 					//$linkres->link_summary = close_tags(str_replace("\n", "<br />", $linkres->link_summary));
 				}
 			}
-/*** Redwine: Roles and permissions and Groups fixes. To add the ability to submit to a group or to change from one group to another ***/
-//get link_group_id
+            /*** Redwine: Roles and permissions and Groups fixes. To add the ability to submit to a group or to change from one group to another ***/
+            //get link_group_id
 			if((isset($_POST['link_group_id']))&&($_POST['link_group_id']!='')){
 				$linkres->link_group_id = intval($_POST['link_group_id']);
 				}else{
@@ -231,7 +270,7 @@ if ($link) {
 					$linkres->status = 'discard';
 					$story_url = getmyurl($linkres->status, '');
 			}
-			tags_insert_string($linkres->id, $dblang, $linkres->tags);
+			tags_insert_edit($linkres->id, $dblang, $linkres->tags, 0, $org_tags);
 			$linkres->store();
 				$story_url = $my_base_url.str_replace("&amp;", "&", $story_url);
 			header('Location: ' . $story_url);
@@ -285,7 +324,7 @@ if ($link) {
 /*** Redwine: Roles and permissions and Groups fixes. To add the ability to submit to a group or to change from one group to another ***/
 $main_smarty->assign('link_group', $link_group);
 			if(isset($trackback)){$main_smarty->assign('submit_trackback', $trackback);}
-			$main_smarty->assign('SubmitSummary_Allow_Edit', SubmitSummary_Allow_Edit);
+			//$main_smarty->assign('SubmitSummary_Allow_Edit', SubmitSummary_Allow_Edit);
 			$main_smarty->assign('StorySummary_ContentTruncate', StorySummary_ContentTruncate);
 			$main_smarty->assign('submit_summary', $link_summary);			
 			$main_smarty->assign('submit_link_field1', $linkres->link_field1);

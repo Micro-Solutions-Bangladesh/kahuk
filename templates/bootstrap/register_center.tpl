@@ -40,6 +40,16 @@ function checkBreachedPassword() {
 }
 </script>
 {/literal}
+	{if $register_captcha_error neq ''}
+		<div class="alert alert-warning">
+			{$register_captcha_error}
+		</div>
+	{/if}
+	{if $errorMsg neq ''}
+		<div class="alert alert-warning">
+			{$errorMsg}
+		</div>
+	{/if}
 <div class="row register-wrapper">
 	<div class="col-md-4 register-left">
 		{checkActionsTpl location="tpl_plikli_register_start"}
@@ -107,7 +117,7 @@ function checkBreachedPassword() {
 				<input type="hidden" name="regfrom" value="full" />
 			</div>
 {*addded a hook to check for captcha errors because it was not checking and when captcha is not solved, users were returned to the registration page without knowing why*}
-			{checkActionsTpl location="tpl_plikli_submit_error_3"}
+			{*checkActionsTpl location="tpl_plikli_submit_error_3"*}
 		</form>
 	</div><!--/.register-left -->
 	<div class="col-md-8 register-right">

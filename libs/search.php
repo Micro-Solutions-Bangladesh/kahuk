@@ -279,7 +279,7 @@ class Search {
 			$keywords = array();			
 			if( substr( $this->searchTerm, 1, 1 ) == '"'  && substr( $this->searchTerm, strlen( $this->searchTerm )-1 , 1 ) == '"' ) {
 				$literal = true;
-				$addparam = ' COLLATE utf8_general_ci ';
+				$addparam = ' COLLATE utf8mb4_unicode_ci ';
 				$this->searchTerm = str_replace( '\"','',$this->searchTerm );
 				$keywords[] = $this->searchTerm;
 			}

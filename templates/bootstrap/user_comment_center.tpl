@@ -2,7 +2,6 @@
 ******* User History Template ********
  This template controls the user history pages (upvote history, downvote history, submitted, commented on, etc.)
 *************************************}
-
 <!-- user_comment_center.tpl -->
 <div class="user_comment_history">
 	
@@ -50,7 +49,7 @@
 		{if $UseAvatars neq "0"}
 			<a href="{$submitter_profile_url}"><img class="user_comment_story_author_avatar" src="{$Avatar_ImgSrcs}" /></a>
 		{/if}
-		<a href="{$submitter_profile_url}">{$link_submitter}</a>
+		<a href="{$submitter_profile_url}">{$link_submitter}</a> {checkActionsTpl location="tpl_plikli_link_submitter"}
 	</span>
 	<span class="user_comment_story_timestamp">
 		{$link_submit_timeago} {#PLIKLI_Visual_Comment_Ago#}
@@ -62,7 +61,7 @@
 				{if $UseAvatars neq "0"}
 					<a href="{$user_view_url}"><img class="user_comment_comment_author_avatar" src="{$Avatar.small}" /></a>
 				{/if}
-				<a href="{$user_view_url}">{$user_username}</a>
+				<a href="{$user_view_url}">{$user_username}</a> {checkActionsTpl location="tpl_plikli_comment_username"}
 			</span>
 			<span class="user_comment_timestamp">
 				{$comment_age} {#PLIKLI_Visual_Comment_Ago#}

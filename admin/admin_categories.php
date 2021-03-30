@@ -239,13 +239,13 @@ if($canIhaveAccess == 1)
 			exit;
 	    }
 	    
-	    }
+	}
         elseif($action == "changeparent"){
 		// Redwine: if TOKEN is empty, no need to continue, just display the invalid token error.
 		if (empty($_POST['token'])) {
 			$CSRF->show_invalid_error(1);
-	    exit;
-	}
+			exit;
+		}
 		// Redwine: if valid TOKEN, proceed. A valid integer must be equal to 2.
 	    if ($CSRF->check_valid(sanitize($_POST['token'], 3), 'category_manager')== 2){
 		$id = utf8_substr(sanitize($_REQUEST['id'], 3), 9, 100);

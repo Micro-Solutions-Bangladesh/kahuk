@@ -183,7 +183,7 @@
 					{/php}
 					<tr>
 						<td>
-							<img src="{$friend_avatar}" align="absmiddle" /> <a href="{$profileURL}">{$myfriend.user_login}</a>
+							<img src="{$friend_avatar}" align="absmiddle" /> <a href="{$profileURL}">{$myfriend.user_login}</a> {checkActionsTpl location="tpl_plikli_profile_friend_following"}
 						</td>
 						{if $user_authenticated eq true && $myfriend.following>0}
 							<td>

@@ -107,11 +107,11 @@ $main_smarty->assign('user_following', $user->getFollowingCount());
 
 			$mytmpfile = $_FILES['image_file']['tmp_name'];
 			if ($_FILES['image_file']["size"]/1024 > max_avatar_size) {
-				$error['Type'] = 'Maximum file size '. max_avatar_size . 'Kb exceeded';
+				$error[] = 'Maximum file size '. max_avatar_size . 'Kb exceeded';
 			}
 
 			if(!in_array($_FILES['image_file']['type'],$allowedFileTypes)){
-				$error['Type'] = 'Only these file types are allowed : jpeg, gif, png';
+				$error[] = 'Only these file types are allowed : jpeg, gif, png';
 			}
 
 			if(empty($error)){
@@ -154,14 +154,12 @@ $main_smarty->assign('user_following', $user->getFollowingCount());
 			exit;
 		}
 			
-	}/*else{
-		echo 'An error occured while uploading your avatar.';
-	}*/		
-
-	if(isset($error) && is_array($error)) {
-		while(list($key, $val) = each($error)) {
+	}
+    if(isset($error) && is_array($error)) {
+		foreach($error as $key => $val) {
 			echo $val;
 			echo "<br>";
+            
 		}
 	}
 
@@ -263,13 +261,6 @@ function show_profile() {
 	foreach($results as $key => $val)
 		$category[] = $val['category_name'];
 			
-#	$sor = $_GET['err'];
-#	if($sor == 1)
-#	{
-#		$err = "You have to select at least 1 category";
-#		$main_smarty->assign('err', $err);
-#	}
-		
 	$main_smarty->assign('category', $results);
 	$main_smarty->assign('user_category', $user_categories);
 	$main_smarty->assign('view_href', 'submitted');
@@ -351,48 +342,49 @@ function save_profile() {
 			}
 		}
 		$_POST = $_REQUEST = $sanitezedPOST;
-		
-		if ($user->email!=sanitize($_POST['email'], 3))
-		{
+
+		if ($user->email!=sanitize($_POST['email'], 3)) {
 		    if(!check_email(sanitize($_POST['email'], 3))) {
-			$savemsg = $main_smarty->get_config_vars("PLIKLI_Visual_Profile_BadEmail");
-			return $savemsg;
-		    } 
-		    elseif(email_exists(trim(sanitize($_POST['email'], 3)))) { // if email already exists
-			$savemsg = $main_smarty->get_config_vars("PLIKLI_Visual_Register_Error_EmailExists");
-			return $savemsg;
-		    }
-		    else {
-			if(plikli_validate()){
-				$encode=md5($_POST['email'] . $user->karma .  $user->username. plikli_hash().$main_smarty->get_config_vars('PLIKLI_Visual_Name'));
+                $savemsg = $main_smarty->get_config_vars("PLIKLI_Visual_Profile_BadEmail");
+                return $savemsg;
+		    } elseif (email_exists(trim(sanitize($_POST['email'], 3)))) { // if email already exists
+                $savemsg = $main_smarty->get_config_vars("PLIKLI_Visual_Register_Error_EmailExists");
+                return $savemsg;
+		    } else {
+                if(plikli_validate()) {
+                    $encode=md5($_POST['email'] . $user->karma .  $user->username. plikli_hash().$main_smarty->get_config_vars('PLIKLI_Visual_Name'));
 
-				$domain = $main_smarty->get_config_vars('PLIKLI_Visual_Name');			
-				$validation = my_base_url . my_plikli_base . "/validation.php?code=$encode&uid=".urlencode($user->username)."&email=".urlencode($_POST['email']);
-				$str = $main_smarty->get_config_vars('PLIKLI_PassEmail_verification_message');
-				eval('$str = "'.str_replace('"','\"',$str).'";');
-				$message = "$str";
-
-				if(phpnum()>=5)
-					require("libs/class.phpmailer5.php");
-				else
-					require("libs/class.phpmailer4.php");
-				$mail = new PHPMailer();
-				$mail->From = $main_smarty->get_config_vars('PLIKLI_PassEmail_From');
-				$mail->FromName = $main_smarty->get_config_vars('PLIKLI_PassEmail_Name');
-				$mail->AddAddress($_POST['email']);
-				$mail->AddReplyTo($main_smarty->get_config_vars('PLIKLI_PassEmail_From'));
-				$mail->IsHTML(false);
-				$mail->Subject = $main_smarty->get_config_vars('PLIKLI_PassEmail_Subject_verification');
-				$mail->Body = $message;
-				$mail->CharSet = 'utf-8';
-
-#print_r($mail);					
-				if(!$mail->Send())
-					return false;
-				$savemsg = $main_smarty->get_config_vars("PLIKLI_Visual_Register_Noemail").' '.sprintf($main_smarty->get_config_vars("PLIKLI_Visual_Register_ToDo"),$main_smarty->get_config_vars('PLIKLI_PassEmail_From'));
-			}
-			else
-				$user->email=sanitize($_POST['email'], 2);
+                    $domain = $main_smarty->get_config_vars('PLIKLI_Visual_Name');			
+                    $validation = my_base_url . my_plikli_base . "/validation.php?code=$encode&uid=".urlencode($user->username)."&email=".urlencode($_POST['email']);
+                    /*Redwine: fixed the $str to correctly print the username and the domain email address, in the message.*/
+                    $str = sprintf($main_smarty->get_config_vars('PLIKLI_PassEmail_Email_Change_Message'), $user->username, $main_smarty->get_config_vars('PLIKLI_PassEmail_From'));
+                    eval('$str = "'.str_replace('"','\"',$str).'";');
+                    $message = "$str";
+                    
+                    $subject = $main_smarty->get_config_vars('PLIKLI_Visual_User_Profile_Email_Change');
+                    
+                    $AddAddress = $_POST['email'];
+                    
+                    //Redwine: require the file for email sending.
+                    require('libs/phpmailer/sendEmail.php');
+                        
+                    if(!$mail->Send()) {
+                        $savemsg = $main_smarty->get_config_vars('PLIKLI_Visual_Login_Delivery_Failed');
+                        return $savemsg;
+                        exit;
+                    }else{
+                        $savemsg = $main_smarty->get_config_vars("PLIKLI_Visual_Email_Change").'<br />' .$main_smarty->get_config_vars("PLIKLI_Visual_Register_Noemail").' '.sprintf($main_smarty->get_config_vars("PLIKLI_Visual_Register_ToDo"),$main_smarty->get_config_vars('PLIKLI_PassEmail_From'));
+                        
+                        /*Redwine: to print on the page, FOR THE PURPOSE OF TESTING ON LOCALHOST ONLY!*/
+                        if (allow_smtp_testing == 1 && smtp_fake_email == 1) {
+                            return $savemsg. "<br /><hr /><span style=\"font-style: italic;\">You are viewing the email message for the purpose of testing SMTP email sending.<br />" .$message . "</span><hr />";
+                        }else{
+                            return $savemsg;
+                        }
+                    }
+                }
+                else
+                    $user->email=sanitize($_POST['email'], 2);
 		    }
 		}
 
@@ -435,7 +427,7 @@ function save_profile() {
 		$user->skype=sanitize($_POST['skype'], 2);
 		$user->pinterest=sanitize($_POST['pinterest'], 2);
 		$user->names=sanitize($_POST['names'], 2);
-		if (user_language){
+		if ($main_smarty->get_template_vars('user_language')){
 			$user->language=sanitize($_POST['language'], 2);
 		}
 		

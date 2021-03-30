@@ -22,7 +22,7 @@ function submit_list_form(){
 		$('.enabled_disable:checked').each(function(i){
 			usernames += $(this).attr("usernameval")+", ";
 		});
-		if(confirm("Are you sure that you want to killspam these users: "+usernames)){
+		if(confirm("CAUTION: Using killspam will change the user's status to sapmmer and deletes all his activity (submissions, coments, groups, etc and blacklists all the domains of the stories submitted! If you want to mark A PARTICULAR COMMENT, use the gear that appears on the right side of the comment and select \"Delete\" OR from the Comments admin page, select Moderated or Discard\r\rAre you sure that you want to killspam these users: "+usernames)){
         
 		} else {
 			return false;
@@ -191,12 +191,12 @@ function validate_all_user_action(){
 					</td>
 					{checkActionsTpl location="tpl_plikli_admin_users_td_start"}
 					<td style="text-align:center;vertical-align:middle;">{$userlist[nr].user_id}</td>
-					<td style="vertical-align:middle;"><img src="{$userlist[nr].Avatar}" style="height:18px;width:18px;" /> <a href = "?mode=view&user={$userlist[nr].user_id}">{$userlist[nr].user_login}</a></td>	
+					<td style="vertical-align:middle;"><img src="{$userlist[nr].Avatar}" style="height:18px;width:18px;" /> <a href = "?mode=view&user={$userlist[nr].user_id}">{$userlist[nr].user_login}</a> {checkActionsTpl location="tpl_plikli_admin_users_extra"} </td>	
 					<td style="text-align:center;vertical-align:middle;">{$userlist[nr].user_level}</td>
 					<td style="vertical-align:middle;">
 						{* Redwine: Roles and permissions and Groups fixes. Only display email field to Site Admins*}
 						{if $amIadmin eq '1'}
-						{if $userlist[nr].user_lastlogin neq "0000-00-00 00:00:00"}
+						{if $userlist[nr].user_lastlogin neq NULL}
 							<i class="fa fa-check confirmed-email" title="{#PLIKLI_Visual_AdminPanel_Confirmed_Email#}" alt="{#PLIKLI_Visual_AdminPanel_Confirmed_Email#}"></i>
 						{else}
 							<a data-toggle="modal" href="{$my_base_url}{$my_plikli_base}/admin/admin_user_validate.php?id={$userlist[nr].user_id}" title="{#PLIKLI_Visual_AdminPanel_Unconfirmed_Email#}"><i class="fa fa-warning unconfirmed-email" rel="tooltip" data-placement="left" data-toggle="tooltip" data-original-title="{#PLIKLI_Visual_AdminPanel_Unconfirmed_Email#}"></i></a>

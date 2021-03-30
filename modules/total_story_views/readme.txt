@@ -25,4 +25,3 @@
 	{checkActionsTpl location="tpl_plikli_story_views_end"}
 	
 
-

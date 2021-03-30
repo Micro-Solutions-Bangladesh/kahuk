@@ -1,9 +1,8 @@
 <?php
 
-function subscribe2comments_comment_submit(&$vars)
-{
+function subscribe2comments_comment_submit(&$vars) {
 	include_once(mnmmodules.'subscribe2comments/subscribe2comments_settings.php');
-	global $db, $main_smarty, $current_user;
+	global $db, $main_smarty, $smarty, $current_user;
 	
 	$subscribe2_settings = subscribe2comments_settings();
 	$main_smarty->config_load(subscribe2comments_plikli_lang_conf);
@@ -32,6 +31,8 @@ function subscribe2comments_comment_submit(&$vars)
 	if ($subscribe2_settings['subject'] !='') {
 		$fromSubject = $subscribe2_settings['subject'];
 	}else{
+        /*Redwine: we need to load the module's language file first.*/
+        $main_smarty->config_load(subscribe2comments_lang_conf);
 		$fromSubject = $main_smarty->get_config_vars("PLIKLI_Subscribe_2_Comments_Email_Subject");
 	}
 	$main_smarty->assign('site_title', $fromSite);
@@ -62,7 +63,6 @@ function subscribe2comments_comment_submit(&$vars)
 		    $vars['comment_id'] = $vars['comment'];
 			$anonymous_name = $db->get_var("SELECT `comment_anonymous_username` FROM `".table_prefix . "comments` WHERE `comment_id` = {$vars['comment_id']}");
 		    $user->username = $vars['comment_username'];
-			//echo "user anonymous is " .$user->username;die();
 		}
 		if (Default_Site_Logo != '') {
 			$site_logo = my_base_url.my_plikli_base.Default_Site_Logo;
@@ -87,24 +87,26 @@ function subscribe2comments_comment_submit(&$vars)
    	    }
 
 	    if ($subs && $fromEmail) {
-			require_once(mnminclude.'class.phpmailer5.php');
-			$mail = new PHPMailer();
 			foreach ($subs as $sub) {
 				$user->id = $sub['notify_user_id'];
-				if ($user->read())
-				{
-				$main_smarty->assign('unsubscribe_link', my_base_url.my_plikli_base . '/unsubscribe.php?linkid='.$linkres->id.'&unsub=1&uid='.$user->username.'&code='.md5($user->email . $user->date . $user->username . plikli_hash()));
-				$text = $main_smarty->fetch('../modules/subscribe2comments/templates/subscribe2comments_email.tpl');
-
-						$mail->From = $fromEmail;
-						$mail->FromName = $fromSite;
-						$mail->AddAddress($user->email);
-						$mail->AddReplyTo($main_smarty->get_config_vars('PLIKLI_PassEmail_From'));
-						$mail->IsHTML(true);
-						$mail->Subject = $fromSubject;
-						$mail->Body = $text;
-						$mail->CharSet = 'utf-8';
-						$mail->Send();
+				if ($user->read()) {
+                    $main_smarty->assign('unsubscribe_link', my_base_url.my_plikli_base . '/unsubscribe.php?linkid='.$linkres->id.'&unsub=1&uid='.$user->username.'&code='.md5($user->email . $user->date . $user->username . plikli_hash()));
+                    
+                    $AddAddress = $user->email;
+                    $subject = $fromSubject;
+                    $message = $main_smarty->fetch('../modules/subscribe2comments/templates/subscribe2comments_email.tpl');
+                    
+                    /*Redwine: we need to load Plikli's language to get the language definition.*/
+                    $main_smarty->config_load(subscribe2comments_plikli_lang_conf);
+                    
+                    //Redwine: require the file for email sending.
+                    require_once(mnminclude.'phpmailer/sendEmail.php');
+                    
+                    if(!$mail->Send()) {
+						$errs = $main_smarty->get_config_vars('PLIKLI_Visual_Login_Delivery_Failed'). " To: $AddAddress<br />";
+                        return false;
+                        exit;
+					}
 				}
 			}
 		}
@@ -198,7 +200,12 @@ function subscribe2comments_settings()
 
 function subscribe2comments_profile_save(){
 	global $user, $users_extra_fields_field;
+    $user->extra = [];
+    if (isset($_POST['auto_comment_alert'])) {
 	$user->extra['auto_comment_alert']=sanitize($_POST['auto_comment_alert']);	
+    } else {
+        $user->extra['auto_comment_alert']= 0;
+    }
 }
 
 function subscribe2comments_profile_show(){

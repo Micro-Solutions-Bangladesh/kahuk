@@ -680,8 +680,8 @@ class Archive_Zip
         $v_const_list = get_defined_constants();
   	
       	// ----- Extract error constants from all const.
-        for (reset($v_const_list);
-		     list($v_key, $v_value) = each($v_const_list);) {
+        reset($v_const_list);
+		foreach($v_const_list as $v_key => $v_value) {
      	    if (substr($v_key, 0, strlen('ARCHIVE_ZIP_ERR_'))
 			    =='ARCHIVE_ZIP_ERR_') {
     		    $v_error_list[$v_key] = $v_value;
@@ -3248,7 +3248,8 @@ class Archive_Zip
     }
     
     // ----- Check that all the params are valid
-    for (reset($p_params); list($v_key, $v_value) = each($p_params); ) {
+    reset($p_params);
+    foreach($p_params as $v_key => $v_value) {
     	if (!isset($p_default[$v_key])) {
             $this->_errorLog(ARCHIVE_ZIP_ERR_INVALID_PARAMETER,
 			                 'Unsupported parameter with key \''.$v_key.'\'');
@@ -3258,7 +3259,8 @@ class Archive_Zip
     }
 
 	// ----- Set the default values
-    for (reset($p_default); list($v_key, $v_value) = each($p_default); ) {
+    reset($p_default);
+    foreach($p_default as $v_key => $v_value) {
     	if (!isset($p_params[$v_key])) {
     		$p_params[$v_key] = $p_default[$v_key];
     	}

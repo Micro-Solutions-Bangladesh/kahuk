@@ -1,9 +1,9 @@
 <?php
 // header
-	$lang['plikli_version'] = '4.1.0';
+	$lang['plikli_version'] = '4.1.5';
 	$lang['installer'] = 'Instal·lador';
 	$lang['Benvinguda'] = 'Benvinguda';
-	$lang['Install'] = 'Instal · lar';
+	$lang['Install'] = 'Instal·lar';
 	$lang['Actualització'] = 'Actualització';
 	$lang['Upgrade-Kliqqi'] = 'Actualització-Kliqqi';
 	$lang['Upgrade-Pligg'] = 'Actualitza-Pligg';
@@ -23,26 +23,26 @@
 	$lang['WelcomeToThe'] = 'Benvingut a <a href="https://www.plikli.com" target="_blank" rel="noopener noreferrer"> Plikli </a>, el CMS que subministra milers de llocs web de la comunitat. Si aquesta és la primera vegada que instal·leu el CMS de Plikli, llegeix totes les instruccions proporcionades acuradament per no perdre cap indicació important. ';
 	$lang['Bugs'] = 'Familiaritzeu-vos amb la documentació proporcionada per la comunitat de Plikli al <a href="https://www.plikli.com/forum-2/"> Fòrum de Plikli </a > lloc web. També us suggerim que us registreu un compte perquè tingueu accés a assistència gratuïta, mòduls, widgets, plantilles i altres recursos fantàstics. ';
 	$lang['Installation'] = 'Instal·lació (llegeix amb atenció)';
-	$lang['OnceFamiliar'] = '<p> Si aquesta és la primera vegada que instal·leu Plikli, heu de continuar en aquesta pàgina després de seguir acuradament les indicacions a continuació. Si necessiteu <a href="./upgrade.php"> actualitzar el vostre lloc </a> des d\'una versió anterior, executeu l\'script d\'actualització fent clic a l\'enllaç Actualitza a dalt. ADVERTIMENT: executar el procés d\'instal·lació en una base de dades del lloc Plikli existent sobreescriurà totes les dades, així que assegureu-vos que voleu realitzar una instal·lació si voleu continuar a continuació. </ P> <br />
+	$lang['OnceFamiliar'] = '<p> Si aquesta és la primera vegada que instal·leu Plikli, heu de continuar en aquesta pàgina després de seguir acuradament les indicacions a continuació. Si necessiteu <a href="./upgrade.php"> actualitzar el vostre lloc </a> des d\'una versió anterior, executeu l\'script d\'actualització fent clic a l\'enllaç Actualitza a dalt. ADVERTIMENT: executar el procés d\'instal·lació en una base de dades del lloc Plikli existent sobreescriurà totes les dades, així que assegureu-vos que voleu realitzar una instal·lació si voleu continuar a continuació. </P> <br />
 	<ol>
-<li> Canvia el nom de settings.php.default a settings.php </ li>
-<li> Canviar el nom de /languages/lang_english.conf.default a lang_english.conf </ li>
-<li> Canviar el nom de /libs/dbconnect.php.default a dbconnect.php </ li>
-<li> Canvieu el nom del directori /logs.default to / logs </ li>
+		<li> Canvia el nom de settings.php.default a settings.php </li>
+		<li> Canviar el nom de /languages/lang_english.conf.default a lang_english.conf </li>
+		<li> Canviar el nom de /libs/dbconnect.php.default a dbconnect.php </li>
+		<li> Canvieu el nom del directori /logs.default to /logs </li>
 		<li> CHMOD 0777 les següents carpetes:
-		<ol>
-			<li>/admin/backup/</li>
-			<li>/avatars/groups_uploaded/</li>
-			<li>/avatars/user_uploaded/</li>
-			<li>/cache/</li>
-<li> / languages ​​/ (CHMOD 0777 tots els fitxers inclosos en aquesta carpeta) </ li>
-		</ol>
+			<ol>
+				<li> /admin/backup/ </li>
+				<li> /avatars/groups_uploaded/ </li>
+				<li> /avatars/user_uploaded/ </li>
+				<li> /cache/ </li>
+				<li> /languages​​/ (CHMOD 0777 tots els fitxers inclosos en aquesta carpeta) </li>
+			</ol>
 		</li>
 		<li> CHMOD 0666 els següents fitxers:
-		<ol>
-			<li>/libs/dbconnect.php</li>
-			<li>settings.php</li>
-		</ol>
+			<ol>
+				<li> /libs/dbconnect.php </li>
+				<li> settings.php </li>
+			</ol>
 		</li>
 	</ol>
 	<p> Ara ha superat la part més difícil! Continueu fins al següent pas per instal·lar Plikli a la vostra base de dades MySQL. </P> ';
@@ -76,7 +76,7 @@
 	$lang['CreatingTables'] = 'Creant taules de base de dades';
 	$lang['TablesGood'] = '<strong> Les taules s\'han creat amb èxit! </strong>';
 	$lang['Error3-1'] = '<p> Hi ha hagut un problema en crear les taules. </p>';
-	$lang['Error3-2'] = '<p>No s\'ha pogut connectar a la base de dades.</p>';
+	$lang['Error3-2'] = '<p> No s\'ha pogut connectar a la base de dades. </p>';
 	$lang['EnterAdmin'] = '<p> <strong> Introduïu els detalls del vostre compte d\'administrador a continuació: </strong> <br /> Escriviu aquesta informació del compte perquè serà necessària per iniciar sessió i configurar el vostre lloc. </p> ';
 	$lang['AdminLogin'] = 'Login de l\'administrador';
 	$lang['AdminPassword'] = 'Contrasenya d\'administrador';

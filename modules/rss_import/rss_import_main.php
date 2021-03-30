@@ -433,7 +433,7 @@ function checkfortable($table)
 	}
 }
 
-function redirect($url, $msg){
+function redirect($url, $msg = ''){
 	// due to some servers not redirecting the way we would like we
 	// have this function to handle that
 

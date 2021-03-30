@@ -57,6 +57,9 @@ function welcome_email_send(&$registration_details)
 			// Set Mail Body Text
 			$mail->setText($messageText);
 			
+            // OR Set Mail Body HTML
+			//$mail->setHtml($messageText);
+            
 			// Set Mail From
 			$mail->setFrom($siteName." <".$siteEmail.">");
 			

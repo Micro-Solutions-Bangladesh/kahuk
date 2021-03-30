@@ -6,6 +6,20 @@
 	{if $isAdmin eq 1 || $isModerator eq 1 || $is_gr_Admin eq 1}
 		<div class="alert alert-warning expires-warning">{#PLIKLI_Visual_Page_Expires#}</div>
 	{/if}
+	{* Redwine: The below code is to check if the SMTP testing settings are true. If true, it will display the email message sent to users. *}
+	{if $allow_smtp_testing eq '1'  && $smtp_fake_email eq '1' && $groupInvitation neq ''}
+	<span style="font-style: italic;">You are viewing the email message for the purpose of testing SMTP email sending.<br />
+	{$groupInvitation}
+	</span>
+	<br /><hr />
+	{/if}
+	{if $allow_smtp_testing eq '1'  && $smtp_fake_email eq '1' && $errorSending neq ''}
+	<span style="font-style: italic;">You are viewing the email message for the purpose of testing SMTP email sending.<br />
+	{$errorSending}
+	</span>
+	<br /><hr />
+	{/if}
+	{* Redwine: END SMTP testing settings. *}
 	{checkActionsTpl location="tpl_plikli_group_start"}
 	{include file=$the_template."/group_summary.tpl"}
 	{checkActionsTpl location="tpl_plikli_group_end"}

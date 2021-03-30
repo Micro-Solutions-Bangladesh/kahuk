@@ -193,6 +193,7 @@ class plikliconfig {
 				$db->use_disk_cache = true;
 				$db->cache_queries = true;
 				$db->cache_timeout = 0;
+				// if this query changes, update the query in /libs/settings_from_db.php LINE 16
 				$usersql = $db->get_results('SELECT var_name, var_value, var_method, var_enclosein FROM ' . table_prefix . 'config');
 				$db->cache_queries = false;
 			}

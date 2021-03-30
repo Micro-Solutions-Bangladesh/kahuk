@@ -3,65 +3,65 @@
 if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
 
 class Link {
-	var $id = 0;
-	var $author = -1;
-	var $username = false;
-	var $randkey = 0;
-	var $karma = 1;
-	var $valid = true;
-	var $date = false;
-	var $published_date = 0;
-	var $scheduled_date = 0;
-	var $modified = 0;
-	var $url = '';
-	var $url_title = '';
-	var $url_description = '';
-	var $encoding = false;
-	var $status = 'discard';
-	var $type = '';
-	var $category = 0;
-	var $additional_cats = array();	
-	var $votes = 0;
-	var $comments = 0;
-	var $reports = 0;
-	var $title = '';
-	var $title_url = '';
-	var $tags = '';
-	var $content = '';
-	var $link_summary = '';
-	var $html = true;
-	var $trackback = false;
-	var $read = true;
-	var $fullread = true;
-	var $voted = false;
-	var $link_field1 = '';
-	var $link_field2 = '';
-	var $link_field3 = '';
-	var $link_field4 = '';
-	var $link_field5 = '';
-	var $link_field6 = '';
-	var $link_field7 = '';
-	var $link_field8 = '';
-	var $link_field9 = '';
-	var $link_field10 = '';
-	var $link_field11 = '';
-	var $link_field12 = '';
-	var $link_field13 = '';
-	var $link_field14 = '';
-	var $link_field15 = '';
-	var $link_group_id = 0;
-	var $current_user_votes = 0;
-	var $current_user_reports = 0;
-	var $debug = false;
-	var $check_saved = true; // check to see if the user has 'saved' this link. sidebarstories doesn't need to check (so don't waste time on it)
-	var $get_author_info = true; // get information about the link_author. sidebarstories doesn't need this information (so don't waste time on it)
-	var $check_friends = true; // see if the author is a friend of the logged in user.  sidebarstories doesn't need this information (so don't waste time on it)
-	var $vote_from_this_ip=0; // if disable multiple vote from the same ip
-	var $report_from_this_ip=0; // if disable multiple vote from the same ip
+	public $id = 0;
+	public $author = -1;
+	public $username = false;
+	public $randkey = 0;
+	public $karma = 1;
+	public $valid = true;
+	public $date = false;
+	public $published_date = 0;
+	public $scheduled_date = 0;
+	public $modified = 0;
+	public $url = '';
+	public $url_title = '';
+	public $url_description = '';
+	public $encoding = false;
+	public $status = 'discard';
+	public $type = '';
+	public $category = 0;
+	public $additional_cats = array();	
+	public $votes = 0;
+	public $comments = 0;
+	public $reports = 0;
+	public $title = '';
+	public $title_url = '';
+	public $tags = '';
+	public $content = '';
+	public $link_summary = '';
+	public $html = true;
+	public $trackback = false;
+	public $read = true;
+	public $fullread = true;
+	public $voted = false;
+	public $link_field1 = '';
+	public $link_field2 = '';
+	public $link_field3 = '';
+	public $link_field4 = '';
+	public $link_field5 = '';
+	public $link_field6 = '';
+	public $link_field7 = '';
+	public $link_field8 = '';
+	public $link_field9 = '';
+	public $link_field10 = '';
+	public $link_field11 = '';
+	public $link_field12 = '';
+	public $link_field13 = '';
+	public $link_field14 = '';
+	public $link_field15 = '';
+	public $link_group_id = 0;
+	public $current_user_votes = 0;
+	public $current_user_reports = 0;
+	public $debug = false;
+	public $check_saved = true; // check to see if the user has 'saved' this link. sidebarstories doesn't need to check (so don't waste time on it)
+	public $get_author_info = true; // get information about the link_author. sidebarstories doesn't need this information (so don't waste time on it)
+	public $check_friends = true; // see if the author is a friend of the logged in user.  sidebarstories doesn't need this information (so don't waste time on it)
+	public $vote_from_this_ip=0; // if disable multiple vote from the same ip
+	public $report_from_this_ip=0; // if disable multiple vote from the same ip
 	/* Redwine: initialized a new variable $is_rtl to hold the value 0 or 1 when returned from the script that checks whether the content is left-to-right or right-to-left language.  and the uploaded_image to be used for the Open Graph Protocol*/
-	var $is_rtl = 0;
-	var $uploaded_image = '';
-	var $og_twitter_image = '';
+	public $is_rtl = 0;
+	public $uploaded_image = '';
+	public $og_twitter_image = '';
 	function get($url) {
 		$url=trim($url);
 
@@ -213,7 +213,9 @@ class Link {
 		$link_url_description = $db->escape($this->url_description);
 		$link_title = $db->escape($this->title);
 		$link_title_url = $db->escape($this->title_url);
-		if($link_title_url == ""){$link_title_url = makeUrlFriendly($this->title, $this->id);}
+        if ($this->title != '') {
+            if($link_title_url == ""){$link_title_url = makeUrlFriendly($this->title, $this->id);}
+        }
 		$link_tags = preg_replace('/[^\p{L}\p{N}_\s\,]/u', '', $this->tags); //$db->escape($this->tags);
 		$link_content = $db->escape($this->content);
 		$link_field1 = $db->escape($this->link_field1);
@@ -723,6 +725,7 @@ class Link {
 				}
 		
 				$smarty->assign('Allow_Friends', Allow_Friends);
+                $smarty->assign('Use_New_Story_Layout', Use_New_Story_Layout);
 			// --- //
 		}
 		/* Redwine: commented the block from line 639 to 647 because it is related to block 649 to 663 that was commented and therefore obsolete, and generating a notice. */
@@ -825,7 +828,7 @@ class Link {
 
 				$tag_array = explode(",", $tags_words);
 				$c = count($tag_array);
-				$tag_array[$c] = $this->tags;
+				//$tag_array[$c] = $this->tags;
  				$c++;
  				for($i=0; $i<=$c; $i++)
  				{
@@ -837,7 +840,7 @@ class Link {
 				    }
 				  }
  				}
- 				$tag_array[$c - 1] = $alltagtext;
+ 				//$tag_array[$c - 1] = $alltagtext;
 
 				$smarty->assign('tag_array', $tag_array);
 				$smarty->assign('tags_url_array', $tags_url_array);
@@ -861,7 +864,7 @@ class Link {
 		$this->uploaded_image = $vars['smarty']->_vars['uploaded_image'];
 		/*** Redwine: populating the session and assigning it to smarty. ***/
 		$_SESSION['uploaded_image'] = $this->uploaded_image;
-		$smarty->assign('uploaded_image', $uploaded_image);
+		$smarty->assign('uploaded_image', $this->uploaded_image);
 
 		return $smarty;
 	}
@@ -912,20 +915,11 @@ class Link {
 	function truncate_content(){
 		if(utf8_strlen($this->content) > StorySummary_ContentTruncate){
 			if (!use_title_as_link) {$url_read = $this->get_internal_url(); }else{$url_read = $this->url;}
-			 if(Auto_scroll==true){
 				global $main_smarty;
-				$content=	close_tags(utf8_substr($this->content, 0, StorySummary_ContentTruncate));
-				$content.="<div class=\"read_more_article\" storyid=\"".$this->id."\" ><a href=".$url_read."> ".$main_smarty->get_config_vars('PLIKLI_Visual_Read_More')."</a></div>" ;
-				$content.="<div class=\"read_more_story".$this->id." hide\" >";
-				$content.=close_tags(utf8_substr($this->content, StorySummary_ContentTruncate,utf8_strlen($this->content) ));
-				$content.="</div>";
-				// echo $content;
+			$readmore="<div class=\"read_more_article\" storyid=\"".$this->id."\" ><a href=".$url_read."> ".$main_smarty->get_config_vars('PLIKLI_Visual_Read_More')."</a></div>" ;
+			$content= truncate_strings_html($this->content, StorySummary_ContentTruncate, $break=" ", '');
+			$content .= $readmore;
 				return $content;
-			 }else{
-			 
-			 return close_tags(utf8_substr($this->content, 0, StorySummary_ContentTruncate)) . "...";
-			 }
-			 
 			 }
 		return $this->content;
 	}

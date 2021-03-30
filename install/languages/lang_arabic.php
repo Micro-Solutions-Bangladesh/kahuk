@@ -1,6 +1,6 @@
 <?php
 // header
-	$lang['plikli_version'] = '4.1.0';
+	$lang['plikli_version'] = '4.1.5';
 	$lang['installer'] = 'مثبت البرمجيات';
 	$lang['Welcome'] = 'مرحبا';
 	$lang['Install'] = 'تثبيت';
@@ -27,21 +27,21 @@
 		<li>إعادة تسمية settings.php.default إلى settings.php</li>
 		<li>إعادة تسمية /languages/lang_english.conf.default إلى lang_english.conf</li>
 		<li>إعادة تسمية /libs/dbconnect.php.default إلى dbconnect.php</li>
-<li> إعادة تسمية الدليل /logs.default إلى /logs </li>
+		<li> إعادة تسمية الدليل /logs.default إلى /logs </li>
 		<li> CHMOD 0777 ، المجلدات التالية
-		<ol>
-			<li>/admin/backup/</li>
-			<li>/avatars/groups_uploaded/</li>
-			<li>/avatars/user_uploaded/</li>
-			<li>/cache/</li>
-<li> /languages/ (CHMOD 0777 جميع الملفات الموجودة داخل هذا المجلد) </li>
-		</ol>
+			<ol>
+				<li>/admin/backup/</li>
+				<li>/avatars/groups_uploaded/</li>
+				<li>/avatars/user_uploaded/</li>
+				<li>/cache/</li>
+				<li> /languages/ (CHMOD 0777 جميع الملفات الموجودة داخل هذا المجلد) </li>
+			</ol>
 		</li>
 		<li>CHMOD 0666 الملفات التالية
-		<ol>
-			<li>/libs/dbconnect.php</li>
-			<li>settings.php</li>
-		</ol>
+			<ol>
+				<li>/libs/dbconnect.php</li>
+				<li>settings.php</li>
+			</ol>
 		</li>
 	</ol>
 <p>لقد تجاوزت الآن أصعب جزء! انتقل إلى الخطوة التالية لتثبيت Plikli على قاعدة بيانات MySQL.</p>';

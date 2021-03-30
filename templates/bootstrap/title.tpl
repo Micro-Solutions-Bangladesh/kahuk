@@ -9,7 +9,7 @@
 	{elseif !empty($get.page) && $get.page > 1}
 		<title>{#PLIKLI_Visual_Breadcrumb_Published_Tab#} | {#PLIKLI_Page_Title#} {$get.page} | {#PLIKLI_Visual_Name#}</title>
 	{else}
-		<title>{#PLIKLI_Visual_Name#} - {#PLIKLI_Visual_RSS_Description#}</title>
+		<title>{#PLIKLI_Visual_Name#} | {#PLIKLI_Visual_RSS_Description#}</title>
 	{/if}
 {elseif preg_match('/new.php$/',$templatelite.server.SCRIPT_NAME)}
 	{if !empty($get.category)}
@@ -74,6 +74,6 @@
 {elseif $pagename eq "404"}
 	<title>{#PLIKLI_Visual_404_Error#} | {#PLIKLI_Visual_Name#}</title>
 {else}	
-	<title>{if !empty($posttitle)}{$posttitle}{/if} {if !empty($pretitle)} | {$pretitle}{/if} {#PLIKLI_Visual_Name#}</title>
+	<title>{if !empty($posttitle)}{$posttitle}{/if} {if !empty($pretitle)} | {$pretitle}{/if}| {#PLIKLI_Visual_Name#}</title>
 {/if}
 <!-- /title.tpl -->

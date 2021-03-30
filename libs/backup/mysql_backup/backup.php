@@ -17,7 +17,7 @@ if ($dowhat == "backup") {
 		exec("mysqldump --user=$db_user --password=$db_pass --host=$db_host $db_name | gzip > $backupdir/$backup_file.gz");
 	}
 }
-	
+
 function EXPORT_TABLES($host,$user,$pass,$name, $tables=false, $backup_name=false){ 
 	$backupdir = "./backup";
     set_time_limit(3000); $mysqli = new mysqli($host,$user,$pass,$name); $mysqli->select_db($name); $mysqli->query("SET NAMES 'utf8'");
@@ -41,7 +41,7 @@ function EXPORT_TABLES($host,$user,$pass,$name, $tables=false, $backup_name=fals
                 if ( (($st_counter+1)%100==0 && $st_counter!=0) || $st_counter+1==$rows_num) {$content .= ";";} else {$content .= ",";} $st_counter=$st_counter+1;
             }
         } $content .="\n\n\n";
-}
+    }
     $content .= "\r\n\r\n/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;\r\n/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;\r\n/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;";
     $backup_name = $backup_name ? $backup_name : $name . "_" . date("Y-m-d-H-i-s").".sql";
 

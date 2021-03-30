@@ -60,7 +60,7 @@
 					{if $is_anonymous}
 						{#PLIKLI_Visual_Comment_Manage_Unregistered#}
 					{/if}
-					<a href="{$user_view_url}">{$user_username}</a>
+					<a href="{$user_view_url}">{$user_username}</a> {checkActionsTpl location="tpl_plikli_story_comments_extra"}
 					<!-- {if $user_rank neq ''} (#{$user_rank}){/if} -->
 				</span>
 				<span class="comment-date">

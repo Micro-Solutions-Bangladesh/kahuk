@@ -776,7 +776,7 @@ function _PEAR_call_destructors()
         if (PEAR::getStaticProperty('PEAR', 'destructlifo')) {
             $_PEAR_destructor_object_list = array_reverse($_PEAR_destructor_object_list);
         }
-        while (list($k, $objref) = each($_PEAR_destructor_object_list)) {
+        while (list($k, $objref) = current($_PEAR_destructor_object_list)) {
             $classname = get_class($objref);
             while ($classname) {
                 $destructor = "_$classname";
@@ -787,6 +787,7 @@ function _PEAR_call_destructors()
                     $classname = get_parent_class($classname);
                 }
             }
+            next($_PEAR_destructor_object_list);
         }
         // Empty the object list to ensure that destructors are
         // not called more than once.

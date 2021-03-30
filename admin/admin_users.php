@@ -411,13 +411,13 @@ if($canIhaveAccess == 1)
 				canIChangeUser($user->user_level);
 				
 				if ($user) {
-					$to = $user->user_email;
+					$AddAddress = $user->user_email;
 					$subject = $main_smarty->get_config_vars("PLIKLI_Visual_Name").' '.$main_smarty->get_config_vars("PLIKLI_PassEmail_Subject");
 
-					$password = substr(md5(uniqid(rand(), true)),0,8);
+					$password = substr(md5(uniqid(rand(), true)),0,9);
 					$saltedPass = generatePassHash($password);
 					$db->query('UPDATE `' . table_users . "` SET `user_pass` = '$saltedPass' WHERE `user_login` = '".sanitize($_GET["user"], 3)."'");
-					$body = sprintf($main_smarty->get_config_vars("PLIKLI_PassEmail_PassBody"),
+					$message = sprintf($main_smarty->get_config_vars("PLIKLI_PassEmail_PassBody"),
 						$main_smarty->get_config_vars("PLIKLI_Visual_Name"),
 						$my_base_url . $my_plikli_base . '/login.php',
 						$_GET["user"],
@@ -425,8 +425,15 @@ if($canIhaveAccess == 1)
 
 					$headers = 'From: ' . $main_smarty->get_config_vars("PLIKLI_PassEmail_From") . "\r\n";
 					$headers .= "Content-type: text/html; charset=utf-8\r\n";
-
-					mail($to, $subject, $body, $headers);
+					
+					//Redwine: require the file for email sending.
+                    require(mnminclude.'phpmailer/sendEmail.php');
+                    
+					if(!$mail->Send()) {
+						$main_smarty->assign('adminResetPassword', $main_smarty->get_config_vars('PLIKLI_Visual_Login_Delivery_Failed'). " To: $AddAddress<br />");
+					} else {
+						$main_smarty->assign('adminResetPassword', $main_smarty->get_config_vars("PLIKLI_Visual_Group_Email_Invitation")." To: $AddAddress<br /><hr />$message");
+					}
 	
 					// breadcrumbs and page title
 					$navwhere['text1'] = $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel');
@@ -665,7 +672,7 @@ if($canIhaveAccess == 1)
 		
 		if (sanitize($_GET["mode"], 3) == "yeskillspam"){ // killspam step 2
 			// Redwine: if TOKEN is empty, no need to continue, just display the invalid token error.
-			if (empty($_POST['token'])) {
+			if (empty($_POST['token']) && empty($_REQUEST['token'])) {
 				$CSRF->show_invalid_error(1);
 				exit;
 			}

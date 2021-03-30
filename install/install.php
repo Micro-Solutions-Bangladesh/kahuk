@@ -3,6 +3,13 @@ session_start();
 error_reporting(E_ALL ^ E_NOTICE ^ E_WARNING ^ E_STRICT);
 
 $page = 'install';
+define('page', $page);
+if (!isset($_SESSION['agree'])) {
+    header ("Location: plikli-cms-terms.php?action=install");
+}
+if (!isset($_SESSION['mysqlserver'])) {
+    header ("Location: troubleshooter.php");
+}
 
 if (isset($_REQUEST['step'])) { $step=addslashes(strip_tags($_REQUEST['step'])); }
 
@@ -11,6 +18,8 @@ if ((!isset($step)) || ($step == "")) { $step = 0; }
 
 
 if ($step == 0) { 
+$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http') . '://';
+
 	include('install_language.php');
 }
 

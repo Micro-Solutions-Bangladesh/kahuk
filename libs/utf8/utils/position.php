@@ -170,4 +170,3 @@ function utf8_locate_next_chr( &$str, $idx ) {
     
     return $idx;
 }
-

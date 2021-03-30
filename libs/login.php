@@ -45,6 +45,7 @@ class UserAuth {
 
 
 	function SetIDCookie($what, $remember) {
+		global $db;
 		$domain = preg_replace('/^www/','',$_SERVER['HTTP_HOST']);
 		// Remove port information.
         $port = strpos($domain, ':');
@@ -69,7 +70,7 @@ class UserAuth {
 					)
 				);
 				if($remember){
-					$time = time() + (86400 * 30); //Cookie will expire in 30 days if remmber option is selected at login. 86400 = 1 day
+					$time = time() + (86400 * 30); //Cookie will expire in 30 days if remember option is selected at login. 86400 = 1 day
 				} else {
 					$time = 0; //Cookie will expire when browser session ends. Note: This may depend on your browser settings. Example: in Chrome if 'Continue where you left off' option is checked the cookie won't expire.
 				}
@@ -98,21 +99,21 @@ class UserAuth {
 		/***
 		Redwine: the code below is to check for the hashed password of the user logging in. If it contains the string 'bcrypt:' it means that the new password hashing has been applied to it, otherwise, it rehash the password based on the new password hashing!
 		***/
-		if ($user->user_id > 0 && $user->user_lastlogin != "0000-00-00 00:00:00"  && $user->user_enabled) {
+		if ($user->user_id > 0 && $user->user_lastlogin != NULL  && $user->user_enabled) {
 			if(substr($user->user_pass, 0, 7) !== 'bcrypt:'){
 				$salt = substr($user->user_pass, 0, SALT_LENGTH);
 				$sha_hash = substr($user->user_pass, SALT_LENGTH);
 				if (!function_exists('password_hash')) {
 					require(mnminclude."password.php");
 					$new_pass = 'bcrypt:' . $salt . password_hash ($sha_hash, PASSWORD_BCRYPT);
-		} else {
+				}else{
 					$new_pass = 'bcrypt:' . $salt . password_hash ($sha_hash, PASSWORD_BCRYPT);
-		}
+				}
 				$db->query("UPDATE ".table_users." SET user_pass = '$new_pass' WHERE user_id ='$user->user_id' LIMIT 1");
 			}
 		}
 		/* Redwine: End checking/applying the new password hashing */
-		if ($user->user_id > 0 && verifyPassHash($pass, $user->user_pass) && $user->user_lastlogin != "0000-00-00 00:00:00"  && $user->user_enabled) {
+		if ($user->user_id > 0 && verifyPassHash($pass, $user->user_pass) && $user->user_lastlogin != NULL  && $user->user_enabled) {
 			$this->user_login = $user->user_login;  
 			$this->user_id = $user->user_id;
 

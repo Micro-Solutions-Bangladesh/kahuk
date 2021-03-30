@@ -72,4 +72,3 @@ $main_smarty->assign('tpl_center', '/admin/page_submit');
 $main_smarty->display('/admin/admin.tpl');
 
 ?>
-

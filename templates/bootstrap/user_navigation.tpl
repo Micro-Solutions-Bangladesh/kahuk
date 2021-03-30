@@ -52,7 +52,13 @@
 											<img src="{$Avatar.large}" title="{#PLIKLI_Visual_Profile_CurrentAvatar#}" />
 										</div>
 										<div class="fileupload-preview fileupload-exists img-thumbnail" style="max-width:{$Avatar_Large}px;max-height:{$Avatar_Large}px;"></div>
-										{if $error.Type neq ""}<span class="alert alert-danger" style="font-size:0.6em">{$error.Type}</span>{/if}
+										{if $error neq ""}
+                                            <div style="margin-top:27px;margin-bottom:30px;">
+                                            {foreach from=$error item=err}
+                                               <div class="alert alert-danger" style="font-size:0.5em;">{$err}</div> 
+                                            {/foreach} 
+                                            </div>
+                                        {/if}
 										<div>
 											<span class="btn btn-default btn-file">
 												<span class="fileupload-new"><i class="fa fa-picture"></i> Browse</span>

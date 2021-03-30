@@ -54,7 +54,7 @@ $(function() {
 	  });
 	});
 	
-  
+
 
 	 $(".reg_password").blur(function() 
     {
@@ -84,9 +84,9 @@ $(function() {
 	});
 	
 	 return false;
-  });
-  
-  
+});
+
+
   
 //$( document ).ready(function() {
 	/*
@@ -103,7 +103,7 @@ $(function() {
 				var no_spl_char = yourInput.replace(re, '');
 				$(this).val(no_spl_char);
 			}
-  });
+		});
 		$(".reg_username").bind("paste", function() {
 			setTimeout(function() { 
 			  //get the value of the input text
@@ -114,5 +114,5 @@ $(function() {
 			  $( ".reg_username" ).val(dataFull);
 			});
 		});
-	});
+  });
 //});

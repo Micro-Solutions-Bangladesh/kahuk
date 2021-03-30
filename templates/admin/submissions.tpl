@@ -15,7 +15,7 @@ function submit_list_form(){
 		$('.enabled_disable:checked').each(function(i){
 			usernames += $(this).attr("usernameval")+", ";
 		});
-		if(confirm("Are you sure that you want to killspam these users: "+usernames)){
+		if(confirm("CAUTION: Using killspam will change the user's status to sapmmer and deletes all his activity (submissions, coments, groups, etc and blacklists all the domains of the stories submitted! If you want to mark A PARTICULAR STORY AS SPAM, use the gear that appears on the right side of the story and select \"Change the status\" and on the Change Status page, click on Ban this url\r\rAre you sure that you want to killspam these users: "+usernames)){
         
 		} else {
 			return false;
@@ -157,7 +157,7 @@ function validate_all_user_action(){
 				{/if} 
 			</td>
 			{checkActionsTpl location="tpl_plikli_admin_submissions_td_start"}
-			<td><a href="{$my_base_url}{$my_plikli_base}/admin/admin_users.php?mode=view&user={$template_stories[id].link_author}" title="{$template_stories[id].link_author}'s Articles" id="link-{$template_stories[id].link_id}-author">{$template_stories[id].link_author}</a></td>
+			<td><a href="{$my_base_url}{$my_plikli_base}/admin/admin_users.php?mode=view&user={$template_stories[id].link_author}" title="{$template_stories[id].link_author}'s Articles" id="link-{$template_stories[id].link_id}-author">{$template_stories[id].link_author}</a> {checkActionsTpl location="tpl_plikli_admin_links_extra"}</td>
 			<td>
 				<a href='{$my_plikli_base}/editlink.php?id={$template_stories[id].link_id}'><i class="fa fa-edit" title="{#PLIKLI_Visual_AdminPanel_Page_Edit#}" alt="{#PLIKLI_Visual_AdminPanel_Page_Edit#}"></i></a>
 				<a href="{$my_base_url}{$my_plikli_base}/story.php?title={$template_stories[id].link_title_url}" title="{$template_stories[id].link_title|truncate:50:"...":true}" >{$template_stories[id].link_title}</a>

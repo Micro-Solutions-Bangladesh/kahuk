@@ -48,55 +48,48 @@ function upload_showpage(){
 			    }
 			}
 			if (is_numeric($_POST['upload_width']) && $_POST['upload_width'] > 0 &&
-			    is_numeric($_POST['upload_height']) && $_POST['upload_height'] > 0)
-			{
+			    is_numeric($_POST['upload_height']) && $_POST['upload_height'] > 0) {
 			    $size = sanitize($_POST['upload_width'].'x'.$_POST['upload_height'], 3);
-			    if (!@in_array($size,$sizes))
-			    {
+			    if (!@in_array($size,$sizes)) {
 			    	$sizes[] = $size;
-
-				$files = $db->get_results($sql = "SELECT a.* FROM " . table_prefix . "files a
+                    $files = $db->get_results($sql = "SELECT a.* FROM " . table_prefix . "files a
 								    LEFT JOIN " . table_prefix . "files b ON a.file_id=b.file_orig_id AND b.file_size='$size'
 								    WHERE a.file_size='orig' AND ISNULL(b.file_id)");
-				if ($files)
-				{
-				    misc_data_update('upload_sizes', serialize($sizes));
-				    misc_data_update('upload_thumb_format', sanitize($_REQUEST['upload_thumb_format'],3));
-				    misc_data_update('upload_quality', $_REQUEST['upload_quality']<=100 && $_REQUEST['upload_quality']>=1 ? $_REQUEST['upload_quality'] : 80 );
-					/* Redwine: saving 27 queries */
-				    //$settings = get_upload_settings();
+                    if ($files) {
+                        misc_data_update('upload_sizes', serialize($sizes));
+                        misc_data_update('upload_quality', $_REQUEST['upload_quality']<=100 && $_REQUEST['upload_quality']>=1 ? $_REQUEST['upload_quality'] : 80 );
 
-				    foreach ($files as $file)
-					generate_thumbs(
-						strpos($file->file_name,'http')===0 ? $file->file_name : mnmpath.sanitize($_REQUEST['upload_directory'], 3).'/'.$file->file_name,
-						$file->file_link_id,
-						$settings,
-						$file->file_id,
-						$size);
-				}
+                        foreach ($files as $file) {
+                            generate_thumbs(
+                            strpos($file->file_name,'http')===0 ? $file->file_name : mnmpath.sanitize($_REQUEST['upload_directory'], 3).'/'.$file->file_name,
+                            $file->file_link_id,
+                            $settings,
+                            $file->file_id,
+                            $size);
+                        }
+                    }
 			    }
 			}
 
 			$fields = unserialize(base64_decode(get_misc_data('upload_fields')));
-			for ($i=0; $i<sizeof($fields); $i++)
-			{
-			    if (in_array($fields[$i],$_POST['delfield']))
+			for ($i=0; $i<sizeof($fields); $i++) {
+			    if (isset($_POST['delfield']) && in_array($fields[$i],$_POST['delfield']))
 				array_splice($fields,$i--,1);
 			}
 			if ($_POST['upload_new_field'])
 			    $fields[] = sanitize($_POST['upload_new_field'], 3);
 
-			if ($_POST['alternate'])
+			if (isset($_POST['alternate']))
 			    foreach ($_POST['alternate'] as $k => $v)
-			    	$alternates[$k] = sanitize($v, 3);
+                        $alternates[$k] = sanitize($v, 3);
 
 			$mandatory = array();
-			if ($_POST['mandatory'])
+			if (isset($_POST['mandatory']))
 			    foreach ($_POST['mandatory'] as $k => $v)
-			    	$mandatory[$k] = sanitize($v, 3);
+                        $mandatory[$k] = sanitize($v, 3);
 
 			$display = array();
-			if ($_POST['display'])
+			if (isset($_POST['display']))
 			    foreach ($_POST['display'] as $k => $v)
 			    	$display[$k] = sanitize($v, 3);
 
@@ -111,9 +104,6 @@ function upload_showpage(){
 			misc_data_update('upload_format', $_REQUEST['upload_format']);
 			misc_data_update('upload_pre_format', $_REQUEST['upload_pre_format']);
 			misc_data_update('upload_post_format', $_REQUEST['upload_post_format']);
-			misc_data_update('upload_thumb_format', $_REQUEST['upload_thumb_format']);
-			misc_data_update('upload_t_pre_format', $_REQUEST['upload_thumb_pre_format']);
-			misc_data_update('upload_t_post_format', $_REQUEST['upload_thumb_post_format']);
 			misc_data_update('upload_allow_hide', sanitize($_REQUEST['upload_allow_hide'],3));
 			misc_data_update('upload_quality', $_REQUEST['upload_quality']<=100 && $_REQUEST['upload_quality']>=1 ? $_REQUEST['upload_quality'] : 80 );
 			misc_data_update('upload_link', sanitize($_REQUEST['upload_link'], 3));
@@ -125,9 +115,6 @@ function upload_showpage(){
 			$all_extensions = sanitize($_REQUEST['upload_extensions'], 3);
 			misc_data_update('upload_extensions', validate_extensions($all_extensions));
 			misc_data_update('upload_fileplace', sanitize($_REQUEST['upload_fileplace'], 3));
-			misc_data_update('upload_allow_comment', sanitize($_REQUEST['upload_allow_comment'], 3));
-			misc_data_update('upload_commentplace', sanitize($_REQUEST['upload_commentplace'], 3));
-			misc_data_update('upload_cfilelist', sanitize($_REQUEST['upload_commentfilelist'], 3));
 
 			header("Location: ".my_plikli_base."/module.php?module=upload");
 			die();
@@ -445,7 +432,10 @@ function upload_track($vars)
 
     $content = $vars['smarty']->_vars['story_content'];
     $link_id = $vars['smarty']->_vars['link_id'];
-	$uploaded_image = $vars['smarty']->_vars['uploaded_image'];
+
+    if (isset($_SESSION['uploaded_image']) && !empty($_SESSION['uploaded_image'])) {
+        $uploaded_image = $vars['smarty']->_vars['uploaded_image'];
+    }
     if (preg_match_all('/\{image(\d+)(\_(\d+x\d+))?\}/s',$content,$m))
     for ($i=0; $i<sizeof($m[1]); $i++)
     {
@@ -589,12 +579,12 @@ function upload_comment_delete($vars)
 function upload_rss_item($vars) {
 	global $db, $settings;
 
-	$upload_link = get_misc_data('upload_link');
-	$upload_defsize = get_misc_data('upload_defsize');
-	$alternates = unserialize(base64_decode(get_misc_data('upload_alternates')));
-	$upload_directory = get_misc_data('upload_directory');
-	$upload_thdirectory = get_misc_data('upload_thdirectory');
-	$upload_thumb_format = get_misc_data('upload_thumb_format');
+	$upload_link = $settings['link'];
+	$upload_defsize = $settings['upload_defsize'];
+	$alternates = unserialize(base64_decode($settings['upload_alternates']));
+	$upload_directory = mnmpath . $settings['directory'] ;
+	$upload_thdirectory = mnmpath . $settings['thdirectory'] ;
+	//$upload_thumb_format = get_misc_data('upload_thumb_format');
 
      	$sql = "SELECT *, IF(LEFT(file_name,4)='http',file_name,CONCAT('$upload_directory/',file_name)) AS link_name 
 			FROM " . table_prefix . "files a
@@ -609,12 +599,12 @@ function upload_rss_item($vars) {
 function upload_comment_rss_item($vars) {
 	global $db, $settings;
 
-	$upload_link = get_misc_data('upload_link');
-	$upload_defsize = get_misc_data('upload_defsize');
-	$alternates = unserialize(base64_decode(get_misc_data('upload_alternates')));
-	$upload_directory = get_misc_data('upload_directory');
-	$upload_thdirectory = get_misc_data('upload_thdirectory');
-	$upload_thumb_format = get_misc_data('upload_thumb_format');
+	$upload_link = $settings['link'];
+	$upload_defsize = $settings['defsize'];
+	$alternates = unserialize(base64_decode($settings['alternates']));
+	$upload_directory = mnmpath . $settings['directory'] ;
+	$upload_thdirectory = mnmpath . $settings['thdirectory'] ;
+	//$upload_thumb_format = get_misc_data('upload_thumb_format');
 
      	$sql = "SELECT *, IF(LEFT(file_name,4)='http',file_name,CONCAT('$upload_directory/',file_name)) AS link_name 
 			FROM " . table_prefix . "files a

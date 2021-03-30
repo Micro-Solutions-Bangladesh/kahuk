@@ -51,7 +51,7 @@ if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
 							<div class="col-md-12">
 								<legend>Error establishing a database connection!</legend>
 								<ol>
-									<li>Run the <a href = "./install/troubleshooter.php">Plikli Installer</a> Troubleshooter</a> to fix all errors and set all the required files and persmissions!</li>
+									<li>Run the <a href = "../install/troubleshooter.php">Plikli Installer</a> Troubleshooter</a> to fix all errors and set all the required files and persmissions!</li>
 									<!--<li>Does the file /libs/dbconnect.php exist?</li>
 									<li>Does the above file have the correct database username and password combination?</li>
 									<li>Are you sure that you have typed the correct hostname? Typically this value is set to "localhost".</li>
@@ -333,8 +333,9 @@ if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
 				mysqli_query( $this->dbh, 'set names utf8' );
 				mysqli_query ($this->dbh, "set character_set_client='utf8'");
 				mysqli_query ($this->dbh, "set character_set_results='utf8'");
-				mysqli_query ($this->dbh, "set collation_connection='utf8_general_ci'");
-				
+				mysqli_query ($this->dbh, "set collation_connection='utf8mb4_unicode_ci'");
+                mysqli_query ($this->dbh, "set GLOBAL sql_mode ='';");
+                mysqli_query ($this->dbh, "set SESSION sql_mode ='';");
 				$this->dbuser = $dbuser;
 				$this->dbpassword = $dbpassword;
 				$this->dbhost = $dbhost;

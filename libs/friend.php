@@ -89,22 +89,24 @@ class Friend {
 		$sql = "SELECT CONCAT( friend_from, ',', friend_to ) AS STATUS FROM " . table_friends . " WHERE (friend_from, friend_to) IN (( " . $current_user->user_id . "," . $friend . " ) , ( ". $friend . "," . $current_user->user_id. " ))";
 		//$sql = "SELECT " . table_users . ".user_id FROM " . table_friends . " INNER JOIN " . table_users . " ON " . table_friends . ".friend_to = " . table_users . ".user_id WHERE " . table_friends . ".friend_from=" . $current_user->user_id .";";
 		$result = $db->get_results($sql,ARRAY_A);
-		//var_dump($result);
-		//echo sizeof($result);
-		if (sizeof($result) == 2) {
-			$friends = "mutual";
-		}elseif (sizeof($result) == 1) {
-			foreach($result as $key => $val){
-				if ($val['STATUS'] == $current_user->user_id . "," . $friend) {
-					$friends = "following";
-				}elseif ($val['STATUS'] == $friend . "," . $current_user->user_id) {
-					$friends = "follower";
-				}
-			}
-		}else{
-			$friends = "";
-		}
-		//echo $friends;
+        if ($result) {
+            if (sizeof($result) == 2) {
+                $friends = "mutual";
+            } elseif (sizeof($result) == 1) {
+                foreach($result as $key => $val){
+                    if ($val['STATUS'] == $current_user->user_id . "," . $friend) {
+                        $friends = "following";
+                    } elseif ($val['STATUS'] == $friend . "," . $current_user->user_id) {
+                        $friends = "follower";
+                    }
+                }
+            } else {
+                $friends = "";
+            }
+            
+		} else {
+            $friends = "";
+        }
 		return $friends;
 		
 		// returns friend user_id if a friend

@@ -248,7 +248,7 @@ function do_submit1() {
 	$linkres->store();
 
 	$main_smarty->assign('StorySummary_ContentTruncate', StorySummary_ContentTruncate);
-	$main_smarty->assign('SubmitSummary_Allow_Edit', SubmitSummary_Allow_Edit);
+	//$main_smarty->assign('SubmitSummary_Allow_Edit', SubmitSummary_Allow_Edit);
 	$main_smarty->assign('enable_tags', Enable_Tags);
 	$main_smarty->assign('submit_url_title', str_replace('"',"&#034;",$linkres->url_title));
 	$main_smarty->assign('submit_url_description', $linkres->url_description);
@@ -471,10 +471,10 @@ function do_submit2() {
 		check_actions('comment_subscription_insert_function', $vars);
 	}
 
-	$vars = '';
+	$vars = array('username' => $current_user->user_login);
 	check_actions('submit_step_3_after_first_store', $vars);
-	
-	if (!empty($vars['error']) && $vars['error'] == true && link_catcha_errors('captcha_error')){
+
+	if (isset($vars['error']) && $vars['error'] == true && link_catcha_errors('captcha_error')){
 		return;
 	}
 	
@@ -774,13 +774,13 @@ function link_errors($linkres)
 	
 	return $error;
 }
-// assign any errors found during captch checking
+// assign any errors found during captcha checking
 function link_catcha_errors($linkerror)
 {
 	global $main_smarty, $the_template;
 	$error = false;
 
-	if($linkerror == 'captcha_error') { // if no category is selected
+	if($linkerror == 'captcha_error') { 
 		$main_smarty->assign('submit_error', 'register_captcha_error');
 		$main_smarty->assign('tpl_center', $the_template . '/submit_errors_center');
 		$main_smarty->display($the_template . '/plikli.tpl');

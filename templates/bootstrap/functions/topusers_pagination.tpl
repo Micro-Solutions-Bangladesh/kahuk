@@ -65,4 +65,4 @@
 		   }
 		});
 	{/literal}
-	</script>
+</script>

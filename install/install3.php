@@ -72,15 +72,7 @@ if($conn = @mysqli_connect($dbhost,$dbuser,$dbpass)) {
 				$include='../libs/dbconnect.php'; if (file_exists($include)) { require_once($include); }
 				include('db-mysqli.php');
 				
-				$mysqlServerVersion = $handle->server_info;
-				$pattern = '/[^0-9-.]/i';
-				$replacement = '';
-				$mysqlServerVersion = preg_replace($pattern, $replacement, $mysqlServerVersion);
-				if (strpos($mysqlServerVersion, '-') > 0){ 
-				$mysqlServerVersion = strstr($mysqlServerVersion, '-', true);				
-				}else{
-					$mysqlServerVersion = $mysqlServerVersion;
-				}				
+				$mysqlServerVersion = $_SESSION['mysqlserver'];
 				//echo "Your MySQL Server version is => $theMySqlVersion";
 				if (version_compare($mysqlServerVersion, '5.0.3', '>=')) {
 					$warning_mysql_Server_version = "You have what Plikli CMS needs to function properly, MySQL Server Version ". $mysqlServerVersion; 

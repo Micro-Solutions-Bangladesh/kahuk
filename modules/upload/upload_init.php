@@ -36,12 +36,6 @@ if(defined('mnminclude')){
 
 		module_add_action_tpl('tpl_header_admin_main_links', upload_tpl_path . 'upload_admin_main_link.tpl');
 
-		if ($settings['allow_comment']) {
-		    module_add_action('show_comment_content', 'upload_comment_track', '');
-
-        	    module_add_action_tpl($settings['commentplace'], upload_tpl_path . '/upload_comment_thumb.tpl');
-        	    module_add_action_tpl($settings['commentfilelist'], upload_tpl_path . '/upload_links.tpl');
-		}
 	}
 
 	$include_in_pages = array('submit','story','edit');
@@ -51,11 +45,11 @@ if(defined('mnminclude')){
         	module_add_action_tpl('tpl_plikli_submit_step2_after_form', upload_tpl_path . '/upload_files.tpl');
 
 	        //$settings = get_upload_settings();
-		if ($settings['allow_comment']) {
+		/*if ($settings['allow_comment']) {
 		    module_add_action('after_comment_submit', 'upload_do_comment_submit','');        		     
 		    module_add_action('after_comment_edit', 'upload_do_comment_submit','');        		     
         	    module_add_action_tpl('tpl_plikli_story_comments_form_end', upload_tpl_path . '/upload_comments.tpl');
-		}
+		}*/
 	}
 
 	$include_in_pages = array('editlink');

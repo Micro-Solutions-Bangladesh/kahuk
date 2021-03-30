@@ -191,6 +191,14 @@ if(is_numeric($requestID)) {
 	$main_smarty->assign('story_comment_count', $link->comments());
 	$main_smarty->assign('URL_rss_page', getmyurl('storyrss', isset($requestTitle) ? $requestTitle : urlencode($link->title_url), $link->category_safe_name($link->category)));
 
+	/***************************
+	Redwine: if we are testing the smtp email send, WITH A FAKE EMAIL ADDRESS, the SESSION variable will allow us to print the email message when the register_complete.php is loaded, so that the account that is created can be validated and activated.
+	***************************/
+	if (allow_smtp_testing == 1 && smtp_fake_email == 1) {
+		$main_smarty->assign('notifyStatus', $_SESSION['notifyStatus']);
+		unset($_SESSION['notifyStatus']);
+	}
+
 	$main_smarty->assign('tpl_center', $the_template . '/story_center');
 	$main_smarty->display($the_template . '/plikli.tpl');
 } else {

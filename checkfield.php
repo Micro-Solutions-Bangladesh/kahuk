@@ -1,5 +1,6 @@
 <?php
 
+
 include_once('internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
@@ -59,7 +60,7 @@ switch ($type) {
 		break;
 		}
 	case 'password':
-		if(strlen($password) < 5 ) { // if password is less than 5 characters
+		if(strlen($password) < 9 ) { // if password is less than 5 characters
 		 echo $main_smarty->get_config_vars('PLIKLI_Visual_Register_Error_FiveCharPass');
 		 return;
 		}else{

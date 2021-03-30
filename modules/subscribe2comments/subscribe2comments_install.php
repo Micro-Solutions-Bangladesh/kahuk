@@ -1,7 +1,7 @@
 <?php
 	$module_info['name'] = 'Subscribe To Comments';
 	$module_info['desc'] = 'The module provides an option to subscribe/unsubscribe to comments notifications!';
-	$module_info['version'] = 2.0;
+	$module_info['version'] = 2.1;
 	$module_info['settings_url'] = '../module.php?module=subscribe2comments';
 	$module_info['homepage_url'] = 'https://www.plikli.com/mods/subscribe2comments.zip';
 	$module_info['update_url'] = '';

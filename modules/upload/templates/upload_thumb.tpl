@@ -44,7 +44,7 @@
 	}
 {/php}                                                          
 
-{if sizeof($images)}
+{if $images}
 {$upload_thumb_pre_format}
 {foreach from=$images item=image}
     {if $upload_thumb_format}

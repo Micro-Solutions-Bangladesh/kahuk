@@ -1,11 +1,11 @@
 <?php
 	$module_info['name'] = 'RSS Importer';
 	$module_info['desc'] = 'Import RSS Feeds as Posts';
-	$module_info['version'] = 2.1;
+	$module_info['version'] = 2.5;
 	$module_info['update_url'] = '';
 	$module_info['homepage_url'] = 'https://www.plikli.com/mods/rss_import.zip';
 	$module_info['settings_url'] = '../module.php?module=rss_import';
-    $module_info['requires'][] = array('PHP', 5);
+    $module_info['requires'][] = array('PHP', '5.4');
         
 	$module_info['db_add_table'][]=array(
 		'name' => table_prefix . "feed_import_fields",
@@ -13,7 +13,7 @@
 	  `id` int(11) NOT NULL auto_increment,
 	  `field_name` varchar(255) NOT NULL,
 	  PRIMARY KEY  (`id`)
-	) ENGINE = MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;");
+	) ENGINE = MyISAM DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;");
 
 	$module_info['db_add_table'][]=array(
 		'name' => table_prefix . "feed_link",
@@ -23,7 +23,7 @@
 	  `feed_field` varchar(255) NOT NULL,
 	  `plikli_field` varchar(255) NOT NULL,
 	  PRIMARY KEY  (`feed_link_id`)
-	) ENGINE = MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;");
+	) ENGINE = MyISAM DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;");
 
 	$module_info['db_add_table'][]=array(
 		'name' => table_prefix . "feeds",
@@ -45,7 +45,7 @@
 	  `feed_random_vote_max` TINYINT( 3 ) UNSIGNED NOT NULL DEFAULT '20',
 	  `feed_last_item_first` TINYINT( 3 ) UNSIGNED NOT NULL DEFAULT '1',
 	  PRIMARY KEY  (`feed_id`)
-	) ENGINE = MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;");
+	) ENGINE = MyISAM DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;");
 
 	// the 'on duplicate' is just a cheap hack to prevent any errors if the
 	// module is 'installed' more than once.

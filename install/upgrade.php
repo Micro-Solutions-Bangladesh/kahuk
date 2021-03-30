@@ -2,9 +2,30 @@
 session_start();
 error_reporting(E_ALL ^ E_NOTICE ^ E_WARNING ^ E_STRICT);
 $page = 'upgrade';
+define('page', $page);
 define("mnmpath", dirname(__FILE__).'/../');
 define("mnminclude", dirname(__FILE__).'/../libs/');
 define("mnmmodules", dirname(__FILE__).'/../modules/');
+
+if (!isset($_SESSION['agree'])) {
+    header ("Location: plikli-cms-terms.php?action=upgrade");
+    die;
+}
+
+if (file_exists(mnminclude.'dbconnect.php')) {
+    $f = file_get_contents(mnminclude.'dbconnect.php');
+    preg_match('/define\(["|\']EZSQL_DB_NAME["|\'], ["|\'](.*)["|\']\)/', $f, $matches);
+
+    if ($matches[1] == '') {
+        echo '<div style="margin:auto;padding:10px;width:50%"><div>You need to copy, from your old installation, these 2 file:<br />
+        <ol>
+            <li>/libs/dbconnect.php to the libs folder</li>
+            <li>/settings.php to the root folder</li>
+        </ol><br />
+        Copy the files and then refresh the page to proceed with the upgrade!</div></div>';
+        die;
+    }
+}
 include_once '../settings.php';
 if ($language != 'english') {
 	$file_rename = str_replace(".default", "", "lang_".$language.".conf.default");
@@ -19,6 +40,7 @@ if ($language != 'english') {
 	rename("../languages/lang_".$language.".conf.default", "../languages/$file_rename");
 	chmod("../languages/$file_rename", 0777);
 }
+
 include ('header.php');
 include('db-mysqli.php');
 $tbl_prefix = '';
@@ -87,11 +109,11 @@ padding:5px;
 font-size: 12px;
 }
 .alert-success {
-background-color: ##3c763d;
+/* background-color: ##3c763d;
 border: 1px solid #fff;
 color: #ffffff;
 margin: 0 10px 0 10px;
-padding:5px;
+padding:5px; */
 }
 li{margin-left:30px;}
 a:link, a:hover, a:visited, a:active{color:#000000}
@@ -148,8 +170,11 @@ if (isset($_REQUEST['step'])) { $step=addslashes(strip_tags($_REQUEST['step']));
 if ((!isset($step)) || ($step == "")) { $step = 0; }
 include_once('./languages/lang_english.php');
 if ($step == 0 && $tbl_prefix == '') {
-	echo '<fieldset><legend>ATTENTION!</legend>
-	<div  class="alert-danger">We detected that your Site\'s language in your settings is set to <strong><u><i>'.$language.'</i></u></strong> and we renamed the relevant language for you, to be ready when the upgrade is done!</div>
+	echo '<fieldset><legend>ATTENTION!</legend>';
+	if (isset($_SESSION['agree']) && $_SESSION['agree'] != '') {
+        echo '<p class="alert alert-success">You agreed to the terms & Conditions, please proceed to the upgrade of Plikli CMS!</p>';
+    }
+    echo '<div  class="alert-danger">We detected that your Site\'s language in your settings is set to <strong><u><i>'.$language.'</i></u></strong> and we renamed the relevant language for you, to be ready when the upgrade is done!</div>
 	<div  class="alert-danger">' . $lang['UpgradeHome'] . '</div>
 	<div  class="alert-danger">Before you start, make sure you have copied the following files from your Pligg site that you want to upgrade:
 		<ul>

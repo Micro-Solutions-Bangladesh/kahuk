@@ -77,12 +77,12 @@ function create_sitemaps_index($max_rec)
 //
 function create_sitemap_users($index,$max_rec)
 {
-	if (sitemap_header("users$index")) return true;
+	if (sitemap_header("users$index", true)) return true;
 
 	$sql = "SELECT * FROM " . table_users . " WHERE user_enabled ORDER BY user_modification DESC";
 	sitemap_body($sql,'user_modification',"user",'user_login',0.9,$index,$max_rec);
 
-	sitemap_footer("users$index");
+	sitemap_footer("users$index", true);
 }
 
 //
@@ -90,12 +90,12 @@ function create_sitemap_users($index,$max_rec)
 //
 function create_sitemap_groups($index,$max_rec)
 {
-	if (sitemap_header("groups$index")) return true;
+	if (sitemap_header("groups$index", true)) return true;
 
 	$sql = "SELECT * FROM " . table_groups . " WHERE group_status='Enable' ORDER BY group_date DESC";
 	sitemap_body($sql,'group_date',"group_story_title",'group_safename',1,$index,$max_rec);
 
-	sitemap_footer("groups$index");
+	sitemap_footer("groups$index", true);
 }
 
 //
@@ -103,12 +103,12 @@ function create_sitemap_groups($index,$max_rec)
 //
 function create_sitemap_pages($index,$max_rec)
 {
-	if (sitemap_header("pages$index")) return true;
+	if (sitemap_header("pages$index", true)) return true;
 
 	$sql = "SELECT * FROM ".table_links." WHERE link_status='page' order by link_modified DESC";
 	sitemap_body($sql,'link_modified',"page",'link_title_url',0.0001,$index,$max_rec);
 
-	sitemap_footer("pages$index");
+	sitemap_footer("pages$index", true);
 }
 
 //
@@ -118,7 +118,7 @@ function create_sitemap_links($index,$max_rec)
 {
 	global $db;
 
-	if (sitemap_header($index)) return true;
+	if (sitemap_header($index, true)) return true;
 
 	$sql = "SELECT link_id FROM ".table_links." WHERE link_status='new' OR link_status='published' ORDER BY link_modified DESC LIMIT ".($index*$max_rec).",$max_rec";
 	$link = new Link;
@@ -142,7 +142,7 @@ function create_sitemap_links($index,$max_rec)
 		}
 	}	
 
-	sitemap_footer($index);
+	sitemap_footer($index, true);
 }
 
 //
@@ -152,7 +152,7 @@ function create_sitemap_main()
 {
 	global $db,$my_base_url,$my_plikli_base,$URLMethod;
 
-	if (sitemap_header("main")) return true;
+	if (sitemap_header("main", true)) return true;
 
 	sitemap_add_page('index',   "SELECT MAX(UNIX_TIMESTAMP(link_modified)) FROM ".table_links." WHERE link_status='published'");
 	sitemap_add_page('new',"SELECT MAX(UNIX_TIMESTAMP(link_modified)) FROM ".table_links." WHERE link_status='new'");
@@ -189,13 +189,13 @@ function create_sitemap_main()
  	$vars = '';
 	check_actions('xml_sitemaps_main', $vars);
 
-	sitemap_footer("main");
+	sitemap_footer("main", true);
 }
 
 //
 // Ping search engines
 //
-function xml_sitemaps_sites_ping(){
+/*function xml_sitemaps_sites_ping(){
 	global $my_base_url,$my_plikli_base, $XmlSitemaps_friendly_url;
 	$res= "";
 
@@ -213,11 +213,11 @@ function xml_sitemaps_sites_ping(){
 
 	if (XmlSitemaps_ping_ask)
 		sitemap_call_url("http://submissions.ask.com/ping?sitemap=".$Url);
-/* Redwine: fix Yahoo ping */
+
 	//Yahoo now is using Bing
 	if (XmlSitemaps_ping_yahoo)
 		sitemap_call_url("http://www.bing.com/webmaster/ping.aspx?siteMap=".Xml_Sitemaps_yahoo_key."&url=".$Url);
-}
+}*/
 
 //
 // Call given URL

@@ -1,4 +1,5 @@
 <?php
+
 if ($language == 'arabic') {
 	$site_direction = "rtl";
 }else{

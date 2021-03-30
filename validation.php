@@ -30,7 +30,7 @@ if($rcode==$decode)
 	/* Redwine: Fixed erroneous code ($user->karma and $user->username) that was rendering the validation impossible when users request a validation code upon login. At the same time, added a query to delete the entry from the login_attempts table because the user had to wait x number of seconds based on the number of login attempts. Now, upon successful validation, this entry is deleted and users don't have to wait any more!*/
 	$db->query("DELETE FROM ".table_login_attempts." WHERE login_username='$username'");
 	$lastlogin = $db->get_var("SELECT user_lastlogin FROM " . table_users . " WHERE user_login = '$username'");
-	if($lastlogin == "0000-00-00 00:00:00"){
+	if($lastlogin == NULL){
 		$login_url=getmyurl("loginNoVar");
 		$message = sprintf($main_smarty->get_config_vars('PLIKLI_Validation_Message'),$login_url);
 		$main_smarty->assign('message', $message);
@@ -42,7 +42,7 @@ if($rcode==$decode)
 	elseif($_GET['email'] && $_GET['email']!=$result->user_email)
 	{
 		$login_url=getmyurl("loginNoVar");
-		$message = sprintf($main_smarty->get_config_vars('PLIKLI_Validation_Message'),$login_url);
+		$message = $main_smarty->get_config_vars('PLIKLI_Visual_User_Profile_Email_Validated');
 		$main_smarty->assign('message', $message);
 
 		$sql="UPDATE " . table_users . " SET user_email = '".$db->escape($_GET['email'])."' WHERE user_login='$username'";

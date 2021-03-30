@@ -12,6 +12,9 @@
 	<link rel="stylesheet" type="text/css" href="{$my_plikli_base}/templates/{$the_template}/css/font-awesome.min.css">
 	<link rel="stylesheet" type="text/css" href="{$my_plikli_base}/templates/{$the_template}/css/jquery.pnotify.css" media="screen" />
 	<link rel="stylesheet" type="text/css" href="{$my_plikli_base}/templates/{$the_template}/css/style.css" media="screen" />
+    {if $Use_New_Story_Layout eq '1'}
+    <link rel="stylesheet" type="text/css" href="{$my_plikli_base}/templates/{$the_template}/css/custom.css" media="screen" />
+    {/if}
 	{if $Voting_Method eq 2}
 		<link rel="stylesheet" type="text/css" href="{$my_plikli_base}/templates/{$the_template}/css/star_rating/star.css" media="screen" />
 	{/if}

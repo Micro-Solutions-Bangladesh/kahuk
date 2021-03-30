@@ -165,14 +165,14 @@ if($status=="uninstalled") {
 		$main_smarty->assign('updatekey', $updatekey);
 	}
 	$main_smarty->assign('no_module_update_require', $updatecount);
-	//$expire=time()+60*60*24*60;
-    //setcookie("module_update_require_un", $updatecount, $expire);
-	//setcookie("module_update_require_un_ex", $updatecount, $expire,"/",$_SERVER["HTTP_HOST"]);
 	$main_smarty->assign('module_info', $module_info_data);
 	
 	$res_for_update=$db->get_var("select var_value from " . table_config . "  where var_name = 'uninstall_module_updates'");
 	if(count($res_for_update)<=0){
-	 $db->query("INSERT INTO " . table_config . " set var_value =".$updatecount." , var_name = 'uninstall_module_updates'");
+     /* 
+        Redwine: modified the INSERT statement to eliminate the error 
+     */
+	 $db->query("INSERT INTO " . table_config . " set var_page = '', var_value =".$updatecount." , var_name = 'uninstall_module_updates', var_defaultvalue='', var_optiontext='', var_title='', var_desc='', var_method='';");
 	}else{
 		/* Redwine: added conditional satement to save a query. */
 		if ($res_for_update != $updatecount) {

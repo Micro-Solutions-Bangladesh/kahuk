@@ -6,7 +6,7 @@ define('LOG_FILE','logs/error.log'); // Used by the Admin Panel error log file v
 
 error_reporting(E_ALL ^ E_NOTICE ^ E_WARNING); // Define the types of errors that will be reported to the error log
 ini_set('display_errors','Off'); // Off = Don't print errors to the browser
-ini_set('error_log','logs/error.log'); // Error log file location
+ini_set('error_log', LOG_FILE); // Error log file location
 
 // Template Caching
 // 0 = off
@@ -14,38 +14,43 @@ ini_set('error_log','logs/error.log'); // Error log file location
 define('caching', 1);
 define('summarize_mysql', 1);
 
+//Redwine: function to remove the effect of magic quotes if it is set to ON.
+
+function stripslashes_deep($value)
+{
+	$value = is_array($value) ?
+	array_map('stripslashes_deep', $value) :
+	stripslashes($value);
+	return $value;
+}
+
+//Redwine: if magic quotes is set to ON, the below code will stripslashes from $_POST, $_GET, $_REQUEST, $_COOKIE  and any string.
+
 if (get_magic_quotes_gpc()) {
-    function stripslashes_deep($value)
-    {
-        $value = is_array($value) ?
-		array_map('stripslashes_deep', $value) :
-		stripslashes($value);
-        return $value;
-    }
-
-    $_POST = array_map('stripslashes_deep', $_POST);
-    $_GET = array_map('stripslashes_deep', $_GET);
-    $_COOKIE = array_map('stripslashes_deep', $_COOKIE);
-    $_REQUEST = array_map('stripslashes_deep', $_REQUEST);
-
+	$_POST		= stripslashes_deep($_POST);
+	$_GET		= stripslashes_deep($_GET);
+	$_COOKIE	= stripslashes_deep($_COOKIE);
+	$_REQUEST	= stripslashes_deep($_REQUEST);
 }
 
 // Sanitize GET variables used in templates
-if ($main_smarty)
-{
+if ($main_smarty) {
     $get = array();
-    foreach ($_GET as $k => $v)
-	$get[$k] = stripslashes(htmlentities(strip_tags($v),ENT_QUOTES,'UTF-8'));
+    foreach ($_GET as $k => $v) {
+		$get[$k] = stripslashes(htmlentities(strip_tags($v),ENT_QUOTES,'UTF-8'));
+	}
+	
 	if (isset($get['return'])) { 
 		$get['return'] = addslashes($get['return']);
 	}
     $main_smarty->assign('get',$get);
 }
 
-// CSFR/XSFR protection
-if(!isset($_SESSION)) @session_start();
-
-if (!empty($_SESSION['xsfr'])){
+// CSFR/XSFR protection (function check_referrer in /libs/html1.php)
+if (!isset($_SESSION)) {
+	@session_start();
+}
+if (!empty($_SESSION['xsfr'])) {
     $xsfr_first_page = 0;
 } else {
     $xsfr_first_page = 1;
@@ -61,27 +66,35 @@ define("mnminternal", dirname(__FILE__).'/internal/');
 include_once mnminclude . 'pre_install_check.php';
 include_once 'settings.php';
 
-function sanit($var){
+function sanit($var)
+{
 	return addslashes(htmlentities(strip_tags($var),ENT_QUOTES,'UTF-8'));
 }
 
-if ($my_base_url == ''){
+//Redwine: to make sure that my_base_url is assigned.
+if ($my_base_url == '') {
 	$gethttphost = $_SERVER["HTTP_HOST"];
 	$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http') . '://';
 	$port = strpos($gethttphost, ':');
-    if ($port !== false){ 
+    if ($port !== false) { 
 		$httphost = substr($gethttphost, 0, $port);
-	}else{
+	} else {
 		$httphost = $gethttphost;
 	}
 	$standardport = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 443 : 80); 
 	$waitTimeoutInSeconds = 1; 
-	if($fp = fsockopen($httphost,$standardport,$errCode,$errStr,$waitTimeoutInSeconds)){   
+	if ($fp = fsockopen($httphost,$standardport,$errCode,$errStr,$waitTimeoutInSeconds)) {   
 		define('my_base_url', $protocol . $httphost);
+		/*
+			* if we test, by setting my_base_url to empty, right before the if statement, on line 84, we define my_base_url
+			* however, in index.php will still generate an error that my_base_url is missing...
+			* the reason is the below line of code: $my_base_url = $protocol . $httphost was missing.
+		*/
+		$my_base_url = $protocol . $httphost;
 	}
 	fclose($fp);
 
-	if(isset($_REQUEST['action'])){
+	if (isset($_REQUEST['action'])) {
 		$action = sanit($_REQUEST['action']);
 	} else {
 		$action="";
@@ -102,129 +115,167 @@ if ($my_base_url == ''){
 	define('my_plikli_base', $my_plikli_base);
 }
 
+//Redwine: URLMethod is set in /libs/settings_from_db.php
 define('urlmethod', $URLMethod);
 
-if(isset($_COOKIE['template'])){
+//Redwine: We want to unset the template cookie if the Allow_User_Change_Templates is set to false, otherwise, the cookie will remain.
+if (!Allow_User_Change_Templates) {
+    unset($_COOKIE['template']);
+}
+
+//Redwine: If Admins allow users to change the default template from their profile settings, this below statement will be executed if the config value of Allow_User_Change_Templates is set to true, only then the template name is set in a cookie.
+if (isset($_COOKIE['template'])) {
 	$thetemp = str_replace('..','',sanit($_COOKIE['template']));
 }
 
-// template check
+//Redwine: First check if $thetemp (value from the cookie, if user can change templates, or the config table) exists.
 $file = dirname(__FILE__) . '/templates/' . $thetemp . "/plikli.tpl";
 unset($errors);
 if (!file_exists($file)) {
-	$errors[]='You may have typed the template name wrong or "'. $thetemp . '" does not exist. Click <a href = "../admin/admin_config.php?page=Template">here</a> to fix it.';
+	$errors[]='You may have typed the template name wrong or "'. $thetemp . '" does not exist.';
 }
 
+//Redwine: If an error was genrated from the above statement, we check using the default Plikli template, bootstrap.
+$thetemp = "bootstrap";
+$file = dirname(__FILE__) . '/templates/' . $thetemp . "/plikli.tpl";
+if (!file_exists($file)) {
+    $errors[] = 'The default template "bootstrap" does not exist anymore. Please fix this by re-uploading the bootstrap template!';
+}   
+
+//Redwine: if errors, then we output them.    
 if (isset($errors)) {
-	// Name of the default Plikli template
-	$thetemp = "bootstrap";
-	$file = dirname(__FILE__) . '/templates/' . $thetemp . "/plikli.tpl";
-	if (!file_exists($file)) {
-		echo 'The default template "Bootstrap" does not exist anymore. Please fix this by reuploading the Bootstrap template!';
-		die();
-	}
-
+    $output .= '<div id="wrapper" style="width:800px;padding:10px;background-color:#FFC6C6;border:1px solid #000;color:#000;display:block;margin-left:auto;margin-right:auto;">';
 	foreach ($errors as $error) {
-		$output.="<p><b>Error:</b> $error</p>\n";
+		$output.= "<p><b>Error:</b> $error</p>";
 	}
-
-	if (strpos($_SERVER['SCRIPT_NAME'], "admin_config.php") == 0 && strpos($_SERVER['SCRIPT_NAME'], "login.php") == 0){
-		echo "<p><b>Error:</b> $error</p>\n";
+    $output .= '</div>';
+    echo $output;
+    
+    //Redwine: If the user is logged in and is Admin and is on the page specified below, then they can still have access to the Admin section to check the template name. Otherwise, all other user levels will not be able.
+	if (strpos($_SERVER['SCRIPT_NAME'], "admin_config.php") == 0) {
  		die();
 	}
 
 }
-
+//Redwine: the defined The_Template is then assigned as a variable The_Template and assigned to Smarty as well, in /libs/smartyvariables.php 
 define('The_Template', $thetemp);
 
-if(Enable_Extra_Fields){
+if (Enable_Extra_Fields) {
 	include mnminclude.'extra_fields.php';
 }
 
 // Don't touch behind this
+//Redwine: this means if there's a settings local.php file, read and include everything in that file now.
 $local_configuration = $_SERVER['SERVER_NAME'].'-local.php';
 @include($local_configuration);
 
 include_once mnminclude.'define_tables.php';
 
-//
+/*Redwine: a preventive measure to make sure that the smtp_fake_email, which allows printing the email on the page during SMTP testing, is turned off if the base URL does not contain localhost.*/
+if (strpos($my_base_url, 'localhost') === false && smtp_fake_email == 1) {
+    global $db;
+    $db->query("update ". table_config ." set `var_value` = 'false' where `var_name` = 'smtp_fake_email';");
+}
+
 // start summarization and caching of mysql data
-//
 
-	// added to replace 55 redundant queries with 1
-	// used with the following functions in /lib/link.php
-	//	function category_name() {
-	//	function category_safe_name() {
-	// cache the data if caching is enabled
+/***************************
+    * added to replace 55 redundant queries with 1
+    * used with the following functions in /lib/link.php
+    *	function category_name() {
+    *	function category_safe_name() {
+    * cache the data if caching is enabled
+***************************/
 
-	if(caching == 1){
-		$db->cache_dir = mnmpath.'cache';
-		$db->use_disk_cache = true;
-		$db->cache_queries = true;
-	}
+if (caching == 1) {
+    $db->cache_dir = mnmpath.'cache';
+    $db->use_disk_cache = true;
+    $db->cache_queries = true;
+}
 
-	// if this query changes, be sure to change the 'clear the cache' code in admin_categories.php
-	$the_cats = loadCategoriesForCache();
-	$cached_categories = $the_cats;
-	$db->cache_queries = false;
+// if this query changes, be sure to change the 'clear the cache' code in admin_categories.php
+$the_cats = loadCategoriesForCache();
+$cached_categories = $the_cats;
+$db->cache_queries = false;
 
-	// a simple cache type system for the users table
-	// used in the read() function of /libs/user.php
-	$cached_users = array();
+// a simple cache type system for the users table
+// used in the read() function of /libs/user.php
+$cached_users = array();
 
-	// a simple cache type system for the totals table
-	// functions related to this are in /libs/html1.php
-	$cached_totals = array();
-	$cached_votes = array();
-	$cached_links = array();
-	$cached_comments = array();
-	$cached_saved_links = array();
+// a simple cache type system for the totals table
+// functions related to this are in /libs/html1.php
+$cached_totals = array();
+$cached_votes = array();
+$cached_links = array();
+$cached_comments = array();
+$cached_saved_links = array();
 
-//
 // end summarization and caching of mysql data
-//
 
 ob_start();
 
 include_once mnminclude.'db.php';
 include mnminclude.'utils.php';
 
-// Defining the settings.php language setting as it's own variable
-$settings_language = $language;
 
-if(!isset($include_login) || $include_login !== false){
+/************************************
+    * Redwine: this code is obsolete??? include_login does not exist in other than the below 2 lines.
+    * However, we need to include the /libs/login.php file, otherwise, no user can login because they 
+    * won't be authenticated and errors will be generated.
+    * So, removing the if statement, because either way the file will be included???
+    ******************* TO INVESTIGATE ***********************
+************************************/
+
+if (!isset($include_login) || $include_login !== false) {
 	// if $include_login is set to false (like in jspath.php and xmlhttp.php), then we don't
 	// include login, because login will run a query right away to check user credentials
 	// and these two files don't require that.
 	include_once mnminclude.'login.php';
 }
 
+// Defining the settings.php language as it's own variable
+$settings_language = $language;
+
+/*************************************
+    * If Admin allowed users to use a different language file, other than the site's default,
+    * and for a reason, the user language file does not exist anymore,
+    * then we attempt to use the site's default language that is set in /settings.php
+*************************************/
 if (!file_exists(dirname(__FILE__) . '/languages/lang_'.$language.'.conf')) {
-	// If the user language file does not exist, attempt to use the site default
 	$language = $settings_language; // Back where we started. The settings.php file value.
 }
+
+// If all else fails, we default to the english language file
 if (!file_exists(dirname(__FILE__) . '/languages/lang_'.$language.'.conf')) {
-	// If all else fails, default to the english language file
 	$language = 'english';
 }
-define('plikli_language', $language);
 
+/*************************************
+    * Redwine: if no matter what, the language file does not exist, the we throw an error and kill the script.
+    * Otherwise, we define the language as plikli_language.
+*************************************/
 if (!file_exists(dirname(__FILE__) . '/languages/lang_'.$language.'.conf')) {
-	die('The language file /languages/lang_' . $language . '.conf does not exist. Either this file is missing or the server does not have permission to read it. Make sure that you renamed the file /languages/lang_' . $language . '.conf.default to /languages/lang_' . $language . '.conf.');
+    $output .= '<div id="wrapper" style="width:800px;padding:10px;background-color:#FFC6C6;border:1px solid #000;color:#000;display:block;margin-left:auto;margin-right:auto;">';
+    $output .= 'The language file /languages/lang_' . $language . '.conf does not exist. Either this file is missing or the server does not have permission to read it. Make sure that you renamed the file /languages/lang_' . $language . '.conf.default to /languages/lang_' . $language . '.conf.</div>';
+	die($output);
+} else {
+    //Redwine: we define plikli_language as the $language, and it will be used across the site, namely in the modules.
+    define('plikli_language', $language);
 }
-
-include_once(mnmmodules . 'modules_init.php');
+//var_dump(get_defined_constants(true));
+if (page != 'terms') {
+    include_once(mnmmodules . 'modules_init.php');
+}
 include mnminclude.'utf8/utf8.php';
 include_once(mnminclude.'dbtree.php');
 
 
-function loadCategoriesForCache($clear_cache = false) {
-
+function loadCategoriesForCache($clear_cache = false)
+{
 	global $db;
 	$sql = "select * from ".table_categories." ORDER BY lft ASC;";
+    //Redwine: if clear_cache i true, then we call un_cache function in /libs/ez_sql_core.php
 	if ($clear_cache)
 	$db->un_cache($sql);
 	return $db->get_results($sql);
 }
-
-?>

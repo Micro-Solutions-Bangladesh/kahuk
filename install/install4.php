@@ -136,8 +136,7 @@ if (!$errors) {
 	$dbname = EZSQL_DB_NAME;
 	$dbhost = EZSQL_DB_HOST;
 
-	if($conn = @mysqli_connect($dbhost,$dbuser,$dbpass))
-	 {
+	if($conn = @mysqli_connect($dbhost,$dbuser,$dbpass)) {
 		$db_selected = mysqli_select_db($conn, $dbname);
 		if (!$db_selected) { die ('Error: '.$dbname.' : '.mysqli_error($conn)); }
 		define('table_prefix', $_POST['tableprefix']);
@@ -148,10 +147,46 @@ if (!$errors) {
 		echo '<fieldset><legend>' . $lang['CreatingTables'] . '</legend>';
 		include_once ('../libs/db.php');
 		include_once("installtables.php");
-		if (plikli_createtables($conn) == 1) { echo "<li>" . $lang['TablesGood'] . "</li><hr />"; }
-		else { $errors[] = $lang['Error3-1']; }
-	}
-	else { $errors[] = $lang['Error3-2']; }
+		if (plikli_createtables($conn) == 1) {
+            echo "<li>" . $lang['TablesGood'] . "</li><hr />";
+        } else { 
+            $errors[] = $lang['Error3-1']; 
+        }
+	} else { 
+        $errors[] = $lang['Error3-2']; 
+    }
+    
+    define("mnmmods", __DIR__.'/../modules/');
+    $updMods = array('admin_language' => 'admin_language.zip', 'captcha' => 'captcha.zip');
+
+    foreach ($updMods as $key => $value) {
+        $ch = curl_init();
+        $fp = fopen (mnmmods."$value", 'w+');
+        $ch = curl_init("https://plikli.com/upgrade/$value");
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 50);
+        curl_setopt($ch, CURLOPT_FILE, $fp);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($ch, CURLOPT_ENCODING, "");
+        curl_exec($ch);
+        curl_close($ch);
+        fclose($fp);
+        if(filesize(mnmmods."$value") == 0) {
+            echo "<li>" . $key . " module was not downloaded! <a href=\"https://plikli.com/upgrade/$value\">Download $key</a> Module, unzip it to the modules folder.</li>";
+        } else {
+            $zip = new ZipArchive;
+            $res = $zip->open(mnmmods."$value");
+            if ($res === TRUE) {
+                $zip->extractTo(mnmmods."$key/");
+                $zip->close();
+                echo '<li>' .$key. ' module updated!</li>';
+            } else {
+                echo "<li>" . $key . " module was not updated! <a href=\"https://plikli.com/upgrade/$value\">Download $key</a> Module, unzip it to the modules folder.</li>";
+            }
+        }
+        unlink(mnmmods."$value");
+    }
 }
 
 if (!$errors) {

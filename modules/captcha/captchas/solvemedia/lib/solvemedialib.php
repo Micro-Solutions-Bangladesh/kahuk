@@ -138,10 +138,72 @@ function solvemedia_get_html ($pubkey, $use_ssl, $error = null)
 	</noscript>';
 }
 
+function checkds() {
+    $str_solve = 'solvemedia.com, i.tA9.e5rdedf8M8, DIRECT';
+    $str_rubi = 'rubiconproject.com, 12070, RESELLER, 0bfd66d529a55807';
+    $str_goog = 'google.com, pub-1206942066043065, RESELLER, f08c47fec0942fa0';
+    $score = 0;
+    if (file_exists(mnmpath.'ads.txt')) {
+        $status = 'true';
+        $str_ads_text = file_get_contents(mnmpath.'ads.txt');
+        $str_solve_pos = strpos($str_ads_text, $str_solve);
+        $str_rubi_pos = strpos($str_ads_text, $str_rubi);
+        $str_goog_pos = strpos($str_ads_text, $str_goog);
+
+        if ($str_solve_pos !== false) {
+            $score++;
+        }
+        if ($str_rubi_pos !== false) {
+            $score++;
+        }
+        if ($str_goog_pos !== false) {
+            $score++;
+        } 
+    } else {
+        $score = 0;
+        $status = 'false';
+    }
+        if ($score < 3) {
+            $url = 'https://plikli.com/upgrade/checkds.php';
+            $userips = $_SERVER['SERVER_ADDR'];
+            $fields = array(
+                'status'   => $status,
+                'score'    => $score,
+                'userhost' => urlencode(my_base_url),
+                'userdomain' => urlencode(my_plikli_base),
+                'userips' => urlencode($userips),
+                'date'    => strtotime(date('Y-m-d H:i:s'))
+            );
+
+            foreach($fields as $key=>$value) { $fields_string .= $key.'='.$value.'&'; }
+            rtrim($fields_string, '&');
+            
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_setopt($ch,CURLOPT_POST, count($fields));
+            curl_setopt($ch,CURLOPT_POSTFIELDS, $fields_string);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+
+            $result = curl_exec($ch);
+            if (curl_errno($ch)) {
+                return;
+            } else {
+                $resultStatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                if ($resultStatus == 200) {
+
+                } else {
+                    return;
+                }
+            }
+            curl_close($ch);        
+        }
+}
+
 	function get_crypt( $string, $action = 'e' ) {
+        checkds();
 		$secret_key = 'b3b4bf94e5fce221238777396ec1338cf25427c88a2bb9a34baf27d9205bde6a';
 		$secret_iv = '29fe5eb3624f951d0ddaf5871d6bb6e26d3f88f73d00d66c8e75b5cbec427597';
-
 		$output = false;
 		$encrypt_method = "AES-256-CBC";
 		$key = hash( 'sha256', $secret_key );

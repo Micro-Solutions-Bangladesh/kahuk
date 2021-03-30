@@ -51,10 +51,6 @@
 				<td><label><a href="#{#PLIKLI_Upload_Allow_Hiding#}">{#PLIKLI_Upload_Allow_Hiding#}</a>:</label></td>
 				<td><input type="checkbox" name="upload_allow_hide" id="upload_allow_hide" value="1" {if $settings.allow_hide}checked{/if}/></td>
 			</tr>
-			<!--<tr>
-				<td><label><a href="#{#PLIKLI_Upload_Allow_Comment_Attachments#}">{#PLIKLI_Upload_Allow_Comment_Attachments#}</a>:</label></td>
-				<td><input type="checkbox" name="upload_allow_comment" id="upload_allow_comment" value="1" {if $settings.allow_comment}checked{/if}/></td>
-			</tr> -->
 			<tr>
 				<td></td>
 				<td><input type="submit" name="submit" value="{#PLIKLI_Upload_Submit#}" class="btn btn-primary"/></td>
@@ -141,7 +137,7 @@
 					</select>
 				</td>
 			</tr>
-			<tr {if !$settings.thumb || !$settings.allow_comment}style="display:none;"{/if}>
+			{*<tr {if !$settings.thumb || !$settings.allow_comment}style="display:none;"{/if}>
 				<td><label><a href="#{#PLIKLI_Upload_Comment_Place#}">{#PLIKLI_Upload_Comment_Place#}</a>:</label></td>
 				<td>
 					<select name="upload_commentplace" class="form-control">
@@ -151,7 +147,7 @@
 					{/foreach}
 					</select>
 				</td>
-			</tr>
+			</tr>*}
 			<tr>
 				<td></td>
 				<td><input type="submit" name="submit" value="{#PLIKLI_Upload_Submit#}" class="btn btn-primary"/></td>
@@ -190,17 +186,6 @@
 					</select>
 				</td>
 			</tr>
-			<!--<tr {if !$settings.allow_comment}style="display:none"{/if}>
-				<td><label><a href="#{#PLIKLI_Upload_Comment_File_List#}">{#PLIKLI_Upload_Comment_File_List#}</a>:</label></td>
-				<td>
-					<select name="upload_commentfilelist" class="form-control">
-						<option {if $settings.commentfilelist == 'upload_comment_list_custom'}selected{/if}>upload_comment_list_custom</option>
-						{foreach from=$comment_places item=place}
-							<option {if $settings.commentfilelist==$place}selected{/if}>{$place}</option>
-						{/foreach}
-					</select>
-				</td>
-			</tr> -->
 			<tr>
 				<td></td>
 				<td><input type="submit" name="submit" value="{#PLIKLI_Upload_Submit#}" class="btn btn-primary"/></td>
@@ -311,7 +296,6 @@
 <p><strong><a name="{#PLIKLI_Upload_File_Extensions#}">{#PLIKLI_Upload_File_Extensions#}</a></strong>: {#PLIKLI_Upload_File_Extensions_Definition#}</p>
 <p><strong><a name="{#PLIKLI_Upload_Allow_External#}">{#PLIKLI_Upload_Allow_External#}</a></strong>: {#PLIKLI_Upload_Allow_External_Definition#}</p>
 <p><strong><a name="{#PLIKLI_Upload_Allow_Hiding#}">{#PLIKLI_Upload_Allow_Hiding#}</a></strong>: {#PLIKLI_Upload_Allow_Hiding_Definition#}</p>
-<p><strong><a name="{#PLIKLI_Upload_Allow_Comment_Attachments#}">{#PLIKLI_Upload_Allow_Comment_Attachments#}</a></strong>: {#PLIKLI_Upload_Allow_Comment_Definition#}</p>
 
 <p {if !$settings.thumb}style="display:none"{/if}><strong><a name="{#PLIKLI_Upload_Generate_Thumbnails#}">{#PLIKLI_Upload_Generate_Thumbnails#}</a></strong>: {#PLIKLI_Upload_Generate_Thumbnails_Definition#}</p>
 <p {if !$settings.thumb}style="display:none"{/if}><strong><a name="{#PLIKLI_Upload_Thumbnail_Directory#}">{#PLIKLI_Upload_Thumbnail_Directory#}</a></strong>: {#PLIKLI_Upload_Thumbnail_Directory_Definition#}</p>

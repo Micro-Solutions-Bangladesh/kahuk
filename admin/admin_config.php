@@ -104,6 +104,8 @@ function dowork(){
 			}
 			$config->var_value = $db->escape(js_urldecode($_REQUEST['var_value']));
 			$config->store(false);
+			//Redwine: added the below function call to delete the cache to make the new settings effect immediate.
+			recursive_remove_directory('../cache',TRUE);
 		}
 	}
 }

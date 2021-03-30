@@ -1,5 +1,5 @@
 {checkActionsTpl location="tpl_plikli_admin_stats_widget_start"}
-<table class="table table-condensed table-striped" style="margin-bottom:0;">
+<table class="table table-condensed table-striped" style="margin-bottom:0;word-break: break-word;">
 	{if $sw_version eq "1"}
 		<tr>
 			<td>
@@ -386,9 +386,96 @@
 			</td>
 		</tr>
 	{/if}
-	{if $sw_members eq "1"}
+	{if $sw_sys_info eq "1"}
 		<tr>
 			<td>
+				<strong>
+				{#PLIKLI_Statistics_Widget_System_Information#}
+				</strong>
+			</td>
+			<td>
+			&nbsp;
+			</td>
+		</tr>
+		
+		<tr>
+			<td style="padding-left:40px">
+				<strong>
+				{#PLIKLI_Statistics_Widget_Server_Name#}
+				</strong>
+			</td>
+			<td>
+				{$uname_Host_name}
+			</td>
+		</tr>
+		
+		<tr>
+			<td style="padding-left:40px">
+				<strong>
+				{#PLIKLI_Statistics_Widget_Operating_System#}
+				</strong>
+			</td>
+			<td>
+				{$operating_system}
+			</td>
+		</tr>
+		
+		<tr>
+			<td style="padding-left:40px">
+				<strong>
+				{#PLIKLI_Statistics_Widget_System_Architecture#}
+				</strong>
+			</td>
+			<td>
+				{$machine_type}
+			</td>
+		</tr>
+		<tr>
+			<td style="padding-left:40px">
+				<strong>
+				{#PLIKLI_Statistics_Widget_System_Release_kernel#}
+				</strong>
+			</td>
+			<td>
+				{$release_name}
+			</td>
+		</tr>
+		
+		<tr>
+			<td style="padding-left:40px">
+				<strong>
+				{#PLIKLI_Statistics_Widget_Version_Information#}
+				</strong>
+			</td>
+			<td>
+				{$version_information}
+			</td>
+		</tr>
+		
+		<tr>
+			<td style="padding-left:40px">
+				<strong>
+				{#PLIKLI_Statistics_Widget_Apache_Version#}
+				</strong>
+			</td>
+			<td>
+				{$apache_version}
+			</td>
+		</tr>
+		
+		<tr>
+			<td style="padding-left:40px">
+				<strong>
+				{#PLIKLI_Statistics_Widget_System_Home_Web_Directory#}
+				</strong>
+			</td>
+			<td>
+				{$ABSPATH}
+			</td>
+		</tr>
+
+		<tr>
+			<td style="padding-left:40px">
 				<strong>
 				{#PLIKLI_Statistics_Widget_PHP_Version#}:
 				</strong>
@@ -403,10 +490,9 @@
 				{/php}{/if}
 			</td>
 		</tr>
-	{/if}
-	{if $sw_members eq "1"}
+
 		<tr>
-			<td>
+			<td style="padding-left:40px">
 				<strong>
 				{#PLIKLI_Statistics_Widget_MySQL_Server_Version#}:
 				</strong>
@@ -433,54 +519,32 @@
 				{/php}
 			</td>
 		</tr>
-	{/if}
-	{if $sw_members eq "1"}
+
 		<tr>
-			<td>
+			<td style="padding-left:40px">
 				<strong>
 				{#PLIKLI_Statistics_Widget_MySQL_Client_Version#}:
 				</strong>
 			</td>
 			<td>
 				{php}
-					{* Redwine: Fix to the Statistics Widget to accurately get the MySql Version. https://github.com/Pligg/pligg-cms/commit/1ed283f70f5e8c08c1b2bdc34e6c61c40ef7b01a *}
-					/* Redwine: creating a mysqli connection */
-					$mysqli = new mysqli(EZSQL_DB_HOST,EZSQL_DB_USER,EZSQL_DB_PASSWORD,EZSQL_DB_NAME);
-					/* check connection */
-					if (mysqli_connect_errno()) {
-						printf("Connect failed: %s\n", mysqli_connect_error());
-						exit();
-					}
-					 
-					ob_start();
-					phpinfo();
-					$info = ob_get_contents();
-					ob_end_clean();
-					$start = explode("<h2><a name=\"module_mysql\">mysql</a></h2>",$info,1000);
-					if(count($start) < 2){
-						$mysqlClientversion = '0';
-					}else{
-						$again = explode("<tr><td class=\"e\">Client API version </td><td class=\"v\">",$start[1],1000);
-						$last_time = explode(" </td></tr>",$again[1],1000);
-						$mysqlClientversion = $last_time[0];
-					} 
-					$pattern = '/[^0-9-.]/i';
-					$replacement = '';
-
-					$mysqlClientversion = preg_replace($pattern, $replacement, $mysqlClientversion); 
-					$mysqlClientversion = strstr($mysqlClientversion, '-', true);
+					$mysqlClientversion = mysqli_get_client_info();
+                    $pattern = '/[^0-9-.]/i';
+                    $replacement = '';
+                    $mysqlClientversion = preg_replace($pattern, $replacement, $mysqlClientversion); 
+                    if (strpos($mysqlClientversion, '-') > 0){ 
+                        $mysqlClientversion = strstr($mysqlClientversion, '-', true);
+                    }else{
+                        $mysqlClientversion = $mysqlClientversion;
+                    }
 					
 					printf("%s\n", preg_replace($pattern, $replacement, $mysqlClientversion));
-					 
-					/* close connection */
-					$mysqli->close();
 				{/php}
 			</td>
 		</tr>
-	{/if}
-	{if $sw_members eq "1"}
+
 		<tr>
-			<td>
+			<td style="padding-left:40px">
 				<strong>
 				{#PLIKLI_Statistics_Widget_DB_Size#}:
 				</strong>
@@ -489,6 +553,12 @@
 				{$dbsize}
 			</td>
 		</tr>
+		
+		
+		
+		
+		
+		
 	{/if}
 	{checkActionsTpl location="tpl_plikli_admin_stats_widget_intable"}
 </table>

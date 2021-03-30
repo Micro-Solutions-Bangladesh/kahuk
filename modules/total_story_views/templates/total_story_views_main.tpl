@@ -96,4 +96,3 @@
 <div style="text-align:center;"><img src="{$my_plikli_base}/modules/total_story_views/templates/images/sidebar.jpg" alt="Most Viewed in Sidebar" title="Most Viewed in Sidebar" /></div><br />
 <hr />
 
-

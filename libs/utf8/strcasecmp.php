@@ -23,4 +23,3 @@ function utf8_strcasecmp($strX, $strY) {
     $strY = utf8_strtolower($strY);
     return strcmp($strX, $strY);
 }
-

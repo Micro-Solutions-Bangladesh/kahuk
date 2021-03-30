@@ -84,6 +84,20 @@ function CheckmysqlServerVersion() {
 	return $theMySqlVersion;
 }
 
+function CheckmysqlClientVersion() {
+	global $handle;
+	$theMySqlClientVersion = mysqli_get_client_info();
+    $pattern = '/[^0-9-.]/i';
+    $replacement = '';
+    $theMySqlClientVersion = preg_replace($pattern, $replacement, $theMySqlClientVersion); 
+    if (strpos($theMySqlClientVersion, '-') > 0){ 
+        $theMySqlClientVersion = strstr($theMySqlClientVersion, '-', true);
+    }else{
+        $theMySqlClientVersion = $theMySqlClientVersion;
+    }
+	return $theMySqlClientVersion;
+}
+
 function CheckIfFileExists ($file, $default) {
 	if (!file_exists($file)) {
 		if (file_exists($default)) {
@@ -97,4 +111,16 @@ function CheckIfFileExists ($file, $default) {
 		return true;
 	}
 }
+	// Add user IP address to approved IP list, so they are never blocked for bad logins
+	function get_ip_address() {
+		foreach (array('HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED', 'HTTP_X_CLUSTER_CLIENT_IP', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED', 'REMOTE_ADDR') as $key) {
+			if (array_key_exists($key, $_SERVER) === true) {
+				foreach (explode(',', $_SERVER[$key]) as $ip) {
+					if (filter_var($ip, FILTER_VALIDATE_IP) !== false) {
+						return $ip;
+					}
+				}
+			}
+		}
+	}
 ?>

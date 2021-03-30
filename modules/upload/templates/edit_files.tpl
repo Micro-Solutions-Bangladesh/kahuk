@@ -29,7 +29,16 @@
 {section name=files start=0 loop=$upload_maxnumber step=1}
     {#PLIKLI_Upload_Upload#}: <input type='file' name='upload_files[]'>
     {if $upload_external}
-	OR Link: <input type='text' name='upload_urls[]' value='http://'>
+        {php}
+            //checking the site's protocol
+            if (strpos(my_base_url, 'https') !== false) { {/php}
+            OR Link: <input type='text' name='upload_urls[]' value='https://'>
+        {php}
+            } else { {/php}
+            OR Link: <input type='text' name='upload_urls[]' value='http://'>
+        {php}
+            }
+        {/php}
     {/if}
     <br>
 {/section}

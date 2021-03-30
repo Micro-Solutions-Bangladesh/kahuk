@@ -44,6 +44,15 @@ function checkBreachedPassword() {
 			{$errorMsg}
 		</div>
 	{/if}
+    
+	{* Redwine: The below code is to check if the SMTP testing settings are true. If true, it will display the email message sent to users. *}
+	{if $allow_smtp_testing eq '1'  && $smtp_fake_email eq '1' && $validationEmail neq ''}
+		<span style="font-style: italic;">You are viewing the email message for the purpose of testing SMTP email sending.<br />
+		{$validationEmail}
+		</span>
+		<br /><hr />
+	{/if}
+	{* Redwine: END SMTP testing settings. *}
 	{if $errorMsg eq ""}
 	<div class="col-md-4 left">
 		<form action="recover.php" id="thisform2" method="post" {if $validate_password eq '1'}onsubmit="return checkBreachedPassword();"{/if}>

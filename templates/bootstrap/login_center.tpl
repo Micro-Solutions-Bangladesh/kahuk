@@ -3,6 +3,16 @@
 *************************************}
 <!-- login_center.tpl -->
 <div class="leftwrapper">
+	<p>
+	{* Redwine: The below code is to check if the SMTP testing settings are true. If true, it will display the email message sent to users. *}
+	{if $allow_smtp_testing eq '1'  && $smtp_fake_email eq '1' && $validationEmail neq ''}
+		<span style="font-style: italic;">You are viewing the email message for the purpose of testing SMTP email sending.<br />
+		{$validationEmail}
+		</span>
+		<br /><hr />
+	{/if}
+	{* Redwine: END SMTP testing settings. *}
+	</p>	
 	{if $errorMsg ne ""}
 		<div class="alert alert-block alert-danger">
 			<a class="close" data-dismiss="alert" href="#">&times;</a>
@@ -23,7 +33,7 @@
 				<input type="hidden" name="processlogin" value="1"/>
 				<input type="hidden" name="return" value="{if isset($get.return)}{$get.return}{/if}"/>
 				<div class="login-submit">
-					<input type="submit" value="{#PLIKLI_Visual_Login_LoginButton#}" class="btn btn-primary" tabindex="4" />
+					<input type="submit" value="{#PLIKLI_Visual_Login_LoginButton#}" id="login_submit" class="btn btn-primary" tabindex="4" />
 				</div>
 				<div class="login-remember">
 					<input type="checkbox" class="col-sm-offset-2" name="persistent" tabindex="3" /> {#PLIKLI_Visual_Login_Remember#}
@@ -53,5 +63,19 @@
 
 	{checkActionsTpl location="tpl_login_bottom"}
 </div>
-
+{literal}
+<script>
+if ($('#waitTime').length) {
+var sec = $('#waitTime').text()
+var timer = setInterval(function() { 
+   $('#waitTime').text(--sec);
+   $('#login_submit').prop('disabled', true);
+   if (sec == 0) {
+      $('#login_submit').prop('disabled', false);
+      clearInterval(timer);
+   } 
+}, 1000);
+}
+</script>
+{/literal}
 <!--/login_center.tpl -->

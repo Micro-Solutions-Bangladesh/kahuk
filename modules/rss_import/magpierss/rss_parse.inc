@@ -91,7 +91,7 @@ class MagpieRSS {
      *                                  source encoding. (caveat emptor)
      *
      */
-    function MagpieRSS ($source, $output_encoding='UTF-8', 
+    function __construct ($source, $output_encoding='UTF-8', 
                         $input_encoding=null, $detect_encoding=true) 
     {   
         # if PHP xml isn't compiled in, die

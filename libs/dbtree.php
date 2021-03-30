@@ -41,11 +41,13 @@ function children_id_to_array(&$child_array, $table, $parent) {
 	$result = $db->get_results($sql);
 
 	if($result){
+        $i = 0;
 		foreach ($result as $row){
-			$child_array[] = $row->category__auto_id;
+			$child_array[$i] = $row->category__auto_id;
 
 			// call this function again to display this child's children
 			children_id_to_array($child_array, $table, $row->category__auto_id);
+            $i++;
 		}
 	}
 }

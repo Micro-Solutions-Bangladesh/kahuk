@@ -49,7 +49,7 @@ if( (isset($_POST["processlogin"]) && is_numeric($_POST["processlogin"])) || (is
 			if($current_user->Authenticate($username, $password, $persistent) == false) {
 				$db->query("UPDATE ".table_login_attempts." SET login_username='$dbusername', login_count=login_count+1, login_time=NOW() WHERE login_id=".$login_id);
 				$user=$db->get_row("SELECT * FROM " . table_users . " WHERE user_login = '$username' or user_email= '$username'");
-				if (plikli_validate() && $user->user_lastlogin == "0000-00-00 00:00:00"){
+				if (plikli_validate() && $user->user_lastlogin == NULL){
 					$errorMsg=$main_smarty->get_config_vars('PLIKLI_Visual_Resend_Email') .
 						"<form method='post'>
 							<div class='input-append notvalidated'>

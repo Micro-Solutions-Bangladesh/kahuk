@@ -27,7 +27,6 @@ if(isset($main_smarty) && is_object($main_smarty)){
 	$main_smarty->assign('subscribe2comments_path', subscribe2comments_path);
 	$main_smarty->assign('subscribe2comments_plikli_lang_conf', subscribe2comments_plikli_lang_conf);
 	$main_smarty->assign('subscribe2comments_lang_conf', subscribe2comments_lang_conf);
-	$main_smarty->assign('subscribe2comments_places', $subscribe2comments_places);
 	$main_smarty->assign('subscribe2comments_tpl_path', subscribe2comments_tpl_path);
 }
 

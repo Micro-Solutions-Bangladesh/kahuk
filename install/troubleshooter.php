@@ -1,8 +1,86 @@
 <?php
-error_reporting(E_ALL^E_NOTICE);
+session_start();
+error_reporting(E_ALL ^ E_NOTICE ^ E_WARNING ^ E_STRICT);
+
+if (!isset($_SESSION['agree'])) {
+    header ("Location: plikli-cms-terms.php?action=troubleshooter");
+}
+
+if (isset($_POST['Submit'])) {
+    include_once('./languages/lang_english.php');
+  $dbuser = $_POST['dbuser'];
+  $dbpass = $_POST['dbpass'];
+  $dbname = $_POST['dbname'];
+  $dbhost = $_POST['dbhost'];
+  if($conn = @mysqli_connect($dbhost,$dbuser,$dbpass)) {
+      echo '<div class="alert alert-success">' . $lang['ConnectionEstab'] . '</div>';
+      if(mysqli_select_db($conn, $dbname)) {
+          
+          $sqlServerVersion = $conn->server_info;
+           echo '<div class="alert alert-success">
+           <p><strong>' . $lang['FoundDb'] . '</strong></p>
+           <p>You have what Plikli CMS needs to function properly, MySQL Server Version '. $sqlServerVersion.'</p></div>';
+          $_SESSION['mysqlserver'] = $sqlServerVersion;
+      } else {
+          echo '<div class="alert alert-warning">' .$lang['Error2-3']. '</div>';
+      } 
+  } else {
+      echo '<div class="alert alert-warning">' .$lang['Error2-4']. '</div>'; 
+  }
+}
+
+
 $page = 'troubleshooter';
+define('page', $page);
 $include='header.php'; if (file_exists($include)) { include_once($include); }
 $include='functions.php'; if (file_exists($include)) { require_once($include); }
+if (!isset($_SESSION['mysqlserver'])) {
+    include_once('./languages/lang_english.php');
+    echo '<fieldset><form class="form-horizontal" id="form1" name="form1" action="" method="post">
+        <div class="alert alert-warning">
+            Plikli CMS needs to get the MySQL Server Version in order to determine if it is suitable for the installation or upgrade. In order to do that, we need to establish a connection to your database. Please enter the required information below. 
+        </div>
+		<p>' . $lang['EnterMySQL'] . '</p>
+		
+		<div class="control-group">
+			<label for="input01" class="control-label">' . $lang['DatabaseName'] . '</label>
+			<div class="controls">
+				<input class="form-control" name="dbname" type="text" value="" />
+			</div>
+		</div>
+
+		<div class="control-group">
+			<label for="input01" class="control-label">' . $lang['DatabaseUsername'] . '</label>
+			<div class="controls">
+				<input class="form-control" name="dbuser" type="text" value="" />
+			</div>
+		</div>
+		  
+		<div class="control-group">
+			<label for="input01" class="control-label">' . $lang['DatabasePassword'] . ' (if it is password protected)</label>
+			<div class="controls">
+				<input class="form-control" name="dbpass" type="password" value="" />
+			</div>
+		</div>
+		
+		<div class="control-group">
+			<label for="input01" class="control-label">' . $lang['DatabaseServer'] . '</label>
+			<div class="controls">
+				<input class="form-control" name="dbhost" type="text" value="localhost" />
+			</div>
+		</div>
+		<br />
+		<div class="form-actions">
+			<input type="submit" class="btn btn-primary" name="Submit" value="' . $lang['CheckSettings'] . '" />
+			<button class="btn btn-default" onclick="history.go(-1)">Back</button>
+		</div>
+		
+</form></fieldset><br /><hr />';
+}
+
+
+
+
 if (isset($_POST['language'])) {
 	$selected_lang = $_POST['language'];
 	foreach ($selected_lang as $sel_lang){
@@ -38,51 +116,54 @@ else {
 //--></script>
 
 <?php
-
-// MySQL Client Version
-// This method reads the phpinfo data to get the Client API version.
-ob_start();
-phpinfo();
-$info = ob_get_contents();
-ob_end_clean();
-$start = explode("<h2><a name=\"module_mysql\">mysql</a></h2>",$info,1000);
-if(count($start) < 2){
-	$mysqlClientversion = '0';
-}else{
-	$again = explode("<tr><td class=\"e\">Client API version </td><td class=\"v\">",$start[1],1000);
-	$last_time = explode(" </td></tr>",$again[1],1000);
-	$mysqlClientversion = $last_time[0];
-} 
-$pattern = '/[^0-9-.]/i';
-$replacement = '';
-
-$mysqlClientversion = preg_replace($pattern, $replacement, $mysqlClientversion); 
-if (strpos($mysqlClientversion, '-') > 0){ 
-$mysqlClientversion = strstr($mysqlClientversion, '-', true);
-}else{
-	$mysqlClientversion = $mysqlClientversion;
+if (isset($_SESSION['mysqlserver'])) {
+    $mysqlServerVersion = $_SESSION['mysqlserver'];
 }
+
+$mysqlClientversion = CheckmysqlClientVersion(); 
+
 
 $phpversion = phpversion();
 
 // Tally up how many items are fulfilled.
-$required = 23; // This should be the number of checks being performed
+$required = 25; // This should be the number of checks being performed
 $tally = 0;
 $warning_php_version = '';
 $warning_mysql_Client_version = '';
+$warning_mysql_Server_version = '';
+
 if (glob("../languages/*.conf")) { $tally = $tally+1;}
-if ($phpversion >= 5.4 && $phpversion < 6) {
-	$tally = $tally+1; 
-}elseif ($phpversion > 6) {
-	$warning_php_version = "You have PHP version $phpversion and Plikli is NOT yet compatible with PHP version 7+; It is in progress!<br />Check the cPanel under SOFTWARE -> MultiPHP Manager. if it is available and you can select the PHP version you want, then set it to 5.4+. Otherwise, ask your host to install EasyApache so you can have access to MultiPHP Manager.";
-}elseif ($phpversion < 5.4) {
+
+if ($phpversion >= 5.4 && $phpversion < 7.3) {
+	$tally = $tally+1;
+} elseif ($phpversion >= 7.3) {
+	$warning_php_version = "You have PHP version $phpversion and Plikli is compatible with this version. However, there are still some deprecated features that must be checked before it is fully compatible with PHP $phpversion<br />It is recommended that you use PHP 7.2.18 for now. Check the cPanel under SOFTWARE -> MultiPHP Manager. if it is available and you can select the PHP version you want. Otherwise, ask your host to install EasyApache so you can have access to MultiPHP Manager.<br /><strong>You can still proceed with the installation / upgrade, however Plikli CMS will not provide technical support until all the deprecated features have been modified and tested thoroughly!</strong>";
+} elseif ($phpversion < 5.4) {
 	$warning_php_version = "You have PHP version $phpversion and Plikli is NOT compatible with PHP version $phpversion; as Plikli CMS uses functions that are designed for PHP 5.4+<br />Check the cPanel under SOFTWARE -> MultiPHP Manager. if it is available and you can select the PHP version you want, then set it to 5.4+. Otherwise, ask your host to install EasyApache so you can have access to MultiPHP Manager.";
 }
 if (version_compare($mysqlClientversion, '5.0.0', '>=')) {
 	$tally = $tally+1; 
 }else{
-	$warning_mysql_Client_version = "You have MySQL Client Server version $mysqlClientversion it may not have newest API to access MySQL Server. If the site experiences some issues, update the MySQL Client Server!";
+	$warning_mysql_Client_version = "You have MySQL Client Server version $mysqlClientversion it may not have the newest API to access MySQL Server. If the site experiences some issues, update the MySQL Client Server!";
 }
+
+if (version_compare($mysqlServerVersion, '5.0.3', '>=')) {
+	$tally = $tally+1; 
+}else{
+	$warning_mysql_Server_version = "You have MySQL Server version $mysqlServerVersion <strong>Pay attention when the CMS is installing the tables in the database. If the LINKS table did not install and the installation halted, OPEN <span style=\"font-style: italic;\">/install/installtables.php and change LINE 385<br />`link_url` varchar(\$urllength) collate utf8mb4_unicode_ci NOT NULL default '',
+    <br />TO<br />
+    `link_url` varchar(255) collate utf8mb4_unicode_ci NOT NULL default '',
+    <br /> <span style=\"text-decoration: underline;\">AND RE-INSTALL PLIKLI CMS.</span></span>
+    </strong>";
+}
+$zip_extension = false;
+if (!extension_loaded('zip')) {
+    $warning_zip_extension = "You need to load the Zip extension in the PHP extensions, otherwise the installation/upgrade will fail! Check the PHP PEAR PACKAGE in your cPanel.";
+} else {
+    $zip_extension = true;
+    $tally = $tally+1;
+}
+
 if (function_exists('curl_version')){ $tally = $tally+1; }
 if (function_exists('fopen')){ $tally = $tally+1; }
 if (function_exists('fwrite')){ $tally = $tally+1; }
@@ -113,6 +194,12 @@ if ($tally < $required ){
 		}
 		if ($warning_mysql_Client_version != '') {
 			echo "<p>$warning_mysql_Client_version</p><br />";
+		}
+        if ($warning_mysql_Server_version != '') {
+			echo "<p>$warning_mysql_Server_version</p><br />";
+		}
+        if ($warning_zip_extension != '') {
+			echo "<p>$warning_zip_extension</p>";
 		}
 		echo '<div class="progress" style="margin-bottom: 9px;">
 				<div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="'.$percent.'" aria-valuemin="0" aria-valuemax="100" style="width: '.$percent.'%;">
@@ -284,13 +371,23 @@ echo '<tbody>';
 
 // PHP
 echo '<tr><td>';
-if ($phpversion >= 5.4 && $phpversion < 6) {
+if ($phpversion >= 5.4 && $phpversion < 7.3) {
 	echo '<i class="fa fa-check"></i>';
 }else{
 	echo '<i class="fa fa-times"></i>';
 
 }
-echo '</td><td><a id="phpversion" data-trigger="hover" data-content="Plikli has been tested on PHP version 5.4+. We have designed the content management system based on PHP 5.4+ technologies, so certain problems may occur when using older versions of PHP. We recommended that your server runs a minimum of PHP 5.4." rel="popover" href="http://us3.php.net/tut.php" data-original-title="PHP Version">PHP Version ('.$phpversion.')</a><br /><strong>NOTE that Plikli is NOT yet compatible with PHP version 7; It is in progress!</strong></td>';
+echo '</td><td><a id="phpversion" data-trigger="hover" data-content="Plikli has been tested on PHP version 5.4+. We have designed the content management system based on PHP 5.4+ technologies, so certain problems may occur when using older versions of PHP. We recommended that your server runs a minimum of PHP 5.4." rel="popover" href="http://us3.php.net/tut.php" data-original-title="PHP Version">PHP Version ('.$phpversion.')</a></td>';
+echo '</tr>';
+
+echo '<tr><td>';
+
+if (version_compare($mysqlServerVersion, '5.0.3', '>=')) {
+	echo '<i class="fa fa-check"></i>';
+}else{
+	echo '<i class="fa fa-times"></i>';
+}
+echo '</td><td><a id="mysqlServerVersion" data-trigger="hover" data-content="Plikli has been tested on MySQL versions 4 and 5, during that process we have discovered that bugs will occasionally pop up if you are running MySQL 4. For this reason we recommend that you use a server with MySQL Server 5.0.3 or later to run a Plikli CMS website. MySQL 5.0.3 has been available for some time now and we hope that most major web hosts now support it. It offers features that are not built into MySQL 4, which we may have used when writing code for Plikli CMS." rel="popover" href="http://dev.mysql.com/doc/" data-original-title="MySQL Server Version">MySQL Server Version ('.$mysqlServerVersion.')</a></td>';
 echo '</tr>';
 
 echo '<tr><td>';
@@ -317,6 +414,9 @@ echo '<tr><td>', file_get_contents(__FILE__) ? '<i class="fa fa-check"></i></td>
 	
 echo '<tr><td>', function_exists('gd_info') ? '<i class="fa fa-check"></i></td>' : '<i class="fa fa-times"></i></td>';
 	echo '<td><a id="gdwarning" data-trigger="hover" data-content="The GD Graphics Library is a graphics software library for dynamically manipulating images. Any images handled by Plikli, like user avatar or group images, use GD to manipulate the file." rel="popover" href="http://php.net/manual/en/book.image.php" data-original-title="GD Graphics Library">GD Graphics Library</a></td></tr>';
+    
+echo '<tr><td>', $zip_extension === true ? '<i class="fa fa-check"></i></td>' : '<i class="fa fa-times"></i></td>';
+	echo '<td><a id="zipwarning" data-trigger="hover" data-content="You need to load the Zip extension in the PHP extensions, otherwise the installation/upgrade will fail! Check the PHP PEAR PACKAGE in your cPanel." rel="popover"  data-original-title="ZipArchive Class">ZipArchive Class</a></td></tr>';
 	
 echo '</tbody></table>';
 
@@ -333,10 +433,12 @@ $(function ()
 	$("#chmod").popover();
 	$("#phpversion").popover();
 	$("#mysqlClientversion").popover();
+    $("#mysqlServerVersion").popover();
 	$("#curlwarning").popover();
 	$("#fopenwarning").popover();
 	$("#fwritewarning").popover();
 	$("#fgetwarning").popover();
 	$("#gdwarning").popover();
+    $("#zipwarning").popover();
 });
 </script>

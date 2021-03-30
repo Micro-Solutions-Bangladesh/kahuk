@@ -1,27 +1,31 @@
 <?php
 
-if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
+if (!defined('mnminclude')) {
+	header('Location: ../error_404.php');die();
+}
 
-function get_category_id($cat_name) {
+function get_category_id($cat_name)
+{
 	// find category id when given category name
 	// $the_cats is set in /libs/smartyvariables.php
 	global $dblang, $the_cats;
 
-	foreach($the_cats as $cat){
-		if($cat->category_name == $cat_name && $cat->category_lang == $dblang) { 
+	foreach ($the_cats as $cat) {
+		if ($cat->category_name == $cat_name && $cat->category_lang == $dblang) { 
 			return $cat->category_id; 
 		}
 	}
 	return null;
 }
 
-function get_category_name($cat_id) {
+function get_category_name($cat_id)
+{
 	// find category name when given category id
 	// $the_cats is set in /libs/smartyvariables.php
 	global $dblang, $the_cats;
 
-	foreach($the_cats as $cat){
-		if($cat->category_id == $cat_id && $cat->category_lang == $dblang) { 
+	foreach ($the_cats as $cat) {
+		if ($cat->category_id == $cat_id && $cat->category_lang == $dblang) { 
 			return $cat->category_name; 
 		}
 	}
@@ -29,11 +33,14 @@ function get_category_name($cat_id) {
 }
 
 
-function who_voted($storyid, $avatar_size, $condition){
+function who_voted($storyid, $avatar_size, $condition)
+{
 	// this returns who voted for a story
 	// eventually add support for filters (only show friends, etc)	
 	global $db;
-	if (!is_numeric($storyid)) die();
+	if (!is_numeric($storyid)) {
+        die();
+    }
 
 	$sql = "SELECT user_login, user_email
 			FROM " . table_votes . " 
@@ -41,47 +48,49 @@ function who_voted($storyid, $avatar_size, $condition){
 			WHERE vote_value $condition AND vote_link_id=$storyid AND vote_type='links' AND user_level NOT IN('Spammer')";
 	$voters = $db->get_results($sql);
 	$voters = object_2_array($voters);
-	foreach($voters as $key => $val)
- 	{
+	foreach ($voters as $key => $val) {
 		$voters[$key]['Avatar'] = get_avatar('all', "", $val['user_login'], $val['user_email']);
 		$voters[$key]['Avatar_ImgSrc'] = $voters[$key]['Avatar']['large'];
 	}
 	return $voters;	
 }
 
-function related_stories($storyid, $related_tags, $category){
+function related_stories($storyid, $related_tags, $category)
+{
 	// this returns similar stories based on tags in common and in the same category    
 	global $db;
-	if (!is_numeric($storyid)) die();
+	
+    if (!is_numeric($storyid)) {
+        die();
+    }
 
 	$related_tags="'".preg_replace('/,\s*/',"','",addslashes($related_tags))."'"; // This gives us the proper string structure for IN SQL statement
 
 	// Select 20 stories that share tags with the current story and order them by number of tags they share    
-        $sql = "SELECT tag_link_id, COUNT(tag_link_id) AS relevance
-			FROM ".table_tags."
-			WHERE tag_words IN ($related_tags) AND tag_link_id!=$storyid
-			GROUP BY tag_link_id 
-			ORDER BY relevance DESC 
-			LIMIT 20";
+    $sql = "SELECT tag_link_id, COUNT(tag_link_id) AS relevance
+        FROM ".table_tags."
+        WHERE tag_words IN ($related_tags) AND tag_link_id!=$storyid
+        GROUP BY tag_link_id 
+        ORDER BY relevance DESC 
+        LIMIT 20";
 	$related_story = $db->get_results($sql);
 	$related_story = object_2_array($related_story);
 	$stories = array();
-        foreach($related_story as $id => $rs){
-
+        foreach ($related_story as $id => $rs) {
 		$rs2=new Link;
 		$rs2->id=$rs['tag_link_id'];
-		if ($rs2->read() && ($rs2->status=='new' || $rs2->status=='published'))
-		{
+		if ($rs2->read() && ($rs2->status=='new' || $rs2->status=='published')) {
 			$related_story[$id]=array_merge($related_story[$id],array(
 								'link_id' => $rs2->id, 
 								'link_category' => $rs2->category, 
 								'link_title' => $rs2->title, 
 								'link_title_url' => $rs2->title_url
 								));
-			if ($rs2->title_url == "")
+			if ($rs2->title_url == "") {
 				$related_story[$id]['url'] = getmyurl("story", $rs2->id);
-			else 
+			} else {
 				$related_story[$id]['url'] = getmyurl("storyURL", $rs2->category_safe_names(), urlencode($rs2->title_url), $rs2->id);
+            }
 			$stories[]=$related_story[$id];
 		} 
 	}
@@ -95,7 +104,7 @@ function category_display()
 	
 	$maincategory = object_2_array($maincategory);
 
-        foreach($maincategory as $id => $rs){
+        foreach ($maincategory as $id => $rs) {
 			$maincategory[$id]['safename'] = $rs['category_safe_name'];
 			$maincategory[$id]['id'] = $rs['category_id'];
 			$maincategory[$id]['parent'] = $rs['category_parent'];
@@ -104,7 +113,7 @@ function category_display()
 			$childcategory = $db->get_results("select * from ".table_categories." where category_parent =".$rs['category_id']);
 			//echo "select * from ".table_categories." where category_parent =".$rs['category_id'];
 			$childcategory = object_2_array($childcategory);
-			foreach($childcategory as $id => $rc){
+			foreach ($childcategory as $id => $rc) {
 				$childcategory[$id]['safename'] = $rc['category_safe_name'];
 				$childcategory[$id]['id'] = $rc['category_id'];
 				$childcategory[$id]['parent'] = $rc['category_parent'];					
@@ -113,60 +122,59 @@ function category_display()
 	return $maincategory;
 }
 
-function cat_safe_name($cat_id) {
-
+function cat_safe_name($cat_id)
+{
 	global $dblang, $the_cats;
 
-	foreach($the_cats as $cat){
-		if($cat->category_id == $cat_id && $cat->category_lang == $dblang)
-		{
+	foreach ($the_cats as $cat) {
+		if ($cat->category_id == $cat_id && $cat->category_lang == $dblang) {
 			return $cat->category_safe_name; 
 		}
 	}
 }
 
 
-function sanitize($var, $santype = 1, $allowable_tags = ''){
-
+function sanitize($var, $santype = 1, $allowable_tags = '')
+{
 	if ($santype == 0) {
 		return htmlspecialchars($var,ENT_QUOTES,'UTF-8');
-	}
-	elseif ($santype == 1) {
+	} elseif ($santype == 1) {
 		return strip_tags($var, $allowable_tags = '');
-	}
-	elseif ($santype == 2) {
+	} elseif ($santype == 2) {
 		return htmlentities(strip_tags($var, $allowable_tags),ENT_QUOTES,'UTF-8');
-	}
-	elseif ($santype == 3) {
+	} elseif ($santype == 3) {
 		return addslashes(strip_tags($var, $allowable_tags));
-	}
-	elseif ($santype == 4) {
+	} elseif ($santype == 4) {
 		/*** Redwine: As of PHP 5.5.0, the preg_replace() emitts an error E_DEPRECATED level when passing in the "\e" modifier
 			As of PHP 7.0.0 E_WARNING is emited in this case and "\e" modifier has no effect.
 		***/
 		//return stripslashes(preg_replace('/<([^>]+)>/es', "'<'.sanitize('\\1',5).'>'",strip_tags($var, $allowable_tags)));
 		// Substituting preg_replace with preg_replace_callback 
 		return stripslashes(preg_replace_callback('/<([^>]+)>/is', 
-	function($m) { 
+	function($m) 
+    { 
 		return '<'.sanitize($m[1],5).'>';
 		}, strip_tags($var, $allowable_tags)));
-	}
-	elseif ($santype == 5) {
+	} elseif ($santype == 5) {
 		/*** Redwine: As of PHP 5.5.0, the preg_replace() emitts an error E_DEPRECATED level when passing in the "\e" modifier
 			As of PHP 7.0.0 E_WARNING is emited in this case and "\e" modifier has no effect.
 		***/
 		//return preg_replace('/\son\w+\s*=/is','',$var);
 		// Substituting preg_replace with preg_replace_callback 
 		return preg_replace_callback('/\son\w+\s*=/is',
-	function($m) {
+	function($m)
+    {
 		return '';
 		},$var);
 	}
 }
 
-function do_we_use_avatars(){
+function do_we_use_avatars()
+{
 	// checks to see if avatars are enabled
-	if(Enable_User_Upload_Avatar == true){return "1";}		
+	if (Enable_User_Upload_Avatar == true) {
+        return "1";
+    }		
 	return "0";
 }
 
@@ -175,68 +183,71 @@ function do_we_use_avatars(){
  * server has changed, so that the client will request the updated version of
  * the file from the server, for the new URL, instead of relying on the
  * out-dated client-side cache. */
-function latest_avatar($client_url, $server_path) {
+function latest_avatar($client_url, $server_path)
+{
 	clearstatcache();
 	return $client_url . '?cache_timestamp=' . filemtime ($server_path);
 }
 
-function get_avatar($size = "large", $avatarsource, $user_name = "", $user_email = "", $user_id=""){
+function get_avatar($size = "large", $avatarsource, $user_name = "", $user_email = "", $user_id="")
+{
 	// returns the location of a user's avatar
 	global $globals;
 	
 	include_once(mnminclude.'user.php');
 	$user=new User();
-	if($user_name != ""){
+	if ($user_name != "") {
 		$user->username = $user_name;
 	} else {
 		$user->id = $user_id;
 	}
 	
-	if(!$user->read()) {
+	if (!$user->read()) {
 		echo "invalid username or userid in get_avatar";
 		die;
-	}else {
+	} else {
 		$avatarsource = $user->avatar_source;
 		$user_name = $user->username;
 		$user_id = $user->id;
-		if(isset($user->login)){$user_email = $user->login;}
+		if (isset($user->login)) {
+            $user_email = $user->login;
+        }
 	}
 	$user = "";
 /* Redwine declared $imgsize below to eliminate all the Notice: Undefined variable: */
 $imgsize = '';
-	if ($size == "large")
+	if ($size == "large") {
 		$imgsize = Avatar_Large;
-	elseif ($size == "small")
+	} elseif ($size == "small") {
 		$imgsize = Avatar_Small;
-	elseif ($size == "original")
+	} elseif ($size == "original") {
 		$imgsize = 'original';
+    }
 
 	// use the user uploaded avatars ?
 	$avatars = array( 'large' => my_base_url . my_plikli_base . Default_Gravatar_Large,
 			  'small' => my_base_url . my_plikli_base . Default_Gravatar_Small
 			);
-	if(Enable_User_Upload_Avatar == true && $avatarsource == "useruploaded"){
+	if (Enable_User_Upload_Avatar == true && $avatarsource == "useruploaded") {
 	    if ($imgsize) {
-		$imgsrc = my_base_url . my_plikli_base . '/avatars/user_uploaded/' . $user_id . "_" . $imgsize . ".jpg";
-		if (file_exists(mnmpath.'avatars/user_uploaded/'.$user_id . "_" . $imgsize . ".jpg"))
-		    return latest_avatar($imgsrc, mnmpath.'avatars/user_uploaded/'.$user_id . "_" . $imgsize . ".jpg");
-		elseif (file_exists(mnmpath.'avatars/user_uploaded/'. $user_name . "_" . $imgsize . ".jpg"))
-		{
-		    $imgsrc = my_base_url . my_plikli_base . '/avatars/user_uploaded/' . $user_name . "_" . $imgsize . ".jpg";
-		    return latest_avatar($imgsrc, mnmpath.'avatars/user_uploaded/'.$user_name . "_" . $imgsize . ".jpg");
-		}
+            $imgsrc = my_base_url . my_plikli_base . '/avatars/user_uploaded/' . $user_id . "_" . $imgsize . ".jpg";
+            if (file_exists(mnmpath.'avatars/user_uploaded/'.$user_id . "_" . $imgsize . ".jpg"))
+                return latest_avatar($imgsrc, mnmpath.'avatars/user_uploaded/'.$user_id . "_" . $imgsize . ".jpg");
+            elseif (file_exists(mnmpath.'avatars/user_uploaded/'. $user_name . "_" . $imgsize . ".jpg")) {
+                $imgsrc = my_base_url . my_plikli_base . '/avatars/user_uploaded/' . $user_name . "_" . $imgsize . ".jpg";
+                return latest_avatar($imgsrc, mnmpath.'avatars/user_uploaded/'.$user_name . "_" . $imgsize . ".jpg");
+            }
 	    } else {
-		$dir = mnmpath.'avatars/user_uploaded/';
-		if ($dh = opendir($dir)) {
+            $dir = mnmpath.'avatars/user_uploaded/';
+            if ($dh = opendir($dir)) {
         	    while (($file = readdir($dh)) !== false)
-			if (preg_match("/^$user_id\_(.+)\.jpg\$/", $file, $m))
-			{
-			    $imgsrc = my_base_url . my_plikli_base . '/avatars/user_uploaded/' . $file;
-			    $avatars[$m[1]] = latest_avatar($imgsrc, $dir . $file);
-			    if ($m[1] == Avatar_Large)
-				$avatars['large'] = $avatars[$m[1]];
-			    elseif ($m[1] == Avatar_Small)
-				$avatars['small'] = $avatars[$m[1]];
+                    if (preg_match("/^$user_id\_(.+)\.jpg\$/", $file, $m)) {
+                        $imgsrc = my_base_url . my_plikli_base . '/avatars/user_uploaded/' . $file;
+                        $avatars[$m[1]] = latest_avatar($imgsrc, $dir . $file);
+                        if ($m[1] == Avatar_Large)
+                        $avatars['large'] = $avatars[$m[1]];
+                        elseif ($m[1] == Avatar_Small)
+                        $avatars['small'] = $avatars[$m[1]];
         	    	}
 	            closedir($dh);
     		}	    
@@ -245,25 +256,56 @@ $imgsize = '';
 	} elseif (!$imgsize) 
 	    return $avatars;
 	
-	if ($size == "large") {return my_base_url . my_plikli_base . Default_Gravatar_Large;}
-	if ($size == "small") {return my_base_url . my_plikli_base . Default_Gravatar_Small;}
+	if ($size == "large") {
+        return my_base_url . my_plikli_base . Default_Gravatar_Large;
+    }
+	if ($size == "small") {
+        return my_base_url . my_plikli_base . Default_Gravatar_Small;
+    }
 }
 
-function do_sidebar($var_smarty, $navwhere = '') {
+function do_sidebar($var_smarty, $navwhere = '')
+{
 	// show the categories in the sidebar
 	global $db, $dblang, $globals, $the_cats;
 	
-	if($navwhere == ''){global $navwhere;}
+	if ($navwhere == '') {
+        global $navwhere;
+    }
 
 	// fix for 'undefined index' errors
-		if(!isset($navwhere['text4'])){$navwhere['text4'] = '';}else{$navwhere['text4'] = htmlspecialchars($navwhere['text4']);}
-		if(!isset($navwhere['text3'])){$navwhere['text3'] = '';}else{$navwhere['text3'] = htmlspecialchars($navwhere['text3']);}
-		if(!isset($navwhere['text2'])){$navwhere['text2'] = '';}else{$navwhere['text2'] = htmlspecialchars($navwhere['text2']);}
-		if(!isset($navwhere['text1'])){$navwhere['text1'] = '';}else{$navwhere['text1'] = htmlspecialchars($navwhere['text1']);}
-		if(!isset($navwhere['link4'])){$navwhere['link4'] = '';}
-		if(!isset($navwhere['link3'])){$navwhere['link3'] = '';}
-		if(!isset($navwhere['link2'])){$navwhere['link2'] = '';}
-		if(!isset($navwhere['link1'])){$navwhere['link1'] = '';}
+		if (!isset($navwhere['text4'])) {
+            $navwhere['text4'] = '';
+        } else {
+            $navwhere['text4'] = htmlspecialchars($navwhere['text4']);
+        }
+		if (!isset($navwhere['text3'])) {
+            $navwhere['text3'] = '';
+        } else {
+            $navwhere['text3'] = htmlspecialchars($navwhere['text3']);
+        }
+		if (!isset($navwhere['text2'])) {
+            $navwhere['text2'] = '';
+        } else {
+            $navwhere['text2'] = htmlspecialchars($navwhere['text2']);
+        }
+		if (!isset($navwhere['text1'])) {
+            $navwhere['text1'] = '';
+        } else {
+            $navwhere['text1'] = htmlspecialchars($navwhere['text1']);
+        }
+		if (!isset($navwhere['link4'])) {
+            $navwhere['link4'] = '';
+        }
+		if (!isset($navwhere['link3'])) {
+            $navwhere['link3'] = '';
+        }
+		if (!isset($navwhere['link2'])) {
+            $navwhere['link2'] = '';
+        }
+		if (!isset($navwhere['link1'])) {
+            $navwhere['link1'] = '';
+        }
 		$var_smarty->assign('navbar_where', $navwhere);
 	
 		$var_smarty->assign('body_args', '');	
@@ -277,15 +319,15 @@ function do_sidebar($var_smarty, $navwhere = '') {
 	// check to see if the category sidebar module is already cached
 	// if it is, use it
 
-    if(isset($_GET['category'])){
+    if (isset($_GET['category'])) {
 		$thecat = sanitize($_GET['category'], 3);
-	}else{
+	} else {
 		$thecat = '';
 	}
 	if (isset($var_smarty) && is_object($var_smarty) && $var_smarty->is_cached($thetpl, 'sidebar|category|'.$thecat)) {
 		$var_smarty->assign('cat_array', 'x'); // this is needed. sidebar.tpl won't include the category module if cat_array doesnt have some data
-	}else{
-        if(isset($_GET['category'])){
+	} else {
+        if (isset($_GET['category'])) {
             $thecat = get_cached_category_data('category_safe_name', urlencode(sanitize($_GET['category'], 1)));
 			$catID  = $thecat->category_id;
 			$thecat = $thecat->category_name;
@@ -293,13 +335,12 @@ function do_sidebar($var_smarty, $navwhere = '') {
 	
 		$var_smarty->assign('UrlMethod', urlmethod);
 		if (!empty($catID)) {
-		foreach($the_cats as $cat){
-			if($cat->category_id == $catID && $cat->category_lang == $dblang && $cat->category_parent == 0)
-			{ 
+            foreach ($the_cats as $cat) {
+                if ($cat->category_id == $catID && $cat->category_lang == $dblang && $cat->category_parent == 0) { 
 				$globals['category_id'] = $cat->category_id;
 				$globals['category_name'] = $cat->category_name;
-			}
-		}
+                }
+            }
 		}
 		$pos = strrpos($_SERVER["SCRIPT_NAME"], "/");
 		$script_name = substr($_SERVER["SCRIPT_NAME"], $pos + 1, 100);
@@ -309,8 +350,7 @@ function do_sidebar($var_smarty, $navwhere = '') {
 		/* Redwine: added isset and initialized $sqlGeticategory to eliminate the Notice undefined mnm_user and sqlGeticategory in case the user is not logged in. */
 		$login_user = $db->escape(sanitize(isset($_COOKIE['mnm_user']),3));
 		$sqlGeticategory = "";
-		if($login_user)
-		{
+		if ($login_user) {
 		/////// for user set category----sorojit.
 		    $sqlGeticategory = $db->get_var("SELECT user_categories from " . table_users . " where user_login = '$login_user';");
 		    if (!empty($sqlGeticategory)) {
@@ -330,8 +370,7 @@ function do_sidebar($var_smarty, $navwhere = '') {
 			$lastspacer = 0;
 			$array = array();
 
-			foreach($result as $row)
-			{
+			foreach ($result as $row) {
 				if (count($right)>0) {
 					// check if we should remove a node from the stack
 					while ($right && end($right)<$row->rgt) {
@@ -349,8 +388,10 @@ function do_sidebar($var_smarty, $navwhere = '') {
 				$array[$i]['name'] = $row->category_name;
 				$array[$i]['description'] = $row->category_desc;
 				$array[$i]['safename'] = $row->category_safe_name;
-				if(isset($row->category_color)){$array[$i]['color'] = $row->category_color;}
-				if(isset($row->category_parent)){
+				if (isset($row->category_color)) {
+                    $array[$i]['color'] = $row->category_color;
+                }
+				if (isset($row->category_parent)) {
 					$array[$i]['parent'] = $row->category_parent;
 					$array[$i]['parent_name'] = GetCatName($row->category_parent);
 					$array[$i]['parent_subcat_count'] = GetSubCatCount($row->category_parent);
@@ -361,17 +402,8 @@ function do_sidebar($var_smarty, $navwhere = '') {
 				$i = $i + 1;
 				$right[] = $row->rgt;
 			}
-//		    }
 			///////end of for user set category
 			$var_smarty->assign('start', 0);	
-
-/*		}
-		else
-		{
-			$array = tree_to_array(0, table_categories);
-			$var_smarty->assign('start', 1);
-		}
-*/
 		$var_smarty->assign('lastspacer', 0);
 		$var_smarty->assign('cat_array', $array);		
 	
@@ -379,11 +411,7 @@ function do_sidebar($var_smarty, $navwhere = '') {
 		$published_count = get_story_count('published');
 		
 		$var_smarty->assign('published_count', $published_count);
-//	    $sql = "select *,  count(*) as count from " . table_links . ", " . table_categories . " where category_lang='$dblang' and category_id=link_category group by link_category ORDER BY category_name ASC";
-//		$categorylist = object_2_array($db->get_results($sql));
-//		$var_smarty->assign('categorylist', $categorylist);
 		$var_smarty->assign('category_url', getmyurl('maincategory'));
-
 	}
 
 	$var_smarty->cache = $_caching; // set cache back to original value
@@ -395,15 +423,16 @@ function do_sidebar($var_smarty, $navwhere = '') {
 }
 
 
-function force_authentication() {
+function force_authentication()
+{
 	// requires user to login before viewing the page
 	global $current_user;
-	if(!$current_user->authenticated) {
+	if (!$current_user->authenticated) {
 		if (strpos($_SERVER["REQUEST_URI"],'/admin/') !== false) {
 			// Admin panel login
 			header("Location: " . getmyurl('admin_login', $_SERVER['REQUEST_URI']));
 			die;
-		}else{
+		} else {
 			// Normal login
 			header("Location: " . getmyurl('login', $_SERVER['REQUEST_URI']));
 			die;
@@ -412,7 +441,8 @@ function force_authentication() {
 	return true;
 }
 
-function do_pages($total, $page_size, $thepage, $fetch = false) {
+function do_pages($total, $page_size, $thepage, $fetch = false)
+{
 	// "previous" and "next" page buttons
 	global $db, $URLMethod, $main_smarty;   
 	
@@ -425,51 +455,55 @@ function do_pages($total, $page_size, $thepage, $fetch = false) {
 
 	$output = '';
 
-	if ($total_pages != '1'){ // If there is only 1 page, don't display any pagination at all
+	if ($total_pages != '1') { // If there is only 1 page, don't display any pagination at all
 		if ($URLMethod == 1) {
-
 			$query=preg_replace('/page=[0-9]+/', '', sanitize($_SERVER['QUERY_STRING'],3));
 			$query=preg_replace('/^&*(.*)&*$/', "$1", $query);
-			if(!empty($query)) $query = "&amp;$query";
+			if (!empty($query)) {
+                $query = "&amp;$query";
+            }
 
 			$output .= '<div class="pagination_wrapper"><ul class="pagination">';
 
-			if($current==1) {
+			if ($current==1) {
 				// There are no previous pages, so don't show the "previous" link.
 				//$output .= '<li class="disabled"><span>&#171; '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Previous"). '</span></li>';
 			} else {
 				$i = $current-1;
-				if ((pagename == "index" || pagename == "published")  && $i==1)
+				if ((pagename == "index" || pagename == "published")  && $i==1) {
 					$output .= '<li><a href="'.($query ? '?' : './').$query.'">&#171; '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Previous").'</a></li>';
-				else
+				} else {
 					$output .= '<li><a href="?page='.$i.$query.'">&#171; '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Previous").'</a></li>';
+                }
 			}
 
-			if($start>1) {
+			if ($start>1) {
 				$i = 1;
-				if ((pagename == "index" || pagename == "published")  && $i==1)
+				if ((pagename == "index" || pagename == "published")  && $i==1) {
 					$output .= '<li><a href="'.($query ? '?' : './').$query.'">'.$i.'</a></li>';
-				else
+				} else {
 					$output .= '<li><a href="?page='.$i.$query.'">'.$i.'</a></li>';
-				$output .= '<li class="active"><a href="#">...</a></li>';
+                    $output .= '<li class="active"><a href="#">...</a></li>';
+                }
 			}
 			
 			for ($i=$start;$i<=$end && $i<= $total_pages;$i++) {
-				if($i==$current) 
+				if ($i==$current) {
 					$output .= '<li class="active"><a href="#">'.$i.'</a></li>';
-				elseif ((pagename == "index" || pagename == "published")  && $i==1)
+				} elseif ((pagename == "index" || pagename == "published")  && $i==1) {
 					$output .= '<li><a href="'.($query ? '?' : './').$query.'" class="pages">'.$i.'</a></li>';
-				else 
+				} else {
 					$output .= '<li><a href="?page='.$i.$query.'" class="pages">'.$i.'</a></li>';
+                }
 			}
 			
-			if($total_pages>$end) {
+			if ($total_pages>$end) {
 				$i = $total_pages;
 				$output .= '<li class="disabled"><span>...</span></li>';
 				$output .= '<li><a href="?page='.$i.$query.'">'.$i.'</a></li>';
 			}
 			
-			if($current<$total_pages) {
+			if ($current<$total_pages) {
 				$i = $current+1;
 				$output .= '<li><a href="?page='.$i.$query.'"> '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Next"). ' &#187;' . '</a></li>';
 			} else {
@@ -480,8 +514,6 @@ function do_pages($total, $page_size, $thepage, $fetch = false) {
 		}	
 		
 		if ($URLMethod == 2) {           
-					
-
 			$query=preg_replace('(login=)', '/', str_replace('amp;','&',sanitize($_SERVER['QUERY_STRING'],3)));	//remove login= from query string //
 			$query=preg_replace('(view=)', '/', $query);	                    //remove view= from query string //
 			$query=preg_replace('(part=)', '', $query);
@@ -502,196 +534,334 @@ function do_pages($total, $page_size, $thepage, $fetch = false) {
 
 			$output .= '<div class="pagination_wrapper"><ul class="pagination">';
 
-			if($current==1) {
+			if ($current==1) {
 				// There are no previous pages, so don't show the "previous" link.
 				//$output .= '<li class="disabled"><span>&#171; '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Previous"). '</span></li>';
 			} else {
 				$i = $current-1;
 				if (pagename == "admin_users") {
 					$output .= '<li><a href="'.my_plikli_base.'/admin/'.pagename.'.php?page='.$i.'">&#171; '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Previous").'</a></li>';
-				}
-				elseif (pagename == "admin_links") {
+				} elseif (pagename == "admin_links") {
 					$output .= '<li><a href="'.my_plikli_base.'/admin/'.pagename.'.php?page='.$i.'">&#171; '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Previous").'</a></li>';
-				}
-				elseif (pagename == "index" || pagename == "published" ) {
+				} elseif (pagename == "index" || pagename == "published" ) {
 					$output .= '<li><a href="'.my_plikli_base.'/'.$query.($i>1 ? '/page/'.$i : '').'">&#171; '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Previous").'</a></li>';
-				}
-				elseif (pagename == "live_published") {
+				} elseif (pagename == "live_published") {
 					$output .= '<li><a href="'.my_plikli_base.'/live/published/'.$query.'/page/'.$i.'">&#171; '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Previous").'</a></li>';
-				}
-				elseif (pagename == "live_unpublished") {
+				} elseif (pagename == "live_unpublished") {
 					$output .= '<li><a href="'.my_plikli_base.'/live/new/'.$query.'/page/'.$i.'">&#171; '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Previous").'</a></li>';
-				}
-				elseif (pagename == "live_comments") {
+				} elseif (pagename == "live_comments") {
 					$output .= '<li><a href="'.my_plikli_base.'/live/comments/'.$query.'/page/'.$i.'">&#171; '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Previous").'</a></li>';
-				}
-				else {
+				} else {
 					$output .= '<li><a href="'.my_plikli_base.'/'.pagename.'/'.$query.'/page/'.$i.'">&#171; '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Previous").'</a></li>';
 				}
 			}
 
-			if($start>1) {
+			if ($start>1) {
 				$i = 1;
 				if (pagename == "admin_users") {
 					$output .= '<li><a href="'.my_plikli_base.'/admin/'.pagename.'.php?page='.$i.'">'.$i.'</a></li>';
-				}
-				elseif (pagename == "admin_links") {
+				} elseif (pagename == "admin_links") {
 					$output .= '<li><a href="'.my_plikli_base.'/admin/'.pagename.'.php?page='.$i.'">'.$i.'</a></li>';
-				}
-				elseif (pagename == "index" || pagename == "published" ) {
+				} elseif (pagename == "index" || pagename == "published" ) {
 					$output .= '<li><a href="'.my_plikli_base.'/'.$query.'">'.$i.'</a></li>';
-				}
-				elseif (pagename == "live_published") {
+				} elseif (pagename == "live_published") {
 					$output .= '<li><a href="'.my_plikli_base.'/live/published/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
-				}
-				elseif (pagename == "live_unpublished") {
+				} elseif (pagename == "live_unpublished") {
 					$output .= '<li><a href="'.my_plikli_base.'/live/new/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
-				}
-				elseif (pagename == "live_comments") {
+				} elseif (pagename == "live_comments") {
 					$output .= '<li><a href="'.my_plikli_base.'/live/comments/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
-				}
-				else {
+				} else {
 					$output .= '<li><a href="'.my_plikli_base.'/'.pagename.'/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
 				}
 				$output .= '<li class="active"><a href="#">...</a></li>';
 			}
 			for ($i=$start;$i<=$end && $i<= $total_pages;$i++) {
-				if($i==$current) {
-					$output .= '<li class="active"><a href="#">'.$i.'</a></li>';	} 
-				else {
+				if ($i==$current) {
+					$output .= '<li class="active"><a href="#">'.$i.'</a></li>';
+                } else {
 					if (pagename == "admin_users") {
 						$output .= '<li><a href="'.my_plikli_base.'/admin/'.pagename.'.php?page='.$i.'">'.$i.'</a></li>';
-					}
-					elseif (pagename == "admin_links") {
+					} elseif (pagename == "admin_links") {
 						$output .= '<li><a href="'.my_plikli_base.'/admin/'.pagename.'.php?page='.$i.'">'.$i.'</a></li>';
-					}
-					elseif (pagename == "index" || pagename == "published" ) {
+					} elseif (pagename == "index" || pagename == "published" ) {
 						$output .= '<li><a href="'.my_plikli_base.'/'.$query.($i>1 ? '/page/'.$i : '').'">'.$i.'</a></li>';
-					}
-					elseif (pagename == "live_published") {
+					} elseif (pagename == "live_published") {
 						$output .= '<li><a href="'.my_plikli_base.'/live/published/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
-					}
-					elseif (pagename == "live_unpublished") {
+					} elseif (pagename == "live_unpublished") {
 						$output .= '<li><a href="'.my_plikli_base.'/live/new/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
-					}
-					elseif (pagename == "live_comments") {
+					} elseif (pagename == "live_comments") {
 						$output .= '<li><a href="'.my_plikli_base.'/live/comments/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
-					}
-					else {
+					} else {
 						$output .= '<li><a href="'.my_plikli_base.'/'.pagename.'/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
 					}
 				}	
 			}
 			
-			if($total_pages>$end) {
+			if ($total_pages>$end) {
 				$i = $total_pages;
 				$output .= '<li class="active"><a href="#">...</a></li>';
 				if ($pagename == "admin_users") {
 					$output .= '<li><a href="'.my_plikli_base.'/admin/'.pagename.'.php?page='.$i.'">'.$i.'</a></li>';
-				}
-				elseif (pagename == "admin_links") {
+				} elseif (pagename == "admin_links") {
 					$output .= '<li><a href="'.my_plikli_base.'/admin/'.pagename.'.php?page='.$i.'">'.$i.'</a></li>';
-				}
-				elseif (pagename == "index" || pagename == "published" ) {
+				} elseif (pagename == "index" || pagename == "published" ) {
 					$output .= '<li><a href="'.my_plikli_base.'/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
-				}
-				elseif (pagename == "live_published") {
+				} elseif (pagename == "live_published") {
 					$output .= '<li><a href="'.my_plikli_base.'/live/published/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
-				}
-				elseif (pagename == "live_unpublished") {
+				} elseif (pagename == "live_unpublished") {
 					$output .= '<li><a href="'.my_plikli_base.'/live/new/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
-				}
-				elseif (pagename == "live_comments") {
+				} elseif (pagename == "live_comments") {
 					$output .= '<li><a href="'.my_plikli_base.'/live/comments/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
-				}
-				else {
+				} else {
 					$output .= '<li><a href="'.my_plikli_base.'/'.pagename.'/'.$query.'/page/'.$i.'">'.$i.'</a></li>';
 				}
 			}
 			
-			if($current<$total_pages) {
+			if ($current<$total_pages) {
 				$i = $current+1;
 				if (pagename == "admin_users") {
 					$output .= '<li><a href="'.my_plikli_base.'/admin/'.pagename.'.php?page='.$i.'"> '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Next"). ' &#187;' . '</a></li>';
-				}
-				elseif (pagename == "admin_links") {
+				} elseif (pagename == "admin_links") {
 					$output .= '<li><a href="'.my_plikli_base.'/admin/'.pagename.'.php?page='.$i.'"> '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Next"). ' &#187;' . '</a></li>';
-				}
-				elseif (pagename == "live_published") {
+				} elseif (pagename == "live_published") {
 					$output .= '<li><a href="'.my_plikli_base.'/live/published/'.$query.'/page/'.$i.'"> '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Next"). ' &#187;' . '</a></li>'; 
-				}
-				elseif (pagename == "live_unpublished") {
+				} elseif (pagename == "live_unpublished") {
 					$output .= '<li><a href="'.my_plikli_base.'/live/new/'.$query.'/page/'.$i.'"> '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Next"). ' &#187;' . '</a></li>'; 
-				}
-				elseif (pagename == "live_comments") {
+				} elseif (pagename == "live_comments") {
 					$output .= '<li><a href="'.my_plikli_base.'/live/comments/'.$query.'/page/'.$i.'"> '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Next"). ' &#187;' . '</a></li>'; 
-				}
-				elseif (pagename == "index" || pagename == "published" ) {
+				} elseif (pagename == "index" || pagename == "published" ) {
 					$output .= '<li><a href="'.my_plikli_base.'/'.$query.'/page/'.$i.'"> '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Next"). ' &#187;' . '</a></li>'; 
-				} 
-				else {
+				} else {
 					$output .= '<li><a href="'.my_plikli_base.'/'.pagename.'/'.$query.'/page/'.$i.'"> '.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Next"). ' &#187;' . '</a></li>'; 
 				} 
-			}		
-			else {
-				$output .= '<li class="active"><a href="#">'.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Next"). ' &#187;' . '</a></li>';	}
+			} else {
+				$output .= '<li class="active"><a href="#">'.$main_smarty->get_config_vars("PLIKLI_Visual_Page_Next"). ' &#187;' . '</a></li>';	
+            }
 			
 			$output .= "</ul></div>";
 			$output = str_replace("/group_story/","/groups/",$output);
 			$output = str_replace("//","/",$output);
 		}
 	}
-	if($fetch == false){
+	if ($fetch == false) {
 		echo $output;
 	} else {
 		return $output;
 	}
 }
 
-function generateHash($plainText, $salt = null){
+function generateHash($plainText, $salt = null)
+{
     if ($salt === null) {
-        $salt = substr(md5(uniqid(rand(), true)), 0, SALT_LENGTH); }
-    else {
+        $salt = substr(md5(uniqid(rand(), true)), 0, SALT_LENGTH);
+    } else {
         $salt = substr($salt, 0, SALT_LENGTH); 
 	}		
     return $salt . sha1($salt . $plainText);
 }
 
-function generatePassHash($plainText){
+function generatePassHash($plainText)
+{
 	if (!function_exists('password_hash')) {
 		require "password.php";
 		$salt = substr(md5(uniqid(rand(), true)), 0, SALT_LENGTH);
 		return 'bcrypt:' . $salt . password_hash (sha1 ($salt . $plainText) , PASSWORD_BCRYPT);
-	}else{
+	} else {
 		$salt = substr(md5(uniqid(rand(), true)), 0, SALT_LENGTH);
 		return 'bcrypt:' . $salt . password_hash (sha1 ($salt . $plainText) , PASSWORD_BCRYPT);
 	}
 }
 
-function verifyPassHash($plainText, $hashedPass){
+function verifyPassHash($plainText, $hashedPass)
+{
     $hashTrim = substr($hashedPass, (SALT_LENGTH + 7));
     $salt = substr($hashedPass, 7, SALT_LENGTH);
 	if (!function_exists('password_verify')) {
 		require "password.php";
-		if(password_verify(sha1($salt.$plainText), $hashTrim)){
+		if (password_verify(sha1($salt.$plainText), $hashTrim)) {
 			return true;
-		} else{
+		} else {
 			return false;
 		}
-	}else{
-		if(password_verify(sha1($salt.$plainText), $hashTrim)){
+	} else {
+		if (password_verify(sha1($salt.$plainText), $hashTrim)) {
 			return true;
-		} else{
+		} else {
 			return false;
 		}
 	}
 }
 
-function getmyFullurl($x, $var1="", $var2="", $var3="") {
+function urlsafe_base64_encode($data)
+{
+    return strtr(base64_encode($data), ['+' => '-', '/' => '_', '=' => '']);
+}
+
+function urlsafe_base64_decode($data, $strict = false)
+{
+    return base64_decode(strtr($data, '-_', '+/'), $strict);
+}
+
+function create_token()
+{
+	//mcrypt_create_iv (PHP 4, PHP 5, PHP 7 < 7.2.0, PECL mcrypt >= 1.0.0)
+	//bin2hex (PHP 4, PHP 5, PHP 7)
+	//openssl_random_pseudo_bytes (PHP 5 >= 5.3.0, PHP 7)
+	/*if (function_exists('mcrypt_create_iv')) {
+		$created_token = bin2hex(mcrypt_create_iv(32, MCRYPT_DEV_URANDOM));
+	} else {
+		$created_token = bin2hex(openssl_random_pseudo_bytes(32));
+	}
+	return $created_token;*/
+    if (!function_exists('random_bytes')) {
+        require_once "random_compat/lib/random.php";
+    }
+	try {
+    $string = random_bytes(64);
+    } catch (TypeError $e) {
+        // Well, it's an integer, so this IS unexpected.
+        die("An unexpected error has occurred"); 
+    } catch (Error $e) {
+    // This is also unexpected because 32 is a reasonable integer.
+        die("An unexpected error has occurred");
+    } catch (Exception $e) {
+        // If you get this message, the CSPRNG failed hard.
+        die("Could not generate a random string. Is our OS secure?");
+    }
+
+    //$string1 = random_bytes(64);
+    $authenticator = bin2hex($string);
+    //$saltedlogin = hash('sha256', $authenticator);
+    return $authenticator;
+}
+
+function check_valid($token, $name)
+{
+	defined('USE_MB_STRING') or define('USE_MB_STRING', function_exists('mb_strlen'));
+		/**
+		 * hash_equals — Timing attack safe string comparison
+		 *
+		 * Arguments are null by default, so an appropriate warning can be triggered
+		 *
+		 * @param string $known_string
+		 * @param string $user_string
+		 *
+		 * @link http://php.net/manual/en/function.hash-equals.php
+		 *
+		 * @return boolean
+		 */
+	$score_valid = 0;
+	if (!function_exists('hash_equals')) {
+		defined('USE_MB_STRING') or define('USE_MB_STRING', function_exists('mb_strlen'));
+		/**
+		 * hash_equals — Timing attack safe string comparison
+		 *
+		 * Arguments are null by default, so an appropriate warning can be triggered
+		 *
+		 * @param string $known_string
+		 * @param string $user_string
+		 *
+		 * @link http://php.net/manual/en/function.hash-equals.php
+		 *
+		 * @return boolean
+		 */
+		function hash_equals($token = null, $name = null)
+		{
+			$argc = func_num_args();
+			// Check the number of arguments
+			if ($argc < 2) {
+				//trigger_error(sprintf('hash_equals() expects exactly 2 parameters, %d given', $argc), E_USER_WARNING);
+				return null;
+			}
+
+			// Check $known_string type
+			if (!is_string($token)) {
+				//trigger_error(sprintf('hash_equals(): Expected known_string to be a string, %s given', strtolower(gettype($token))), E_USER_WARNING);
+				return false;
+			}
+
+			// Check $user_string type
+			if (!is_string($name)) {
+				//trigger_error(sprintf('hash_equals(): Expected user_string to be a string, %s given', strtolower(gettype($name))), E_USER_WARNING);
+				return false;
+			}
+
+			// Ensures raw binary string length returned
+			$strlen = function($string) {
+				if (USE_MB_STRING) {
+					return mb_strlen($string, '8bit');
+				}
+				return strlen($string);
+			};
+
+			// Compare string lengths
+			if (($length = $strlen($token)) !== $strlen($name)) {
+				return false;
+			}
+			$diff = 0;
+			// Calculate differences
+			for ($i = 0; $i < $length; $i++) {
+				$diff |= ord($token[$i]) ^ ord($name[$i]);
+			}
+			return $diff === 0;
+		}
+	}
+	/***************************************************************
+	Redwine: calling hash_equals function, the built-in or the user's created one expects a return of 1 (equal = true) or 0 (equal = false).
+	***************************************************************/
+	$score_valid = hash_equals($token, $name);
+	
+	return $score_valid;
+}
+
+function truncate_strings_html($string, $limit, $break=" ", $pad="")
+{
+	// return with no change if string is shorter than $limit
+	if (mb_strlen($string, 'UTF-8') <= $limit) {
+        return $string;
+    }
+
+	// is $break present between $limit and the end of the string?
+		if (false !== ($breakpoint = mb_strpos($string, $break, $limit, "UTF-8"))) {
+			if ($breakpoint < mb_strlen($string, 'UTF-8') - 1) {
+				// $string = substr($string, 0, $breakpoint) . $pad;
+				$string = mb_substr($string, 0, $breakpoint, "UTF-8") . $pad;
+			}
+		}
+
+	#put all opened tags into an array	
+	preg_match_all ( "#<([a-z]+)( .*)?(?!/)>#iU", $string, $result );
+	$openedtags = $result[1];
+	#put all closed tags into an array
+	preg_match_all ( "#</([a-z]+)>#iU", $string, $result );
+
+	$closedtags = $result[1];
+	$len_opened = count ( $openedtags );
+
+	# all tags are closed
+	if ( count ( $closedtags ) == $len_opened ) {
+		return $string;
+	}
+
+	$openedtags = array_reverse ( $openedtags );
+	# close tags
+	for ($i = 0; $i < $len_opened; $i++) {
+		if (!in_array( $openedtags[$i], $closedtags)) {
+			$string .= "</" . $openedtags[$i] . ">";
+		} else {
+			unset($closedtags[array_search($openedtags[$i], $closedtags)] );
+		}
+	}
+	return $string;
+}
+
+function getmyFullurl($x, $var1="", $var2="", $var3="")
+{
 	return my_base_url . getmyurl($x, $var1, $var2, $var3);
 }
 
-function getmyurl($x, $var1="", $var2="", $var3="") {
+function getmyurl($x, $var1="", $var2="", $var3="")
+{
 	global $URLMethod;
 	
 	$var1 = sanitize($var1,1);
@@ -704,13 +874,12 @@ function getmyurl($x, $var1="", $var2="", $var3="") {
 		// var 1 = category_safe_name
 		// var 2 = title_url
 		// var 3 = story id
-		if(enable_friendly_urls == true){
+		if (enable_friendly_urls == true) {
 		    return getmyurl("storycattitle", $var1, $var2);
 		} else {
 		    return getmyurl("story", $var3);
 		}
 	}
-	
 	
 	if ($URLMethod == 1) {
 		if ($x == "index") $ret = "/index.php";
@@ -918,11 +1087,12 @@ function getmyurl($x, $var1="", $var2="", $var3="") {
 	return my_plikli_base . preg_replace('/\/+/', '/', $ret);
 }
 
-function SetSmartyURLs($main_smarty) {
+function SetSmartyURLs($main_smarty)
+{
 	global $dblang, $URLMethod;
-	if(strpos($_SERVER['PHP_SELF'], "login.php") === false){
+	if (strpos($_SERVER['PHP_SELF'], "login.php") === false) {
 		$main_smarty->assign('URL_login', htmlentities(getmyurl("login", $_SERVER['REQUEST_URI'])));
-	} else{
+	} else {
 		$main_smarty->assign('URL_login', getmyurl("loginNoVar"));
 	}
 	$main_smarty->assign('URL_logout', htmlentities(getmyurl("logout", $_SERVER['REQUEST_URI'])));
@@ -944,17 +1114,16 @@ function SetSmartyURLs($main_smarty) {
 	$main_smarty->assign('URL_story', getmyurl("story"));
 	$main_smarty->assign('URL_storytitle', getmyurl("storytitle"));
 	$main_smarty->assign('URL_topusers', getmyurl("topusers"));
-    	if(isset($_GET['category']) && sanitize($_GET['category'],1) != '' && strpos($_SERVER['PHP_SELF'], "new.php") === false  && strpos($_SERVER['PHP_SELF'], "story.php") === false) {
-
+    	if (isset($_GET['category']) && sanitize($_GET['category'],1) != '' && strpos($_SERVER['PHP_SELF'], "new.php") === false  && strpos($_SERVER['PHP_SELF'], "story.php") === false) {
             $main_smarty->assign('URL_new', getmyurl("newcategory").sanitize(sanitize($_GET['category'],1),2));
-	} else {
-	    $main_smarty->assign('URL_new', getmyurl("new"));
-	}
-    	if(isset($_GET['category']) && sanitize($_GET['category'],1) != '' && strpos($_SERVER['PHP_SELF'], "index.php") === false && strpos($_SERVER['PHP_SELF'], "story.php") === false) {
+        } else {
+            $main_smarty->assign('URL_new', getmyurl("new"));
+        }
+    	if (isset($_GET['category']) && sanitize($_GET['category'],1) != '' && strpos($_SERVER['PHP_SELF'], "index.php") === false && strpos($_SERVER['PHP_SELF'], "story.php") === false) {
             $main_smarty->assign('URL_base', getmyurl("maincategory",sanitize(sanitize($_GET['category'],1),2)));
     	} else {
             $main_smarty->assign('URL_base', getmyurl("index"));
-	}
+        }
 
 	$main_smarty->assign('URL_submit', getmyurl("submit"));
 	$main_smarty->assign('URL_rss', getmyurl("rss"));
@@ -987,11 +1156,12 @@ function SetSmartyURLs($main_smarty) {
 	return $main_smarty;
 }
 
-function friend_MD5($userA, $userB) {
+function friend_MD5($userA, $userB)
+{
 	include_once(mnminclude.'user.php');
 	$user=new User();
 	$user->username = $userA;
-	if(!$user->read()) {
+	if (!$user->read()) {
 		echo "a-" . $userA . "error 2";
 		die;
 	}
@@ -999,7 +1169,7 @@ function friend_MD5($userA, $userB) {
 
 	$user=new User();
 	$user->username = $userB;
-	if(!$user->read()) {
+	if (!$user->read()) {
 		echo "b-" . $userB . "error 2";
 		die;
 	}
@@ -1009,7 +1179,8 @@ function friend_MD5($userA, $userB) {
 	return $themd5;
 }
 
-function totals_regenerate(){
+function totals_regenerate()
+{
 	global $db, $cached_totals;
 	
 	$name = 'new';
@@ -1022,7 +1193,7 @@ function totals_regenerate(){
 	$db->query("UPDATE `" . table_totals . "` set `total` = $count where `name` = '$name';");	
 	$cached_totals[$name] = $count;
 
-	if(caching == 1){
+	if (caching == 1) {
 		// this is to clear the cache and reload it for settings_from_db.php
 		$db->cache_dir = mnmpath.'cache';
 		$db->use_disk_cache = true;
@@ -1031,18 +1202,18 @@ function totals_regenerate(){
 		$totals = $db->get_results("SELECT * FROM `" . table_totals . "`");
 		$db->cache_queries = false;
 	}
-
 	return true;
 }
 
-function totals_adjust_count($name, $adjust){
+function totals_adjust_count($name, $adjust)
+{
 	global $db, $cached_totals;
 
 	$name = $db->escape($name);
 	$db->query('UPDATE '.table_totals.' SET total=total+'.$adjust.' WHERE name="'.$name.'"');
 	$cached_totals[$name] = $db->get_var('SELECT total FROM '.table_totals.' WHERE name="'.$name.'"');
 
-	if(caching == 1){
+	if (caching == 1) {
 		// this is to clear the cache and reload it for settings_from_db.php
 		$db->cache_dir = mnmpath.'cache';
 		$db->use_disk_cache = true;
@@ -1055,21 +1226,20 @@ function totals_adjust_count($name, $adjust){
 	return true;
 }
 
-function get_story_count($name){
+function get_story_count($name)
+{
 	global $db, $cached_totals;
 
 	$name = $db->escape($name);
-	if(summarize_mysql == 1){
-		if(isset($cached_totals[$name])){
+	if (summarize_mysql == 1) {
+		if (isset($cached_totals[$name])) {
 			return $cached_totals[$name];
 		} else {
-			
-			if(caching == 1){
+			if (caching == 1) {
 				$db->cache_dir = mnmpath.'cache';
 				$db->use_disk_cache = true;
 				$db->cache_queries = true;
 			}
-			
 			$totals = $db->get_results("SELECT * FROM `" . table_totals . "`");
 
 			$db->cache_queries = false;
@@ -1079,7 +1249,7 @@ function get_story_count($name){
 			}
 			return $cached_totals[$name];
 		}
-	}else{	
+	} else {	
 		return $db->get_var("SELECT count(*) FROM " . table_links . " WHERE link_status='$name';");
 	}
 }
@@ -1091,28 +1261,26 @@ function close_tags($html)
    // Close HTML tags
    $html = preg_replace('/<[^>]*$/is', '', $html);
 
-   if (preg_match_all('/<([a-z]+)(?: .*)?(?<![\/|\/ ])>/iU', $html, $m))
-   	$opened_tags = $m[1];
-   else
-	return $html;
- 
-   if (preg_match_all('/<\/([a-z]+)>/iU', $html, $m))
-   	$closed_tags = $m[1];
-   else
-	$closed_tags = array();
- 
-   if (count($closed_tags) == count($opened_tags))
-      	return $html;
- 
-   for ($i=count($opened_tags)-1; $i>=0; $i--)
-   {
-       if (!in_array($opened_tags[$i],$single_tags))
-       {
-           if (!in_array($opened_tags[$i], $closed_tags))
-                  $html .= '</'.$opened_tags[$i].'>';
+    if (preg_match_all('/<([a-z]+)(?: .*)?(?<![\/|\/ ])>/iU', $html, $m)) {
+        $opened_tags = $m[1];
+    } else {
+        return $html;
+    }
+    if (preg_match_all('/<\/([a-z]+)>/iU', $html, $m)) {
+        $closed_tags = $m[1];
+    } else {
+        $closed_tags = array();
+    }
+    if (count($closed_tags) == count($opened_tags)) {
+        return $html;
+    }
+    for ($i=count($opened_tags)-1; $i>=0; $i--) {
+       if (!in_array($opened_tags[$i],$single_tags)) {
+            if (!in_array($opened_tags[$i], $closed_tags)) {
+                $html .= '</'.$opened_tags[$i].'>';
+            }
        }
-   }
- 
+    }
    return $html;
 }
 
@@ -1124,29 +1292,21 @@ function check_referrer($post_url=false)
 {
 	global $my_base_url, $my_plikli_base, $xsfr_first_page, $_GET, $_POST;
 
-	if (sizeof($_GET)>0 || sizeof($_POST)>0)
-	{
-
-		if (isset($_SERVER['HTTP_REFERER']))
-		{
+	if (sizeof($_GET)>0 || sizeof($_POST)>0) {
+		if (isset($_SERVER['HTTP_REFERER'])) {
 			$base = $my_plikli_base;
 
 			if (!$base) $base = '/';
 			$_SERVER['HTTP_REFERER'] = sanitize($_SERVER['HTTP_REFERER'],3);
 
 			// update checks if HTTP_REFERER and posted url are the same!
-			if(strpos($_SERVER['HTTP_REFERER'],$post_url)!==false) return true;
+			if (strpos($_SERVER['HTTP_REFERER'],$post_url)!==false) return true;
 
-
-			//if (strpos(preg_replace('/^.+:\/\/(www\.)?/','',$_SERVER['HTTP_REFERER']).'/',preg_replace('/^.+:\/\/(www\.)?/','',$my_base_url).$base)!==0)
-			if (strpos(preg_replace('/^.+:\/\/(www\.)?/','',$_SERVER['HTTP_REFERER']).'/',preg_replace('/^.+:\/\/(www\.)?/','',$my_base_url))!==0)
-			{
+			if (strpos(preg_replace('/^.+:\/\/(www\.)?/','',$_SERVER['HTTP_REFERER']).'/',preg_replace('/^.+:\/\/(www\.)?/','',$my_base_url))!==0) {
 				unset($_SESSION['xsfr']);
 				die("Wrong Referrer '{$_SERVER['HTTP_REFERER']}'");
 			}
-		}
-		elseif ($xsfr_first_page)
-		{
+		} elseif ($xsfr_first_page) {
 			unset($_SESSION['xsfr']);
 			die('Wrong security code');
 		}
@@ -1158,58 +1318,66 @@ function translate($str)
 {
     global $language, $main_smarty, $english_language;
 
-    if ($language=='english') return $str;
-    if (sizeof($english_language)==0)
-    {
-		$path = dirname(__FILE__);
-		if (strrpos($path,'/'))
-			$path = substr($path,0,strrpos($path,'/'));
-		elseif (strrpos($path,'\\'))
-			$path = substr($path,0,strrpos($path,'\\'));
-			if (!file_exists( $path . '/languages/lang_english.conf')) return $str;
-
-		$strings = parse_ini_file($path .  '/languages/lang_english.conf');
-		foreach ($strings as $key => $value)
-			$english_language[strtoupper(str_replace('&quot;','"',$value))] = $main_smarty->get_config_vars($key);
+    if ($language=='english') {
+        return $str;
     }
-    if ($translation = $english_language[strtoupper(str_replace("\r\n","\\n",$str))])
+    if (sizeof($english_language)==0) {
+		$path = dirname(__FILE__);
+		if (strrpos($path,'/')) {
+			$path = substr($path,0,strrpos($path,'/'));
+		} elseif (strrpos($path,'\\')) {
+			$path = substr($path,0,strrpos($path,'\\'));
+                if (!file_exists( $path . '/languages/lang_english.conf')) {
+                    return $str;
+                }
+        }
+		$strings = parse_ini_file($path .  '/languages/lang_english.conf');
+		foreach ($strings as $key => $value) {
+			$english_language[strtoupper(str_replace('&quot;','"',$value))] = $main_smarty->get_config_vars($key);
+        }
+    }
+    if ($translation = $english_language[strtoupper(str_replace("\r\n","\\n",$str))]) {
     	return $translation;
-    else
-	return $str;
+    } else {
+        return $str;
+    }
 }
 
-function detect_encoding($string) {  
+function detect_encoding($string)
+{  
 	static $list = array('utf-8');
 	foreach ($list as $item) {
-	$sample = iconv($item, $item, $string);
-	if (md5($sample) == md5($string))
-		return $item;
+        $sample = iconv($item, $item, $string);
+        if (md5($sample) == md5($string)) {
+            return $item;
+        }
 	}
 	return null;
 }
 
 function js_urldecode($str)
 {
-  $str = rawurldecode($str);
-  $utf8 = is_utf8($str);
+    $str = rawurldecode($str);
+    $utf8 = is_utf8($str);
 
-  preg_match_all("/(?:%u.{4})|&#x.{4};|&#\d+;|.+/U",$str,$r);
-  $ar = $r[0];
-  foreach($ar as $k=>$v) {
-    if(substr($v,0,2) == "%u")
-      $ar[$k] = c2UTF8(intval(substr($v,-4),16));
-    elseif(substr($v,0,3) == "&#x")
-      $ar[$k] = c2UTF8(intval(substr($v,3,-1),16));
-    elseif(substr($v,0,2) == "&#") 
-      $ar[$k] = c2UTF8(intval(substr($v,2,-1),16));
-    elseif($utf8)
-      continue;
-    elseif (function_exists('mb_convert_encoding'))
-      $ar[$k] = mb_convert_encoding($v,'UTF-8','ASCII');
-    elseif (function_exists('iconv'))
-      $ar[$k] = iconv(iconv_get_encoding('input_encoding'),'UTF-8',$v);
-  }
-  return join("",$ar);
+    preg_match_all("/(?:%u.{4})|&#x.{4};|&#\d+;|.+/U",$str,$r);
+    $ar = $r[0];
+    foreach ($ar as $k=>$v) {
+        if (substr($v,0,2) == "%u") {
+          $ar[$k] = c2UTF8(intval(substr($v,-4),16));
+        } elseif(substr($v,0,3) == "&#x") {
+          $ar[$k] = c2UTF8(intval(substr($v,3,-1),16));
+        } elseif(substr($v,0,2) == "&#") {
+          $ar[$k] = c2UTF8(intval(substr($v,2,-1),16));
+        } elseif($utf8) {
+          continue;
+        } elseif (function_exists('mb_convert_encoding')) {
+          $ar[$k] = mb_convert_encoding($v,'UTF-8','ASCII');
+        } elseif (function_exists('iconv')) {
+          $ar[$k] = iconv(iconv_get_encoding('input_encoding'),'UTF-8',$v);
+        }
+    }
+    return join("",$ar);
 }
 
 function c2UTF8($i)
@@ -1217,12 +1385,13 @@ function c2UTF8($i)
 //0x00000000 - 0x0000007F	00000000 00000000 00000000 0zzzzzzz	0zzzzzzz
 //0x00000080 - 0x000007FF	00000000 00000000 00000yyy yyzzzzzz	110yyyyy 10zzzzzz
 //0x00000800 - 0x0000FFFF	00000000 00000000 xxxxyyyy yyzzzzzz	1110xxxx 10yyyyyy 10zzzzzz
-    if ($i<128)
-	return chr($i);
-    elseif ($i<2048)
-	return chr(floor($i/64)+192).chr($i%64+128);
-    else
-	return chr(floor($i/64/64)+224).chr(floor($i/64)%64+128).chr($i%64+128);
+    if ($i<128) {
+        return chr($i);
+    } elseif ($i<2048) {
+        return chr(floor($i/64)+192).chr($i%64+128);
+    } else {
+        return chr(floor($i/64/64)+224).chr(floor($i/64)%64+128).chr($i%64+128);
+    }
 }
 
 $approved_ips = $static_ips = '';
@@ -1232,10 +1401,10 @@ function ban_ip($ip,$ip2)
 
 	$filename = mnmpath.'/logs/bannedips.log';
 	if (is_writable($filename)) {
-	    if (!$handle = fopen($filename, 'a')) 
-		return "Cannot open file ($filename)";
-	    if (!is_ip_approved($ip))
-	    {
+	    if (!$handle = fopen($filename, 'a')) { 
+            return "Cannot open file ($filename)";
+        }
+	    if (!is_ip_approved($ip)) {
 	       if (!is_ip_banned($ip) && fwrite($handle, "$ip\n") === FALSE) 
 		   return "Cannot write to file ($filename)";
 	       else
@@ -1247,8 +1416,7 @@ function ban_ip($ip,$ip2)
 	        else
 		    $static_ips[] = "$ip2\n";
 	   fclose($handle);
-	} 
-	else 
+	} else 
 		return "The file $filename is not writable";
 	return '';
 }
@@ -1272,15 +1440,17 @@ function is_ip_approved($ip)
 }
 
 if(!function_exists('error')) {
-function error($mess) {
-	header('Content-Type: text/plain; charset=UTF-8');
-	echo "ERROR: $mess";
-	die;
-}
+    function error($mess)
+    {
+        header('Content-Type: text/plain; charset=UTF-8');
+        echo "ERROR: $mess";
+        die;
+    }
 }
 
 define('_is_utf8_split',5000); 
-function is_utf8($string) { // v1.01 
+function is_utf8($string)
+{ // v1.01 
     if (strlen($string) > _is_utf8_split) { 
         // Based on: http://mobile-website.mobi/php-utf8-vs-iso-8859-1-59 
         for ($i=0,$s=_is_utf8_split,$j=ceil(strlen($string)/_is_utf8_split);$i < $j;$i++,$s+=_is_utf8_split) { 
@@ -1318,49 +1488,39 @@ function is_utf8($string) { // v1.01
 function recursive_remove_directory($directory, $empty=TRUE)
 {
 	// if the path has a slash at the end we remove it here
-	if(substr($directory,-1) == '../cache')
-	{
+	if (substr($directory,-1) == '../cache') {
 		$directory = substr($directory,0,-1);
 	}
 
 	// if the path is not valid or is not a directory ...
-	if(!file_exists($directory) || !is_dir($directory))
-	{
+	if (!file_exists($directory) || !is_dir($directory)) {
 		// ... we return false and exit the function
 		return FALSE;
-
 	// ... if the path is not readable
-	}elseif(!is_readable($directory))
-	{
+	} elseif(!is_readable($directory)) {
 		// ... we return false and exit the function
 		return FALSE;
-
 	// ... else if the path is readable
-	}else{
-
+	} else {
 		// we open the directory
 		$handle = opendir($directory);
-
 		// and scan through the items inside
-		while (FALSE !== ($item = readdir($handle)))
-		{
+		while (FALSE !== ($item = readdir($handle))) {
 			//print $item."\n";
 			
 			// if the filepointer is not the current directory
 			// or the parent directory
-			if($item != '.' && $item != '..' && $item != '.htaccess' && $item != 'index.html')
-			{
+			if ($item != '.' && $item != '..' && $item != '.htaccess' && $item != 'index.html') {
 				// we build the new path to delete
 				$path = $directory.'/'.$item;
 
 				// if the new path is a directory
-				if(is_dir($path)) 
-				{
+				if (is_dir($path)) {
 					// we call this function with the new path
 					recursive_remove_directory($path);
 
 				// if the new path is a file
-				}else{
+				} else {
 					// we remove the file
 					unlink($path);
 				}
@@ -1370,11 +1530,9 @@ function recursive_remove_directory($directory, $empty=TRUE)
 		closedir($handle);
 
 		// if the option to empty is not set to true
-		if($empty == FALSE)
-		{
+		if ($empty == FALSE) {
 			// try to delete the now empty directory
-			if(!rmdir($directory))
-			{
+			if (!rmdir($directory)) {
 				// return false if not possible
 				return FALSE;
 			}
@@ -1389,34 +1547,34 @@ function recursive_remove_directory($directory, $empty=TRUE)
 
 
 
-function allowToAuthorCat($cat) {
+function allowToAuthorCat($cat)
+{
 	global $current_user, $db;
 
 	$user = new User($current_user->user_id);
-	if($user->level == "admin")
+	if ($user->level == "admin") {
 		return true;
-	else if($user->level == "moderator" && ((is_array($cat) && $cat['authorlevel'] != "admin") || $cat->category_author_level != "admin"))
+	} elseif ($user->level == "moderator" && ((is_array($cat) && $cat['authorlevel'] != "admin") || $cat->category_author_level != "admin")) {
 		return true;
-	else if((is_array($cat) && $cat['authorlevel'] == "normal") || $cat->category_author_level == "normal")
+	} elseif ((is_array($cat) && $cat['authorlevel'] == "normal") || $cat->category_author_level == "normal") {
 	// DB 11/12/08
-	{
+	
 	    $group = is_array($cat) ? $cat['authorgroup'] : $cat->category_author_group;
-	    if (! $group)
-		return true;
-	    else
-	    {
-		$group = "'".preg_replace("/\s*(,\s*)+/","','",$group)."'";
-		$groups = $db->get_row($sql = "SELECT a.* FROM ".table_groups." a, ".table_group_member." b 
-							WHERE   a.group_id=b.member_group_id AND 
-							 	b.member_user_id=$user->id   AND 
-								a.group_status='Enable' AND 
-								b.member_status='active' AND
-								a.group_name IN ($group)");
-		if ($groups->group_id)
-		    return true;
+	    if (! $group) {
+            return true;
+	    } else {
+            $group = "'".preg_replace("/\s*(,\s*)+/","','",$group)."'";
+            $groups = $db->get_row($sql = "SELECT a.* FROM ".table_groups." a, ".table_group_member." b 
+                                WHERE   a.group_id=b.member_group_id AND 
+                                    b.member_user_id=$user->id   AND 
+                                    a.group_status='Enable' AND 
+                                    b.member_status='active' AND
+                                    a.group_name IN ($group)");
+            if ($groups->group_id) {
+                return true;
+            }
 	    }
 	}
 	/////
 	return false;
 }
-?>

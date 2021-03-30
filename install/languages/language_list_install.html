@@ -57,6 +57,9 @@ a:link, a:hover, a:visited, a:active{color:#000000}
 <fieldset>
 	<legend>Plikli CMS Installation</legend>
 <div class="well">
+        <?php if (isset($_SESSION['agree']) && $_SESSION['agree'] != '') { ?>
+            <p class="alert alert-success">You agreed to the terms & Conditions, please proceed to the installation of Plikli CMS!</p>
+        <?php } ?>
 	<p>Please select your language from the list below.</p>
 	<ul class="language_list">
 		<a href="install.php?step=1&language=english"><li class="btn btn-default col-md-2"><img src="./icons/usa.png" alt=""> English</li></a>

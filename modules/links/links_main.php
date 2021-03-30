@@ -5,6 +5,13 @@ $links_settings = links_settings();
 function embed_videos($text, $type) {
 	global $links_settings;
 	
+    //checking the site's protocol
+    if (strpos(my_base_url, 'https') !== false) {
+        $theProtocol = 'https';
+    } else {
+        $theProtocol = 'http';
+    }   
+    
 	// wrap the image to make it responsive
 	if (preg_match('/(<img[^>]+\s{0,}\/?\s{0,}>)/si', $text, $regs)) {
 		if (strpos($text, '<div class="videoWrapper"><img src=') === false) {
@@ -25,7 +32,7 @@ function embed_videos($text, $type) {
 			$numFB = sizeof($facebookurl);
 			$numFirstFB = sizeof($facebookurl[0]);
 			for ($FB = 0; $FB < $numFirstFB; $FB++) {
-				$text = str_replace($facebookurl[0][$FB], "<br /><div class=\"videoWrapper\"><iframe style=\"border: none; overflow: hidden;\" src=\"https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/facebook/videos/".$facebookurl[1][$FB]."&show_text=0\" frameborder=\"0\" scrolling=\"no\" width=\"560\" height=\"375\"></iframe></div><br />",	$text);
+				$text = str_replace($facebookurl[0][$FB], "<br /><div class=\"videoWrapper\"><iframe style=\"border: none; overflow: hidden;\" src=\"$theProtocol://www.facebook.com/plugins/video.php?href=$theProtocol://www.facebook.com/facebook/videos/".$facebookurl[1][$FB]."&show_text=0\" frameborder=\"0\" scrolling=\"no\" width=\"560\" height=\"375\"></iframe></div><br />",	$text);
 			}
 		}
 	}
@@ -63,7 +70,7 @@ function embed_videos($text, $type) {
 			$numYT = sizeof($youtubeurl);
 			$numFirst = sizeof($youtubeurl[0]);
 			for ($YT = 0; $YT < $numFirst; $YT++) {
-				$text = str_replace($youtubeurl[0][$YT], '<br /><div class="videoWrapper"><iframe width="560" height="315" src="http://www.youtube.com/embed/'.$youtubeurl[1][$YT].'" frameborder="0" allowfullscreen></iframe></div><br />',	$text);
+				$text = str_replace($youtubeurl[0][$YT], '<br /><div class="videoWrapper"><iframe width="560" height="315" src="'.$theProtocol.'://www.youtube.com/embed/'.$youtubeurl[1][$YT].'" frameborder="0" allowfullscreen></iframe></div><br />',	$text);
 		}
 		}
 

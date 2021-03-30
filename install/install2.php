@@ -5,6 +5,7 @@ if ($_POST['language'] == 'arabic') {
 }else{
 	$site_direction = "ltr";
 }
+
 if ($_POST['language'])
     $language = addslashes(strip_tags($_POST['language']));
 if($language == 'arabic'){
