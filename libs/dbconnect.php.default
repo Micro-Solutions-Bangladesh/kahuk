@@ -1,0 +1,9 @@
+<?php
+define( 'EZSQL_DB_USER', 'database_username_here' );
+define( 'EZSQL_DB_PASSWORD', 'database_login_password_here' );
+define( 'EZSQL_DB_NAME', 'database_name_here' );
+define( 'EZSQL_DB_HOST', 'database_host_here' );
+
+if ( !function_exists( 'gettext' ) ) {
+	function _( $s ) {return $s;}
+}

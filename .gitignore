@@ -1,0 +1,33 @@
+node_modules/
+/node_modules/
+cache/
+/cache/
+
+# Packages #
+############
+*.7z
+*.dmg
+*.bz2
+*.iso
+*.jar
+*.rar
+*.tar
+*.tgz
+*.map
+
+# Logs and databases #
+######################
+*.log
+*.env
+
+# SASS #
+##########
+**/.sass-cache
+**/.sass-cache/*
+**/.map
+
+
+#########
+#/kahuk-configs.php
+#/settings.php
+#/libs/dbconnect.php
