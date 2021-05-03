@@ -11,10 +11,8 @@ include_once('internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'link.php');
-include(mnminclude.'smartyvariables.php');
-include_once(mnminclude.'user.php');
+include(KAHUK_LIBS_DIR.'link.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
 
 $requestID = isset($_GET['id']) && is_numeric($_GET['id']) ? $_GET['id'] : 0; 
 
@@ -31,13 +29,10 @@ if(is_numeric($requestID)) {
 	if(!$link->read() || ($link->status=='spam' && !checklevel('admin') && !checklevel('moderator'))){
 
 		// check for redirects
-		include(mnminclude.'redirector.php');
+		include(KAHUK_LIBS_DIR.'redirector.php');
 		$x = new redirector($_SERVER['REQUEST_URI']);
 
-		header("Location: $my_plikli_base/error_404.php");
-//		$main_smarty->assign('tpl_center', 'error_404_center');
-//		$main_smarty->display($the_template . '/plikli.tpl');		
-		die();
+		kahuk_redirect_404();
 	}
 
 	do_rss_header($link);
@@ -57,7 +52,7 @@ if(is_numeric($requestID)) {
 
 	$comments = $db->get_results($sql);
 	if ($comments) {
-		require_once(mnminclude.'comment.php');
+		require_once(KAHUK_LIBS_DIR.'comment.php');
 		$comment = new Comment;
 		foreach($comments as $dbcomment) {
 			$comment->id=$dbcomment->comment_id;
@@ -65,7 +60,7 @@ if(is_numeric($requestID)) {
 			$comment->read();
 
 			echo "<item>\n";
-			echo "	<title><![CDATA[".$main_smarty->get_config_vars('PLIKLI_MiscWords_Comment')." #".$comment->id."]]></title>\n";
+			echo "	<title><![CDATA[".$main_smarty->get_config_vars('KAHUK_MiscWords_Comment')." #".$comment->id."]]></title>\n";
 			echo "	<link>".getmyFullurl("storyURL", $link->category_safe_names($link->category), urlencode($link->title_url), $link->id)."#c".$comment->id."</link>\n";
 			$vars = array('link' => $link);
 			check_actions('rss_add_data', $vars);
@@ -92,14 +87,10 @@ if(is_numeric($requestID)) {
 } else {
 
 	// check for redirects
-	include(mnminclude.'redirector.php');
+	include(KAHUK_LIBS_DIR.'redirector.php');
 	$x = new redirector($_SERVER['REQUEST_URI']);
 	
-	header("Location: $my_plikli_base/error_404.php");
-//	header("Location: error_404.php");
-//	$main_smarty->assign('tpl_center', 'error_404_center');
-//	$main_smarty->display($the_template . '/plikli.tpl');		
-	die();
+	kahuk_redirect_404();
 }
 
 function do_rss_header($link) {
@@ -112,7 +103,7 @@ function do_rss_header($link) {
 	echo 'xmlns:dc="http://purl.org/dc/elements/1.1/"'."\n";
 	echo '>'. "\n";
 	echo '<channel>'."\n";
-	echo '<title>'.htmlspecialchars($main_smarty->get_config_vars("PLIKLI_Visual_Name"))." - ".$link->title.'</title>'."\n";
+	echo '<title>'.htmlspecialchars($main_smarty->get_config_vars("KAHUK_Visual_Name"))." - ".$link->title.'</title>'."\n";
 	echo "<link>".getmyFullurl("storyURL", $link->category_safe_names($link->category), urlencode($link->title_url), $link->id)."</link>\n";
 	echo '<description>'.strip_tags($link->truncate_content()).'</description>'."\n";
 
@@ -138,4 +129,3 @@ function onlyreadables($string) {
   }
   return str_replace("~", "", $string);
 }
-?>

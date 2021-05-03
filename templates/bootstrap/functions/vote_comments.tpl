@@ -1,12 +1,12 @@
 <script>
 var my_base_url='{$my_base_url}';
-var my_plikli_base='{$my_plikli_base}';
+var my_kahuk_base='{$my_kahuk_base}';
 var anonymous_vote = {$anonymous_vote};
 var Voting_Method = '{$Voting_Method}';
-var PLIKLI_Visual_Vote_Cast = "{#PLIKLI_Visual_Vote_Cast#}";
-var PLIKLI_Visual_Vote_Report = "{#PLIKLI_Visual_Vote_Report#}";
-var PLIKLI_Visual_Vote_For_It = "{#PLIKLI_Visual_Vote_For_It#}";
-var PLIKLI_Visual_Comment_ThankYou_Rating = "{#PLIKLI_Visual_Comment_ThankYou_Rating#}";
+var KAHUK_Visual_Vote_Cast = "{#KAHUK_Visual_Vote_Cast#}";
+var KAHUK_Visual_Vote_Report = "{#KAHUK_Visual_Vote_Report#}";
+var KAHUK_Visual_Vote_For_It = "{#KAHUK_Visual_Vote_For_It#}";
+var KAHUK_Visual_Comment_ThankYou_Rating = "{#KAHUK_Visual_Comment_ThankYou_Rating#}";
 
 {literal}
 function cvote (user, id, htmlid, md5, value)
@@ -14,11 +14,11 @@ function cvote (user, id, htmlid, md5, value)
     var anchor = $('#cxvote-'+htmlid+' > .btn.btn-default:'+(value>0 ? 'first' : 'last'));
     anchor.attr('disabled','disabled');
 
-    var url = my_plikli_base + "/cvote.php";
+    var url = my_kahuk_base + "/cvote.php";
     var mycontent = "id=" + id + "&user=" + user + "&md5=" + md5 + "&value=" + value;
 
     if (!anonymous_vote && user==0) {
-        window.location= my_base_url + my_plikli_base + "/login.php?return="+location.href;
+        window.location= my_base_url + my_kahuk_base + "/login.php?return="+location.href;
     } else {
     	$.post(url, mycontent, function (data) {
 		if (data.match (new RegExp ("^ERROR:"))) {
@@ -48,10 +48,10 @@ function cunvote (user, id, htmlid, md5, value)
     var anchor = $('#cxvote-'+htmlid+' > .'+(value<0 ? 'btn-danger' : 'btn-success'));
     anchor.attr('disabled','disabled');
 
-    var url = my_plikli_base + "/cvote.php";
+    var url = my_kahuk_base + "/cvote.php";
     var mycontent = "unvote=true&id=" + id + "&user=" + user + "&md5=" + md5 + "&value=" + value;
     if (!anonymous_vote && user==0) {
-        window.location= my_base_url + my_plikli_base + "/login.php?return="+location.href;
+        window.location= my_base_url + my_kahuk_base + "/login.php?return="+location.href;
     } else {
     	$.post(url, mycontent, function (data) {
 		if (data.match (new RegExp ("^ERROR:"))) {

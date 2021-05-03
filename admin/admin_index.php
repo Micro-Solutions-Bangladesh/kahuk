@@ -4,10 +4,8 @@ include_once('../internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('../config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'link.php');
-include(mnminclude.'user.php');
-include(mnminclude.'smartyvariables.php');
+include(KAHUK_LIBS_DIR.'link.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
 check_referrer();
 
 // require user to log in
@@ -62,16 +60,16 @@ $main_smarty->assign('isAdmin', $canIhaveAccess);
 //$main_smarty = do_sidebar($main_smarty);
 
 // breadcrumbs and page titles
-$navwhere['text1'] = $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel');
+$navwhere['text1'] = $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel');
 $navwhere['link1'] = getmyurl('admin', '');
 $main_smarty->assign('navbar_where', $navwhere);
-$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel'));
+$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel'));
 
 // Database Size
 include_once('../libs/dbconnect.php');
-/* Redwine: changed the query to mysqli to be compliant with php 5.5+ and added a filter to just get the size of tables belonging to the current plikli site */
+/* Redwine: changed the query to mysqli to be compliant with php 5.5+ and added a filter to just get the size of tables belonging to the current kahuk site */
 function CalcFullDatabaseSize($database, $db) {
-   $result = $db->query("SELECT CONCAT(GROUP_CONCAT(table_name) , ';' ) AS statement FROM information_schema.tables WHERE table_schema = '" . EZSQL_DB_NAME. "' AND table_name LIKE  '" .table_prefix."%'");
+   $result = $db->query("SELECT CONCAT(GROUP_CONCAT(table_name) , ';' ) AS statement FROM information_schema.tables WHERE table_schema = '" . EZSQL_DB_NAME. "' AND table_name LIKE  '" .TABLE_PREFIX."%'");
 	if (!$result) { return -1; }
 	$arraytables = $result->fetch_array(MYSQLI_ASSOC);
 	$mytables = explode(",",$arraytables['statement']);
@@ -140,7 +138,7 @@ $main_smarty->assign('pagename', pagename);
 
 
 $widgets = $db->get_results($sql='SELECT * from ' . table_widgets . ' where enabled=1 ORDER BY position',ARRAY_A);
-$main_smarty->assign('plikli_lang_conf',lang_loc . "/languages/lang_" . plikli_language . ".conf");
+$main_smarty->assign('kahuk_lang_conf',lang_loc . "/languages/lang_" . KAHUK_LANG . ".conf");
 #$db->cache_queries = false;
 if($widgets){
 	// for each module...
@@ -153,8 +151,8 @@ if($widgets){
 			include_once($file);
 			$widgets[$i]['settings'] = '../widgets/'.$widgets[$i]['folder'].'/templates/settings.tpl';
 			$widgets[$i]['main'] = '../widgets/'.$widgets[$i]['folder'].'/templates/widget.tpl';
-			if (file_exists('../widgets/'.$widgets[$i]['folder'].'/lang_' . plikli_language . '.conf'))
-			    $widgets[$i]['lang_conf'] = '../widgets/'.$widgets[$i]['folder'].'/lang_' . plikli_language . '.conf';
+			if (file_exists('../widgets/'.$widgets[$i]['folder'].'/lang_' . KAHUK_LANG . '.conf'))
+			    $widgets[$i]['lang_conf'] = '../widgets/'.$widgets[$i]['folder'].'/lang_' . KAHUK_LANG . '.conf';
 			elseif (file_exists('../widgets/'.$widgets[$i]['folder'].'/lang.conf'))
 			    $widgets[$i]['lang_conf'] = '../widgets/'.$widgets[$i]['folder'].'/lang.conf';
 			$widgets[$i] = array_merge($widgets[$i],$widget);
@@ -169,5 +167,3 @@ if($widgets){
 // show the template
 $main_smarty->assign('tpl_center', '/admin/home');
 $main_smarty->display('/admin/admin.tpl');
-
-?>

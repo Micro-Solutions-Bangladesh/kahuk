@@ -4,8 +4,7 @@ include_once('../internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('../config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'smartyvariables.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
 
 check_referrer();
 force_authentication();
@@ -21,18 +20,18 @@ if($canIhaveAccess == 0)
 define('pagename', 'admin_modules'); 
 $main_smarty->assign('pagename', pagename);
 
-// read the mysql database to get the plikli version
-/* Redwine: plikli version query removed and added to /libs/smartyvriables.php */
+// read the mysql database to get the kahuk version
+/* Redwine: kahuk version query removed and added to /libs/smartyvriables.php */
 
 // breadcrumbs and page title
-$navwhere['text1'] = $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel');
+$navwhere['text1'] = $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel');
 $navwhere['link1'] = getmyurl('admin', '');
-$navwhere['text2'] = $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel_6');
+$navwhere['text2'] = $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel_6');
 $main_smarty->assign('navbar_where', $navwhere);
-$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel_6'));
+$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel_6'));
  
-$main_smarty->assign('module_management_name', $main_smarty->get_config_vars('PLIKLI_Visual_AdminPanel_Module_Management'));
-$main_smarty->assign('module_management_desc', $main_smarty->get_config_vars('PLIKLI_Visual_AdminPanel_Module_Description'));
+$main_smarty->assign('module_management_name', $main_smarty->get_config_vars('KAHUK_Visual_AdminPanel_Module_Management'));
+$main_smarty->assign('module_management_desc', $main_smarty->get_config_vars('KAHUK_Visual_AdminPanel_Module_Description'));
 
 if (!isset($_GET["status"])) {
 	$status = "installed";
@@ -187,8 +186,8 @@ if($status=="uninstalled") {
 } elseif($status=='installed') {
 	// Installed Modules
 	
-	$main_smarty->assign('btn_apply_change', $main_smarty->get_config_vars('PLIKLI_Visual_AdminPanel_Apply_Changes'));
-	$main_smarty->assign('btn_module_remove', $main_smarty->get_config_vars('PLIKLI_Visual_AdminPanel_Module_Remove'));
+	$main_smarty->assign('btn_apply_change', $main_smarty->get_config_vars('KAHUK_Visual_AdminPanel_Apply_Changes'));
+	$main_smarty->assign('btn_module_remove', $main_smarty->get_config_vars('KAHUK_Visual_AdminPanel_Module_Remove'));
 
 	$token=isset($_GET['token']) ? $_GET['token']: '';
     if($token==1)
@@ -208,7 +207,7 @@ if($status=="uninstalled") {
 		
 		foreach($modules as $module) {
 					
-			if (file_exists(mnmmodules . $module->folder)) {
+			if (file_exists(KAHUK_MODULES_DIR . $module->folder)) {
 				
 				$module_info_data[$i]['id']=$module->id;
 				$module_info_data[$i]['enabled']= $module->enabled;
@@ -344,7 +343,7 @@ if($status=="uninstalled") {
 	if(count($update_require_modules)){
 		
 		foreach($update_require_modules as $module) {
-				if (file_exists(mnmmodules . $module->folder))
+				if (file_exists(KAHUK_MODULES_DIR . $module->folder))
 				$num_update_required++;
 				
 		}
@@ -363,8 +362,8 @@ $action=$_GET['action'];
 if($action == 'readme'){
 	$main_smarty->assign('action', 'readme');
 	$module = sanitize($_REQUEST['module'],3);
-	$main_smarty->assign('module_management_name', $main_smarty->get_config_vars('PLIKLI_Visual_AdminPanel_Module_Readme'));
-	$main_smarty->assign('module_readme_return', $main_smarty->get_config_vars('PLIKLI_Visual_AdminPanel_Module_Return'));
+	$main_smarty->assign('module_management_name', $main_smarty->get_config_vars('KAHUK_Visual_AdminPanel_Module_Readme'));
+	$main_smarty->assign('module_readme_return', $main_smarty->get_config_vars('KAHUK_Visual_AdminPanel_Module_Return'));
 	
 	
 	if(file_exists('../modules/' . $module . '/' . $module . '_readme.htm')){
@@ -376,7 +375,7 @@ if($action == 'readme'){
 		$main_smarty->assign('readme_content', $theData);
 	} else {
 		$main_smarty->assign('found','no');
-		$main_smarty->assign('not_found', $main_smarty->get_config_vars('PLIKLI_Visual_AdminPanel_Module_Readme_Not_Found'));
+		$main_smarty->assign('not_found', $main_smarty->get_config_vars('KAHUK_Visual_AdminPanel_Module_Readme_Not_Found'));
 		
 	}
 }else
@@ -424,7 +423,7 @@ if($canIhaveAccess == 1){
 
 	if (!function_exists('clear_module_cache'))
 	{
-		echo "Your template is not compatible with this version of Plikli. Missing the 'clear_modules_cache' function in modules.tpl.";
+		echo "Your template is not compatible with this version of Kahuk. Missing the 'clear_modules_cache' function in modules.tpl.";
 	} else {
 		echo $output;
 	}
@@ -480,7 +479,7 @@ function clear_module_cache ()
 	if(caching == 1)
 	{
 		// this is to clear the cache and reload it for settings_from_db.php
-		$db->cache_dir = mnmpath.'cache';
+		$db->cache_dir = KAHUKPATH.'cache';
 		$db->use_disk_cache = true;
 		$db->cache_queries = true;
 		$db->cache_timeout = 0;
@@ -532,5 +531,3 @@ function safe_file_get_contents($url,$redirect=0)
 	}
 	return $res;
 }
-
-?>

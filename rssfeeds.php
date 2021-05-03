@@ -4,9 +4,8 @@ include_once('internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'link.php');
-include(mnminclude.'smartyvariables.php');
+include(KAHUK_LIBS_DIR.'link.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
 
 // sidebar
 $main_smarty = do_sidebar($main_smarty);
@@ -22,6 +21,4 @@ $main_smarty->assign('pagename', pagename);
 
 // show the template
 $main_smarty->assign('tpl_center', $the_template . '/rss_feeds_center');
-$main_smarty->display($the_template . '/plikli.tpl');
-
-?>
+$main_smarty->display($the_template . '/kahuk.tpl');

@@ -1,5 +1,5 @@
 <?php
-class PlikliDoc{
+class KahukDoc{
 	
 	var $js;
 	var $all_script;
@@ -46,6 +46,6 @@ class PlikliDoc{
 	}
 }
 
-$PlikliDoc= new PlikliDoc();
+$KahukDoc= new KahukDoc();
 
 ?>

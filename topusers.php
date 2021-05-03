@@ -4,26 +4,23 @@ include_once('internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'link.php');
-include(mnminclude.'tags.php');
-include(mnminclude.'user.php');
-include(mnminclude.'smartyvariables.php');
+include(KAHUK_LIBS_DIR.'link.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
 
 // -------------------------------------------------------------------------------------
 
 // breadcrumbs and page titles
-$navwhere['text1'] = $main_smarty->get_config_vars('PLIKLI_Visual_Breadcrumb_TopUsers');
+$navwhere['text1'] = $main_smarty->get_config_vars('KAHUK_Visual_Breadcrumb_TopUsers');
 $navwhere['link1'] = getmyurl('topusers', '');
 $main_smarty->assign('navbar_where', $navwhere);
-$main_smarty->assign('posttitle', $main_smarty->get_config_vars('PLIKLI_Visual_Breadcrumb_TopUsers'));
+$main_smarty->assign('posttitle', $main_smarty->get_config_vars('KAHUK_Visual_Breadcrumb_TopUsers'));
 
 // figure out what "page" of the results we're on
 $page_size = $top_users_size;
 $offset=(get_current_page()-1)* $page_size;
 
 // put the table headers in an array for the top users tpl file
-$header_items = array($main_smarty->get_config_vars('PLIKLI_Visual_TopUsers_TH_User'), $main_smarty->get_config_vars('PLIKLI_Visual_TopUsers_TH_News'), $main_smarty->get_config_vars('PLIKLI_Visual_TopUsers_TH_PublishedNews'), $main_smarty->get_config_vars('PLIKLI_Visual_TopUsers_TH_Comments'), $main_smarty->get_config_vars('PLIKLI_Visual_TopUsers_TH_TotalVotes'), $main_smarty->get_config_vars('PLIKLI_Visual_TopUsers_TH_PublishedVotes'));
+$header_items = array($main_smarty->get_config_vars('KAHUK_Visual_TopUsers_TH_User'), $main_smarty->get_config_vars('KAHUK_Visual_TopUsers_TH_News'), $main_smarty->get_config_vars('KAHUK_Visual_TopUsers_TH_PublishedNews'), $main_smarty->get_config_vars('KAHUK_Visual_TopUsers_TH_Comments'), $main_smarty->get_config_vars('KAHUK_Visual_TopUsers_TH_TotalVotes'), $main_smarty->get_config_vars('KAHUK_Visual_TopUsers_TH_PublishedVotes'));
 
 // determine how to sort users
 // validate and make sure value is between 0 and 5	
@@ -136,5 +133,4 @@ if(Auto_scroll==2 || Auto_scroll==3){
 
 // show the template
 $main_smarty->assign('tpl_center', $the_template . '/topusers_center');
-$main_smarty->display($the_template . '/plikli.tpl');
-?>
+$main_smarty->display($the_template . '/kahuk.tpl');

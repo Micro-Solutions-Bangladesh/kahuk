@@ -4,11 +4,9 @@ include_once('internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('config.php');
-include(mnminclude.'link.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'search.php');
-include(mnminclude.'user.php');
-include_once(mnminclude.'smartyvariables.php');
+include(KAHUK_LIBS_DIR.'link.php');
+include(KAHUK_LIBS_DIR.'search.php');
+include_once(KAHUK_LIBS_DIR.'smartyvariables.php');
 
 // pagename
 define('pagename', 'rss'); 
@@ -28,7 +26,7 @@ if($time > 0) {
 	$sql .= "vote_link_id=link_id  AND (link_status='published' OR link_status='new') GROUP BY vote_link_id  ORDER BY votes DESC LIMIT $rows";
 
 	$last_modified = time();
-	$title = $main_smarty->get_config_vars('PLIKLI_Visual_RSS_Recent') . ' ' . txt_time_diff($from);
+	$title = $main_smarty->get_config_vars('KAHUK_Visual_RSS_Recent') . ' ' . txt_time_diff($from);
 	$link_date = "";
 
 } else {
@@ -42,10 +40,10 @@ if($time > 0) {
 		case 'published':
 			$order_field = 'link_date';
 			$link_date = 'date';
-			$title = " | " . $main_smarty->get_config_vars("PLIKLI_Visual_Published_News");
+			$title = " | " . $main_smarty->get_config_vars("KAHUK_Visual_Published_News");
 			break;
 		case 'new':
-			$title = " | " . $main_smarty->get_config_vars("PLIKLI_Visual_Plikli_Queued");
+			$title = " | " . $main_smarty->get_config_vars("KAHUK_Visual_Kahuk_Queued");
 			$order_field = 'link_date';
 			$link_date = "date";
                         $status = 'new';
@@ -53,7 +51,7 @@ if($time > 0) {
 		case 'shared':
 			$order_field = 'link_date';
 			$link_date = 'date';
-			$title = " | " . $main_smarty->get_config_vars("PLIKLI_Visual_Group_Shared");
+			$title = " | " . $main_smarty->get_config_vars("KAHUK_Visual_Group_Shared");
 			break;
 		case 'all':
 			$title = "";
@@ -61,8 +59,7 @@ if($time > 0) {
 			$link_date = "date";
 			break;
 		default:
-			header("Location: $my_plikli_base/error_404.php");
-			die();
+			kahuk_redirect_404();
 			break;
 	}
 
@@ -88,7 +85,7 @@ if($time > 0) {
 		$cat = $thecat->category_id;
 		if (!$cat)
 		{
-			header("Location: $my_plikli_base/storyrss.php?title=".urlencode($_REQUEST['category']));
+			header("Location: $my_kahuk_base/storyrss.php?title=".urlencode($_REQUEST['category']));
 			die();
 		}	
 	    }
@@ -193,9 +190,9 @@ function do_rss_header($title) {
 	echo '<?xml version="1.0"?>' . "\n";
 	echo '<rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://search.yahoo.com/mrss/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">'. "\n";
 	echo '<channel>'."\n";
-	echo '<title>'.htmlspecialchars($main_smarty->get_config_vars("PLIKLI_Visual_Name")).' '.trim($title).'</title>'."\n";
-	echo '<link>'.my_base_url.my_plikli_base.'</link>'."\n";
-	echo '<description>'.htmlspecialchars($main_smarty->get_config_vars("PLIKLI_Visual_RSS_Description")).'</description>'."\n";
+	echo '<title>'.htmlspecialchars($main_smarty->get_config_vars("KAHUK_Visual_Name")).' '.trim($title).'</title>'."\n";
+	echo '<link>'.my_base_url.my_kahuk_base.'</link>'."\n";
+	echo '<description>'.htmlspecialchars($main_smarty->get_config_vars("KAHUK_Visual_RSS_Description")).'</description>'."\n";
 	echo '<pubDate>'.date('D, d M Y H:i:s T', $last_modified-misc_timezone*3600).'</pubDate>'."\n";
 	echo '<language>'.$dblang.'</language>'."\n";
 }
@@ -215,4 +212,3 @@ function onlyreadables($string) {
   }
   return str_replace("~", "", $string);
 }
-?>

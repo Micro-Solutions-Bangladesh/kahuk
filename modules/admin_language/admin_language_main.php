@@ -23,15 +23,15 @@ class LangFiles implements Iterator {
 	global $db;
 
 	// Main language file
-	$this->files = array(mnmpath.'/languages/lang_'.plikli_language.'.conf' => '');
+	$this->files = array(KAHUKPATH.'/languages/lang_'.KAHUK_LANG.'.conf' => '');
 
    	// Fill files array from installed modules
 	$modules = $db->get_results('SELECT * from ' . table_modules . ' order by weight asc;');
 	foreach ($modules as $module) {
-	    if (file_exists(mnmmodules.$module->folder.'/lang_'.plikli_language.'.conf'))
-		$this->files[mnmmodules.$module->folder.'/lang_'.plikli_language.'.conf'] = $module->name;
-	    elseif (file_exists(mnmmodules.$module->folder.'/lang.conf'))
-		$this->files[mnmmodules.$module->folder.'/lang.conf'] = $module->name;
+	    if (file_exists(KAHUK_MODULES_DIR.$module->folder.'/lang_'.KAHUK_LANG.'.conf'))
+		$this->files[KAHUK_MODULES_DIR.$module->folder.'/lang_'.KAHUK_LANG.'.conf'] = $module->name;
+	    elseif (file_exists(KAHUK_MODULES_DIR.$module->folder.'/lang.conf'))
+		$this->files[KAHUK_MODULES_DIR.$module->folder.'/lang.conf'] = $module->name;
 	}
     }
 
@@ -48,7 +48,7 @@ class LangFiles implements Iterator {
     /**
      * Replace given line in given file
      *
-     * @param string $id Plikli language constant
+     * @param string $id Kahuk language constant
      * @param string $value New value to save
      * @param string $file Full path to language file
      * @return string Error or empty on success
@@ -116,10 +116,8 @@ function admin_language_showpage(){
 	global $main_smarty, $the_template;
 		
 	include_once('config.php');
-	include_once(mnminclude.'html1.php');
-	include_once(mnminclude.'link.php');
-	include_once(mnminclude.'tags.php');
-	include_once(mnminclude.'smartyvariables.php');
+	include_once(KAHUK_LIBS_DIR.'link.php');
+	include_once(KAHUK_LIBS_DIR.'smartyvariables.php');
 	
 	//$main_smarty = do_sidebar($main_smarty);
 
@@ -190,12 +188,12 @@ function admin_language_showpage(){
 		    $main_smarty->assign('lines', $lines);
 
 		// breadcrumbs
-			$navwhere['text1'] = $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel');
+			$navwhere['text1'] = $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel');
 			$navwhere['link1'] = getmyurl('admin', '');
 			$navwhere['text2'] = "Modify Language";
-			$navwhere['link2'] = my_plikli_base . "/module.php?module=admin_language";
+			$navwhere['link2'] = my_kahuk_base . "/module.php?module=admin_language";
 			$main_smarty->assign('navbar_where', $navwhere);
-			$main_smarty->assign('posttitle', " | " . $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel'));
+			$main_smarty->assign('posttitle', " | " . $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel'));
 		// breadcrumbs
 
 			//Method for identifying modules rather than pagename
@@ -214,4 +212,3 @@ function admin_language_showpage(){
 	else
 		header("Location: " . getmyurl('login', $_SERVER['REQUEST_URI']));
 }	
-?>

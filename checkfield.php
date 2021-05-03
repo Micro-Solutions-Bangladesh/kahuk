@@ -5,8 +5,7 @@ include_once('internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('config.php');
-include(mnminclude.'html1.php');
-include_once(mnminclude.'smartyvariables.php');
+include_once(KAHUK_LIBS_DIR.'smartyvariables.php');
 
 $type=sanitize($_REQUEST['type'], 2);
 $name=js_urldecode($_POST["name"]);
@@ -16,22 +15,22 @@ $password=$_POST["password"];
 switch ($type) {
 	case 'username':
 		if (utf8_strlen($name)<3) { // if username is less than 3 characters
-			echo $main_smarty->get_config_vars("PLIKLI_Visual_CheckField_UserShort");
+			echo $main_smarty->get_config_vars("KAHUK_Visual_CheckField_UserShort");
 			return;
 		}
 		if (preg_match('/\pL/u', 'a')) {	// Check if PCRE was compiled with UTF-8 support
 		    if (!preg_match('/^[_\-\d\p{L}\p{M}]+$/iu', $name)) { // if username contains invalid characters
-			echo $main_smarty->get_config_vars("PLIKLI_Visual_CheckField_InvalidChars");
+			echo $main_smarty->get_config_vars("KAHUK_Visual_CheckField_InvalidChars");
 			return;
 		    }
 		} else {
 		    if (!preg_match('/^[^~`@%&=\\/;:\\.,<>!"\\\'\\^\\.\\[\\]\\$\\(\\)\\|\\*\\+\\-\\?\\{\\}\\\\]+$/', $name)) { // if username contains invalid characters
-			echo $main_smarty->get_config_vars("PLIKLI_Visual_CheckField_InvalidChars");
+			echo $main_smarty->get_config_vars("KAHUK_Visual_CheckField_InvalidChars");
 			return;
 		    }
 		}
 		if(user_exists($name)) { // if username already exists
-			echo $main_smarty->get_config_vars("PLIKLI_Visual_CheckField_UserExists");
+			echo $main_smarty->get_config_vars("KAHUK_Visual_CheckField_UserExists");
 			return;
 		}
 		$vars = array('name' => $name);
@@ -43,12 +42,12 @@ switch ($type) {
 		break;
 	case 'email':
 		if (!check_email($email)) { // if email contains invald characters
-			echo $main_smarty->get_config_vars("PLIKLI_Visual_CheckField_EmailInvalid");
+			echo $main_smarty->get_config_vars("KAHUK_Visual_CheckField_EmailInvalid");
 			return;
 		}
 		if (check_email($email)) {
 			if(email_exists($email)) { // if email already exists
-			echo $main_smarty->get_config_vars("PLIKLI_Visual_CheckField_EmailExists");
+			echo $main_smarty->get_config_vars("KAHUK_Visual_CheckField_EmailExists");
 			return;
 		}
 			$vars = array('email' => $email);
@@ -61,7 +60,7 @@ switch ($type) {
 		}
 	case 'password':
 		if(strlen($password) < 9 ) { // if password is less than 5 characters
-		 echo $main_smarty->get_config_vars('PLIKLI_Visual_Register_Error_FiveCharPass');
+		 echo $main_smarty->get_config_vars('KAHUK_Visual_Register_Error_FiveCharPass');
 		 return;
 		}else{
 		 echo "OK";
@@ -71,5 +70,3 @@ switch ($type) {
 	default:
 		echo "KO";
 }
-
-?>

@@ -3,11 +3,10 @@ include_once('internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'link.php');
-include(mnminclude.'group.php');
-include(mnminclude.'smartyvariables.php');
-include mnminclude.'extra_fields_smarty.php';
+include(KAHUK_LIBS_DIR.'link.php');
+include(KAHUK_LIBS_DIR.'group.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
+include KAHUK_LIBS_DIR.'extra_fields_smarty.php';
 
 $sanitezedREQUEST = array();
 foreach ($_REQUEST as $key => $value) {
@@ -53,7 +52,7 @@ $main_smarty->assign('total_row_for_group', $rows);
 $numGr = $db->get_var("SELECT count(*) FROM " .table_groups . " WHERE `group_creator` = " . $current_user->user_id);
 $max_user_groups_allowed = $main_smarty->get_template_vars('max_user_groups_allowed');
 if ($numGr >= $max_user_groups_allowed) {
-	$error_max = $main_smarty->get_config_vars('PLIKLI_Visual_Submit_A_New_Group_Error');
+	$error_max = $main_smarty->get_config_vars('KAHUK_Visual_Submit_A_New_Group_Error');
 	$main_smarty->assign('error_max', $error_max);
 }
 
@@ -77,7 +76,7 @@ function group_read($from_where,$order_by)
 
 	if ($order_by == "")
 		$order_by = "group_date DESC";
-	include_once(mnminclude.'smartyvariables.php');
+	include_once(KAHUK_LIBS_DIR.'smartyvariables.php');
 	global $db,$main_smarty;
 	$rows = $db->get_var("SELECT count(*) FROM " . table_groups . " WHERE ".$from_where." ");
 	$group = $db->get_results("SELECT distinct(group_id) as group_id FROM " . table_groups . " WHERE ".$from_where." ORDER BY group_status DESC, ".$order_by." LIMIT $offset,$page_size ");
@@ -110,5 +109,4 @@ function group_read($from_where,$order_by)
 
 // show the template
 $main_smarty->assign('tpl_center', $the_template . '/group_center');
-$main_smarty->display($the_template . '/plikli.tpl');
-?>
+$main_smarty->display($the_template . '/kahuk.tpl');

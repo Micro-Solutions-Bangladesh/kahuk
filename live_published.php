@@ -4,24 +4,20 @@ include_once('internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'link.php');
-include(mnminclude.'tags.php');
-include(mnminclude.'user.php');
-include(mnminclude.'smartyvariables.php');
+include(KAHUK_LIBS_DIR.'link.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
 
-if(!Enable_Live) {
-	header("Location: $my_plikli_base/error_404.php");
-	die();
+if ( ! Enable_Live ) {
+	kahuk_redirect_404();
 }
 
 // breadcrumbs and page title
-$navwhere['text1'] = $main_smarty->get_config_vars('PLIKLI_Visual_Breadcrumb_Live');
+$navwhere['text1'] = $main_smarty->get_config_vars('KAHUK_Visual_Breadcrumb_Live');
 $navwhere['link1'] = getmyurl('live', '');
-$navwhere['text2'] = $main_smarty->get_config_vars('PLIKLI_Visual_Breadcrumb_Published');
+$navwhere['text2'] = $main_smarty->get_config_vars('KAHUK_Visual_Breadcrumb_Published');
 $navwhere['link2'] = getmyurl('live_published', '');
 $main_smarty->assign('navbar_where', $navwhere);
-$main_smarty->assign('posttitle', $main_smarty->get_config_vars('PLIKLI_Visual_Breadcrumb_Published'));
+$main_smarty->assign('posttitle', $main_smarty->get_config_vars('KAHUK_Visual_Breadcrumb_Published'));
 
 // figure out what "page" of the results we're on
 $offset = (get_current_page() - 1) * $top_users_size;
@@ -88,5 +84,4 @@ $main_smarty = do_sidebar($main_smarty);
 
 // show the template
 $main_smarty->assign('tpl_center', $the_template . '/live_published_center');
-$main_smarty->display($the_template . '/plikli.tpl');
-?>
+$main_smarty->display($the_template . '/kahuk.tpl');

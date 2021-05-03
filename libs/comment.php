@@ -1,6 +1,8 @@
 <?php
 
-if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
+if ( ! defined( 'KAHUKPATH' ) ) {
+	die();
+}
 
 class Comment {
 	var $id = 0;
@@ -130,8 +132,8 @@ class Comment {
 			$smarty->compile_dir = "cache/";
 			$smarty->template_dir = "templates/";
 			$smarty->config_dir = "";
-			$smarty->assign('plikli_language', plikli_language);
-			$smarty->config_load("/languages/lang_" . plikli_language . ".conf");
+			// $smarty->assign('kahuk_language', KAHUK_LANG);
+			$smarty->config_load("/languages/lang_" . KAHUK_LANG . ".conf");
 
 		// if we can't read the comment, return
 			if(!$this->read) return;
@@ -213,7 +215,7 @@ class Comment {
 		
 		// the url for the edit comment link
 		$smarty->assign('edit_comment_url', getmyurl('editcomment', $this->id, $this->link));
-		$smarty->assign('delete_comment_url', my_plikli_base.'/delete.php?comment_id='.$this->id);
+		$smarty->assign('delete_comment_url', my_kahuk_base.'/delete.php?comment_id='.$this->id);
 
 		// avatars
 		$smarty->assign('UseAvatars', do_we_use_avatars());
@@ -228,23 +230,23 @@ class Comment {
 		if($canIhaveAccess == 1){$smarty->assign('isadmin', 1);}
 		
 		// the link to upvote the comment
-		$jslinky = "cvote($current_user->user_id,$this->id,$this->id," . "'" . md5($current_user->user_id.$this->randkey) . "',10,'" . my_base_url . my_plikli_base . "/')";
+		$jslinky = "cvote($current_user->user_id,$this->id,$this->id," . "'" . md5($current_user->user_id.$this->randkey) . "',10,'" . my_base_url . my_kahuk_base . "/')";
 		$smarty->assign('link_shakebox_javascript_votey', $jslinky);
 
-		$jslinky = "cunvote($current_user->user_id,$this->id,$this->id," . "'" . md5($current_user->user_id.$this->randkey) . "',10,'" . my_base_url . my_plikli_base . "/')";
+		$jslinky = "cunvote($current_user->user_id,$this->id,$this->id," . "'" . md5($current_user->user_id.$this->randkey) . "',10,'" . my_base_url . my_kahuk_base . "/')";
 		$smarty->assign('link_shakebox_javascript_unvotey', $jslinky);
 
 		// the link to downvote the comment
-		$jslinkn = "cvote($current_user->user_id,$this->id,$this->id," . "'" . md5($current_user->user_id.$this->randkey) . "',-10,'" . my_base_url . my_plikli_base . "/')";
+		$jslinkn = "cvote($current_user->user_id,$this->id,$this->id," . "'" . md5($current_user->user_id.$this->randkey) . "',-10,'" . my_base_url . my_kahuk_base . "/')";
 		$smarty->assign('link_shakebox_javascript_voten', $jslinkn);
 
-		$jslinkn = "cunvote($current_user->user_id,$this->id,$this->id," . "'" . md5($current_user->user_id.$this->randkey) . "',-10,'" . my_base_url . my_plikli_base . "/')";
+		$jslinkn = "cunvote($current_user->user_id,$this->id,$this->id," . "'" . md5($current_user->user_id.$this->randkey) . "',-10,'" . my_base_url . my_kahuk_base . "/')";
 		$smarty->assign('link_shakebox_javascript_unvoten', $jslinkn);
 
 		// misc
 		$smarty->assign('Enable_Comment_Voting', Enable_Comment_Voting);
 		$smarty->assign('my_base_url', my_base_url);
-		$smarty->assign('my_plikli_base', my_plikli_base);
+		$smarty->assign('my_kahuk_base', my_kahuk_base);
 		$smarty->assign('Default_Gravatar_Small', Default_Gravatar_Small);
 		
 		return $smarty;
@@ -252,7 +254,6 @@ class Comment {
 
 	function username() {
 		global $db;
-		include_once(mnminclude.'user.php');
 
 		$user = new User;
 		$user->id = $this->author;
@@ -267,7 +268,7 @@ class Comment {
 	}
 	
 	function votes($user, $value="<> 0") {
-		require_once(mnminclude.'votes.php');
+		require_once(KAHUK_LIBS_DIR.'class-votes.php');
 
 		$vote = new Vote;
 		$vote->type='comments';
@@ -278,7 +279,7 @@ class Comment {
 	
 	// DB 11/10/08
 	function votes_from_ip($ip='', $value="<> 0") {
-		require_once(mnminclude.'votes.php');
+		require_once(KAHUK_LIBS_DIR.'class-votes.php');
 
 		$vote = new Vote;
 		$vote->type='comments';
@@ -290,7 +291,7 @@ class Comment {
 	/////
 	
 	function remove_vote($user=0, $value=10) {
-		require_once(mnminclude.'votes.php');
+		require_once(KAHUK_LIBS_DIR.'class-votes.php');
 		if(!is_numeric($this->id)){return false;}
 	
 		$vote = new Vote;
@@ -308,7 +309,7 @@ class Comment {
 	
 	function insert_vote($user=0, $value=10) {
 		global $anon_karma;
-		require_once(mnminclude.'votes.php');
+		require_once(KAHUK_LIBS_DIR.'class-votes.php');
 		if(!is_numeric($this->id)){return false;}
 
 		$vote = new Vote;
@@ -330,7 +331,7 @@ class Comment {
 				$vars = array('comment_id' => $this->id);
 				check_actions('comment_spam', $vars);
 /* Redwine: Fix the Negative votes to remove comment in Admin Panel -> Settings -> Comments -> Negative votes to remove comment. See https://github.com/Pligg/pligg-cms/commit/68a52f2e77cec7f95d5775444d213d1a6419e121 */
-				require_once(mnminclude.'link.php');
+				require_once(KAHUK_LIBS_DIR.'link.php');
 				$link = new Link;
 				$link->id=$this->link;
 				$link->read();

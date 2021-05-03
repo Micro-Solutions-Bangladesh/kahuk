@@ -5,11 +5,13 @@
 *	Author:			Ciprian Voicu												*
 *	Version: 		1.0 														*
 *	Date:			2006-08-08													*
-*	Description:	• creates, saves, outputs thumbs							*
+*	Description:	ï¿½ creates, saves, outputs thumbs							*
 *	License: 		GNU GPL														*
 ********************************************************************************/
 
-if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
+if ( ! defined( 'KAHUKPATH' ) ) {
+	die();
+}
 
 class pThumb {
 

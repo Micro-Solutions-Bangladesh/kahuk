@@ -1,8 +1,8 @@
 <?php
-if(defined('mnminclude')){
+if(defined('KAHUK_LIBS_DIR')){
 	include_once('admin_snippet_settings.php');
 
-	// tell plikli what pages this modules should be included in
+	// tell kahuk what pages this modules should be included in
 	// pages are <script name> minus .php
 	// index.php becomes 'index' and new.php becomes 'new'
 	$do_not_include_in_pages = array();
@@ -11,11 +11,11 @@ if(defined('mnminclude')){
 	if( do_we_load_module() ) {		
 		module_add_action_tpl('tpl_header_admin_main_links', admin_snippet_tpl_path . 'admin_snippet_admin_main_link.tpl');
 		module_add_action('lib_link_summary_fill_smarty', 'admin_snippet_fill_smarty', '');
-		include_once(mnmmodules . 'admin_snippet/admin_snippet_main.php');
+		include_once(KAHUK_MODULES_DIR . 'admin_snippet/admin_snippet_main.php');
 
 		// Add templates for all existing snippets
 		$snippet_actions_tpl = array();
-		$snippets = $db->get_results("SELECT * FROM ".table_prefix."snippets ORDER BY snippet_location, snippet_order");
+		$snippets = $db->get_results("SELECT * FROM ".TABLE_PREFIX."snippets ORDER BY snippet_location, snippet_order");
 		$oldloc = '';
 		if (is_array($snippets))
 			foreach ($snippets as $snippet)
@@ -40,7 +40,7 @@ if(defined('mnminclude')){
 		if($moduleName == 'admin_snippet'){
 			module_add_action('module_page', 'admin_snippet_showpage', '');
 		
-			include_once(mnmmodules . 'admin_snippet/admin_snippet_main.php');
+			include_once(KAHUK_MODULES_DIR . 'admin_snippet/admin_snippet_main.php');
 		}
 	}
 }

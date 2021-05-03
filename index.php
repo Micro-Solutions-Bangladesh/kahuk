@@ -22,11 +22,9 @@ include_once('internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'link.php');
-include(mnminclude.'tags.php');
-include(mnminclude.'search.php');
-include(mnminclude.'smartyvariables.php');
+include(KAHUK_LIBS_DIR.'link.php');
+include(KAHUK_LIBS_DIR.'search.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
 
 // module system hook
 $vars = '';
@@ -40,16 +38,14 @@ if (isset($_REQUEST['category'])) {
 	$main_smarty->assign('request_category_name', $thecat->category_name);
 	$catID = $thecat->category_id;
 	$thecat = $thecat->category_name;
-	if (!$thecat) {
-		header("Location: $my_plikli_base/error_404.php");
-		//$main_smarty->assign('tpl_center', 'error_404_center');
-		//$main_smarty->display($the_template . '/plikli.tpl');		
-		die();
+
+	if ( !$thecat ) {
+		kahuk_redirect_404();
 	}
 }
 
 // start a new search
-$search=new Search();
+$search = new Search();
 
 // check for some get/post
 if (isset($_REQUEST['from'])) {$search->newerthan = sanitize($_REQUEST['from'], 3);}
@@ -100,25 +96,25 @@ if (isset($_REQUEST['category'])) {
 	$main_smarty->assign('meta_keywords', $category_data->category_keywords);
 
 	// breadcrumbs and page title for the category we're looking at
-	$main_smarty->assign('title', ''.$main_smarty->get_config_vars('PLIKLI_Visual_Published_News').' - ' . $thecat . '');
-	$navwhere['text1'] = $main_smarty->get_config_vars('PLIKLI_Visual_Published_News');
+	$main_smarty->assign('title', ''.$main_smarty->get_config_vars('KAHUK_Visual_Published_News').' - ' . $thecat . '');
+	$navwhere['text1'] = $main_smarty->get_config_vars('KAHUK_Visual_Published_News');
 	$navwhere['link1'] = getmyurl('root', '');
 	$navwhere['text2'] = $thecat;
 	$main_smarty->assign('navbar_where', $navwhere);
 	$main_smarty->assign('pretitle', $thecat );
-	$main_smarty->assign('posttitle', $main_smarty->get_config_vars('PLIKLI_Visual_Published_News'));
-	$main_smarty->assign('page_header', $thecat . $main_smarty->get_config_vars('PLIKLI_Visual_Published_News'));
+	$main_smarty->assign('posttitle', $main_smarty->get_config_vars('KAHUK_Visual_Published_News'));
+	$main_smarty->assign('page_header', $thecat . $main_smarty->get_config_vars('KAHUK_Visual_Published_News'));
 	// pagename	
 	define('pagename', 'published'); 
 	$main_smarty->assign('pagename', pagename);
 } else {
 	// breadcrumbs and page title
 	$navwhere['show'] = 'yes';
-	$navwhere['text1'] = $main_smarty->get_config_vars('PLIKLI_Visual_Published_News');
+	$navwhere['text1'] = $main_smarty->get_config_vars('KAHUK_Visual_Published_News');
 	$navwhere['link1'] = getmyurl('root', '');
 	$main_smarty->assign('navbar_where', $navwhere);
-	$main_smarty->assign('posttitle', $main_smarty->get_config_vars('PLIKLI_Visual_Home_Title'));
-	$main_smarty->assign('page_header', $main_smarty->get_config_vars('PLIKLI_Visual_Published_News'));
+	$main_smarty->assign('posttitle', $main_smarty->get_config_vars('KAHUK_Visual_Home_Title'));
+	$main_smarty->assign('page_header', $main_smarty->get_config_vars('KAHUK_Visual_Published_News'));
 	// pagename	
 	define('pagename', 'index'); 
 	$main_smarty->assign('pagename', pagename);
@@ -163,4 +159,4 @@ if (Auto_scroll==2 || Auto_scroll==3) {
 }
 // show the template
 $main_smarty->assign('tpl_center', $the_template . '/index_center');
-$main_smarty->display($the_template . '/plikli.tpl');
+$main_smarty->display($the_template . '/kahuk.tpl');

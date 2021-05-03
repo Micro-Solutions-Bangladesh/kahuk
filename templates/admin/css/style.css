@@ -1,4 +1,4 @@
-/************** PLIKLI ADMIN PANEL *****************/
+/************** KAHUK ADMIN PANEL *****************/
 
 /************** GENERAL *****************/
 
@@ -464,4 +464,8 @@ display: inline-block;
 height: 10px;
 margin: 0 3px 0 5px;
 width: 10px;
+}
+
+.navbar-brand img {
+	max-height: 100%;
 }

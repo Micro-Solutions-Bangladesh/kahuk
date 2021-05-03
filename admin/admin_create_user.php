@@ -4,14 +4,11 @@ include_once('../internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('../config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'link.php');
-include(mnminclude.'votes.php');
-include(mnminclude.'tags.php');
-include(mnminclude.'user.php');
-include(mnminclude.'smartyvariables.php');
-include(mnminclude.'csrf.php');
-include(mnminclude.'document_class.php');
+include(KAHUK_LIBS_DIR.'link.php');
+include(KAHUK_LIBS_DIR.'class-votes.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
+include(KAHUK_LIBS_DIR.'csrf.php');
+include(KAHUK_LIBS_DIR.'document_class.php');
 
 check_referrer();
 
@@ -49,25 +46,25 @@ if (isset($_REQUEST["mode"]) && sanitize($_REQUEST["mode"], 3) == "newuser"){
 		$level=trim($db->escape($_POST['level']));
 		$saltedpass=generatePassHash($password);
 			if (!isset($username) || strlen($username) < 3) {
-				$main_smarty->assign(username_error, $main_smarty->get_config_vars('PLIKLI_Visual_Register_Error_UserTooShort'));			
+				$main_smarty->assign(username_error, $main_smarty->get_config_vars('KAHUK_Visual_Register_Error_UserTooShort'));			
 			}
 			elseif (!preg_match('/^[a-zA-Z0-9\-]+$/', $username)) {
-				$main_smarty->assign(username_error, $main_smarty->get_config_vars('PLIKLI_Visual_Register_Error_UserInvalid'));
+				$main_smarty->assign(username_error, $main_smarty->get_config_vars('KAHUK_Visual_Register_Error_UserInvalid'));
 			}
 			elseif (user_exists(trim($username)) ) {
-				$main_smarty->assign(username_error, $main_smarty->get_config_vars('PLIKLI_Visual_Register_Error_UserExists'));
+				$main_smarty->assign(username_error, $main_smarty->get_config_vars('KAHUK_Visual_Register_Error_UserExists'));
 			}
 			elseif (!check_email(trim($email))) {
-				$main_smarty->assign(email_error, $main_smarty->get_config_vars('PLIKLI_Visual_Register_Error_BadEmail'));
+				$main_smarty->assign(email_error, $main_smarty->get_config_vars('KAHUK_Visual_Register_Error_BadEmail'));
 			}
 			elseif (email_exists(trim($email))) {
-				$main_smarty->assign(email_error, $main_smarty->get_config_vars('PLIKLI_Visual_Register_Error_EmailExists'));			
+				$main_smarty->assign(email_error, $main_smarty->get_config_vars('KAHUK_Visual_Register_Error_EmailExists'));			
 			}
 			elseif (strlen($password) < 5 ) {
-				$main_smarty->assign(password_error, $main_smarty->get_config_vars('PLIKLI_Visual_Register_Error_FiveCharPass'));			
+				$main_smarty->assign(password_error, $main_smarty->get_config_vars('KAHUK_Visual_Register_Error_FiveCharPass'));			
 			}
 			else {
-				$db->query("INSERT IGNORE INTO " . table_users . " (user_login, user_level, user_email, user_pass, user_date) VALUES ('$username', '$level', '$email', '$saltedpass', now())");
+				$db->query("INSERT IGNORE INTO " . table_users . " (user_login, user_level, user_email, user_pass, user_date) VALUES ('$username', '$level', '$email', '$saltedpass', NOW())");
 				echo "User Added successfully";
 			}
 	    // Redwine: if invalid TOKEN, display TOKEN invalid error.	
@@ -76,5 +73,3 @@ if (isset($_REQUEST["mode"]) && sanitize($_REQUEST["mode"], 3) == "newuser"){
 		exit;
 	    }
 	}
-	
-?>

@@ -8,59 +8,59 @@
 {***********************************************************************************}
 {if $user_view eq 'profile'}
 {if $user_login eq $user_logged_in}
-	<div class="alert alert-warning expires-warning">{#PLIKLI_Visual_Page_Expires#}</div>
+	<div class="alert alert-warning expires-warning">{#KAHUK_Visual_Page_Expires#}</div>
 {/if}
 	<div id="profile_container" style="position: relative;">
 		<div class="row">
-			{checkActionsTpl location="tpl_plikli_profile_info_start"}
-			{checkActionsTpl location="tpl_plikli_profile_info_middle"}
+			{checkActionsTpl location="tpl_kahuk_profile_info_start"}
+			{checkActionsTpl location="tpl_kahuk_profile_info_middle"}
 			<div id="stats" class="col-md-6">
 				<table class="table table-bordered table-striped vertical-align">
 					<thead class="table_title">
 						<tr>
-							<th colspan="2">{#PLIKLI_Visual_User_Profile_User_Stats#}</th>
+							<th colspan="2">{#KAHUK_Visual_User_Profile_User_Stats#}</th>
 						</tr>
 					</thead>
 					<tbody>
 						{if $user_karma > "0.00"}
 							<tr>
-								<td><strong>{#PLIKLI_Visual_Rank#}:</strong></td>
+								<td><strong>{#KAHUK_Visual_Rank#}:</strong></td>
 								<td>{$user_rank}</td>
 							</tr>
 							<tr>
-								<td><strong>{#PLIKLI_Visual_User_Profile_KarmaPoints#}:</strong></td>
+								<td><strong>{#KAHUK_Visual_User_Profile_KarmaPoints#}:</strong></td>
 								<td>{$user_karma|number_format:"0"}</td>
 							</tr>
 						{/if}
 						<tr>
-							<td><strong>{#PLIKLI_Visual_User_Profile_Joined#}:</strong></td>
+							<td><strong>{#KAHUK_Visual_User_Profile_Joined#}:</strong></td>
 							<td width="120px">
 								{*	{$user_joined}	*}
 								{php}
-									$plikli_date = $this->_vars['user_joined'];
-									echo date("F d, Y", strtotime($plikli_date));
+									$kahuk_date = $this->_vars['user_joined'];
+									echo date("F d, Y", strtotime($kahuk_date));
 								{/php}
 							</td>	
 						</tr>
 						<tr>
-							<td><strong>{#PLIKLI_Visual_User_Profile_Total_Links#}:</strong></td>
+							<td><strong>{#KAHUK_Visual_User_Profile_Total_Links#}:</strong></td>
 							<td>{$user_total_links}</td>
 						</tr>
 						<tr>
-							<td><strong>{#PLIKLI_Visual_User_Profile_Published_Links#}:</strong></td>
+							<td><strong>{#KAHUK_Visual_User_Profile_Published_Links#}:</strong></td>
 							<td>{$user_published_links}</td>
 						</tr>
 						<tr>
-							<td><strong>{#PLIKLI_Visual_User_Profile_Total_Comments#}:</strong></td>
+							<td><strong>{#KAHUK_Visual_User_Profile_Total_Comments#}:</strong></td>
 							<td>{$user_total_comments}</td>
 						</tr>
 						<tr>
-							<td><strong>{#PLIKLI_Visual_User_Profile_Total_Votes#}:</strong></td>
+							<td><strong>{#KAHUK_Visual_User_Profile_Total_Votes#}:</strong></td>
 							<td>{$user_total_votes}</td>
 						</tr>
 						{*
 						<tr>
-							<td><strong>{#PLIKLI_Visual_User_Profile_Published_Votes#}:</strong></td>
+							<td><strong>{#KAHUK_Visual_User_Profile_Published_Votes#}:</strong></td>
 							<td>{$user_published_votes}</td>
 						</tr>
 						*}
@@ -72,14 +72,14 @@
 					<table class="table table-bordered table-striped vertical-align">
 						<thead class="table_title">
 							<tr>
-								<th>{#PLIKLI_Visual_AdminPanel_Group_Name#}</th>
-								{if !empty($group_display)}<th style="width:60px;text-align:center;">{#PLIKLI_Visual_Group_Member#}</th>{/if}
+								<th>{#KAHUK_Visual_AdminPanel_Group_Name#}</th>
+								{if !empty($group_display)}<th style="width:60px;text-align:center;">{#KAHUK_Visual_Group_Member#}</th>{/if}
 							</tr>
 						<tbody>
 							{if empty($group_display)}
 								<tr>
 									<td colspan="2">
-										{#Plikli_Profile_No_Membership#}
+										{#Kahuk_Profile_No_Membership#}
 									</td>
 								</tr>
 							{else}
@@ -94,13 +94,13 @@
 					<table class="table table-bordered table-striped vertical-align">
 						<thead class="table_title">
 							<tr>
-								<th>{#PLIKLI_Visual_User_Profile_Friends#}</th>
-								{checkActionsTpl location="tpl_plikli_profile_friend_th"}
+								<th>{#KAHUK_Visual_User_Profile_Friends#}</th>
+								{checkActionsTpl location="tpl_kahuk_profile_friend_th"}
 								{if check_for_enabled_module('simple_messaging',2.0) && $user_logged_in && $following}
-									<th>{#PLIKLI_Visual_User_Profile_Message#}</th>
+									<th>{#KAHUK_Visual_User_Profile_Message#}</th>
 								{/if}
 								{if $user_authenticated eq true}
-									<th>{#PLIKLI_Visual_User_Profile_Add_Friend#} / {#PLIKLI_Visual_User_Profile_Remove_Friend#}</th>
+									<th>{#KAHUK_Visual_User_Profile_Add_Friend#} / {#KAHUK_Visual_User_Profile_Remove_Friend#}</th>
 								{/if}
 							</tr>
 						</thead>
@@ -116,27 +116,27 @@
 									<tr>
 										<td>
 											<a href="{$profileURL}"><img src="{$friend_avatar}" style="text-decoration:none;border:0;"/></a>
-											<a href="{$profileURL}">{$myfriend.user_login}</a> {checkActionsTpl location="tpl_plikli_profile_friend_following"}
+											<a href="{$profileURL}">{$myfriend.user_login}</a> {checkActionsTpl location="tpl_kahuk_profile_friend_following"}
 										</td>
 										{if $user_authenticated eq true && $myfriend.is_mutual eq 'mutual'}
 											<td style="text-align:center">
-												<a href="{$my_plikli_base}/module.php?module=simple_messaging&view=compose&return={$templatelite.server.REQUEST_URI|urlencode}&to={$myfriend.user_login}" class="btn btn-default"><i class="fa fa-envelope"></i></a>
+												<a href="{$my_kahuk_base}/module.php?module=simple_messaging&view=compose&return={$templatelite.server.REQUEST_URI|urlencode}&to={$myfriend.user_login}" class="btn btn-default"><i class="fa fa-envelope"></i></a>
 											</td>
 										{elseif $user_authenticated eq true}
 											<td>&nbsp;</td>
 										{else}
 											
 										{/if}
-										{checkActionsTpl location="tpl_plikli_profile_friend_td"}										
+										{checkActionsTpl location="tpl_kahuk_profile_friend_td"}										
 										{if $user_authenticated eq true && $myfriend.is_mutual eq 'mutual' || $myfriend.is_mutual eq 'following' || $is_friend eq 'mutual'}
 											<td>
-												<a class="btn btn-danger" href="{$removeURL}">{#PLIKLI_Visual_User_Profile_Remove_Friend#}</a>
+												<a class="btn btn-danger" href="{$removeURL}">{#KAHUK_Visual_User_Profile_Remove_Friend#}</a>
 											</td>
 										{elseif $user_authenticated neq true}
 										
 										{else}
 											<td>
-												<a class="btn btn-success" href="{$addURL}">{#PLIKLI_Visual_User_Profile_Add_Friend#}</a>
+												<a class="btn btn-success" href="{$addURL}">{#KAHUK_Visual_User_Profile_Add_Friend#}</a>
 											</td>											
 										{/if}
 									</tr>
@@ -144,7 +144,7 @@
 							{else}
 								<tr>
 									<td colspan="3">
-										{$user_username|capitalize} {#PLIKLI_Visual_User_Profile_No_Friends#}
+										{$user_username|capitalize} {#KAHUK_Visual_User_Profile_No_Friends#}
 									</td>
 								</tr>
 							{/if}
@@ -152,9 +152,9 @@
 					</table>
 				</div>
 			{/if}
-			{checkActionsTpl location="tpl_plikli_profile_info_end"}
+			{checkActionsTpl location="tpl_kahuk_profile_info_end"}
 			<div style="clear:both;"> </div>
-			{checkActionsTpl location="tpl_plikli_profile_tab_insert"}
+			{checkActionsTpl location="tpl_kahuk_profile_tab_insert"}
 		</div>
 	</div>
 {/if}
@@ -163,15 +163,15 @@
 {if isset($user_page)}
 	{$user_page}
 	{if $user_page eq ''}
-		<div class="jumbotron" style="padding:15px 25px;"><p style="padding:0;margin:0;font-size:1.1em;">{#PLIKLI_User_Profile_No_Content#}</p></div>
+		<div class="jumbotron" style="padding:15px 25px;"><p style="padding:0;margin:0;font-size:1.1em;">{#KAHUK_User_Profile_No_Content#}</p></div>
 	{/if}
 {/if}
 
 {if isset($user_pagination) && $user_page neq ''}
-	{checkActionsTpl location="tpl_plikli_pagination_start"}
+	{checkActionsTpl location="tpl_kahuk_pagination_start"}
 	{$user_pagination}
-	{checkActionsTpl location="tpl_plikli_pagination_end"}
+	{checkActionsTpl location="tpl_kahuk_pagination_end"}
 {/if}
 
-{checkActionsTpl location="tpl_plikli_profile_end"}
+{checkActionsTpl location="tpl_kahuk_profile_end"}
 <!--/user_profile_center.tpl -->

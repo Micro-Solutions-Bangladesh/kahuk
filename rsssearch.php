@@ -3,11 +3,9 @@ include_once('internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'link.php');
-include(mnminclude.'tags.php');
-include(mnminclude.'search.php');
-include(mnminclude.'smartyvariables.php');
+include(KAHUK_LIBS_DIR.'link.php');
+include(KAHUK_LIBS_DIR.'search.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
 
 $_REQUEST['search'] = str_replace(array('://',':/'),array(':\\',':\\'),$_REQUEST['search']);
 if (strstr($_REQUEST['search'],'/') && $URLMethod == 2)
@@ -59,7 +57,6 @@ $search=new Search();
 if( isset( $_REQUEST['adv'] ) && $_REQUEST['adv'] == 1 ){
 	$search->adv = true;
 	$search->s_group = sanitize($_REQUEST['sgroup'],2);
-	$search->s_tags = sanitize($_REQUEST['stags'],2);
 	$search->s_story = sanitize($_REQUEST['slink'],2);
 	$search->status = sanitize($_REQUEST['status'],2);
 	$search->s_user = sanitize($_REQUEST['suser'],2);
@@ -78,10 +75,7 @@ $linksum_count = $search->countsql;
 $linksum_sql = $search->sql;
 
 
-if ($_GET['tag'])
-    $title = " | " . $main_smarty->get_config_vars("PLIKLI_Visual_Search_Tags");
-else
-    $title = " | " . $main_smarty->get_config_vars("PLIKLI_Visual_Search_Keywords");
+$title = " | " . $main_smarty->get_config_vars("KAHUK_Visual_Search_Keywords");	
 $title .= " | " . sanitize($_GET['search'],4);
 
 do_rss_header($title);
@@ -95,11 +89,11 @@ if ($links) {
 		$category_name = $db->get_var("SELECT category_name FROM " . table_categories . " WHERE category_id = $link->category AND category_lang='$dblang'");
 
 		$link->link_summary = str_replace("\n", "<br />", $link->link_summary);
-		$link->link_summary = str_replace("òÀÙ", "'", $link->link_summary);
-		$link->link_summary = str_replace("òÀÓ", "-", $link->link_summary);
-		$link->link_summary = str_replace("òÀÔ", "-", $link->link_summary);
-		$link->link_summary = str_replace("òÀÜ", "\"", $link->link_summary);
-		$link->link_summary = str_replace("òÀÝ", "\"", $link->link_summary);		
+		$link->link_summary = str_replace("ï¿½ï¿½ï¿½", "'", $link->link_summary);
+		$link->link_summary = str_replace("ï¿½ï¿½ï¿½", "-", $link->link_summary);
+		$link->link_summary = str_replace("ï¿½ï¿½ï¿½", "-", $link->link_summary);
+		$link->link_summary = str_replace("ï¿½ï¿½ï¿½", "\"", $link->link_summary);
+		$link->link_summary = str_replace("ï¿½ï¿½ï¿½", "\"", $link->link_summary);		
 		
 		echo "<item>\n";
 		echo "<title><![CDATA[". $link->title . "]]></title>\n"; 
@@ -112,7 +106,7 @@ if ($links) {
 		echo "<dc:creator>" . $link->username($link->author) . "</dc:creator>\n";
 		echo "<category>" . htmlspecialchars($category_name) . "</category>\n";
 		echo "<guid>".getmyFullurl("storyURL", $link->category_safe_names($link->category), urlencode($link->title_url), $link->id)."</guid>\n";
-		echo "<description><![CDATA[" . $link->link_summary . "<br/><br/>".$link->votes." ".$main_smarty->get_config_vars('PLIKLI_Visual_RSS_Votes')." ]]></description>\n";
+		echo "<description><![CDATA[" . $link->link_summary . "<br/><br/>".$link->votes." ".$main_smarty->get_config_vars('KAHUK_Visual_RSS_Votes')." ]]></description>\n";
 		echo "</item>\n\n";
 	}
 }
@@ -129,9 +123,9 @@ function do_rss_header($title) {
 	echo 'xmlns:dc="http://purl.org/dc/elements/1.1/"'."\n";
 	echo '>'. "\n";
 	echo '<channel>'."\n";
-	echo '<title>'.htmlspecialchars($main_smarty->get_config_vars("PLIKLI_Visual_Name")).$title.'</title>'."\n";
-	echo '<link>'.my_base_url.my_plikli_base.'</link>'."\n";
-	echo '<description>'.$main_smarty->get_config_vars("PLIKLI_Visual_RSS_Description").'</description>'."\n";
+	echo '<title>'.htmlspecialchars($main_smarty->get_config_vars("KAHUK_Visual_Name")).$title.'</title>'."\n";
+	echo '<link>'.my_base_url.my_kahuk_base.'</link>'."\n";
+	echo '<description>'.$main_smarty->get_config_vars("KAHUK_Visual_RSS_Description").'</description>'."\n";
 	echo '<pubDate>'.date('D, d M Y H:i:s T', $last_modified-misc_timezone*3600).'</pubDate>'."\n";
 	echo '<language>'.$dblang.'</language>'."\n";
 }
@@ -151,4 +145,3 @@ function onlyreadables($string) {
   }
   return str_replace("~", "", $string);
 }
-?>

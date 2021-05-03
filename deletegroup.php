@@ -4,10 +4,9 @@ include_once('internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'link.php');
-include(mnminclude.'group.php');
-include(mnminclude.'smartyvariables.php');
+include(KAHUK_LIBS_DIR.'link.php');
+include(KAHUK_LIBS_DIR.'group.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
 
 check_referrer();
 
@@ -36,6 +35,5 @@ if(isset($_REQUEST['id'])){
 	$group_delete = $db->query(" Delete from ".table_groups." where group_id =".$group_id);
 	$member_delete = $db->query(" Delete from ".table_group_member." where member_group_id =".$group_id);
 	$db->query(" Delete from ".table_group_shared." where share_group_id =".$group_id);
-	header('Location: '.$my_base_url.$my_plikli_base);
+	header( 'Location: ' . KAHUK_BASE_URL );
 }
-?>

@@ -6,12 +6,8 @@ function karma_showpage(){
 	global $db, $main_smarty, $the_template;
 		
 	include_once('config.php');
-	include_once(mnminclude.'html1.php');
-	include_once(mnminclude.'link.php');
-	include_once(mnminclude.'tags.php');
-	include_once(mnminclude.'smartyvariables.php');
-	
-	//$main_smarty = do_sidebar($main_smarty);
+	include_once(KAHUK_LIBS_DIR.'link.php');
+	include_once(KAHUK_LIBS_DIR.'smartyvariables.php');
 
 	force_authentication();
 	$canIhaveAccess = 0;
@@ -42,12 +38,12 @@ function karma_showpage(){
 			$main_smarty->assign('error', $error);
 		}
 		// breadcrumbs
-			$navwhere['text1'] = $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel');
+			$navwhere['text1'] = $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel');
 			$navwhere['link1'] = getmyurl('admin', '');
 			$navwhere['text2'] = "Modify Karma";
-			$navwhere['link2'] = my_plikli_base . "/module.php?module=karma";
+			$navwhere['link2'] = my_kahuk_base . "/module.php?module=karma";
 			$main_smarty->assign('navbar_where', $navwhere);
-			$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel'));
+			$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel'));
 		// breadcrumbs
 		define('modulename', 'karma'); 
 		$main_smarty->assign('modulename', modulename);
@@ -76,21 +72,6 @@ function karma_do_submit3(&$vars)
 	}else{
 		$db->query("UPDATE " . table_users . " SET user_karma=user_karma+'{$karma_settings['submit_story']}' WHERE user_id={$current_user->user_id}");
 	}
-
-/*	// Check if other module turned the story to 'discard' or 'spam' state
-	$linkres = $vars['linkres'];
-	if (!$linkres->id) return;
-	if ($linkres->status=='discard')
-  	{
-	    $vars['link_id'] = $linkres->id;
-            karma_story_discard($vars);
-	}
-	elseif ($linkres->status=='spam')
-  	{
-	    $vars['link_id'] = $linkres->id;
-            karma_story_spam($vars);
-	}
-*/
 }
 
 function karma_comment_submit(&$vars)
@@ -202,5 +183,3 @@ function get_karma_settings()
 		'comment_delete' => get_misc_data('karma_comment_delete')
 		);
 }
-
-?>

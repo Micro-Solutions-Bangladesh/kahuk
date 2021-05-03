@@ -1,1 +1,1 @@
-<li{if $modulename eq "admin_snippet"} class="active"{/if}><a href="{$my_plikli_base}/module.php?module=admin_snippet">Snippet</a></li>
+<li{if $modulename eq "admin_snippet"} class="active"{/if}><a href="{$my_kahuk_base}/module.php?module=admin_snippet">Snippet</a></li>

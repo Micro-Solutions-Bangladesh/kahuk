@@ -1,6 +1,8 @@
 <?php
 
-if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
+if ( ! defined( 'KAHUKPATH' ) ) {
+	die();
+}
 
 // taken from http://www.sitepoint.com/article/hierarchical-data-database and modified
 function rebuild_tree($parent, $left, $table, $key_name, $parent_name) {
@@ -103,86 +105,6 @@ function get_cached_between($lft, $rgt){
 	return $results;
 }
 
-
-function tree_to_array($root, $table, $showRoot = TRUE) {
-	// showRoot -- Do we want to include the "root" category named "all" in our results -- all subcats WILL appear regardless
-	
-	global $db, $cached_categories;
-	$row = get_cached_category_data('category__auto_id', $root);
-	if(!$row){
-		$sqlfix = "UPDATE " . table_categories . " SET `category__auto_id` = '0' WHERE `category_name` = 'all' LIMIT 1;";
-		$db->query($sqlfix);
-
-		$cached_categories = loadCategoriesForCache();
-		$row = get_cached_category_data('category__auto_id', $root);
-		if(!$row){
-			die('There is a problem with the categories table. Error CA:001.');
-		}
-	}
-	$right = array();
-	$left  = array();
-	$result = get_cached_between($row->lft, $row->rgt);
-	$i = 0;
-	$lastspacer = 0;
-	
-	foreach($result as $row){
-		if (count($right)>0) {
-			// check if we should remove a node from the stack
-			while ($right && end($right)<$row->rgt) {
-				array_pop($left);
-				if (array_pop($right) == NULL) {
-					break;  // We've reached the top of the category chain
-				}
-			}
-		}
-		/* Redwine: to eliminate PHP Notice:  Undefined offset: -1 */
-		if (sizeof($left) >0) {
-		$array[$i]['first'] = $row->lft-1 == $left[sizeof($left)-1];
-		}
-		if (sizeof($right) > 0) {
-		$array[$i]['last']  = $row->rgt+1 == $right[sizeof($right)-1];
-		}
-		/* Redwine: end to eliminate PHP Notice:  Undefined offset: -1 */
-		$array[$i]['principlecat'] = $row->rgt - $row->lft -1;
-		$array[$i]['spacercount'] = count($right);
-		$array[$i]['lastspacercount'] = $lastspacer;
-		$array[$i]['spacerdiff'] = abs($lastspacer - count($right));
-		$array[$i]['id'] = $row->category_id;
-		$array[$i]['auto_id'] = $row->category__auto_id;
-		$array[$i]['name'] = $row->category_name;
-		$array[$i]['safename'] = $row->category_safe_name;
-		$array[$i]['order'] = $row->category_order;
-		$array[$i]['left'] = $row->lft;
-		$array[$i]['right'] = $row->rgt;
-		$array[$i]['leftrightdiff'] = $row->rgt - $row->lft;
-		$array[$i]['authorlevel'] = $row->category_author_level;
-		$array[$i]['authorgroup'] = $row->category_author_group;
-		$array[$i]['votes'] = $row->category_votes;
-		$array[$i]['karma'] = $row->category_karma;
-		$array[$i]['description'] = $row->category_desc;
-		$array[$i]['keywords'] = $row->category_keywords;
-		if(isset($row->category_color)){$array[$i]['color'] = $row->category_color;}
-		if(isset($row->category_parent)){
-			$array[$i]['parent'] = $row->category_parent;
-			$array[$i]['parent_name'] = GetCatName($row->category_parent);
-			$array[$i]['parent_subcat_count'] = GetSubCatCount($row->category_parent);
-		}
-		$array[$i]['subcat_count'] = GetSubCatCount($row->category__auto_id);
-		$lastspacer = count($right);
-		$right[] = $row->rgt;
-		$left[] = $row->lft;
-		if($array[$i]['leftrightdiff'] != 1)
-		{
-			for($j=0;$j<=$array[$i]['leftrightdiff'];$j++) 
-			{
-				$array[$i]['subcatalign'] = 1;
-			}
-		}
-		$i++;
-	}
-	if($showRoot == FALSE){array_splice($array, 0, 1);}
-	return $array;
-}
 
 function GetSubCatCount($catid){
 	/* Redwine added gloabal $dblang below to eliminate all the Notice: Undefined variable: dblang and make the function work as intended */

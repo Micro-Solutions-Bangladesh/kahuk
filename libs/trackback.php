@@ -1,6 +1,8 @@
 <?php
 
-if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
+if ( ! defined( 'KAHUKPATH' ) ) {
+	die();
+}
 
 class Trackback {
 	var $id = 0;
@@ -90,7 +92,7 @@ class Trackback {
         $http_request .= 'Host: '.$trackback_url['host']."\r\n";
         $http_request .= 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8'."\r\n";
         $http_request .= 'Content-Length: '.strlen($query_string)."\r\n";
-        $http_request .= "User-Agent: PLG (https://www.plikli.com) ";
+        $http_request .= "User-Agent: PLG (https://www.kahuk.com) ";
         $http_request .= "\r\n\r\n";
         $http_request .= $query_string;
         if ( '' == $trackback_url['port'] )

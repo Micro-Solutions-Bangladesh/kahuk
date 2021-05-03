@@ -3,11 +3,8 @@
 	$main_smarty = new Smarty;
 	
 	include('config.php');
-	include(mnminclude.'html1.php');
-	include(mnminclude.'link.php');
-	include(mnminclude.'tags.php');
-	include(mnminclude.'user.php');
-	include(mnminclude.'smartyvariables.php');
+	include(KAHUK_LIBS_DIR.'link.php');
+	include(KAHUK_LIBS_DIR.'smartyvariables.php');
 	
 	$users_display = "";
 	
@@ -61,4 +58,3 @@ $users = $db->get_results("SELECT user_karma, COUNT(*) FROM " . table_users . " 
 			echo $users_table = $main_smarty->fetch(The_Template . "/topusers_data.tpl");
 		}
 	}
-?>

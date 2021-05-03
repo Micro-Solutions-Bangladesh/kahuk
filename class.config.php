@@ -48,8 +48,7 @@ class config {
 
 		if (preg_match('/^(.+)\.([^\.]+)$/',$file,$m))
 		{
-		    include ('settings.php');
-		    $file2 = "{$m[1]}_$language.{$m[2]}";
+		    $file2 = "{$m[1]}_".KAHUK_LANG.".{$m[2]}";
 		    if (file_exists($file2)) $file = $file2;
 		}
 

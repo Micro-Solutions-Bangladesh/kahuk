@@ -1,8 +1,8 @@
 <?php
-if(defined('mnminclude')){
+if(defined('KAHUK_LIBS_DIR')){
 	include_once('captcha_settings.php');
 
-	// tell plikli what pages this modules should be included in
+	// tell kahuk what pages this modules should be included in
 	// pages are <script name> minus .php
 	// index.php becomes 'index' and new.php becomes 'new'
 	$include_in_pages = array('all');
@@ -11,7 +11,7 @@ if(defined('mnminclude')){
 	if( do_we_load_module() ) {		
 
 		module_add_action_tpl('tpl_header_admin_main_links', captcha_tpl_path . 'captcha_admin_main_link.tpl');
-		module_add_action_tpl('tpl_plikli_submit_error_3', captcha_tpl_path . 'captcha_incorrect.tpl');
+		module_add_action_tpl('tpl_kahuk_submit_error_3', captcha_tpl_path . 'captcha_incorrect.tpl');
 
 		if(captcha_reg_enabled == true){
 			module_add_action('register_showform', 'captcha_register', '');
@@ -36,7 +36,7 @@ if(defined('mnminclude')){
          
 	
   
-		include_once(mnmmodules . 'captcha/captcha_main.php');
+		include_once(KAHUK_MODULES_DIR . 'captcha/captcha_main.php');
 		$basename = basename($_SERVER['REQUEST_URI']);
 		if ($current_user->user_id <= 0 && $current_user->authenticated==false && $basename!="register" && !strstr($_SERVER['REQUEST_URI'], '/admin/')){ 
 			$vars='';

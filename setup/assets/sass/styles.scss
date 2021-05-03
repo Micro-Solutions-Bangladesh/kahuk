@@ -1,0 +1,100 @@
+// 1. Include functions first (so you can manipulate colors, SVGs, calc, etc)
+@import "../../node_modules/bootstrap/scss/functions";
+
+
+// 2. Include any default variable overrides here
+
+$font-family-sans-serif: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif, Arial;
+
+
+
+$brand-color-light: #f2efef;;
+$brand-color-dark: #3B5B9B;;
+
+
+
+
+
+
+// 3. Include remainder of required Bootstrap stylesheets
+@import "../../node_modules/bootstrap/scss/variables";
+@import "../../node_modules/bootstrap/scss/mixins";
+
+// 4. Include any optional Bootstrap components as you like
+@import "../../node_modules/bootstrap/scss/root";
+@import "../../node_modules/bootstrap/scss/reboot";
+@import "../../node_modules/bootstrap/scss/alert";
+// // @import "../../node_modules/bootstrap/scss/type";
+// // @import "../../node_modules/bootstrap/scss/images";
+// @import "../../node_modules/bootstrap/scss/containers";
+@import "../../node_modules/bootstrap/scss/forms";
+@import "../../node_modules/bootstrap/scss/buttons";
+@import "../../node_modules/bootstrap/scss/grid";
+
+
+
+// 5. Add additional custom code here
+
+@include media-breakpoint-up(lg) {
+    .container-fluid {
+        max-width: 1024px;
+    }
+}
+
+.tac {
+    text-align: center;
+}
+
+.logo-wrap {
+    height: 50px;
+    text-align: center;
+}
+.logo-wrap img {
+    max-height: 100%;
+}
+.screen-reader-text {
+    border: 0;
+    clip: rect(1px,1px,1px,1px);
+    clip-path: inset(50%);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+    word-wrap: normal !important;
+}
+.link-btn {
+    font-weight: bold;
+    color: $brand-color-dark;
+    text-decoration: none;
+    padding: 3px 5px;
+
+    &.lets-go {
+        display: block;
+        background-color: $brand-color-light;
+    }
+}
+.link-btn:hover {
+    background-color: $brand-color-light;
+}
+
+.header-content {
+    margin-bottom: $spacer;
+}
+.main-content {
+    margin-bottom: $spacer;
+}
+
+
+
+.alert {
+    p {
+        &:first-child {
+            margin-bottom: 0;
+        }
+    }
+}
+.form-row {
+    margin-bottom: $spacer;
+}

@@ -43,28 +43,26 @@ class config {
 		$this->_qstr_regexp = '(?:' . $this->_db_qstr_regexp . '|' . $this->_bool_true_regexp . '|' . $this->_bool_false_regexp . ')';
 	}
 
-	function config_load($file, $section_name = null, $var_name = null)
-	{
-		if (preg_match('/^(.+)\.([^\.]+)$/',$file,$m))
-		{
-			/* Redwwine: the include file always failed and generated warnings. Added mnmpath to correct it. */
-		    include (mnmpath.'settings.php');
-		    $file2 = "{$m[1]}_$language.{$m[2]}";
-		    if (file_exists($file2)) $file = $file2;
+	function config_load( $file, $section_name = null, $var_name = null ) {
+		if (preg_match('/^(.+)\.([^\.]+)$/',$file,$m)) {
+		    $file2 = "{$m[1]}_".KAHUK_LANG.".{$m[2]}";
+
+		    if ( file_exists( $file2 ) ) {
+				$file = $file2;
+			}
 		}
 
 		$_result = array();
 		$contents = file_get_contents($file);
-		if (empty($contents))
-		{
-			die("Could not open $file");
+
+		if ( empty( $contents ) ) {
+			die( "Could not open $file" );
 		}
 
 		// insert new line into beginning of file
 		$contents = "\n" . $contents;
 		// fix new-lines
-		if ($this->fix_new_lines)
-		{
+		if ($this->fix_new_lines) {
 			$contents = str_replace("\r\n","\n",$contents);
 		}
 

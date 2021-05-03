@@ -1,5 +1,7 @@
 <?php
-if(!defined('mnminclude')){header('Location: ../../error_404.php');die();}
+if ( ! defined( 'KAHUKPATH' ) ) {
+	die();
+}
 
 function module_add_action($location, $the_function, $variables, $weight = array ('weight' => 0) )
 {
@@ -183,9 +185,9 @@ function check_module_requirements($requires)
 
 function include_module_settings($module)
 {
-	if(file_exists(mnmmodules . $module . '/' . $module . '_install.php'))
+	if(file_exists(KAHUK_MODULES_DIR . $module . '/' . $module . '_install.php'))
 	{
-		include(mnmmodules . $module . '/' . $module . '_install.php');		
+		include(KAHUK_MODULES_DIR . $module . '/' . $module . '_install.php');		
 		return $module_info;
 	} else {
 		return false;

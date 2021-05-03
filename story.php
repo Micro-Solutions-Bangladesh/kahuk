@@ -4,11 +4,9 @@ include_once('internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'link.php');
-include(mnminclude.'group.php');
-include(mnminclude.'smartyvariables.php');
-include_once(mnminclude.'user.php');
+include(KAHUK_LIBS_DIR.'link.php');
+include(KAHUK_LIBS_DIR.'group.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
 
 $requestID = isset($_GET['id']) && is_numeric($_GET['id']) ? $_GET['id'] : 0; 
 $thecat = array();
@@ -36,8 +34,7 @@ if($requestID > 0 && enable_friendly_urls == true){
 				      (array_diff($thecat, $link->additional_cats, array($link->category)) || 
 				       sizeof($thecat)!=sizeof($link->additional_cats)+1)))
 	{
-		header("Location: $my_plikli_base/error_404.php");
-		die();
+		kahuk_redirect_404();
 	}
 
 	$url = getmyurl("storyURL", $link->category_safe_names(), urlencode($link->title_url), $link->id);
@@ -66,11 +63,10 @@ if(is_numeric($requestID)) {
 				      (($link->status=='spam' || $link->status=='discard') && !checklevel('admin') && !checklevel('moderator'))){
 
 		// check for redirects
-		include(mnminclude.'redirector.php');
+		include(KAHUK_LIBS_DIR.'redirector.php');
 		$x = new redirector($_SERVER['REQUEST_URI']);
 
-		header("Location: $my_plikli_base/error_404.php");
-		die();
+		kahuk_redirect_404();
 	}
 
 	// Hide private group stories
@@ -98,8 +94,6 @@ if(is_numeric($requestID)) {
 			insert_comment();
 		}
 	}
-
-	require_once(mnminclude.'check_behind_proxy.php');
 
 	// Set globals
 	$globals['link_id']=$link->id;
@@ -147,7 +141,6 @@ if(is_numeric($requestID)) {
 	//$main_smarty->assign('enable_show_last_visit', enable_show_last_visit);
 	$main_smarty->assign('UseAvatars', do_we_use_avatars());
 	$main_smarty->assign('related_title_url', getmyurl('storytitle', ""));
-	$main_smarty->assign('related_story', related_stories($id, $link->tags, $link->category));
 
 	// meta tags
 	$meta_description = preg_replace(array('/\r/', '/\n/'), '', $link->truncate_content());
@@ -200,17 +193,14 @@ if(is_numeric($requestID)) {
 	}
 
 	$main_smarty->assign('tpl_center', $the_template . '/story_center');
-	$main_smarty->display($the_template . '/plikli.tpl');
+	$main_smarty->display($the_template . '/kahuk.tpl');
 } else {
 
 	// check for redirects
-	include(mnminclude.'redirector.php');
+	include(KAHUK_LIBS_DIR.'redirector.php');
 	$x = new redirector($_SERVER['REQUEST_URI']);
 	
-	header("Location: $my_plikli_base/error_404.php");
-//	$main_smarty->assign('tpl_center', 'error_404_center');
-//	$main_smarty->display($the_template . '/plikli.tpl');		
-	die();
+	kahuk_redirect_404();
 }
 
 function get_comments ($fetch = false, $parent = 0, $comment_id=0, $show_parent=0){
@@ -255,7 +245,7 @@ function get_comments ($fetch = false, $parent = 0, $comment_id=0, $show_parent=
 	                                    ORDER BY " . $CommentOrderBy);	
 	}
 	if ($comments) {
-		require_once(mnminclude.'comment.php');
+		require_once(KAHUK_LIBS_DIR.'comment.php');
 	    $comment = new Comment;
 		foreach($comments as $dbcomment) {
 			$comment->id=$dbcomment->comment_id;
@@ -289,7 +279,7 @@ function insert_comment () {
 		$error = true;
 		return;
 	}
-	require_once(mnminclude.'comment.php');
+	require_once(KAHUK_LIBS_DIR.'comment.php');
 	$comment = new Comment;
 
 	$cancontinue = false;
@@ -305,7 +295,7 @@ function insert_comment () {
 /*Redwine: added smarty assign for the length of the comment to be able to provide the relevant warning in the comments_error.tpl*/
 		$main_smarty->assign('max_Comment_Length', 'comment_too_long');
 		$main_smarty->assign('tpl_center', $the_template . '/comment_errors');
-		$main_smarty->display($the_template . '/plikli.tpl');
+		$main_smarty->display($the_template . '/kahuk.tpl');
 		exit;
 	}
 	settype($_POST['randkey'], "integer");
@@ -383,10 +373,9 @@ function comment_catcha_errors($linkerror)
 	if($linkerror == 'captcha_error') {
 		$main_smarty->assign('submit_error', 'register_captcha_error');
 		$main_smarty->assign('tpl_center', $the_template . '/comment_errors');
-		$main_smarty->display($the_template . '/plikli.tpl');
+		$main_smarty->display($the_template . '/kahuk.tpl');
 #		$main_smarty->display($the_template . '/submit_errors.tpl');
 		$error = true;
 	}
 	return $error;
 }
-?>

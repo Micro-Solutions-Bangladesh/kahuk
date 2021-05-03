@@ -1,12 +1,13 @@
 <?php
+if ( ! defined( 'KAHUKPATH' ) ) {
+	die();
+}
 
-if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
+include KAHUK_LIBS_DIR.'extra_fields_smarty.php';
 
-include mnminclude.'extra_fields_smarty.php';
-
-$main_smarty->compile_dir = mnmpath."cache/";
-$main_smarty->template_dir = mnmpath."templates/";
-$main_smarty->cache_dir = mnmpath."cache/";
+$main_smarty->compile_dir = KAHUKPATH."cache/";
+$main_smarty->template_dir = KAHUKPATH."templates/";
+$main_smarty->cache_dir = KAHUKPATH."cache/";
 //global $current_user;
 
 // determine if we're in root or another folder like admin
@@ -15,7 +16,7 @@ if(!defined('lang_loc')){
 	$path = substr($_SERVER["SCRIPT_NAME"], 0, $pos);
 	if ($path == "/"){$path = "";}
 	
-	if($path != my_plikli_base){
+	if($path != my_kahuk_base){
 		define('lang_loc', '..');
 	} else {
 		define('lang_loc', '.');
@@ -30,7 +31,7 @@ $main_smarty->assign('maintenance_mode', $maintenance);
 
 $main_smarty->config_dir = "";
 $main_smarty->force_compile = false; // has to be off to use cache
-$main_smarty->config_load(lang_loc . "/languages/lang_" . plikli_language . ".conf");
+$main_smarty->config_load(lang_loc . "/languages/lang_" . KAHUK_LANG . ".conf");
 
 if(isset($_GET['id']) && is_numeric($_GET['id'])){$main_smarty->assign('request_id', $_GET['id']);}
 if(isset($_GET['category']) && sanitize($_GET['category'], 3) != ''){$main_smarty->assign('request_category', sanitize($_GET['category'], 3));}
@@ -39,7 +40,7 @@ if(isset($_POST['username']) && sanitize($_POST['username'], 0) != ''){$main_sma
 
 $main_smarty->assign('votes_per_ip', votes_per_ip);
 $main_smarty->assign('dblang', $dblang);
-$main_smarty->assign('plikli_language', plikli_language);
+// $main_smarty->assign('kahuk_language', KAHUK_LANG);
 $main_smarty->assign('user_logged_in', $current_user->user_login);
 $main_smarty->assign('user_id', $current_user->user_id);
 if ($current_user->authenticated == true) {
@@ -59,11 +60,11 @@ if ($current_user->authenticated == true) {
 	$current_user_level = ''; /* Redwine: user_level is not part oof the $current_user array when user is not auhtenticated (logged in), hence this variable to be used on line 74. otherwise, generating a Notice in case user is not authenticated. */
 }
 $main_smarty->assign('user_authenticated', $current_user->authenticated);
-$main_smarty->assign('Enable_Tags', Enable_Tags);
 $main_smarty->assign('Enable_Live', Enable_Live);
 $main_smarty->assign('Voting_Method', Voting_Method);
+$main_smarty->assign('kahuk_base_url', KAHUK_BASE_URL);
 $main_smarty->assign('my_base_url', my_base_url);
-$main_smarty->assign('my_plikli_base', my_plikli_base);
+$main_smarty->assign('my_kahuk_base', my_kahuk_base);
 $main_smarty->assign('Allow_User_Change_Templates', Allow_User_Change_Templates);
 $main_smarty->assign('urlmethod', urlmethod);
 $main_smarty->assign('UseAvatars', do_we_use_avatars());
@@ -206,9 +207,9 @@ $main_smarty->assign('sidebar_stats_members', $sidebar_stats_members);
 $last_user = $db->get_var("SELECT user_login FROM " . table_users . " where user_level != 'Spammer' ORDER BY user_id DESC LIMIT 1");
 $main_smarty->assign('last_user', $last_user); 
 /* Redwine: added the query to get the version and removed 16 duplicate queries from all admin and some other files */
-// read the mysql database to get the plikli version
-$plikli_version = plikli_version();
-$main_smarty->assign('version_number', $plikli_version); 
+// read the mysql database to get the kahuk version
+$kahuk_version = kahuk_version();
+$main_smarty->assign('version_number', $kahuk_version); 
 /* Redwine: redundant query */
 /*// Count variable for moderated comments
 $moderated_comments_count = $db->get_var('SELECT count(*) from ' . table_comments . ' where comment_status = "moderated";');
@@ -299,7 +300,7 @@ $moderated_groups_count = $db->get_var('SELECT count(*) from ' . table_groups . 
 $main_smarty->assign('moderated_groups_count', $moderated_groups_count);*/
 
 // Count the number of errors
-$error_log_path = mnminclude.'../logs/error.log';
+$error_log_path = KAHUK_LIBS_DIR.'../logs/error.log';
 $error_log_content = file_get_contents($error_log_path);
 $error_count = preg_match_all('/\[(\d{2})-(\w{3})-(\d{4}) (\d{2}:\d{2}:\d{2})/', $error_log_content, $matches);
 $main_smarty->assign('error_count', $error_count);
@@ -323,10 +324,10 @@ $backup_count = $sqlcount+$zipcount;
 $moderated_total_count = $disabled_groups_count+$moderated_users_count+$moderated_comments_count+$moderated_submissions_count+$error_count+$backup_count;
 $main_smarty->assign('moderated_total_count', $moderated_total_count);
 
-/********************** NEW FOR PLIKLI VERSION, INSTALLED / UNINSTALLED MODULES UPDATES **********************/
+/********************** NEW FOR KAHUK VERSION, INSTALLED / UNINSTALLED MODULES UPDATES **********************/
 
 /**********
-Redwine: this block of code is the new check for module and plikli version updates. It checks if today's date is the date to check for updates, then it computes all the needed processes and generate all the variabes to pass to admin_modules.php for the installed and uninstalled modules pages.
+Redwine: this block of code is the new check for module and kahuk version updates. It checks if today's date is the date to check for updates, then it computes all the needed processes and generate all the variabes to pass to admin_modules.php for the installed and uninstalled modules pages.
 
 1- Redwine: verify if it is time to run the check for update. 
 If yes it should run, then it runs and updates the $update_uninstalled data.
@@ -334,7 +335,7 @@ if not, then it checks the $update_uninstalled if it is not empty and then it ta
 **********/
 
 /* 3- Find all the modules in the modules directory */
-$dir = mnmmodules; //the defined path to the modules, in config.php
+$dir = KAHUK_MODULES_DIR; //the defined path to the modules, in config.php
 if (is_dir($dir)) {
    if ($dh = opendir($dir)) {
 	   while (($file = readdir($dh)) !== false) {
@@ -354,7 +355,7 @@ if($modules) {
 	foreach($modules as $module) {
 		if(isset($foundfolders_unins) && is_array($foundfolders_unins)) {
 			foreach($foundfolders_unins as $key => $value) {
-				if ($module->folder == $value  && file_exists(mnmmodules . $module->folder)) {
+				if ($module->folder == $value  && file_exists(KAHUK_MODULES_DIR . $module->folder)) {
 					unset($foundfolders_unins[$key]);
 				}
 			}
@@ -362,7 +363,7 @@ if($modules) {
 	}
 }
 
-$sql_get_mods_update = $db->get_results('SELECT * from `' . table_misc_data . '` where `name` like "modules_%" OR `name` like "plikli_update%";');
+$sql_get_mods_update = $db->get_results('SELECT * from `' . table_misc_data . '` where `name` like "modules_%" OR `name` like "kahuk_update%";');
 
 if($sql_get_mods_update) {
 	foreach($sql_get_mods_update as $item) {
@@ -372,12 +373,12 @@ if($sql_get_mods_update) {
 			$update_link = $item->data; //holds the location of the file from where it gets the latest versions.
 		}elseif ($item->name == 'modules_update_unins') {
 			$update_uninstalled = $item->data; //holds serialized array of the uninstalled modules that need update.
-		}elseif ($item->name == 'plikli_update') {
-			$update_available = $item->data; //holds the latest plikli version if there is an update or empty if not.
+		}elseif ($item->name == 'kahuk_update') {
+			$update_available = $item->data; //holds the latest kahuk version if there is an update or empty if not.
 		}elseif ($item->name == 'modules_upd_versions') {
-			$update_latest_versions = $item->data; //holds the latest plikli versions from the file.
-		}elseif ($item->name == 'plikli_update_url') {
-			$update_plikli_url = $item->data; //holds the latest plikli versions from the file.
+			$update_latest_versions = $item->data; //holds the latest kahuk versions from the file.
+		}elseif ($item->name == 'kahuk_update_url') {
+			$update_kahuk_url = $item->data; //holds the latest kahuk versions from the file.
 		}
 	}
 }
@@ -388,34 +389,34 @@ if(time() >= strtotime($check_for_update)) {
 	$proceed_check_update = 'true'; // meaning go ahead and check the latest versions.
 	/* Redwine: checking if modules updates exist. It runs only if today is equal or greater than the date in the misc_data table. $versionupdate is an array that holds the name and latest version of each module that is due for update. */
 	$versionupdate = array();
-	$versionplikliupdate = array();
+	$versionkahukupdate = array();
 	$lines = file($update_link, FILE_IGNORE_NEW_LINES);
 
 	foreach ($lines as $key => $value) {
-		if (strpos($value, 'plikli_new_version') !== false) {
-			$versionplikliupdate[$key] = str_getcsv($value);
+		if (strpos($value, 'kahuk_new_version') !== false) {
+			$versionkahukupdate[$key] = str_getcsv($value);
 		}else{
 			$versionupdate[$key] = str_getcsv($value);
 		}
 	}
 	/* Redwine: the only way to mantain the $versionupdate if it not the time to check is to insert it in the misc_data table. */
 	misc_data_update('modules_upd_versions',serialize($versionupdate));
-	/* Redwine: first let's check if there is a new plikli version. */
-	if ($update_available == '0' || $update_available == ''|| $update_available == $plikli_version) {
-		$update_plikli = '';
+	/* Redwine: first let's check if there is a new kahuk version. */
+	if ($update_available == '0' || $update_available == ''|| $update_available == $kahuk_version) {
+		$update_kahuk = '';
 		if ($proceed_check_update == 'true') {
-			$plikli_new_version = 'plikli_new_version';
-			foreach($versionplikliupdate as $entry) {
-				if (in_array($plikli_new_version, $entry)) {
-					if($entry[1]>$plikli_version) {
-						$update_plikli = $entry[1];
-						misc_data_update('plikli_update',$update_plikli);
+			$kahuk_new_version = 'kahuk_new_version';
+			foreach($versionkahukupdate as $entry) {
+				if (in_array($kahuk_new_version, $entry)) {
+					if($entry[1]>$kahuk_version) {
+						$update_kahuk = $entry[1];
+						misc_data_update('kahuk_update',$update_kahuk);
 					}
 				}
 			}	
 		}
 	}
-	/* END CHECKING PLIKLI NEW VERSION. */
+	/* END CHECKING KAHUK NEW VERSION. */
 	
 	/* Redwine: we need to maintain a copy to pass on to the installed modules instead of running the process again. */
 	$versionupdate_to_pass_to_installed = $versionupdate;
@@ -533,10 +534,10 @@ if(time() >= strtotime($check_for_update)) {
 		$versionupdate = unserialize($update_latest_versions);
 	}	
 	$versionupdate_to_pass_to_installed = unserialize($update_latest_versions);
-	if ($update_available == $plikli_version) {
-		$update_plikli = '';
+	if ($update_available == $kahuk_version) {
+		$update_kahuk = '';
 	}else{
-		$update_plikli = $update_available;
+		$update_kahuk = $update_available;
 	}
 	
 
@@ -544,12 +545,12 @@ $res_update_mod=$db->get_results('SELECT folder from ' . table_modules . ' where
 $num_update_mod=0;
 if($res_update_mod) {
 foreach($res_update_mod as $modules_folders){
-	if (file_exists(mnmmodules . $modules_folders->folder))
+	if (file_exists(KAHUK_MODULES_DIR . $modules_folders->folder))
 			$num_update_mod++;
  }
 }
-$main_smarty->assign('update_plikli', $update_plikli);
-$main_smarty->assign('update_plikli_url', $update_plikli_url);
+$main_smarty->assign('update_kahuk', $update_kahuk);
+$main_smarty->assign('update_kahuk_url', $update_kahuk_url);
 $main_smarty->assign('in_no_module_update_require', $num_update_mod);
 
 $res_for_update=$db->get_var("select var_value from " . table_config . "  where var_name = 'uninstall_module_updates'");
@@ -568,7 +569,7 @@ function update_module_update_date($update_new_date){
 
 /* END CHECKING FOR UNINSTALLED MODULES.*/
 
-/********************** END NEW FOR PLIKLI VERSION, INSTALLED / UNINSTALLED MODULES UPDATES **********************/
+/********************** END NEW FOR KAHUK VERSION, INSTALLED / UNINSTALLED MODULES UPDATES **********************/
 //count installed module with updates available
 
 
@@ -580,21 +581,21 @@ $vars = '';
 check_actions('all_pages_top', $vars);
 
 // setup the sorting links on the index page in smarty
-$plikli_category = isset($_GET['category']) ? sanitize($_GET['category'], 3) : '';
-if($plikli_category != ''){
-	$main_smarty->assign('index_url_recent', getmyurl('maincategory', $plikli_category));
-	$main_smarty->assign('index_url_today', getmyurl('index_sort', 'today', $plikli_category));
-	$main_smarty->assign('index_url_yesterday', getmyurl('index_sort', 'yesterday', $plikli_category));
-	$main_smarty->assign('index_url_week', getmyurl('index_sort', 'week', $plikli_category));
-	$main_smarty->assign('index_url_month', getmyurl('index_sort', 'month', $plikli_category));
+$kahuk_category = isset($_GET['category']) ? sanitize($_GET['category'], 3) : '';
+if($kahuk_category != ''){
+	$main_smarty->assign('index_url_recent', getmyurl('maincategory', $kahuk_category));
+	$main_smarty->assign('index_url_today', getmyurl('index_sort', 'today', $kahuk_category));
+	$main_smarty->assign('index_url_yesterday', getmyurl('index_sort', 'yesterday', $kahuk_category));
+	$main_smarty->assign('index_url_week', getmyurl('index_sort', 'week', $kahuk_category));
+	$main_smarty->assign('index_url_month', getmyurl('index_sort', 'month', $kahuk_category));
 /* Redwine: add an additional Sort by from the sort button to sort the stories of the current month */
-	$main_smarty->assign('index_url_curmonth', getmyurl('index_sort', 'curmonth', $plikli_category));
-	$main_smarty->assign('index_url_year', getmyurl('index_sort', 'year', $plikli_category));
-	$main_smarty->assign('index_url_alltime', getmyurl('index_sort', 'alltime', $plikli_category));
+	$main_smarty->assign('index_url_curmonth', getmyurl('index_sort', 'curmonth', $kahuk_category));
+	$main_smarty->assign('index_url_year', getmyurl('index_sort', 'year', $kahuk_category));
+	$main_smarty->assign('index_url_alltime', getmyurl('index_sort', 'alltime', $kahuk_category));
 	
-	$main_smarty->assign('index_url_upvoted', getmyurl('index_sort', 'upvoted', $plikli_category));
-	$main_smarty->assign('index_url_downvoted', getmyurl('index_sort', 'downvoted', $plikli_category));
-	$main_smarty->assign('index_url_commented', getmyurl('index_sort', 'commented', $plikli_category));
+	$main_smarty->assign('index_url_upvoted', getmyurl('index_sort', 'upvoted', $kahuk_category));
+	$main_smarty->assign('index_url_downvoted', getmyurl('index_sort', 'downvoted', $kahuk_category));
+	$main_smarty->assign('index_url_commented', getmyurl('index_sort', 'commented', $kahuk_category));
 	
 	$main_smarty->assign('cat_url', getmyurl("maincategory"));
 }	

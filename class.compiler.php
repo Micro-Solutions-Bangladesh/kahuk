@@ -544,61 +544,54 @@ class Template_Lite_Compiler extends Template_Lite {
 				return '<?php break; endswitch; ?>';
 				break;
 			case 'case':
-				if (count($this->_switch_stack) > 0)
-				{
+				if (count($this->_switch_stack) > 0) {
 					$_result = "<?php ";
 					$_args = $this->_parse_arguments($arguments);
 					$_index = count($this->_switch_stack) - 1;
-					if (!$this->_switch_stack[$_index]["matched"])
-					{
+
+					if (!$this->_switch_stack[$_index]["matched"]) {
 						$_result .= 'switch(' . $this->_switch_stack[$_index]["var"] . '): ';
 						$this->_switch_stack[$_index]["matched"] = true;
-					}
-					else
-					{
+					} else {
 						$_result .= 'break; ';
 					}
-					if (!empty($_args['value']))
-					{
+
+					if (!empty($_args['value'])) {
 						$_result .= 'case '.$_args['value'].': ';
-					}
-					else
-					{
+					} else {
 						$_result .= 'default: ';
 					}
+
 					return $_result . ' ?>';
-				}
-				else
-				{
+				} else {
 					$this->trigger_error("unexpected 'case', 'case' can only be in a 'switch'", E_USER_ERROR, __FILE__, __LINE__);
 				}
+				
 				break;
 			case 'config_load':
 				$_args = $this->_parse_arguments($arguments);
-				if (empty($_args['file']))
-				{
+
+				if (empty($_args['file'])) {
 					$this->trigger_error("missing 'file' attribute in 'config_load' tag", E_USER_ERROR, __FILE__, __LINE__);
 				}
+
 				isset($_args['section']) ? null : $_args['section'] = 'null';
 				isset($_args['var']) ? null : $_args['var'] = 'null';
+
 				return '<?php $this->config_load(' . $_args['file'] . ', ' . $_args['section'] . ', ' . $_args['var'] . '); ?>';
 				break;
+
 			default:
 				$_result = "";
-				if ($this->_compile_compiler_function($function, $arguments, $_result))
-				{
+				if ($this->_compile_compiler_function($function, $arguments, $_result)) {
 					return $_result;
 				}
-				else if ($this->_compile_custom_block($function, $modifiers, $arguments, $_result))
-				{
+				else if ($this->_compile_custom_block($function, $modifiers, $arguments, $_result)) {
 					return $_result;
 				}
-				elseif ($this->_compile_custom_function($function, $modifiers, $arguments, $_result))
-				{
+				elseif ($this->_compile_custom_function($function, $modifiers, $arguments, $_result)) {
 					return $_result;
-				}
-				else
-				{
+				} else {
 					$this->trigger_error($function." function does not exist", E_USER_ERROR, __FILE__, __LINE__);
 				}
 				break;

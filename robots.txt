@@ -1,9 +1,9 @@
 # 1) this filename (robots.txt) must stay lowercase
 # 2) this file must be in the servers root directory
-# 	ex: http://www.mydomain.com/pliklisubfolder/ -- you must move the robots.txt from
-# 	/pliklisubfolder/ to the root folder for http://www.mydomain.com/
+# 	ex: http://www.mydomain.com/kahuksubfolder/ -- you must move the robots.txt from
+# 	/kahuksubfolder/ to the root folder for http://www.mydomain.com/
 # 	you must then add your subfolder to each 'Disallow' below
-# 	ex:  Disallow: /cache/  becomes  Disallow: /pliklisubfolder/cache/
+# 	ex:  Disallow: /cache/  becomes  Disallow: /kahuksubfolder/cache/
 User-agent: *
 Crawl-delay: 5
 Disallow: 

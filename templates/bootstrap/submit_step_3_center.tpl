@@ -3,9 +3,9 @@
 *************************************}
 <!-- submit_step_3_center.tpl -->
 <div class="submit_page">
-	<legend>{#PLIKLI_Visual_Submit3_Header#}</legend>
-	<h2>{#PLIKLI_Visual_Submit3_Details#}</h2><br />
-	{checkActionsTpl location="tpl_plikli_submit_step3_start"}
+	<legend>{#KAHUK_Visual_Submit3_Header#}</legend>
+	<h2>{#KAHUK_Visual_Submit3_Details#}</h2><br />
+	{checkActionsTpl location="tpl_kahuk_submit_step3_start"}
 	{* javascript that protects people from clicking away from the story before submitting it *}
 	{literal}
 	<SCRIPT>
@@ -45,13 +45,7 @@
 		if (!is_numeric($link_id)) die();
 		$linkres->read(FALSE);
 		$linkres->print_summary();
-		$main_smarty->assign('tags', $linkres->tags);
-		if (!empty($linkres->tags)) {
-			$tags_words = str_replace(",", ", ", $linkres->tags);
-			$tags_url = urlencode($linkres->tags);
-			$main_smarty->assign('tags_words', $tags_words);
-			$main_smarty->assign('tags_url', $tags_url);
-		}
+
 		$main_smarty->assign('submit_url', $url);
 		$main_smarty->assign('submit_url_title', $linkres->url_title);
 		$main_smarty->assign('submit_id', $linkres->id);
@@ -68,10 +62,10 @@
 		<br style="clear: both;" />
 		<hr />
 		<center>
-			<input type="button" onclick="gPageIsOkToExit = true; document.location.href='{$my_base_url}{$my_plikli_base}/submit.php?id='+this.form.id.value+'&trackback='+this.form.trackback.value;" value="{#PLIKLI_Visual_Submit3_Modify#}" class="btn btn-default">&nbsp;&nbsp;
-			<input type="button" onclick="submitEdgeStory();" value="{#PLIKLI_Visual_Submit3_SubmitStory#}" class="btn btn-primary" />
+			<input type="button" onclick="gPageIsOkToExit = true; document.location.href='{$kahuk_base_url}/submit.php?id='+this.form.id.value+'&trackback='+this.form.trackback.value;" value="{#KAHUK_Visual_Submit3_Modify#}" class="btn btn-default">&nbsp;&nbsp;
+			<input type="button" onclick="submitEdgeStory();" value="{#KAHUK_Visual_Submit3_SubmitStory#}" class="btn btn-primary" />
 		</center>
-	{checkActionsTpl location="tpl_plikli_submit_step3_end"} 
+	{checkActionsTpl location="tpl_kahuk_submit_step3_end"} 
 	</form>
 	{checkActionsTpl location="tpl_submit_step_3_end"}
 </div>

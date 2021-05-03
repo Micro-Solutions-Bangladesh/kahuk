@@ -4,10 +4,8 @@ include_once('internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'link.php');
-include(mnminclude.'smartyvariables.php');
-include_once(mnminclude.'user.php');
+include(KAHUK_LIBS_DIR.'link.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
 
 $user=$_GET['user'];
 
@@ -30,5 +28,4 @@ if (allow_smtp_testing == 1 && smtp_fake_email == 1) {
 }
 $main_smarty = do_sidebar($main_smarty, $navwhere);
 $main_smarty->assign('tpl_center', $the_template . '/register_complete_center');
-$main_smarty->display($the_template . '/plikli.tpl');
-?>
+$main_smarty->display($the_template . '/kahuk.tpl');

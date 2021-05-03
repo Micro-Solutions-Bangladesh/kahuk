@@ -4,8 +4,7 @@ include_once('../internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('../config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'smartyvariables.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
 
 check_referrer();
 
@@ -23,15 +22,15 @@ if($canIhaveAccess == 0){
 define('pagename', 'template_widgets');
 $main_smarty->assign('pagename', pagename);
 
-// read the mysql database to get the plikli version
-/* Redwine: plikli version query removed and added to /libs/smartyvriables.php */
+// read the mysql database to get the kahuk version
+/* Redwine: kahuk version query removed and added to /libs/smartyvriables.php */
 
 // breadcrumbs and page title
-$navwhere['text1'] = $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel');
+$navwhere['text1'] = $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel');
 $navwhere['link1'] = getmyurl('admin', '');
-$navwhere['text2'] = $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel_6');
+$navwhere['text2'] = $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel_6');
 $main_smarty->assign('navbar_where', $navwhere);
-$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel_6'));
+$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel_6'));
 
 // sidebar
 //$main_smarty = do_sidebar($main_smarty);
@@ -49,5 +48,3 @@ if($canIhaveAccess == 1){
 	}
 
 }
-
-?>

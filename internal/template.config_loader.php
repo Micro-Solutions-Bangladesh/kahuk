@@ -7,30 +7,30 @@
  */
 
 $this->_config_module_loaded = true;
-$this->template_dir = $this->_get_dir($this->template_dir);
-$this->config_dir = $this->_get_dir($this->config_dir);
-$this->compile_dir = $this->_get_dir($this->compile_dir);
-$name = ($this->encode_file_name) ? md5($this->template_dir . $file . $section_name . $var_name).'.php' : str_replace(".", "_", str_replace("/", "_", $file."_".$section_name."_".$var_name)).'.php';
 
-if ($this->debugging)
-{
-	$debug_start_time = array_sum(explode(' ', microtime()));
+$this->template_dir = $this->_get_dir( $this->template_dir );
+$this->config_dir = $this->_get_dir( $this->config_dir );
+$this->compile_dir = $this->_get_dir( $this->compile_dir );
+
+$name = ($this->encode_file_name ) ? md5( $this->template_dir . $file . $section_name . $var_name ).'.php' : str_replace( ".", "_", str_replace("/", "_", $file."_".$section_name."_".$var_name)).'.php';
+
+if ( $this->debugging ) {
+	$debug_start_time = array_sum( explode( ' ', microtime() ) );
 }
 
-if ($this->cache)
-{
+if ( $this->cache ) {
 	array_push($this->_cache_info['config'], $file);
 }
 
-if (!$this->force_compile && file_exists($this->compile_dir.'c_'.$name) && (filemtime($this->compile_dir.'c_'.$name) > filemtime($this->config_dir.$file)))
-{
-	include($this->compile_dir.'c_'.$name);
+if ( !$this->force_compile && file_exists( $this->compile_dir.'c_'.$name ) && ( filemtime( $this->compile_dir.'c_'.$name ) > filemtime($this->config_dir.$file))) {
+	include( $this->compile_dir.'c_'.$name );
+
 	return true;
 }
 
-if (!is_object($this->_config_obj))
-{
+if ( !is_object( $this->_config_obj ) ) {
 	require_once(TEMPLATE_LITE_DIR . "internal/class.config.php");
+
 	$this->_config_obj = new $this->config_class;
 	$this->_config_obj->overwrite = $this->config_overwrite;
 	$this->_config_obj->booleanize = $this->config_booleanize;
@@ -38,13 +38,11 @@ if (!is_object($this->_config_obj))
 	$this->_config_obj->read_hidden = $this->config_read_hidden;
 }
 
-if (!($_result = $this->_config_obj->config_load($this->config_dir.$file, $section_name, $var_name)))
-{
+if ( !( $_result = $this->_config_obj->config_load( $this->config_dir.$file, $section_name, $var_name ) ) ) {
 	return false;
 }
 
-if (!empty($var_name) || !empty($section_name))
-{
+if ( !empty( $var_name ) || !empty( $section_name ) ) {
 	$output = "\$this->_confs = " . var_export($_result, true) . ";";
 }
 else

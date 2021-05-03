@@ -4,10 +4,8 @@ include_once('../internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('../config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'link.php');
-include(mnminclude.'tags.php');
-include(mnminclude.'smartyvariables.php');
+include(KAHUK_LIBS_DIR.'link.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
 
 //check_referrer();
 
@@ -137,5 +135,3 @@ else{
 //	echo "<br />We're sorry, but you do not have administrative privileges on this site.<br />If you wish to be promoted, please contact the site administrator.<br />";
 	header("Location: " . getmyurl('admin_login', $_SERVER['REQUEST_URI']));
 }
-
-?>

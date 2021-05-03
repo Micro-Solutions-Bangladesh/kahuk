@@ -2,14 +2,14 @@
 ********* Live Comments Page ********
 *************************************}
 <!-- live_comments_center.tpl -->
-<legend>{#PLIKLI_Visual_Live#} {#PLIKLI_Visual_Comments#}</legend>
+<legend>{#KAHUK_Visual_Live#} {#KAHUK_Visual_Comments#}</legend>
 <table class="table table-bordered table-striped">
 	<thead>
 		<tr class="live2-item">
-			<td><strong>{#PLIKLI_Visual_Comments_Comment#}</th>
-			<td><strong>{#PLIKLI_Visual_Comments_Author#}</th>
-			<td><strong>{#PLIKLI_Visual_Comments_Link#}</th>
-			<td><strong>{#PLIKLI_Visual_Comments_Date#}</th>
+			<td><strong>{#KAHUK_Visual_Comments_Comment#}</th>
+			<td><strong>{#KAHUK_Visual_Comments_Author#}</th>
+			<td><strong>{#KAHUK_Visual_Comments_Link#}</th>
+			<td><strong>{#KAHUK_Visual_Comments_Date#}</th>
 		</tr>
 	</thead>
 		{section name=live_item loop=$live_items}
@@ -22,7 +22,7 @@
 		{/section}
 	</tbody>
 </table>
-{checkActionsTpl location="tpl_plikli_pagination_start"}
+{checkActionsTpl location="tpl_kahuk_pagination_start"}
 {$live_pagination}
-{checkActionsTpl location="tpl_plikli_pagination_end"}
+{checkActionsTpl location="tpl_kahuk_pagination_end"}
 <!--/live_comments_center.tpl -->

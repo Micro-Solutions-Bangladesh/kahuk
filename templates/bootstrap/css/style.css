@@ -956,7 +956,6 @@ min-width:240px;
 
 #url {width:100%;}
 #title {}
-#tags {}
 #summarytext {}
 #bodytext {}
 
@@ -1203,3 +1202,12 @@ width: 10px;
 #btn-desc{font-size:20px;padding:5px;display:none;}
 .advanced-search{background-color:#183a52;padding:3px;}
 .advanced-search a{color:#ffffff !important;}
+
+
+.mt-0 {margin-top: 0 !important;}
+.mt-1 {margin-top: 0.25rem !important;}
+.mt-2 {margin-top: 0.5rem !important;}
+.mt-3 {margin-top: 1rem !important;}
+.mt-4 {margin-top: 1.5rem !important;}
+
+.link-submit-form-wrapper {width: 800px;max-width: 100%;margin: 0 auto;}

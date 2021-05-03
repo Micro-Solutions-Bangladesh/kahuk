@@ -44,8 +44,8 @@ input[type="radio"] {margin-right:10px;}
 <legend class="centerText">MUST CONFIGURE</legend>
 {*site email*}
 	<fieldset>
-        <legend><a href="{$my_plikli_base}/module.php?module=admin_language" target="_blank">Site's Email</a>:</legend>
-        <p>Your site's email is {if $siteEmail neq 'Not configured'}configured{else}Not configured{/if}. If you wish to change the email or configure it, click on the title to go to the Modify Language Module, then type "@" in the filter box and click on the filter button. The definition that needs to be configured is PLIKLI_PassEmail_From. Click inside the box until you see two buttons appearing. "Save" and "cancel". Enter the email and click save.</p>
+        <legend><a href="{$my_kahuk_base}/module.php?module=admin_language" target="_blank">Site's Email</a>:</legend>
+        <p>Your site's email is {if $siteEmail neq 'Not configured'}configured{else}Not configured{/if}. If you wish to change the email or configure it, click on the title to go to the Modify Language Module, then type "@" in the filter box and click on the filter button. The definition that needs to be configured is KAHUK_PassEmail_From. Click inside the box until you see two buttons appearing. "Save" and "cancel". Enter the email and click save.</p>
 		<select name="site_email" class="form-control {if $siteEmail neq 'Not configured'}configured{else}notconfigured{/if}">					
             <option selected>{$siteEmail}</option>
 		</select>
@@ -53,7 +53,7 @@ input[type="radio"] {margin-right:10px;}
     
 {*SMTP email*}
 	<fieldset>
-        <legend><a href="{$my_base_url}{$my_plikli_base}/admin/admin_config.php?page=Location%20Installed" target="_blank">SMTP Email</a>:</legend>
+        <legend><a href="{$kahuk_base_url}/admin/admin_config.php?page=Location%20Installed" target="_blank">SMTP Email</a>:</legend>
         <p>If you want to use the SMTP settings of your server's email, you can follow the instructions to set it up or to change it.<br />SMTP settings will allow to send SMTP emails, as well as testing, on LOCALHOST, all the features that sends an email to your users. Testing on LOCALHOST has an additional option to configure, which prints out the email sent on the page, and only Admins can view it.<br />The relevant configurations are:<br /></p>
         <label>Allow SMTP Testing?</label>
 		<select name="allow_smtp" class="form-control {if $allowSMTP eq 'true'}configured{else}notconfigured{/if}">					
@@ -79,7 +79,7 @@ input[type="radio"] {margin-right:10px;}
     
 {*Logo, openGraph and Twitter Card*}
 	<fieldset>
-        <legend><a href="{$my_base_url}{$my_plikli_base}/admin/admin_config.php?page=Logo" target="_blank">Logo, openGraph and Twitter Card</a>:</legend>
+        <legend><a href="{$kahuk_base_url}/admin/admin_config.php?page=Logo" target="_blank">Logo, openGraph and Twitter Card</a>:</legend>
         <p>If you want to use a Logo in place of the site's name, click on the title above and configure the Logo, openGraph and Twitter Card</p>
         <label>Site Logo</label>
 		<select name="use_logo" class="form-control {if $useLogo neq ''}configured{else}notconfigured{/if}">					
@@ -97,7 +97,7 @@ input[type="radio"] {margin-right:10px;}
 
 {*Misc settings*}
 	<fieldset>
-        <legend><a href="{$my_base_url}{$my_plikli_base}/admin/admin_config.php?page=Misc" target="_blank">Miscellaneous Settings</a>:</legend>
+        <legend><a href="{$kahuk_base_url}/admin/admin_config.php?page=Misc" target="_blank">Miscellaneous Settings</a>:</legend>
         <p>To set or change any of these settings, click on the title above. It is recommended to set the following settings:</p>
         <label>Validate user email</label>
         <p>By default, it is set to false. If you set it to true, then you have to have a site's email configured.</p>
@@ -119,7 +119,7 @@ input[type="radio"] {margin-right:10px;}
 
 {*SEO settings*}
 	<fieldset>
-        <legend><a href="{$my_base_url}{$my_plikli_base}/admin/admin_config.php?page=SEO" target="_blank">SEO Settings</a>:</legend>
+        <legend><a href="{$kahuk_base_url}/admin/admin_config.php?page=SEO" target="_blank">SEO Settings</a>:</legend>
         <label>URL Method</label>
         <p>Under SEO Settings. It is a best to use the SEO URL Method 2. To use it, on localhost or production server, you also need to have an <strong>.htaccess</strong> file, which you can get it ready by following the instructions under URL Method.</p>
         <select name="Seo_method" class="form-control {if $SEOMethod eq 2}configured{else}notconfigured{/if}">					
@@ -129,7 +129,7 @@ input[type="radio"] {margin-right:10px;}
 
 {*AntiSpam settings*}
 	<fieldset>
-        <legend><a href="{$my_base_url}{$my_plikli_base}/admin/admin_config.php?page=AntiSpam" target="_blank">AntiSpam Settings</a>:</legend>
+        <legend><a href="{$kahuk_base_url}/admin/admin_config.php?page=AntiSpam" target="_blank">AntiSpam Settings</a>:</legend>
         <label>Enable Spam Checking</label>
         <p>Under AntiSpam Settings. It is a best to set it to true. It helps Admins to whitelist/blacklist domains. When set to true, "Manage Domains" link will appear under Manage section in the dashboard.</p>
         <select name="Anti_spam" class="form-control {if $Anti_spam eq true}configured{else}notconfigured{/if}">					
@@ -139,7 +139,7 @@ input[type="radio"] {margin-right:10px;}
 
 {*Submit settings*}
 	<fieldset>
-        <legend><a href="{$my_base_url}{$my_plikli_base}/admin/admin_config.php?page=Submit" target="_blank">Submit Settings</a>:</legend>
+        <legend><a href="{$kahuk_base_url}/admin/admin_config.php?page=Submit" target="_blank">Submit Settings</a>:</legend>
         <label>Allow Draft Articles?</label>
         <p>Under Submit Settings, Admins can enable submitting <strong><u>Draft</u></strong> stories that can later be published, by the author,  manually by changing the status of the story.</p>
         <select name="submitDraft" class="form-control {if $submitDraft eq true}configured{else}notconfigured{/if}">					
@@ -180,14 +180,14 @@ input[type="radio"] {margin-right:10px;}
 	
     {*Anonymous*}
 	<fieldset>
-        <legend><a href="{$my_base_url}{$my_plikli_base}/admin/admin_config.php?page=Anonymous" target="_blank">Anonymous</a>:</legend>
+        <legend><a href="{$kahuk_base_url}/admin/admin_config.php?page=Anonymous" target="_blank">Anonymous</a>:</legend>
         <label>Anonymous vote</label>
         <p>By default it is set to false. If you wish to allow anonymous (not logged in) to vote, set it to true.</p>
     </fieldset>
     
     {*Avatars*}
 	<fieldset>
-        <legend><a href="{$my_base_url}{$my_plikli_base}/admin/admin_config.php?page=Avatars" target="_blank">Avatars</a>:</legend>
+        <legend><a href="{$kahuk_base_url}/admin/admin_config.php?page=Avatars" target="_blank">Avatars</a>:</legend>
         <label>Allow User to Upload Avatars</label>
         <p>By default it is set to true. If you wish to disallow user to upload their avatars, set it to false.</p>
         <p>Under the Avatars section, you can also set the "Maximum image size allowed to upload"</p>
@@ -195,7 +195,7 @@ input[type="radio"] {margin-right:10px;}
     
     {*Comments*}
 	<fieldset>
-        <legend><a href="{$my_base_url}{$my_plikli_base}/admin/admin_config.php?page=Comments" target="_blank">Comments</a>:</legend>
+        <legend><a href="{$kahuk_base_url}/admin/admin_config.php?page=Comments" target="_blank">Comments</a>:</legend>
         <label>Allow Comments</label>
         <p>By default it is set to true. If you wish to disallow comments (temporarily or indefinitely, set it to false.</p>
         <p>Edit the "Message to display when Comments are disallowed" setting to fit your needs.</p>
@@ -210,7 +210,7 @@ input[type="radio"] {margin-right:10px;}
     
     {*Groups*}
 	<fieldset>
-        <legend><a href="{$my_base_url}{$my_plikli_base}/admin/admin_config.php?page=Groups" target="_blank">Groups</a>:</legend>
+        <legend><a href="{$kahuk_base_url}/admin/admin_config.php?page=Groups" target="_blank">Groups</a>:</legend>
         <label>Groups</label>
         <p>By default it is set to true. If you wish to disallow groups (temporarily or indefinitely, set it to false.</p>
         
@@ -228,7 +228,7 @@ input[type="radio"] {margin-right:10px;}
     
     {*Live*}
 	<fieldset>
-        <legend><a href="{$my_base_url}{$my_plikli_base}/admin/admin_config.php?page=Live" target="_blank">Live</a>:</legend>
+        <legend><a href="{$kahuk_base_url}/admin/admin_config.php?page=Live" target="_blank">Live</a>:</legend>
         <label>Enable Live</label>
         <p>By default it is set to true. If you wish to disallow it (temporarily or indefinitely, set it to false.</p>
         
@@ -242,7 +242,7 @@ input[type="radio"] {margin-right:10px;}
     
     {*Location Installed*}
 	<fieldset>
-        <legend><a href="{$my_base_url}{$my_plikli_base}/admin/admin_config.php?page=Location%20Installed" target="_blank">Location Installed</a>:</legend>
+        <legend><a href="{$kahuk_base_url}/admin/admin_config.php?page=Location%20Installed" target="_blank">Location Installed</a>:</legend>
         <label>Allow registration?</label>
         <p>Default is true. If you wish to disallow it (temporarily or indefinitely, set it to false.</p>
         
@@ -256,9 +256,9 @@ input[type="radio"] {margin-right:10px;}
     
     {*Misc*}
 	<fieldset>
-        <legend><a href="{$my_base_url}{$my_plikli_base}/admin/admin_config.php?page=Misc" target="_blank">Miscellaneous</a>:</legend>
+        <legend><a href="{$kahuk_base_url}/admin/admin_config.php?page=Misc" target="_blank">Miscellaneous</a>:</legend>
         <label>Enable Extra Fields</label>
-        <p>Default is false. If you wish to enable it, set it to true. <strong>When SET to TRUE, you have to edit the /libs/extra_fields.php file, using the NEW <a href="{$my_base_url}{$my_plikli_base}/admin/admin_xtra_fields_editor.php" target="_blank">Extra Fields Editor</a> in the Dashboard!</strong></p>
+        <p>Default is false. If you wish to enable it, set it to true. <strong>When SET to TRUE, you have to edit the /libs/extra_fields.php file, using the NEW <a href="{$kahuk_base_url}/admin/admin_xtra_fields_editor.php" target="_blank">Extra Fields Editor</a> in the Dashboard!</strong></p>
         
         <ul>
         <li>Allow friends: default is true. If you wish to disallow it (temporarily or indefinitely, set it to false.</li>
@@ -266,21 +266,21 @@ input[type="radio"] {margin-right:10px;}
         <li>How many users to display in top users: default is 25. Set it to your needs.</li>
         <li>Timezone offset: set to Zero. Set it according to your timezone.</li>
         <li>Site Language: default is English. You might want to set it to your language (require that you rename the appropriate language file in the /languages/ folder.</li>
-        <li>Allow users to change Plikli language: default is 0 (no). When SET to 1, you have to rename the language file that you want to allow in /languages/ folder. Ex: RENAME lang_italian.conf.default to lang_italian.conf</li>
-        <li>Display What is Plikli in the sidebar?: default is set to true. Set it to false if you do not want it to display. If you want it to display but with your own content, Keep it set to true and edit the language file where the entry is PLIKLI_Visual_What_Is_Plikli and PLIKLI_Visual_What_Is_Plikli_Text under the Sidebar section.<br /><a href="{$my_base_url}{$my_plikli_base}/module.php?module=admin_language" target="_blank">Modify Language</a> in the Dashboard!</strong></li>
+        <li>Allow users to change Kahuk language: default is 0 (no). When SET to 1, you have to rename the language file that you want to allow in /languages/ folder. Ex: RENAME lang_italian.conf.default to lang_italian.conf</li>
+        <li>Display What is Kahuk in the sidebar?: default is set to true. Set it to false if you do not want it to display. If you want it to display but with your own content, Keep it set to true and edit the language file where the entry is KAHUK_Visual_What_Is_Kahuk and KAHUK_Visual_What_Is_Kahuk_Text under the Sidebar section.<br /><a href="{$kahuk_base_url}/module.php?module=admin_language" target="_blank">Modify Language</a> in the Dashboard!</strong></li>
         </ul>
     </fieldset>
 
     {*OutGoing*}
 	<fieldset>
-        <legend><a href="{$my_base_url}{$my_plikli_base}/admin/admin_config.php?page=OutGoing" target="_blank">OutGoing</a>:</legend>
+        <legend><a href="{$kahuk_base_url}/admin/admin_config.php?page=OutGoing" target="_blank">OutGoing</a>:</legend>
         <label>Enable Outgoing Links</label>
         <p>Default is false. If you wish to track the clicks on the original link to the Story source (from the Story page, not the summary page), then set it to true.</p>
     </fieldset>
 
     {*Story*}
 	<fieldset>
-        <legend><a href="{$my_base_url}{$my_plikli_base}/admin/admin_config.php?page=Story" target="_blank">Story</a>:</legend>
+        <legend><a href="{$kahuk_base_url}/admin/admin_config.php?page=Story" target="_blank">Story</a>:</legend>
         <label>Use Story Title as External Link</label>
         <p>Default is false. <strong>When set to true, the Story title will link directly to the original story link even when the story is displayed in summary mode (Home, New, profile tabs and any other page that displays a story)!<br />Users can still click on the "Discuss" link to comment and use the other links in the toolsbar to share and save the story.</strong></p>
         
@@ -290,7 +290,7 @@ input[type="radio"] {margin-right:10px;}
 
     {*Submit*}
 	<fieldset>
-        <legend><a href="{$my_base_url}{$my_plikli_base}/admin/admin_config.php?page=Submit" target="_blank">Submit</a>:</legend>
+        <legend><a href="{$kahuk_base_url}/admin/admin_config.php?page=Submit" target="_blank">Submit</a>:</legend>
         <label>Allow users to submit articles?</label>
         <p>Default is true. If you wish to disallow submitting, (temporarily or indefinitely, set it to false.</p>
         <p>Edit the "Message to display when Submitting articles is disallowed" setting to fit your needs.</p>
@@ -315,18 +315,9 @@ input[type="radio"] {margin-right:10px;}
         </ul>
     </fieldset>
 
-    {*Tags*}
-	<fieldset>
-        <legend><a href="{$my_base_url}{$my_plikli_base}/admin/admin_config.php?page=Tags" target="_blank">Tags</a>:</legend>
-        <label>Enable the use of tags and the tag cloud.</label>
-        <p>Default is true. <strong>NOTE THAT THE TAGS IN THE SIDEBAR REQUIRE THAT YOU INSTALL THE SIDEBAR TAG CLOUD MODULE.</strong></p>
-        
-        <p>Under the Tags settings section, you can also keep the default or modify settings like the font size and word limits.</p>
-    </fieldset>
-
     {*Voting*}
 	<fieldset>
-        <legend><a href="{$my_base_url}{$my_plikli_base}/admin/admin_config.php?page=Voting" target="_blank">Voting</a>:</legend>
+        <legend><a href="{$kahuk_base_url}/admin/admin_config.php?page=Voting" target="_blank">Voting</a>:</legend>
         <label>Votes to publish (Number of votes before story is sent to the front page.)</label>
         <p>Default is 5. <strong>NOTE THAT if you want to immediately publish the Story, keep the default setting for Auto vote: default is true and set this one to 1. Otherwise, set the number of days that fit your needs, <u>However, I suggest never setting it to 0 because it will be discarded from the first negative vote (if the "Negative Votes Story Discard" below is set to 1.</u></strong></p>
         

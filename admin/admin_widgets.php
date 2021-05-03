@@ -4,8 +4,7 @@ include_once('../internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('../config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'smartyvariables.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
 
 check_referrer();
 
@@ -23,15 +22,15 @@ if($canIhaveAccess == 0){
 define('pagename', 'admin_widgets');
 $main_smarty->assign('pagename', pagename);
 
-// read the mysql database to get the plikli version
-/* Redwine: plikli version query removed and added to /libs/smartyvriables.php */
+// read the mysql database to get the kahuk version
+/* Redwine: kahuk version query removed and added to /libs/smartyvriables.php */
 
 // breadcrumbs and page title
-$navwhere['text1'] = $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel');
+$navwhere['text1'] = $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel');
 $navwhere['link1'] = getmyurl('admin', '');
-$navwhere['text2'] = $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel_6');
+$navwhere['text2'] = $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel_6');
 $main_smarty->assign('navbar_where', $navwhere);
-$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel_6'));
+$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel_6'));
 
 // sidebar
 //$main_smarty = do_sidebar($main_smarty);
@@ -114,7 +113,7 @@ if(isset($_GET['action']) && $_GET['action']== 'remove'){
 	$output = $main_smarty->fetch('/admin/admin.tpl');		
 
 	if (!function_exists('clear_widget_cache')) {
-		echo "Your template is not compatible with this version of Plikli. Missing the 'clear_widgets_cache' function in admin_widgets_center.tpl.";
+		echo "Your template is not compatible with this version of Kahuk. Missing the 'clear_widgets_cache' function in admin_widgets_center.tpl.";
 	} else {
 		echo $output;
 	}
@@ -125,7 +124,7 @@ function clear_widget_cache () {
 	global $db;
 	if(caching == 1){
 		// this is to clear the cache and reload it for settings_from_db.php
-		$db->cache_dir = mnmpath.'cache';
+		$db->cache_dir = KAHUKPATH.'cache';
 		$db->use_disk_cache = true;
 		$db->cache_queries = true;
 		$db->cache_timeout = 0;
@@ -137,14 +136,12 @@ function clear_widget_cache () {
 
 function include_widget_settings($name)
 {
-	if(file_exists(mnmpath . '/widgets/'. $name . '/' . 'init.php'))
+	if(file_exists(KAHUKPATH . '/widgets/'. $name . '/' . 'init.php'))
 	{
-		include_once(mnmpath . '/widgets/' . $name . '/' . 'init.php');		
+		include_once(KAHUKPATH . '/widgets/' . $name . '/' . 'init.php');		
 
 		return $widget;
 	} else {
 		return false;
 	}
 }
-
-?>

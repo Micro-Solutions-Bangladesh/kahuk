@@ -4,9 +4,8 @@ include_once('internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'link.php');
-include(mnminclude.'smartyvariables.php');
+include(KAHUK_LIBS_DIR.'link.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
 
 check_referrer();
 
@@ -60,4 +59,3 @@ if($current_user->user_id != 0)
 		
 	}
 } 
-?>

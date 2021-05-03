@@ -1,8 +1,8 @@
 <?php
-if(defined('mnminclude')){
+if(defined('KAHUK_LIBS_DIR')){
 	include_once('admin_language_settings.php');
 
-	// tell plikli what pages this modules should be included in
+	// tell kahuk what pages this modules should be included in
 	// pages are <script name> minus .php
 	// index.php becomes 'index' and new.php becomes 'new'
 	$do_not_include_in_pages = array();
@@ -20,10 +20,10 @@ if(defined('mnminclude')){
 		$moduleName = $_REQUEST['module'];
 
 		if($moduleName == 'admin_language'){
-			module_add_action_tpl('tpl_plikli_admin_head_end', admin_language_tpl_path . 'admin_language_javascript.tpl');
+			module_add_action_tpl('tpl_kahuk_admin_head_end', admin_language_tpl_path . 'admin_language_javascript.tpl');
 			module_add_action('module_page', 'admin_language_showpage', '');
 		
-			include_once(mnmmodules . 'admin_language/admin_language_main.php');
+			include_once(KAHUK_MODULES_DIR . 'admin_language/admin_language_main.php');
 		}
 	}
 }

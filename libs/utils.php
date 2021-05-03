@@ -1,16 +1,18 @@
 <?php
 date_default_timezone_set('UTC');
 
-if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
+if ( ! defined( 'KAHUKPATH' ) ) {
+	die();
+}
 
 function mailer_start(){
-	// Usually a module will define Plikli_Mailer
+	// Usually a module will define Kahuk_Mailer
 	// If defined, then include call the function thats starts (includes) it
 
-	if(defined('Plikli_Mailer') && function_exists(Plikli_Mailer . '_mailer_start')){
-		call_user_func(Plikli_Mailer . '_mailer_start');
+	if(defined('Kahuk_Mailer') && function_exists(Kahuk_Mailer . '_mailer_start')){
+		call_user_func(Kahuk_Mailer . '_mailer_start');
 	} else {
-		include_once(mnminclude.'mailer.php');
+		include_once(KAHUK_LIBS_DIR.'mailer.php');
 	}
 }
 
@@ -32,23 +34,23 @@ function check_if_table_exists($table) {
 	}
 }
 
-function plikli_version(){
-	// returns the version of Plikli that's installed 
-	$ver = get_misc_data('plikli_version');
+function kahuk_version(){
+	// returns the version of Kahuk that's installed 
+	$ver = get_misc_data('kahuk_version');
 	return $ver;
 }
 
-function plikli_hash(){
+function kahuk_hash(){
 	// returns the hash from the misc_table 
 	$hash = get_misc_data('hash');
 	return $hash;
 }
 
 
-function plikli_validate(){
+function kahuk_validate(){
 	// returns the value for register validation 
 	$vars = array('validate' => misc_validate);
-	check_actions('plikli_validate', $vars);
+	check_actions('kahuk_validate', $vars);
 
 	return $vars['validate'];
 }
@@ -176,20 +178,20 @@ function txt_time_diff($from, $now=0){
 	$diff=$diff%3600;
 	$minutes=intval($diff/60);
 
-	if($days>1) $txt  .= " $days ".$main_smarty->get_config_vars('PLIKLI_Visual_Story_Times_Days');
-	else if ($days==1) $txt  .= " $days ".$main_smarty->get_config_vars('PLIKLI_Visual_Story_Times_Day');
+	if($days>1) $txt  .= " $days ".$main_smarty->get_config_vars('KAHUK_Visual_Story_Times_Days');
+	else if ($days==1) $txt  .= " $days ".$main_smarty->get_config_vars('KAHUK_Visual_Story_Times_Day');
 
 	if($days < 2){
-		if($hours>1) $txt .= " $hours ".$main_smarty->get_config_vars('PLIKLI_Visual_Story_Times_Hours');
-		else if ($hours==1) $txt  .= " $hours ".$main_smarty->get_config_vars('PLIKLI_Visual_Story_Times_Hour');
+		if($hours>1) $txt .= " $hours ".$main_smarty->get_config_vars('KAHUK_Visual_Story_Times_Hours');
+		else if ($hours==1) $txt  .= " $hours ".$main_smarty->get_config_vars('KAHUK_Visual_Story_Times_Hour');
 	
 		if($hours < 3){
-			if($minutes>1) $txt .= " $minutes ".$main_smarty->get_config_vars('PLIKLI_Visual_Story_Times_Minutes');
-			else if ($minutes==1) $txt  .= " $minutes ".$main_smarty->get_config_vars('PLIKLI_Visual_Story_Times_Minute');
+			if($minutes>1) $txt .= " $minutes ".$main_smarty->get_config_vars('KAHUK_Visual_Story_Times_Minutes');
+			else if ($minutes==1) $txt  .= " $minutes ".$main_smarty->get_config_vars('KAHUK_Visual_Story_Times_Minute');
 		}
 	}
 	
-	if($txt=='') $txt = ' '. $main_smarty->get_config_vars('PLIKLI_Visual_Story_Times_FewSeconds') . ' ';
+	if($txt=='') $txt = ' '. $main_smarty->get_config_vars('KAHUK_Visual_Story_Times_FewSeconds') . ' ';
 	return $txt;
 }
 
@@ -249,7 +251,7 @@ function get_date($epoch) {
 }
 
 function get_base_url($url){
-	// get base of URL. For example, get_base_url will return www.plikli.com if the URL was www.plikli.com/support/
+	// get base of URL. For example, get_base_url will return www.kahuk.com if the URL was www.kahuk.com/support/
    $req = $url;
   
    $pos = strpos($req, '://');
@@ -321,9 +323,9 @@ function utils_makeUrlFriendly($output)
 	$output = utf8_substr($output, 0, 240);
 	$output = utf8_strtolower($output);
 
-	if (file_exists(mnmpath.'languages/translit.txt'))
+	if (file_exists(KAHUKPATH.'languages/translit.txt'))
 	{
-      		$translations = parse_ini_file(mnmpath.'languages/translit.txt');
+      		$translations = parse_ini_file(KAHUKPATH.'languages/translit.txt');
   		$output = strtr($output, $translations);
 	} 
 	/* Redwine: the preg_replace to replace spaces with underscores used with the \e modifiyer is generating a notice even in PHP version 5.4.3.
@@ -361,13 +363,13 @@ function utils_makeUrlFriendly($output)
 	$output = str_replace("]", "", $output);
 	$output = str_replace("^", "", $output);
 	$output = str_replace("%", "", $output);
-//	$output = str_replace("»", "-", $output);
+//	$output = str_replace("ï¿½", "-", $output);
 //	$output = str_replace("|", "", $output);
 	$output = str_replace("#", "", $output);
 	$output = str_replace("@", "", $output);
 	$output = str_replace("`", "", $output);
-//	$output = str_replace("”", "", $output);
-//	$output = str_replace("“", "", $output);
+//	$output = str_replace("ï¿½", "", $output);
+//	$output = str_replace("ï¿½", "", $output);
 	$output = str_replace("\"", "", $output);
 	$output = str_replace("--", "-", $output);
 	return $output;
@@ -378,60 +380,60 @@ function utils_makeUrlFriendly($output)
 
 function remove_error_creating_chars($chars) { 
 	$replace=array( 
-	'Á' => 'A',
-	'Å' => 'A',
-	'Ä' => 'A',
-	'ä' => 'a',
-	'á' => 'a',
-	'à' => 'a',
-	'â' => 'a',
-	'ã' => 'a',
-	'å' => 'a',
-	'Æ' => 'ae',
-	'æ' => 'ae',
-	'ç' => 'c',
-	'Ç' => 'C',
-	'é' => 'e',
-	'È' => 'E',
-	'É' => 'E',
-	'Ë' => 'E',
-	'ë' => 'e',
-	'Ì' => 'I', 
-	'ì' => 'i', 
-	'Í' => 'I',
-	'í' => 'i',
-	'Ï' => 'I',
-	'ï' => 'i',
-	'¼' => '',
-	'¾' => '',
-	'¿' => '',
-	'ñ' => 'n',
-	'Ñ' => 'N',
-	'Ò' => 'O',
-	'ò' => 'o',
-	'Ö' => 'O',
-	'Õ' => 'O',
-	'Ó' => 'O',
-	'ô' => 'o',
-	'ó' => 'o',
-	'õ' => 'o',
-	'ö' => 'o',
-	'Š' => 's',
-	'š' => 's',
-	'ß' => 'ss',
-	'Û' => 'U',
-	'Ú' => 'U',
-	'Ü' => 'U',
-	'û' => 'u',
-	'ú' => 'u',
-	'ü' => 'u',
-	'Ý' => 'Y',
-	'ý' => 'y',
-	'Ÿ' => 'Y',
-	'ÿ' => 'y',
-	'Ž' => 'Z', 
-	'ž' => 'z', 
-	'€' => ''
+	'ï¿½' => 'A',
+	'ï¿½' => 'A',
+	'ï¿½' => 'A',
+	'ï¿½' => 'a',
+	'ï¿½' => 'a',
+	'ï¿½' => 'a',
+	'ï¿½' => 'a',
+	'ï¿½' => 'a',
+	'ï¿½' => 'a',
+	'ï¿½' => 'ae',
+	'ï¿½' => 'ae',
+	'ï¿½' => 'c',
+	'ï¿½' => 'C',
+	'ï¿½' => 'e',
+	'ï¿½' => 'E',
+	'ï¿½' => 'E',
+	'ï¿½' => 'E',
+	'ï¿½' => 'e',
+	'ï¿½' => 'I', 
+	'ï¿½' => 'i', 
+	'ï¿½' => 'I',
+	'ï¿½' => 'i',
+	'ï¿½' => 'I',
+	'ï¿½' => 'i',
+	'ï¿½' => '',
+	'ï¿½' => '',
+	'ï¿½' => '',
+	'ï¿½' => 'n',
+	'ï¿½' => 'N',
+	'ï¿½' => 'O',
+	'ï¿½' => 'o',
+	'ï¿½' => 'O',
+	'ï¿½' => 'O',
+	'ï¿½' => 'O',
+	'ï¿½' => 'o',
+	'ï¿½' => 'o',
+	'ï¿½' => 'o',
+	'ï¿½' => 'o',
+	'ï¿½' => 's',
+	'ï¿½' => 's',
+	'ï¿½' => 'ss',
+	'ï¿½' => 'U',
+	'ï¿½' => 'U',
+	'ï¿½' => 'U',
+	'ï¿½' => 'u',
+	'ï¿½' => 'u',
+	'ï¿½' => 'u',
+	'ï¿½' => 'Y',
+	'ï¿½' => 'y',
+	'ï¿½' => 'Y',
+	'ï¿½' => 'y',
+	'ï¿½' => 'Z', 
+	'ï¿½' => 'z', 
+	'ï¿½' => ''
 	);
 
 	foreach ($replace as $key => $value) {

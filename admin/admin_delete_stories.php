@@ -4,10 +4,8 @@ include_once('../internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('../config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'link.php');
-include(mnminclude.'user.php');
-include(mnminclude.'smartyvariables.php');
+include(KAHUK_LIBS_DIR.'link.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
 
 check_referrer();
 
@@ -41,9 +39,6 @@ $handle = new mysqli(EZSQL_DB_HOST,EZSQL_DB_USER,EZSQL_DB_PASSWORD,EZSQL_DB_NAME
     
 	# delete the saved links
     $handle->query("DELETE FROM " . table_saved_links . " WHERE saved_link_id IN (" . $todelete.");");
-    
-	# delete the story tags
-    $handle->query("DELETE FROM " . table_tags . " WHERE tag_link_id IN (" . $todelete.");");
 
     # delete the story trackbacks
     $handle->query("DELETE FROM " . table_trackbacks . " WHERE trackback_link_id IN (" . $todelete.");");
@@ -75,29 +70,24 @@ if ($num_rows > 0) {
 }
 # set discards total to zero
 $db->query("UPDATE " . table_totals . " SET total = '0' WHERE name = 'discard'");
-/* Redwine: empty the table tag cache to rebuild it. */
-$db->query("DELETE FROM " . table_tag_cache);
-
-# Redwine - Sidebar tag cache fix
-$db->query("INSERT INTO ".table_tag_cache." select tag_words, count(DISTINCT link_id) as count FROM ".table_tags.", ".table_links." WHERE tag_lang='en' and link_id = tag_link_id and (link_status='published' OR link_status='new') GROUP BY tag_words order by count desc");
 ?>
 
 <div class="modal-dialog">
 	<div class="modal-content">
 		<div class="modal-header">
 			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-			<h4 class="modal-title"><?php echo $main_smarty->get_config_vars('PLIKLI_Visual_AdminPanel_Discarded_Stories_Removed') ?></h4>
+			<h4 class="modal-title"><?php echo $main_smarty->get_config_vars('KAHUK_Visual_AdminPanel_Discarded_Stories_Removed') ?></h4>
 		</div>
 		<div class="modal-body">
 			<?php
 			include_once('../libs/dbconnect.php');
 			/* Redwine: new query created to get the optimize table query in one shot and therefore save some processing time and cpu.*/
-			$query = "SELECT CONCAT('OPTIMIZE TABLE ', GROUP_CONCAT(table_name) , ';' ) AS statement FROM information_schema.tables WHERE table_schema = '".EZSQL_DB_NAME."' AND table_name LIKE '".table_prefix."%';";
+			$query = "SELECT CONCAT('OPTIMIZE TABLE ', GROUP_CONCAT(table_name) , ';' ) AS statement FROM information_schema.tables WHERE table_schema = '".EZSQL_DB_NAME."' AND table_name LIKE '".TABLE_PREFIX."%';";
 
 				$sqlqry = $db->get_var($query);
 				$db->query($sqlqry);
 			
-				echo '<p><strong>'.$num_rows.'</strong> '.$main_smarty->get_config_vars("PLIKLI_Visual_AdminPanel_Discarded_Stories_Removed_Message");
+				echo '<p><strong>'.$num_rows.'</strong> '.$main_smarty->get_config_vars("KAHUK_Visual_AdminPanel_Discarded_Stories_Removed_Message");
 			?>
 		</div>
 		<div class="modal-footer">

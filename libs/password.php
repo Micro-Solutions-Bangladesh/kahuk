@@ -237,19 +237,22 @@ namespace {
          *
          * @return boolean If the password matches the hash
          */
-        function password_verify($password, $hash) {
-            if (!function_exists('crypt')) {
-                trigger_error("Crypt must be loaded for password_verify to function", E_USER_WARNING);
+        function password_verify( $password, $hash ) {
+            if ( ! function_exists( 'crypt' ) ) {
+                trigger_error( "Crypt must be loaded for password_verify to function", E_USER_WARNING );
                 return false;
             }
+
             $ret = crypt($password, $hash);
-            if (!is_string($ret) || PasswordCompat\binary\_strlen($ret) != PasswordCompat\binary\_strlen($hash) || PasswordCompat\binary\_strlen($ret) <= 13) {
+
+            if ( !is_string( $ret ) || PasswordCompat\binary\_strlen( $ret ) != PasswordCompat\binary\_strlen( $hash ) || PasswordCompat\binary\_strlen($ret) <= 13) {
                 return false;
             }
 
             $status = 0;
-            for ($i = 0; $i < PasswordCompat\binary\_strlen($ret); $i++) {
-                $status |= (ord($ret[$i]) ^ ord($hash[$i]));
+
+            for ( $i = 0; $i < PasswordCompat\binary\_strlen($ret); $i++ ) {
+                $status |= ( ord($ret[$i]) ^ ord( $hash[$i] ) );
             }
 
             return $status === 0;

@@ -1,10 +1,10 @@
-{checkActionsTpl location="tpl_plikli_admin_stats_widget_start"}
+{checkActionsTpl location="tpl_kahuk_admin_stats_widget_start"}
 <table class="table table-condensed table-striped" style="margin-bottom:0;word-break: break-word;">
 	{if $sw_version eq "1"}
 		<tr>
 			<td>
 				<strong>
-				{#PLIKLI_Statistics_Widget_Version#}:
+				{#KAHUK_Statistics_Widget_Version#}:
 				</strong>
 			</td>
 			<td>
@@ -16,11 +16,11 @@
 		<tr>
 			<td>
 				<strong>
-				{#PLIKLI_Statistics_Widget_Front_Member#}:
+				{#KAHUK_Statistics_Widget_Front_Member#}:
 				</strong>
 			</td>
 			<td>
-				<a href="{$URL_user, $last_user}" title="{#PLIKLI_Visual_AdminPanel_Latest_User#}">{$last_user}</a>
+				<a href="{$URL_user, $last_user}" title="{#KAHUK_Visual_AdminPanel_Latest_User#}">{$last_user}</a>
 			</td>
 		</tr>
 	{/if}
@@ -28,7 +28,7 @@
 		<tr>
 			<td title="Total including disabled, spammer and user_enabled = disabled users">
 				<strong>
-				{#PLIKLI_Statistics_Widget_Front_Members#}:
+				{#KAHUK_Statistics_Widget_Front_Members#}:
 				</strong>
 			</td>
 			<td>
@@ -40,7 +40,7 @@
 		<tr>
 			<td style="padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_Front_Members_Admins#}:
+				{#KAHUK_Statistics_Widget_Front_Members_Admins#}:
 				</strong>
 			</td>
 			<td>
@@ -52,7 +52,7 @@
 		<tr>
 			<td style="padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_Front_Members_Moderators#}:
+				{#KAHUK_Statistics_Widget_Front_Members_Moderators#}:
 				</strong>
 			</td>
 			<td>
@@ -64,7 +64,7 @@
 		<tr>
 			<td style="padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_Front_Members_Normal#}:
+				{#KAHUK_Statistics_Widget_Front_Members_Normal#}:
 				</strong>
 			</td>
 			<td>
@@ -76,7 +76,7 @@
 		<tr>
 			<td style="{if $moderated_users_count gt 0}background-color:#d9534f;{/if}padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_Front_Members_Disabled#}:
+				{#KAHUK_Statistics_Widget_Front_Members_Disabled#}:
 				</strong>
 			</td>
 			<td {if $moderated_users_count gt 0}style="background-color:#d9534f"{/if}>
@@ -88,7 +88,7 @@
 		<tr>
 			<td style="{if $spammer_users_count gt 0}background-color:#d9534f;{/if}padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_Front_Members_Spammers#}:
+				{#KAHUK_Statistics_Widget_Front_Members_Spammers#}:
 				</strong>
 			</td>
 			<td {if $spammer_users_count gt 0}style="background-color:#d9534f"{/if}>
@@ -102,7 +102,7 @@
 		<tr>
 			<td>
 				<strong>
-				{#PLIKLI_Statistics_Widget_Front_Groups#}:
+				{#KAHUK_Statistics_Widget_Front_Groups#}:
 				</strong>
 			</td>
 			<td>
@@ -114,7 +114,7 @@
 		<tr>
 			<td style="padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_Front_Groups_Enabled#}:
+				{#KAHUK_Statistics_Widget_Front_Groups_Enabled#}:
 				</strong>
 			</td>
 			<td>
@@ -126,7 +126,7 @@
 		<tr>
 			<td style="{if $disabled_groups_count gt 0}background-color:#d9534f;{/if}padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_Front_Groups_Disabled#}:
+				{#KAHUK_Statistics_Widget_Front_Groups_Disabled#}:
 				</strong>
 			</td>
 			<td {if $disabled_groups_count gt 0}style="background-color:#d9534f"{/if}>
@@ -138,7 +138,7 @@
 		<tr>
 			<td>
 				<strong>
-				{#PLIKLI_Statistics_Widget_Front_Submissions#}:
+				{#KAHUK_Statistics_Widget_Front_Submissions#}:
 				</strong>
 			</td>
 			<td>
@@ -150,7 +150,7 @@
 		<tr>
 			<td style="padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_Front_Published#}:
+				{#KAHUK_Statistics_Widget_Front_Published#}:
 				</strong>
 			</td>
 			<td>
@@ -162,7 +162,7 @@
 		<tr>
 			<td style="padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_Front_New#}:
+				{#KAHUK_Statistics_Widget_Front_New#}:
 				</strong>
 			</td>
 			<td>
@@ -174,7 +174,7 @@
 		<tr>
 			<td style="{if $draft_submissions_count gt 0}background-color:#d9534f;{/if}padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_Front_Draft#}:
+				{#KAHUK_Statistics_Widget_Front_Draft#}:
 				</strong>
 			</td>
 			<td {if $draft_submissions_count gt 0}style="background-color:#d9534f"{/if}>
@@ -186,7 +186,7 @@
 		<tr>
 			<td style="{if $scheduled_submissions_count gt 0}background-color:#d9534f;{/if}padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_Front_Scheduled#}:
+				{#KAHUK_Statistics_Widget_Front_Scheduled#}:
 				</strong>
 			</td>
 			<td {if $scheduled_submissions_count gt 0}style="background-color:#d9534f"{/if}>
@@ -198,7 +198,7 @@
 		<tr>
 			<td style="{if $moderated_submissions_count gt 0}background-color:#d9534f;{/if}padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_Front_Moderated#}:
+				{#KAHUK_Statistics_Widget_Front_Moderated#}:
 				</strong>
 			</td>
 			<td {if $moderated_submissions_count gt 0}style="background-color:#d9534f"{/if}>
@@ -210,7 +210,7 @@
 		<tr>
 			<td style="{if $discarded_submissions_count gt 0}background-color:#d9534f;{/if}padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_Front_Discarded#}:
+				{#KAHUK_Statistics_Widget_Front_Discarded#}:
 				</strong>
 			</td>
 			<td {if $discarded_submissions_count gt 0}style="background-color:#d9534f"{/if}>
@@ -222,7 +222,7 @@
 		<tr>
 			<td style="{if $spam_submissions_count gt 0}background-color:#d9534f;{/if}padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_Front_Spam#}:
+				{#KAHUK_Statistics_Widget_Front_Spam#}:
 				</strong>
 			</td>
 			<td {if $spam_submissions_count gt 0}style="background-color:#d9534f"{/if}>
@@ -234,7 +234,7 @@
 		<tr>
 			<td style="{if $abuse_submissions_count gt 0}background-color:#d9534f;{/if}padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_Front_Abuse#}:
+				{#KAHUK_Statistics_Widget_Front_Abuse#}:
 				</strong>
 			</td>
 			<td {if $abuse_submissions_count gt 0}style="background-color:#d9534f"{/if}>
@@ -246,7 +246,7 @@
 		<tr>
 			<td style="{if $duplicate_submissions_count gt 0}background-color:#d9534f;{/if}padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_Front_Duplicate#}:
+				{#KAHUK_Statistics_Widget_Front_Duplicate#}:
 				</strong>
 			</td>
 			<td {if $duplicate_submissions_count gt 0}style="background-color:#d9534f"{/if}>
@@ -258,7 +258,7 @@
 		<tr>
 			<td style="{if $page_submissions_count gt 0}background-color:#d9534f;{/if}padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_Front_Page#}:
+				{#KAHUK_Statistics_Widget_Front_Page#}:
 				</strong>
 			</td>
 			<td {if $page_submissions_count gt 0}style="background-color:#d9534f"{/if}>
@@ -270,7 +270,7 @@
 		<tr>
 			<td>
 				<strong>
-				{#PLIKLI_Statistics_Widget_Front_Votes#}:
+				{#KAHUK_Statistics_Widget_Front_Votes#}:
 				</strong>
 			</td>
 			<td>
@@ -282,7 +282,7 @@
 		<tr>
 			<td style="padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_Front_Votes_links_Upvoted#}:
+				{#KAHUK_Statistics_Widget_Front_Votes_links_Upvoted#}:
 				</strong>
 			</td>
 			<td>
@@ -294,7 +294,7 @@
 		<tr>
 			<td style="padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_Front_Votes_links_Downvoted#}:
+				{#KAHUK_Statistics_Widget_Front_Votes_links_Downvoted#}:
 				</strong>
 			</td>
 			<td>
@@ -306,7 +306,7 @@
 		<tr>
 			<td style="padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_Front_Votes_Comments_Upvoted#}:
+				{#KAHUK_Statistics_Widget_Front_Votes_Comments_Upvoted#}:
 				</strong>
 			</td>
 			<td>
@@ -318,7 +318,7 @@
 		<tr>
 			<td style="padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_Front_Votes_Comments_Downvoted#}:
+				{#KAHUK_Statistics_Widget_Front_Votes_Comments_Downvoted#}:
 				</strong>
 			</td>
 			<td>
@@ -330,7 +330,7 @@
 		<tr>
 			<td>
 				<strong>
-				{#PLIKLI_Statistics_Widget_Front_Comments#}:
+				{#KAHUK_Statistics_Widget_Front_Comments#}:
 				</strong>
 			</td>
 			<td>
@@ -342,7 +342,7 @@
 		<tr>
 			<td style="padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_Front_Published#}:
+				{#KAHUK_Statistics_Widget_Front_Published#}:
 				</strong>
 			</td>
 			<td>
@@ -354,7 +354,7 @@
 		<tr>
 			<td style="{if $moderated_comments_count gt 0}background-color:#d9534f;{/if}padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_Front_Moderated#}:
+				{#KAHUK_Statistics_Widget_Front_Moderated#}:
 				</strong>
 			</td>
 			<td {if $moderated_comments_count gt 0}style="background-color:#d9534f"{/if}>
@@ -366,7 +366,7 @@
 		<tr>
 			<td style="{if $discarded_comments_count gt 0}background-color:#d9534f;{/if}padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_Front_Discarded#}:
+				{#KAHUK_Statistics_Widget_Front_Discarded#}:
 				</strong>
 			</td>
 			<td {if $discarded_comments_count gt 0}style="background-color:#d9534f"{/if}>
@@ -378,7 +378,7 @@
 		<tr>
 			<td style="{if $spam_comments_count gt 0}background-color:#d9534f;{/if}padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_Front_Spam#}:
+				{#KAHUK_Statistics_Widget_Front_Spam#}:
 				</strong>
 			</td>
 			<td {if $spam_comments_count gt 0}style="background-color:#d9534f"{/if}>
@@ -390,7 +390,7 @@
 		<tr>
 			<td>
 				<strong>
-				{#PLIKLI_Statistics_Widget_System_Information#}
+				{#KAHUK_Statistics_Widget_System_Information#}
 				</strong>
 			</td>
 			<td>
@@ -401,7 +401,7 @@
 		<tr>
 			<td style="padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_Server_Name#}
+				{#KAHUK_Statistics_Widget_Server_Name#}
 				</strong>
 			</td>
 			<td>
@@ -412,7 +412,7 @@
 		<tr>
 			<td style="padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_Operating_System#}
+				{#KAHUK_Statistics_Widget_Operating_System#}
 				</strong>
 			</td>
 			<td>
@@ -423,7 +423,7 @@
 		<tr>
 			<td style="padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_System_Architecture#}
+				{#KAHUK_Statistics_Widget_System_Architecture#}
 				</strong>
 			</td>
 			<td>
@@ -433,7 +433,7 @@
 		<tr>
 			<td style="padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_System_Release_kernel#}
+				{#KAHUK_Statistics_Widget_System_Release_kernel#}
 				</strong>
 			</td>
 			<td>
@@ -444,7 +444,7 @@
 		<tr>
 			<td style="padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_Version_Information#}
+				{#KAHUK_Statistics_Widget_Version_Information#}
 				</strong>
 			</td>
 			<td>
@@ -455,7 +455,7 @@
 		<tr>
 			<td style="padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_Apache_Version#}
+				{#KAHUK_Statistics_Widget_Apache_Version#}
 				</strong>
 			</td>
 			<td>
@@ -466,7 +466,7 @@
 		<tr>
 			<td style="padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_System_Home_Web_Directory#}
+				{#KAHUK_Statistics_Widget_System_Home_Web_Directory#}
 				</strong>
 			</td>
 			<td>
@@ -477,7 +477,7 @@
 		<tr>
 			<td style="padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_PHP_Version#}:
+				{#KAHUK_Statistics_Widget_PHP_Version#}:
 				</strong>
 			</td>
 			<td>
@@ -494,7 +494,7 @@
 		<tr>
 			<td style="padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_MySQL_Server_Version#}:
+				{#KAHUK_Statistics_Widget_MySQL_Server_Version#}:
 				</strong>
 			</td>
 			<td>
@@ -523,7 +523,7 @@
 		<tr>
 			<td style="padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_MySQL_Client_Version#}:
+				{#KAHUK_Statistics_Widget_MySQL_Client_Version#}:
 				</strong>
 			</td>
 			<td>
@@ -546,7 +546,7 @@
 		<tr>
 			<td style="padding-left:40px">
 				<strong>
-				{#PLIKLI_Statistics_Widget_DB_Size#}:
+				{#KAHUK_Statistics_Widget_DB_Size#}:
 				</strong>
 			</td>
 			<td>
@@ -560,6 +560,6 @@
 		
 		
 	{/if}
-	{checkActionsTpl location="tpl_plikli_admin_stats_widget_intable"}
+	{checkActionsTpl location="tpl_kahuk_admin_stats_widget_intable"}
 </table>
-{checkActionsTpl location="tpl_plikli_admin_stats_widget_end"}
+{checkActionsTpl location="tpl_kahuk_admin_stats_widget_end"}

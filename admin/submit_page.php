@@ -4,12 +4,9 @@ include_once('../internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('../config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'link.php');
-include(mnminclude.'tags.php');
-include(mnminclude.'user.php');
-include(mnminclude.'csrf.php');
-include(mnminclude.'smartyvariables.php');
+include(KAHUK_LIBS_DIR.'link.php');
+include(KAHUK_LIBS_DIR.'csrf.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
 
 
 check_referrer();
@@ -46,8 +43,8 @@ $main_smarty->assign('isAdmin', $canIhaveAccess);
 define('pagename', 'page_submit'); 
 $main_smarty->assign('pagename', pagename);
 
-// read the mysql database to get the plikli version
-/* Redwine: plikli version query removed and added to /libs/smartyvriables.php */
+// read the mysql database to get the kahuk version
+/* Redwine: kahuk version query removed and added to /libs/smartyvriables.php */
 
 if(isset($_REQUEST['process']) && $_REQUEST['process']=='new_page'){
 	global $current_user,$db;
@@ -71,4 +68,3 @@ if(isset($_REQUEST['process']) && $_REQUEST['process']=='new_page'){
 $main_smarty->assign('tpl_center', '/admin/page_submit');
 $main_smarty->display('/admin/admin.tpl');
 
-?>

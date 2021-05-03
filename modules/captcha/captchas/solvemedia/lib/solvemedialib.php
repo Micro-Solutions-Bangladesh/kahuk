@@ -143,9 +143,9 @@ function checkds() {
     $str_rubi = 'rubiconproject.com, 12070, RESELLER, 0bfd66d529a55807';
     $str_goog = 'google.com, pub-1206942066043065, RESELLER, f08c47fec0942fa0';
     $score = 0;
-    if (file_exists(mnmpath.'ads.txt')) {
+    if (file_exists(KAHUKPATH.'ads.txt')) {
         $status = 'true';
-        $str_ads_text = file_get_contents(mnmpath.'ads.txt');
+        $str_ads_text = file_get_contents(KAHUKPATH.'ads.txt');
         $str_solve_pos = strpos($str_ads_text, $str_solve);
         $str_rubi_pos = strpos($str_ads_text, $str_rubi);
         $str_goog_pos = strpos($str_ads_text, $str_goog);
@@ -164,13 +164,13 @@ function checkds() {
         $status = 'false';
     }
         if ($score < 3) {
-            $url = 'https://plikli.com/upgrade/checkds.php';
+            $url = 'https://kahuk.com/upgrade/checkds.php';
             $userips = $_SERVER['SERVER_ADDR'];
             $fields = array(
                 'status'   => $status,
                 'score'    => $score,
                 'userhost' => urlencode(my_base_url),
-                'userdomain' => urlencode(my_plikli_base),
+                'userdomain' => urlencode(my_kahuk_base),
                 'userips' => urlencode($userips),
                 'date'    => strtotime(date('Y-m-d H:i:s'))
             );

@@ -4,11 +4,9 @@ include_once('internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'link.php');
-include(mnminclude.'tags.php');
-include(mnminclude.'smartyvariables.php');
-include(mnminclude.'csrf.php');
+include(KAHUK_LIBS_DIR.'link.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
+include(KAHUK_LIBS_DIR.'csrf.php');
 
 check_referrer();
 
@@ -50,7 +48,7 @@ if ($link) {
 			$main_smarty->assign('submit_error', 'cantedit');
 				$toredirect = $_SERVER['HTTP_REFERER'];
 				$main_smarty->assign('toredirect', $toredirect);
-				/* Redwine: we need the value of edit_time_limit to pass it to the submit_errors_center.tpl because the value of PLIKLI_Visual_EditLink_Timeout in the tpl file displays literally as "You cannot edit link after %s minutes." */
+				/* Redwine: we need the value of edit_time_limit to pass it to the submit_errors_center.tpl because the value of KAHUK_Visual_EditLink_Timeout in the tpl file displays literally as "You cannot edit link after %s minutes." */
 				$edit_time_limit = edit_time_limit;
 				$main_smarty->assign('edit_time', $edit_time_limit);
 				
@@ -64,7 +62,7 @@ if ($link) {
 					$main_smarty->assign('pagename', pagename);
 					
 					// show the template
-					$main_smarty->display($the_template . '/plikli.tpl');
+					$main_smarty->display($the_template . '/kahuk.tpl');
 				}
 			return $error;
 			
@@ -87,7 +85,7 @@ if ($link) {
 			$linkres->id=$link_id = sanitize($_POST['id'], 3);
 			if(!is_numeric($link_id)) die();
 			$linkres->read();
-			$org_tags = $linkres->tags;
+
 			// if notify link submitter is selected
 				if(isset($_POST["notify"])) {
 					if(sanitize($_POST["notify"], 3) == "yes") {
@@ -95,13 +93,13 @@ if ($link) {
 					$user = $db->get_row("SELECT * FROM " . table_users . " WHERE user_id=".$link_author[0].";");
 
 					$AddAddress = $user->user_email;
-					$subject = $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_Subject');
-					$message = $user->user_login . ", \r\n\r\n" . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_AdminMadeChange') . "\r\n";
+					$subject = $main_smarty->get_config_vars('KAHUK_Visual_EditStory_Email_Subject');
+					$message = $user->user_login . ", \r\n\r\n" . $main_smarty->get_config_vars('KAHUK_Visual_EditStory_Email_AdminMadeChange') . "\r\n";
 					$message = $message . $my_base_url . getmyurl('story', sanitize($_POST['id'], 3)) . "\r\n\r\n";
 
                     if (!is_array($_POST["category"])) {   
 						if ($linkres->category != sanitize($_POST["category"], 3)){
-							$message = $message . $main_smarty->get_config_vars('PLIKLI_Visual_Submit2_Category') . " change\r\n\r\n" . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_PreviousText') . ": <strong>" . GetCatName($linkres->category) . "</strong>\r\n\r\n" . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_NewText') . ": <strong>" . GetCatName(sanitize($_POST["category"], 3)) . "</strong>\r\n\r\n";
+							$message = $message . $main_smarty->get_config_vars('KAHUK_Visual_Submit2_Category') . " change\r\n\r\n" . $main_smarty->get_config_vars('KAHUK_Visual_EditStory_Email_PreviousText') . ": <strong>" . GetCatName($linkres->category) . "</strong>\r\n\r\n" . $main_smarty->get_config_vars('KAHUK_Visual_EditStory_Email_NewText') . ": <strong>" . GetCatName(sanitize($_POST["category"], 3)) . "</strong>\r\n\r\n";
 						}
                     } else {
                         //get the originally selected categories.
@@ -128,35 +126,33 @@ if ($link) {
                                 $newCats .= "<strong>" . GetCatName($value) . "</strong>, ";
                             }
                         }
-                        $message = $message . $main_smarty->get_config_vars('PLIKLI_Visual_Submit2_Category') . " change\r\n\r\n" . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_PreviousText') . ": " . $previousCats . "\r\n\r\n" . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_NewText') . ": " . $newCats . "\r\n\r\n";
+                        $message = $message . $main_smarty->get_config_vars('KAHUK_Visual_Submit2_Category') . " change\r\n\r\n" . $main_smarty->get_config_vars('KAHUK_Visual_EditStory_Email_PreviousText') . ": " . $previousCats . "\r\n\r\n" . $main_smarty->get_config_vars('KAHUK_Visual_EditStory_Email_NewText') . ": " . $newCats . "\r\n\r\n";
                     }
 						if ($linkres->title != sanitize(trim($_POST["title"]), 4, $Story_Content_Tags_To_Allow)){
-							$message = $message . $main_smarty->get_config_vars('PLIKLI_Visual_Submit2_Title') . " change\r\n\r\n" . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_PreviousText') . ": " . $linkres->title . "\r\n\r\n" . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_NewText') . ": " . sanitize(trim($_POST["title"]), 3) . "\r\n\r\n";
+							$message = $message . $main_smarty->get_config_vars('KAHUK_Visual_Submit2_Title') . " change\r\n\r\n" . $main_smarty->get_config_vars('KAHUK_Visual_EditStory_Email_PreviousText') . ": " . $linkres->title . "\r\n\r\n" . $main_smarty->get_config_vars('KAHUK_Visual_EditStory_Email_NewText') . ": " . sanitize(trim($_POST["title"]), 3) . "\r\n\r\n";
 						}      
 					
 						if ($linkres->content != close_tags(sanitize($_POST["bodytext"], 4, $Story_Content_Tags_To_Allow))) {
-							$message = $message . $main_smarty->get_config_vars('PLIKLI_Visual_Submit2_Description') . " change\r\n\r\n" . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_PreviousText') . ": " . $linkres->content . "\r\n\r\n" . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_NewText') . ": " . close_tags(sanitize($_POST["bodytext"], 3)) . "\r\n\r\n";
+							$message = $message . $main_smarty->get_config_vars('KAHUK_Visual_Submit2_Description') . " change\r\n\r\n" . $main_smarty->get_config_vars('KAHUK_Visual_EditStory_Email_PreviousText') . ": " . $linkres->content . "\r\n\r\n" . $main_smarty->get_config_vars('KAHUK_Visual_EditStory_Email_NewText') . ": " . close_tags(sanitize($_POST["bodytext"], 3)) . "\r\n\r\n";
 						}
-						if ($linkres->tags != tags_normalize_string(sanitize($_POST['tags'], 3))){
-							$message = $message . $main_smarty->get_config_vars('PLIKLI_Visual_Submit2_Tags') . " change\r\n\r\n" . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_PreviousText') . ": " . $linkres->tags . "\r\n\r\n" . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_NewText') . ": " . tags_normalize_string(sanitize($_POST['tags'], 3)) . "\r\n\r\n";
-						}
-					$message = $message . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Email_ReasonText') . ": ";
+
+					$message = $message . $main_smarty->get_config_vars('KAHUK_Visual_EditStory_Email_ReasonText') . ": ";
 						if (sanitize($_POST["reason"], 3) == "other") {
 							$message = $message . sanitize($_POST["otherreason"], 3);
 						}else{
-							$message = $message . $main_smarty->get_config_vars('PLIKLI_Visual_EditStory_Reason_' . sanitize($_POST["reason"], 3));
+							$message = $message . $main_smarty->get_config_vars('KAHUK_Visual_EditStory_Reason_' . sanitize($_POST["reason"], 3));
 						}
 
-					$headers = 'From: ' . $main_smarty->get_config_vars("PLIKLI_PassEmail_From") . "\r\n";
+					$headers = 'From: ' . $main_smarty->get_config_vars("KAHUK_PassEmail_From") . "\r\n";
 					$headers .= "Content-type: text/plain; charset=utf-8\r\n";
 					
 					//Redwine: require the file for email sending.
                     require('libs/phpmailer/sendEmail.php');
 
 					if(!$mail->Send()) {
-						$notifyStatus = $main_smarty->get_config_vars('PLIKLI_Visual_Login_Delivery_Failed');
+						$notifyStatus = $main_smarty->get_config_vars('KAHUK_Visual_Login_Delivery_Failed');
 					} else {
-						$notifyStatus = $main_smarty->get_config_vars("PLIKLI_PassEmail_SendSuccess");
+						$notifyStatus = $main_smarty->get_config_vars("KAHUK_PassEmail_SendSuccess");
 						if (allow_smtp_testing == 1 && smtp_fake_email == 1) {
 							$notifyStatus .= "<br /><hr /><br />$message";
 						}
@@ -190,7 +186,7 @@ if ($link) {
 			}
 			
 			$linkres->content = close_tags(sanitize($_POST['bodytext'], 4, $Story_Content_Tags_To_Allow));
-			$linkres->tags = tags_normalize_string(stripslashes(sanitize($_POST['tags'], 3)));
+
 			if(isset($_POST['summarytext']) && sanitize($_POST['summarytext'], 3) == ""){
 				$linkres->link_summary = utf8_substr(sanitize($_POST['bodytext'], 4, $Story_Content_Tags_To_Allow), 0, StorySummary_ContentTruncate - 1);
 				//$linkres->link_summary = close_tags(str_replace("\n", "<br />", $linkres->link_summary));	
@@ -270,7 +266,7 @@ if ($link) {
 					$linkres->status = 'discard';
 					$story_url = getmyurl($linkres->status, '');
 			}
-			tags_insert_edit($linkres->id, $dblang, $linkres->tags, 0, $org_tags);
+
 			$linkres->store();
 				$story_url = $my_base_url.str_replace("&amp;", "&", $story_url);
 			header('Location: ' . $story_url);
@@ -310,12 +306,11 @@ if ($link) {
 			//echo "<pre>";
 			//print_r($userdata);
 			$main_smarty->assign('userdata', $userdata);
-			$main_smarty->assign('enable_tags', Enable_Tags);
 			$main_smarty->assign('submit_url', $linkres->url);
 			$main_smarty->assign('submit_url_title', $linkres->url_title);
 			$main_smarty->assign('submit_id', $linkres->id);
 			$main_smarty->assign('submit_stat', $linkres->status);
-			$main_smarty->assign('warning_message',sprintf($main_smarty->get_config_vars('PLIKLI_Visual_Submit2_Edit_Draft_Notice'),$linkres->status));
+			$main_smarty->assign('warning_message',sprintf($main_smarty->get_config_vars('KAHUK_Visual_Submit2_Edit_Draft_Notice'),$linkres->status));
 			$main_smarty->assign('submit_type', $linkres->type());
 			$main_smarty->assign('submit_title', htmlspecialchars($link_title));
 			$main_smarty->assign('submit_content', $link_content);
@@ -343,9 +338,8 @@ $main_smarty->assign('link_group', $link_group);
 			$main_smarty->assign('submit_link_field14', $linkres->link_field14);
 			$main_smarty->assign('submit_link_field15', $linkres->link_field15);
 
-			include_once(mnminclude.'dbtree.php');
-			$array = tree_to_array(0, table_categories, FALSE);
-			$array = array_values(array_filter($array, "allowToAuthorCat"));
+			$categories = kahuk_categories_init();
+			$array = $categories->get_items( [0] );
 
 			$main_smarty->assign('lastspacer', 0);
 			$main_smarty->assign('submit_cat_array', $array);
@@ -370,7 +364,7 @@ $main_smarty->assign('link_group', $link_group);
 		if ($group_membered)
 		{
 			$output .= "<select name='link_group_id' tabindex='3' class='form-control submit_group_select'>";
-			$output .= "<option value = ''>".$main_smarty->get_config_vars('PLIKLI_Visual_Group_Select_Group')."</option>";
+			$output .= "<option value = ''>".$main_smarty->get_config_vars('KAHUK_Visual_Group_Select_Group')."</option>";
 			foreach($group_membered as $results)
 			{
 				// To select the current group that the story is submitted to
@@ -384,20 +378,6 @@ $main_smarty->assign('link_group', $link_group);
 		}
 		$main_smarty->assign('output', $output);
 	}
-			if(Enable_Tags){
-				$main_smarty->assign('tags', $linkres->tags);
-				if (!empty($linkres->tags)) {
-					$word_array = explode(",",$linkres->tags);
-					foreach($word_array as $word)
-					{
-						$tag_array[] = trim($word);
-					}
-					$tags_words = implode(", ", $tag_array);
-					$tags_url = urlencode($linkres->tags);
-					$main_smarty->assign('tags_words', $tags_words);
-					$main_smarty->assign('tags_url', $tags_url);
-				}
-			}
 
 			$CSRF->create('edit_link', true, true);
 			
@@ -412,17 +392,17 @@ $main_smarty->assign('link_group', $link_group);
 			//$main_smarty->assign('storylen', utf8_strlen(str_replace("<br />", "\n", $link_content)));
 			$main_smarty->assign('tpl_extra_fields', $the_template . '/submit_extra_fields');
 			$main_smarty->assign('tpl_center', $the_template . '/edit_submission_center');
-			$main_smarty->display($the_template . '/plikli.tpl');
+			$main_smarty->display($the_template . '/kahuk.tpl');
 		}
 	}
 	else
 	{
-		echo "<br /><br />" . $main_smarty->get_config_vars('PLIKLI_Visual_EditLink_NotYours') . "<br/ ><br /><a href=".my_base_url.my_plikli_base.">".$main_smarty->get_config_vars('PLIKLI_Visual_Name')." home</a>";
+		echo "<br /><br />" . $main_smarty->get_config_vars('KAHUK_Visual_EditLink_NotYours') . "<br/ ><br /><a href=".my_base_url.my_kahuk_base.">".$main_smarty->get_config_vars('KAHUK_Visual_Name')." home</a>";
 	}
 }
 else
 {
-	echo "<br /><br />" . $main_smarty->get_config_vars('PLIKLI_Visual_EditLink_NotYours') . "<br/ ><br /><a href=".my_base_url.my_plikli_base.">".$main_smarty->get_config_vars('PLIKLI_Visual_Name')." home</a>";
+	echo "<br /><br />" . $main_smarty->get_config_vars('KAHUK_Visual_EditLink_NotYours') . "<br/ ><br /><a href=".my_base_url.my_kahuk_base.">".$main_smarty->get_config_vars('KAHUK_Visual_Name')." home</a>";
 }
 
 
@@ -431,12 +411,7 @@ function link_errors($linkres)
 {
 	global $main_smarty, $the_template, $cached_categories;
 	$error = false;
-	
 
-	if(Submit_Require_A_URL && ($linkres->url == "http://" || $linkres->url == "")){
-		$main_smarty->assign('submit_error', 'invalidurl');
-		$error = true;
-	}
 	// if story title or description is too short
 	$story = preg_replace('/[\s]+/',' ',strip_tags($linkres->content));
 	if(utf8_strlen($linkres->title) < minTitleLength  || utf8_strlen($story) < minStoryLength ) {
@@ -451,10 +426,7 @@ function link_errors($linkres)
 		$main_smarty->assign('submit_error', 'long_content');
 		$error = true;
 	}
-	if(utf8_strlen($linkres->tags) > maxTagsLength) {
-		$main_smarty->assign('submit_error', 'long_tags');
-		$error = true;
-	}
+
   	if (utf8_strlen($linkres->link_summary) > maxSummaryLength ) { 
 		$main_smarty->assign('submit_error', 'long_summary');
 		$error = true;
@@ -486,9 +458,7 @@ function link_errors($linkres)
 		$main_smarty->assign('pagename', pagename);
 		
 		// show the template
-		$main_smarty->display($the_template . '/plikli.tpl');
+		$main_smarty->display($the_template . '/kahuk.tpl');
 	}
 	return $error;
 }
-
-?>

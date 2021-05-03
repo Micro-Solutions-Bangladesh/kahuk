@@ -4,11 +4,9 @@ include_once('internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'link.php');
-//include(mnminclude.'tags.php');
-include(mnminclude.'search.php');
-include(mnminclude.'smartyvariables.php');
+include(KAHUK_LIBS_DIR.'link.php');
+include(KAHUK_LIBS_DIR.'search.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
 
 // start a new search
 $search=new Search();
@@ -175,7 +173,7 @@ if($page_name=='group_story'){
 
 if($load_page==1){
 	$fetch_link_summary = true;
-	include(mnminclude.'link_summary.php'); // this is the code that show the links / stories
+	include(KAHUK_LIBS_DIR.'link_summary.php'); // this is the code that show the links / stories
 	//$main_smarty->assign('link_pagination', do_pages($rows, $page_size, "published", true));
 
 	echo $link_summary_output;
@@ -210,4 +208,3 @@ function gen_query_forCatId($catId){
 		
 	 return $from_where	;	
 }
-?>

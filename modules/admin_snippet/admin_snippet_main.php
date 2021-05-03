@@ -7,13 +7,11 @@ function admin_snippet_fill_smarty($vars){
 
 
 function admin_snippet_showpage(){
-	global $db, $main_smarty, $the_template;
+	global $db, $main_smarty;
 		
 	include_once('config.php');
-	include_once(mnminclude.'html1.php');
-	include_once(mnminclude.'link.php');
-	include_once(mnminclude.'tags.php');
-	include_once(mnminclude.'smartyvariables.php');
+	include_once(KAHUK_LIBS_DIR.'link.php');
+	include_once(KAHUK_LIBS_DIR.'smartyvariables.php');
 	
 	//$main_smarty = do_sidebar($main_smarty);
 
@@ -24,12 +22,12 @@ function admin_snippet_showpage(){
 	if($canIhaveAccess == 1)
 	{	
 		// breadcrumbs
-			$navwhere['text1'] = $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel');
+			$navwhere['text1'] = $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel');
 			$navwhere['link1'] = getmyurl('admin', '');
 			$navwhere['text2'] = "Modify Snippet";
-			$navwhere['link2'] = my_plikli_base . "/module.php?module=admin_snippet";
+			$navwhere['link2'] = my_kahuk_base . "/module.php?module=admin_snippet";
 			$main_smarty->assign('navbar_where', $navwhere);
-			$main_smarty->assign('posttitle', " | " . $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel'));
+			$main_smarty->assign('posttitle', " | " . $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel'));
 		// breadcrumbs
 		//Method for identifying modules rather than pagename
 		define('modulename', 'admin_snippet'); 
@@ -50,9 +48,9 @@ function admin_snippet_showpage(){
 					$snippet_name = $db->escape(sanitize($_POST['snippet_name'],4));
 					$snippet_location = $db->escape(sanitize($_POST['snippet_location'],4));
 					$snippet_content  = $db->escape($_POST['snippet_content']);
-					$db->query("INSERT INTO ".table_prefix."snippets (snippet_name,snippet_location,snippet_updated,snippet_order,snippet_content) 
+					$db->query("INSERT INTO ".TABLE_PREFIX."snippets (snippet_name,snippet_location,snippet_updated,snippet_order,snippet_content) 
 						   VALUES ('$snippet_name','$snippet_location',NOW(),'1','$snippet_content')");
-					header("Location: ".my_plikli_base."/module.php?module=admin_snippet");
+					header("Location: ".my_kahuk_base."/module.php?module=admin_snippet");
 					die();
 			    }
 			}
@@ -74,20 +72,20 @@ function admin_snippet_showpage(){
 					$snippet_location = $db->escape(sanitize($_POST['snippet_location'],4));
 					$snippet_content  = $db->escape($_POST['snippet_content']);
 					$snippet_status  = $db->escape($_POST['snippet_status']);
-					$db->query("UPDATE ".table_prefix."snippets SET snippet_name='$snippet_name', snippet_location='$snippet_location', snippet_content='$snippet_content', snippet_updated=NOW(), snippet_status=$snippet_status WHERE snippet_id='$snippet_id'");
-					header("Location: ".my_plikli_base."/module.php?module=admin_snippet");
+					$db->query("UPDATE ".TABLE_PREFIX."snippets SET snippet_name='$snippet_name', snippet_location='$snippet_location', snippet_content='$snippet_content', snippet_updated=NOW(), snippet_status=$snippet_status WHERE snippet_id='$snippet_id'");
+					header("Location: ".my_kahuk_base."/module.php?module=admin_snippet");
 					die();
 			    }
 			}
 	
 			// Check ID
 			if(!is_numeric($_GET['id'])) {
-				header("Location: ".my_plikli_base."/module.php?module=admin_snippet");
+				header("Location: ".my_kahuk_base."/module.php?module=admin_snippet");
 				die();
 			} else {
-				$snippet = $db->get_row("SELECT * FROM ".table_prefix."snippets WHERE snippet_id={$_GET['id']}");
+				$snippet = $db->get_row("SELECT * FROM ".TABLE_PREFIX."snippets WHERE snippet_id={$_GET['id']}");
 				if (!$snippet->snippet_id) {
-					header("Location: ".my_plikli_base."/module.php?module=admin_snippet");
+					header("Location: ".my_kahuk_base."/module.php?module=admin_snippet");
 					die();
 				}
 				$main_smarty->assign("snippet",(array)$snippet);
@@ -106,7 +104,7 @@ function admin_snippet_showpage(){
     			echo "<?xml version=\"1.0\"?>\r\n";
 				echo "<data>\r\n";
 
-				$snippets = $db->get_results("SELECT * FROM ".table_prefix."snippets WHERE snippet_id IN(".join(",",array_keys($_POST["snippet_delete"])).")",ARRAY_A);
+				$snippets = $db->get_results("SELECT * FROM ".TABLE_PREFIX."snippets WHERE snippet_id IN(".join(",",array_keys($_POST["snippet_delete"])).")",ARRAY_A);
 				foreach ($snippets as $snippet)
 				{
 				    echo "\t<snippet>\r\n";
@@ -120,23 +118,23 @@ function admin_snippet_showpage(){
 				die();
 			}
 
-			header("Location: ".my_plikli_base."/module.php?module=admin_snippet");
+			header("Location: ".my_kahuk_base."/module.php?module=admin_snippet");
 			die();
 		// Delete selected
 		} elseif(isset($_POST['delete'])) { 
 			if (sizeof($_POST["snippet_delete"]))
-				$db->query("DELETE FROM ".table_prefix."snippets WHERE snippet_id IN(".join(",",array_keys($_POST["snippet_delete"])).")");
+				$db->query("DELETE FROM ".TABLE_PREFIX."snippets WHERE snippet_id IN(".join(",",array_keys($_POST["snippet_delete"])).")");
 
-			header("Location: ".my_plikli_base."/module.php?module=admin_snippet");
+			header("Location: ".my_kahuk_base."/module.php?module=admin_snippet");
 			die();
 		// Update orders
 		} elseif(isset($_POST['update'])) {
 			if (sizeof($_POST["snippet_order"]))
 			    foreach ($_POST["snippet_order"] AS $k => $v)
 				if (is_numeric($k) && is_numeric($v))
-					$db->query("UPDATE ".table_prefix."snippets SET snippet_order='$v' WHERE snippet_id='$k'");
+					$db->query("UPDATE ".TABLE_PREFIX."snippets SET snippet_order='$v' WHERE snippet_id='$k'");
 
-			header("Location: ".my_plikli_base."/module.php?module=admin_snippet");
+			header("Location: ".my_kahuk_base."/module.php?module=admin_snippet");
 			die();
 		// Display the list
 		} else {
@@ -158,10 +156,10 @@ function admin_snippet_showpage(){
 					    	$snippet_location = $db->escape($m[1]);
 					    if (preg_match('/<content>(<!\[CDATA\[)?(.+?)(\]\]>)?<\/content>/is',$snippet,$m))
 					    	$snippet_content = $db->escape($m[2]);
-					    $db->query("INSERT INTO ".table_prefix."snippets (snippet_name,snippet_location,snippet_updated,snippet_order,snippet_content) 
+					    $db->query("INSERT INTO ".TABLE_PREFIX."snippets (snippet_name,snippet_location,snippet_updated,snippet_order,snippet_content) 
 							   VALUES ('$snippet_name','$snippet_location',NOW(),'1','$snippet_content')");
 					}
-					header("Location: ".my_plikli_base."/module.php?module=admin_snippet");
+					header("Location: ".my_kahuk_base."/module.php?module=admin_snippet");
 					die();
 				    }
 				    else
@@ -176,7 +174,7 @@ function admin_snippet_showpage(){
 		   	    $main_smarty->assign('snippet_error',$error);
 		    	}
 
-	 		$filtered = $db->get_results("SELECT * FROM ".table_prefix."snippets ORDER BY snippet_location, snippet_order");
+	 		$filtered = $db->get_results("SELECT * FROM ".TABLE_PREFIX."snippets ORDER BY snippet_location, snippet_order");
 			if ($filtered)
 			{
 			    foreach($filtered as $dbfiltered) 
@@ -194,4 +192,3 @@ function admin_snippet_showpage(){
 		
 }	
 
-?>

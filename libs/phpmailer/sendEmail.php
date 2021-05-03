@@ -25,12 +25,12 @@ if (isset($fromEmail) && $fromEmail != '') {
     $mail->Username = $fromEmail;
     $mail->From = $fromEmail;
 } else {
-    $mail->Username = $main_smarty->get_config_vars('PLIKLI_PassEmail_From');
-    $mail->From = $main_smarty->get_config_vars('PLIKLI_PassEmail_From');
+    $mail->Username = $main_smarty->get_config_vars('KAHUK_PassEmail_From');
+    $mail->From = $main_smarty->get_config_vars('KAHUK_PassEmail_From');
 }
-$mail->FromName = $main_smarty->get_config_vars('PLIKLI_PassEmail_Name');
+$mail->FromName = $main_smarty->get_config_vars('KAHUK_PassEmail_Name');
 $mail->AddAddress($AddAddress);
-$mail->AddReplyTo($main_smarty->get_config_vars('PLIKLI_PassEmail_From'));
+$mail->AddReplyTo($main_smarty->get_config_vars('KAHUK_PassEmail_From'));
 $mail->IsHTML(true);
 $mail->Subject = $subject;
 $mail->CharSet = 'utf-8';

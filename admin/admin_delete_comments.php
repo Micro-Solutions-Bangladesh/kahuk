@@ -4,10 +4,8 @@ include_once('../internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('../config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'link.php');
-include(mnminclude.'user.php');
-include(mnminclude.'smartyvariables.php');
+include(KAHUK_LIBS_DIR.'link.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
 
 check_referrer();
 
@@ -59,7 +57,7 @@ foreach($result as $comment)
 	<div class="modal-content">
 		<div class="modal-header">
 			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-			<h4 class="modal-title"><?php echo $main_smarty->get_config_vars('PLIKLI_Visual_AdminPanel_Discarded_Comments_Removed') ?></h4>
+			<h4 class="modal-title"><?php echo $main_smarty->get_config_vars('KAHUK_Visual_AdminPanel_Discarded_Comments_Removed') ?></h4>
 		</div>
 		<div class="modal-body">
 			<?php 
@@ -69,7 +67,7 @@ foreach($result as $comment)
 			if (mysql_error()){
 				echo '<p>'.mysql_error().'</p>';
 			}else{*/
-				echo '<p><strong>'.$num_rows.'</strong> '.$main_smarty->get_config_vars("PLIKLI_Visual_AdminPanel_Discarded_Comments_Removed_Message").'</p>';
+				echo '<p><strong>'.$num_rows.'</strong> '.$main_smarty->get_config_vars("KAHUK_Visual_AdminPanel_Discarded_Comments_Removed_Message").'</p>';
 			//}
 			include_once('../libs/dbconnect.php');
 			$handle = new mysqli(EZSQL_DB_HOST,EZSQL_DB_USER,EZSQL_DB_PASSWORD,EZSQL_DB_NAME);

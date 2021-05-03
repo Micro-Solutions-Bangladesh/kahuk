@@ -1,6 +1,6 @@
 <?php
  /******************************************************************
-* template_lite Adsense Plugin for Plikli
+* template_lite Adsense Plugin for Kahuk
 *
 * Name: adsense
 * Type: function

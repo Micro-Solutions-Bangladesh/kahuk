@@ -4,11 +4,9 @@ include_once('../internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('../config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'link.php');
-include(mnminclude.'user.php');
-include(mnminclude.'smartyvariables.php');
-include(mnminclude.'csrf.php');
+include(KAHUK_LIBS_DIR.'link.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
+include(KAHUK_LIBS_DIR.'csrf.php');
 
 check_referrer();
 
@@ -54,9 +52,9 @@ if($canIhaveAccess == 1) {
 	$search_sql = '';
 	// if user is searching
 	$temp = '';
-	if(isset($_GET['keyword']) && $_GET['keyword']!= $main_smarty->get_config_vars('PLIKLI_Visual_Search_SearchDefaultText')){
-		$plikli_keyword = sanitize($_GET["keyword"], 3);
-		$search_sql = " AND (link_author LIKE '%".$plikli_keyword."%' OR link_title LIKE '%".$plikli_keyword."%' OR link_content LIKE '%".$plikli_keyword."%' OR link_tags LIKE '%".$plikli_keyword."%') ";
+	if(isset($_GET['keyword']) && $_GET['keyword']!= $main_smarty->get_config_vars('KAHUK_Visual_Search_SearchDefaultText')){
+		$kahuk_keyword = sanitize($_GET["keyword"], 3);
+		$search_sql = " AND (link_author LIKE '%".$kahuk_keyword."%' OR link_title LIKE '%".$kahuk_keyword."%' OR link_content LIKE '%".$kahuk_keyword."%' OR link_tags LIKE '%".$kahuk_keyword."%') ";
 	}
 
 	if (!empty($_GET['user']))
@@ -153,11 +151,11 @@ if($canIhaveAccess == 1) {
 	}
 
 	// breadcrumbs and page title
-	$navwhere['text1'] = $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel');
+	$navwhere['text1'] = $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel');
 	$navwhere['link1'] = getmyurl('admin', '');
-	$navwhere['text2'] = $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel_Links');
+	$navwhere['text2'] = $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel_Links');
 	$main_smarty->assign('navbar_where', $navwhere);
-	$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel'));
+	$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel'));
 	
 	// if admin changes the link status
 	if (isset($_GET['action']) && sanitize($_GET['action'], 3) == "bulkmod" && isset($_POST['admin_acction'])) {
@@ -175,7 +173,7 @@ if($canIhaveAccess == 1) {
 					$link_status=$db->get_var('select link_status from ' . table_links . '  WHERE link_id = "'.$key.'"');
 					if($link_status!=$admin_acction){
 						if ($admin_acction == "published") {
-							$db->query('UPDATE `' . table_links . '` SET `link_status` = "published", link_published_date = now() WHERE `link_id` = "'.$key.'"');
+							$db->query('UPDATE `' . table_links . '` SET `link_status` = "published", link_published_date = NOW() WHERE `link_id` = "'.$key.'"');
 							$vars = array('link_id' => $key);
 							check_actions('link_published', $vars);
 						}
@@ -209,7 +207,7 @@ if($canIhaveAccess == 1) {
 				}
 			}
 			totals_regenerate();
-			//header("Location: ".my_plikli_base."/admin/admin_links.php?page=".sanitize($_GET['page'],3));
+			//header("Location: ".my_kahuk_base."/admin/admin_links.php?page=".sanitize($_GET['page'],3));
 			$redirect_url=$_SERVER['HTTP_REFERER'];
 			header("Location:". $redirect_url);
 			exit();
@@ -225,8 +223,8 @@ if($canIhaveAccess == 1) {
 	define('pagename', 'admin_links'); 
 	$main_smarty->assign('pagename', pagename);
 	
-// read the mysql database to get the plikli version
-/* Redwine: plikli version query removed and added to /libs/smartyvriables.php */
+// read the mysql database to get the kahuk version
+/* Redwine: kahuk version query removed and added to /libs/smartyvriables.php */
 	
 	// show the template
 	$main_smarty->assign('tpl_center', '/admin/submissions');
@@ -239,5 +237,3 @@ if($canIhaveAccess == 1) {
 else {
 	echo 'This page is restricted to site Admins!';
 }		
-
-?>

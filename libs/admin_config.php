@@ -1,8 +1,9 @@
 <?php
+if ( ! defined( 'KAHUKPATH' ) ) {
+	die();
+}
 
-if(!defined('mnminclude')){header('Location: ../error_404.php');}
-
-class plikliconfig {
+class kahukconfig {
 	var $id = 0;
 	var $var_page = 0;
 	var $var_name = 0;
@@ -14,7 +15,7 @@ class plikliconfig {
 	var $EditInPlaceCode = '';
 
 	function showpage(){
-		global $db, $my_plikli_base;
+		global $db, $my_kahuk_base;
 		
 		?>
 			<div class="admin_config_content">
@@ -27,10 +28,10 @@ class plikliconfig {
 			echo '<table class="table table-bordered table-striped">';
 			echo '<thead><tr>';
 			echo '<th>Title</th>';
-			echo '<th>'.$main_smarty->get_config_vars(PLIKLI_Visual_Config_Description).'</th>';
-			echo '<th style="min-width:120px">'.$main_smarty->get_config_vars(PLIKLI_Visual_Config_Value).'</th>';
-			echo '<th style="width:120px;">'.$main_smarty->get_config_vars(PLIKLI_Visual_Config_Default_Value).'</th>';
-			echo '<th style="width:120px;">'.$main_smarty->get_config_vars(PLIKLI_Visual_Config_Expected_Values).'</th>';
+			echo '<th>'.$main_smarty->get_config_vars(KAHUK_Visual_Config_Description).'</th>';
+			echo '<th style="min-width:120px">'.$main_smarty->get_config_vars(KAHUK_Visual_Config_Value).'</th>';
+			echo '<th style="width:120px;">'.$main_smarty->get_config_vars(KAHUK_Visual_Config_Default_Value).'</th>';
+			echo '<th style="width:120px;">'.$main_smarty->get_config_vars(KAHUK_Visual_Config_Expected_Values).'</th>';
 			echo '</tr></thead><tbody>';
 			
 			foreach($configs as $config) {
@@ -104,7 +105,7 @@ class plikliconfig {
 		fclose($fp);
 		if($this->var_name == '$my_base_url'){echo translate("It looks like this should be set to") . " <strong>" . $expected_base_url ."</strong> ";}
 		
-		if($this->var_name == '$my_plikli_base'){
+		if($this->var_name == '$my_kahuk_base'){
 			$pos = strrpos($_SERVER["SCRIPT_NAME"], "/admin/");
 			$path = substr($_SERVER["SCRIPT_NAME"], 0, $pos);
 			if ($path == "/" || $path == ""){$path = translate("Nothing - Leave it blank");}
@@ -151,23 +152,24 @@ class plikliconfig {
 		echo "<td>{$this->var_optiontext}</td>";
 		echo '<input type = "hidden" name = "var_id" value = "'.$this->var_id.'">';
 		echo "</td></tr></form></span>";
-//		$this->EditInPlaceCode = "EditInPlace.makeEditable( {type: 'text', action: 'save', id: 'editme" .$this->var_id. "',	save_url: 'admin_config.php'} );";		
 		
 	}
 
 
+	// TODO VVI
 	function create_file($filename = "../settings.php"){
 		global $db;
+
 		if($handle = fopen($filename, 'w')) {
 		
 			fwrite($handle, "<?php\n");
-			$usersql = $db->get_results('SELECT * FROM ' . table_prefix . 'config');
+			$usersql = $db->get_results('SELECT * FROM ' . TABLE_PREFIX . 'config');
 			foreach($usersql as $row) {
 				$value = $row->var_enclosein . trim($row->var_value). $row->var_enclosein;
 				
-				$write_vars = array('table_prefix', '$my_base_url', '$my_plikli_base', '$dblang', '$language' );
+				$write_vars = array( '$my_base_url', '$my_kahuk_base', '$dblang', '$language' );
 				
-				if(in_array($row->var_name, $write_vars)){
+				if( in_array( $row->var_name, $write_vars ) ) {
 				
 					if ($row->var_method == "normal"){
 						$line =  $row->var_name . " = " . $value . ";";
@@ -183,18 +185,18 @@ class plikliconfig {
 					}
 				}				
 			}
-			fwrite($handle, "include_once mnminclude.'settings_from_db.php';\n");
+			fwrite($handle, "include_once KAHUK_LIBS_DIR.'settings_from_db.php';\n");
 			fwrite($handle, "?>");
 			fclose($handle);
 
 			if(caching == 1){
 				// this is to clear the cache and reload it for settings_from_db.php
-				$db->cache_dir = mnmpath.'cache';
+				$db->cache_dir = KAHUKPATH.'cache';
 				$db->use_disk_cache = true;
 				$db->cache_queries = true;
 				$db->cache_timeout = 0;
 				// if this query changes, update the query in /libs/settings_from_db.php LINE 16
-				$usersql = $db->get_results('SELECT var_name, var_value, var_method, var_enclosein FROM ' . table_prefix . 'config');
+				$usersql = $db->get_results('SELECT var_name, var_value, var_method, var_enclosein FROM ' . TABLE_PREFIX . 'config');
 				$db->cache_queries = false;
 			}
 
@@ -203,5 +205,3 @@ class plikliconfig {
 		}
 	}
 }
-
-?>

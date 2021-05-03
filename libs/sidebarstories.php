@@ -1,6 +1,8 @@
 <?php
 
-if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
+if ( ! defined( 'KAHUKPATH' ) ) {
+	die();
+}
 
 class SidebarStories {
   var $pagesize = 5; // The number of items to show
@@ -14,7 +16,7 @@ class SidebarStories {
   
 	function show($fetch = false) {
 		global $main_smarty, $db, $cached_links, $current_user;
-		include_once(mnminclude.'search.php');
+		include_once(KAHUK_LIBS_DIR.'search.php');
 		$search=new Search();
 		$search->orderBy = $this->orderBy;
 		$search->pagesize = $this->pagesize;
@@ -38,7 +40,7 @@ class SidebarStories {
 		if($the_results){
 			// find out if the logged in user voted / reported each of
 			// the stories that the search found and cache the results
-			require_once(mnminclude.'votes.php');
+			require_once(KAHUK_LIBS_DIR.'class-votes.php');
 // DB 03/02/09
 //			$vote = new Vote;
 //			$vote->type='links';

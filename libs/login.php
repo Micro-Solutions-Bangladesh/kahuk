@@ -1,12 +1,13 @@
 <?php
 
-if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
-include_once mnminclude.'/check_behind_proxy.php';
+if ( ! defined( 'KAHUKPATH' ) ) {
+	die();
+}
 
 class UserAuth {
-	var $user_id  = 0;
-	var $user_login = "";
-	var $md5_pass = "";
+	var $user_id       = 0;
+	var $user_login    = "";
+	var $md5_pass      = "";
 	var $authenticated = FALSE;
 
 	// Additional parameters for cookie security
@@ -90,47 +91,58 @@ class UserAuth {
 		}
 	}
 
-	function Authenticate($username, $pass, $remember=false) {
+	function Authenticate( $username, $pass, $remember = false ) {
 		global $db;
-		$dbusername=sanitize($db->escape($username),4);
+		$dbusername = sanitize( $db->escape( $username ), 4 );
 		
-		check_actions('login_start', $vars);
-		$user=$db->get_row("SELECT * FROM " . table_users . " WHERE user_login = '$dbusername' or user_email= '$dbusername' ");
+		check_actions( 'login_start', $vars );
+
+		$user = $db->get_row( "SELECT * FROM " . table_users . " WHERE user_login = '$dbusername' or user_email= '$dbusername'" );
+		
+		
+
 		/***
 		Redwine: the code below is to check for the hashed password of the user logging in. If it contains the string 'bcrypt:' it means that the new password hashing has been applied to it, otherwise, it rehash the password based on the new password hashing!
 		***/
-		if ($user->user_id > 0 && $user->user_lastlogin != NULL  && $user->user_enabled) {
-			if(substr($user->user_pass, 0, 7) !== 'bcrypt:'){
-				$salt = substr($user->user_pass, 0, SALT_LENGTH);
-				$sha_hash = substr($user->user_pass, SALT_LENGTH);
-				if (!function_exists('password_hash')) {
-					require(mnminclude."password.php");
-					$new_pass = 'bcrypt:' . $salt . password_hash ($sha_hash, PASSWORD_BCRYPT);
-				}else{
-					$new_pass = 'bcrypt:' . $salt . password_hash ($sha_hash, PASSWORD_BCRYPT);
+		if ( $user->user_id > 0 && $user->user_lastlogin != NULL  && $user->user_enabled ) {
+			if ( substr($user->user_pass, 0, 7) !== 'bcrypt:' ) {
+				$salt = substr( $user->user_pass, 0, SALT_LENGTH );
+				$sha_hash = substr( $user->user_pass, SALT_LENGTH );
+
+				if ( ! function_exists( 'password_hash' ) ) {
+					require( KAHUK_LIBS_DIR."password.php" );
+					$new_pass = 'bcrypt:' . $salt . password_hash ( $sha_hash, PASSWORD_BCRYPT );
+				} else {
+					$new_pass = 'bcrypt:' . $salt . password_hash ( $sha_hash, PASSWORD_BCRYPT );
 				}
-				$db->query("UPDATE ".table_users." SET user_pass = '$new_pass' WHERE user_id ='$user->user_id' LIMIT 1");
+
+				$db->query( "UPDATE ".table_users." SET user_pass = '$new_pass' WHERE user_id ='$user->user_id' LIMIT 1" );
 			}
 		}
 		/* Redwine: End checking/applying the new password hashing */
-		if ($user->user_id > 0 && verifyPassHash($pass, $user->user_pass) && $user->user_lastlogin != NULL  && $user->user_enabled) {
+		if ( $user->user_id > 0 && verifyPassHash($pass, $user->user_pass) && $user->user_lastlogin != NULL  && $user->user_enabled) {
 			$this->user_login = $user->user_login;  
 			$this->user_id = $user->user_id;
 
-			$vars = array('user' => serialize($this), 'can_login' => true);
-			check_actions('login_pass_match', $vars);
+			$vars = array( 'user' => serialize($this), 'can_login' => true );
+			check_actions( 'login_pass_match', $vars );
 
-			if($vars['can_login'] != true){return false;}
+			if ( $vars['can_login'] != true ) {
+				return false;
+			}
 
 			$this->authenticated = TRUE;
 			$this->md5_pass = md5($user->user_pass);
 			$this->SetIDCookie(1, $remember);
-			require_once(mnminclude.'check_behind_proxy.php');
+
 			$lastip=check_ip_behind_proxy();
-			$sql = "UPDATE " . table_users . " SET user_lastip = '$lastip', user_lastlogin = now() WHERE user_id = {$user->user_id} LIMIT 1";
-			$db->query($sql);
+
+			$sql = "UPDATE " . table_users . " SET user_lastip = '$lastip', user_lastlogin = NOW() WHERE user_id = {$user->user_id} LIMIT 1";
+			$db->query( $sql );
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -149,7 +161,7 @@ class UserAuth {
 			$user=new User();
 			$user->username = $m[1];
 			if(!$user->all_stats() || $user->total_links+$user->total_comments==0) 
-				$url = my_plikli_base.'/';
+				$url = my_kahuk_base.'/';
 		}
 			
 
@@ -158,7 +170,7 @@ class UserAuth {
 			if(strlen(sanitize($url, 3)) > 1) {
 				$url = sanitize($url, 3);
 			} else {
-				$url =  my_plikli_base.'/';
+				$url =  my_kahuk_base.'/';
 			}
 			header("Location: $url");
 		}
@@ -166,7 +178,7 @@ class UserAuth {
 		header("ETag: \"logingout" . time(). "\"");
 		if(strpos($_SERVER['SERVER_SOFTWARE'], "IIS") && strpos(php_sapi_name(), "cgi") >= 0){
 			echo '<SCRIPT LANGUAGE="JavaScript">window.location="' . $url . '";</script>';
-			echo $main_smarty->get_config_vars('PLIKLI_Visual_IIS_Logged_Out') . '<a href = "'.$url.'">' . $main_smarty->get_config_vars('PLIKLI_Visual_IIS_Continue') . '</a>';
+			echo $main_smarty->get_config_vars('KAHUK_Visual_IIS_Logged_Out') . '<a href = "'.$url.'">' . $main_smarty->get_config_vars('KAHUK_Visual_IIS_Continue') . '</a>';
 		}
 		die;
 	}
@@ -174,4 +186,3 @@ class UserAuth {
 }
 
 $current_user = new UserAuth();
-?>

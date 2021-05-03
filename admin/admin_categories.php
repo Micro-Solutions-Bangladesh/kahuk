@@ -4,16 +4,15 @@ include_once('../internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('../config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'link.php');
-include(mnminclude.'smartyvariables.php');
-include_once(mnminclude.'dbtree.php');
-include(mnminclude.'csrf.php');
-include(mnminclude.'document_class.php');
+include(KAHUK_LIBS_DIR.'link.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
+include_once(KAHUK_LIBS_DIR.'dbtree.php');
+include(KAHUK_LIBS_DIR.'csrf.php');
+include(KAHUK_LIBS_DIR.'document_class.php');
 
-$PlikliDoc->add_js(my_base_url.my_plikli_base."/templates/admin/js/move.js");
+$KahukDoc->add_js(my_base_url.my_kahuk_base."/templates/admin/js/move.js");
 
-$PlikliDoc->get_js();
+$KahukDoc->get_js();
 
 check_referrer();
 
@@ -37,12 +36,12 @@ if(caching == 1){
 }
 
 // breadcrumbs and page title
-$navwhere['text1'] = $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel');
+$navwhere['text1'] = $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel');
 $navwhere['link1'] = getmyurl('admin', '');
-$navwhere['text2'] = $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel_2');
-$navwhere['link2'] = my_plikli_base . "/admin_categories.php";
+$navwhere['text2'] = $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel_2');
+$navwhere['link2'] = my_kahuk_base . "/admin_categories.php";
 $main_smarty->assign('navbar_where', $navwhere);
-$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel'));
+$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel'));
 
 if($canIhaveAccess == 1)
 {
@@ -63,8 +62,8 @@ if($canIhaveAccess == 1)
 	define('pagename', 'admin_categories'); 
 	$main_smarty->assign('pagename', pagename);
 	
-	// read the mysql database to get the plikli version
-	/* Redwine: plikli version query removed and added to /libs/smartyvriables.php */
+	// read the mysql database to get the kahuk version
+	/* Redwine: kahuk version query removed and added to /libs/smartyvriables.php */
 
 	rebuild_the_tree();
 	ordernew();
@@ -347,10 +346,14 @@ if($canIhaveAccess == 1)
 	elseif($action == "view"){
 		$CSRF->create('category_manager', true, true);
 	
-		$array = tree_to_array(0, table_categories, true);
-#print_r($array);exit;
-		$main_smarty->assign('cat_count', count($array));
-		$main_smarty->assign('cat_array', $array);
+		$categories = kahuk_categories_init();
+		$catArray = $categories->get_items( false );
+
+		$hierarchicalCategories = $categories->get_items();
+
+		$main_smarty->assign('cat_count', count($catArray));
+		$main_smarty->assign('cat_array', $catArray);
+		$main_smarty->assign('hierarchical_categories', $hierarchicalCategories);
 		$main_smarty->assign('tpl_center', '/admin/categories');
 		$main_smarty->display('/admin/admin.tpl');
 	}
@@ -391,7 +394,7 @@ function Cat_Safe_Names(){
 
 function clearCatCache() {
 	global $db, $cached_categories;
-	$db->cache_dir = mnmpath.'cache';
+	$db->cache_dir = KAHUKPATH.'cache';
 	$db->use_disk_cache = true;
 	$db->cache_queries = true;
 	$db->cache_timeout = 0;
@@ -435,4 +438,3 @@ function move_delete_stories($id) {
 	else
 	    die();
 }
-?>

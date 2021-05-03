@@ -1,7 +1,7 @@
 AddDefaultCharset UTF-8
 ############################################################################################################
 ## 404 Error Page
-## IF PLIKLI IS INSTALLED IN A SUBFOLDER, change LINE 7 to ErrorDocument 404 /NAME-OF-SUBFOLDER/error_404.php
+## IF KAHUK IS INSTALLED IN A SUBFOLDER, change LINE 7 to ErrorDocument 404 /NAME-OF-SUBFOLDER/error_404.php
 ############################################################################################################
 ErrorDocument 404 /error_404.php
 
@@ -10,7 +10,7 @@ ErrorDocument 404 /error_404.php
 Options +FollowSymlinks -MultiViews
 RewriteEngine on
 ############################################################################################################
-###### IF PLIKLI IS INSTALLED IN A SUBFOLDER, change LINE 18 to RewriteBase /NAME-OF-SUBFOLDER ######
+###### IF KAHUK IS INSTALLED IN A SUBFOLDER, change LINE 18 to RewriteBase /NAME-OF-SUBFOLDER ######
 ############################################################################################################
 RewriteBase /
 
@@ -134,11 +134,6 @@ RewriteRule ^story/([^/]+)/?$ story.php?title=$1 [L]
 RewriteRule ^story/([0-9]+)/editcomment/([0-9]+)/?$ edit.php?id=$1&commentid=$2 [L]
 RewriteRule ^story/([0-9]+)/edit/?$ editlink.php?id=$1 [L]
 RewriteRule ^submit/?$ submit.php [L]
-RewriteRule ^tag/([^/]+)/([^/]+)/?$ search.php?search=$1&tag=true&from=$2 [QSA,NC,L]
-RewriteRule ^tag/([^/]+)/?$ search.php?search=$1&tag=true [QSA,NC,L]
-RewriteRule ^tag/([^/]+)/page/(.+)/?$ search.php?search=$1&tag=true&page=$2 [QSA,NC,L]
-RewriteRule ^tagcloud/?$ cloud.php [L]
-RewriteRule ^tagcloud/range/([0-9]+)/?$ cloud.php?range=$1 [L]
 RewriteRule ^topusers/?$ topusers.php [L]
 RewriteRule ^trackback/([0-9]+)/?$ trackback.php?id=$1  [L]
 RewriteRule ^new/?$ new.php [L]
@@ -209,7 +204,7 @@ RewriteRule ^inbox/?$ module.php?module=simple_messaging&view=inbox [L]
 RewriteRule ^sitemapindex.xml module.php?module=xml_sitemaps_show_sitemap [L]
 RewriteRule ^sitemap-([a-zA-Z0-9]+).xml module.php?module=xml_sitemaps_show_sitemap&i=$1 [L]
 RewriteRule ^status/([0-9]+)/?$ modules/status/status.php?id=$1 [L]
-RewriteRule ^toolbar/(\d+)/?$ modules/plikli_web_toolbar/toolbar.php?id=$1
+RewriteRule ^toolbar/(\d+)/?$ modules/kahuk_web_toolbar/toolbar.php?id=$1
 RewriteRule ^sitemap-([0-9a-z]+).xml module.php?module=xml_sitemaps_show_sitemap&i=$1 [L]
 
 ## Pages

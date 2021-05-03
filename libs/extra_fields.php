@@ -1,5 +1,7 @@
 <?php
-if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
+if ( ! defined( 'KAHUKPATH' ) ) {
+	die();
+}
 
 /* Redwine
 	Removed the Field Validation Method and Field Validation Error Message because the browser uses its own validation and message when a field is required. Tested in Chrome, Opera, Firefox, IE 11 and Edge!

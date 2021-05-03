@@ -5,7 +5,7 @@
 /*
 
 include('../config.php');
-include(mnminclude.'user.php');
+include(KAHUK_LIBS_DIR.'user.php');
 
 header("Content-Type: text/plain");
 

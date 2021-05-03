@@ -4,11 +4,9 @@ include_once('internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include_once('config.php');
-include_once(mnminclude.'html1.php');
-include_once(mnminclude.'link.php');
-include_once(mnminclude.'tags.php');
-include_once(mnminclude.'search.php');
-include_once(mnminclude.'smartyvariables.php');
+include_once(KAHUK_LIBS_DIR.'link.php');
+include_once(KAHUK_LIBS_DIR.'search.php');
+include_once(KAHUK_LIBS_DIR.'smartyvariables.php');
 
 global $the_template, $main_smarty, $db;
 
@@ -70,5 +68,4 @@ function comments_category_safe_name($category) {
 		}
 	}
 }
-
 {/php}

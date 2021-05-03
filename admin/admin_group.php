@@ -3,10 +3,8 @@ include_once('../internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('../config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'link.php');
-include(mnminclude.'tags.php');
-include(mnminclude.'smartyvariables.php');
+include(KAHUK_LIBS_DIR.'link.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
 
 check_referrer();
 
@@ -17,7 +15,7 @@ force_authentication();
 $numGr = $db->get_var("SELECT count(*) FROM " .table_groups . " WHERE `group_creator` = " . $current_user->user_id);
 $max_user_groups_allowed = $main_smarty->get_template_vars('max_user_groups_allowed');
 if ($numGr >= $max_user_groups_allowed) {
-	$error_max = $main_smarty->get_config_vars('PLIKLI_Visual_Submit_A_New_Group_Error');
+	$error_max = $main_smarty->get_config_vars('KAHUK_Visual_Submit_A_New_Group_Error');
 	$main_smarty->assign('error_max', $error_max);
 }
 // restrict access to admins and moderators
@@ -46,8 +44,8 @@ $main_smarty->assign('isAdmin', $canIhaveAccess);
 define('pagename', 'admin_group'); 
 $main_smarty->assign('pagename', pagename);
 
-// read the mysql database to get the plikli version
-/* Redwine: plikli version query removed and added to /libs/smartyvriables.php */
+// read the mysql database to get the kahuk version
+/* Redwine: kahuk version query removed and added to /libs/smartyvriables.php */
 global $db;
 
 if(isset($_REQUEST['mode'])){
@@ -58,13 +56,13 @@ if(isset($_REQUEST['mode'])){
 		$db->query("DELETE FROM ".table_group_member." WHERE member_group_id=".$group_id);
 		$db->query("DELETE FROM ".table_group_shared." WHERE share_group_id=".$group_id);
 
-		header("Location: ".my_plikli_base."/admin/admin_group.php");
+		header("Location: ".my_kahuk_base."/admin/admin_group.php");
 		die();
 	}
 	elseif($mode=='approve' && is_numeric($group_id)){
 	        $db->query("UPDATE ".table_groups." SET group_status='Enable' WHERE group_id=$group_id");
 
-		header("Location: ".my_plikli_base."/admin/admin_group.php");
+		header("Location: ".my_kahuk_base."/admin/admin_group.php");
 		die();
 	}
 }
@@ -72,14 +70,11 @@ if(isset($_REQUEST['mode'])){
 $sql = "SELECT * FROM ".table_groups." LEFT JOIN ".table_users." ON user_id=group_creator ORDER BY group_name";
 $main_smarty->assign('groups',$db->get_results($sql,ARRAY_A));
 
-//$main_smarty->assign('page_title' , $page_title);
-//$main_smarty->assign('page_text' , $page_text);
-
 // show the template
 $main_smarty->assign('tpl_center', '/admin/groups');
+
 if ($is_moderator == '1'){
 	$main_smarty->display('/admin/moderator.tpl');
 } else {
 	$main_smarty->display('/admin/admin.tpl');
 }
-?>

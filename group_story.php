@@ -2,11 +2,10 @@
 include_once('internal/Smarty.class.php');
 $main_smarty = new Smarty;
 include('config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'link.php');
-include(mnminclude.'group.php');
-include(mnminclude.'smartyvariables.php');
-include(mnminclude.'csrf.php');
+include(KAHUK_LIBS_DIR.'link.php');
+include(KAHUK_LIBS_DIR.'group.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
+include(KAHUK_LIBS_DIR.'csrf.php');
 
 $requestID = '';
 if(isset($_REQUEST['id'])){$requestID = strip_tags($_REQUEST['id']);}
@@ -37,7 +36,7 @@ if(isset($_REQUEST['category'])){
 
 
 // breadcrumbs and page titles
-$navwhere['text1'] = $main_smarty->get_config_vars('PLIKLI_Visual_Breadcrumb_Submit');
+$navwhere['text1'] = $main_smarty->get_config_vars('KAHUK_Visual_Breadcrumb_Submit');
 $navwhere['link1'] = getmyurl('submit', '');
 $navwhere['text2'] = $thecat;
 $main_smarty->assign('posttitle', $requestTitle);
@@ -102,10 +101,10 @@ if($requestID > 0)
 /* Redwine: Roles and permissions and Groups fixes */
     elseif (($privacy!='private' || isMemberActive($requestID)=='active'))
     {
-	$main_smarty->assign('group_shared_display', $main_smarty->get_config_vars('PLIKLI_Visual_Group_Is_Private'));
-	$main_smarty->assign('group_new_display', $main_smarty->get_config_vars('PLIKLI_Visual_Group_Is_Private'));
-	$main_smarty->assign('group_published_display', $main_smarty->get_config_vars('PLIKLI_Visual_Group_Is_Private'));
-	$main_smarty->assign('member_display', $main_smarty->get_config_vars('PLIKLI_Visual_Group_Is_Private'));
+	$main_smarty->assign('group_shared_display', $main_smarty->get_config_vars('KAHUK_Visual_Group_Is_Private'));
+	$main_smarty->assign('group_new_display', $main_smarty->get_config_vars('KAHUK_Visual_Group_Is_Private'));
+	$main_smarty->assign('group_published_display', $main_smarty->get_config_vars('KAHUK_Visual_Group_Is_Private'));
+	$main_smarty->assign('member_display', $main_smarty->get_config_vars('KAHUK_Visual_Group_Is_Private'));
     }
 } else 
 {
@@ -211,7 +210,7 @@ if(isset($_POST["avatar"]) && $_POST["avatar"] == "uploaded")
 			//$user->avatar_source=$avatar_source;
 			//$user->store();
 	// create large avatar
-	include mnminclude . "class.pThumb.php";
+	include KAHUK_LIBS_DIR . "class.pThumb.php";
 	$img=new pThumb();
 	$img->pSetSize(group_avatar_size_width, group_avatar_size_height);
 	$img->pSetQuality(100);
@@ -256,7 +255,7 @@ if (allow_smtp_testing == 1 && smtp_fake_email == 1) {
 }
 
 $main_smarty->assign('tpl_center', $the_template . '/group_story_center');
-$main_smarty->display($the_template . '/plikli.tpl');
+$main_smarty->display($the_template . '/kahuk.tpl');
 
 function cleanit($value)
 {
@@ -264,4 +263,3 @@ function cleanit($value)
 	$value = trim($value);
 	return $value;
 }
-?>

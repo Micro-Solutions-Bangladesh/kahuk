@@ -4,12 +4,9 @@ include_once('internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'link.php');
-include(mnminclude.'tags.php');
-include(mnminclude.'user.php');
-include(mnminclude.'csrf.php');
-include(mnminclude.'smartyvariables.php');
+include(KAHUK_LIBS_DIR.'link.php');
+include(KAHUK_LIBS_DIR.'csrf.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
 
 $_GET['login'] = sanitize($_GET['login'], 3);
 $_REQUEST['login'] = $_GET['login'] = preg_replace('/[^\p{L}\p{N}_\s\/]/u', '', $_GET['login']);
@@ -30,37 +27,35 @@ $canIhaveAccess = $canIhaveAccess + checklevel('admin');
 $canIhaveAccess = $canIhaveAccess + checklevel('moderator');
 
 // If not logged in, redirect to the index page
-if ($_GET['login'] && $canIhaveAccess) 
+if ( $_GET['login'] && $canIhaveAccess ) {
 	$login=$_GET['login'];
-elseif ($current_user->user_id > 0 && $current_user->authenticated) {
+} elseif ( $current_user->user_id > 0 && $current_user->authenticated ) {
 	$login = $current_user->user_login;
-	if ($_GET['avatar'] != 'edit')
-		if (urlmethod == 1) {
-			header("Location: $my_base_url$my_plikli_base/profile.php?login=$login");
-		}elseif (urlmethod == 2) {
-			header("Location: $my_base_url$my_plikli_base/user/$login/");
+	if ( $_GET['avatar'] != 'edit' )
+		if ( urlmethod == 1 ) {
+			header( "Location: $my_base_url$my_kahuk_base/profile.php?login=$login" );
+		} elseif ( urlmethod == 2) {
+			header( "Location: $my_base_url$my_kahuk_base/user/$login/" );
 		}
 } else {
-	//header('Location: '.$my_base_url.$my_plikli_base);
-	//die;
-	$myname=$my_base_url.$my_plikli_base;
+	$myname = KAHUK_BASE_URL;
 }
 
 // breadcrumbs and page title
-$navwhere['text1'] = $main_smarty->get_config_vars('PLIKLI_Visual_Breadcrumb_Profile');
+$navwhere['text1'] = $main_smarty->get_config_vars('KAHUK_Visual_Breadcrumb_Profile');
 $navwhere['link1'] = getmyurl('user2', $login, 'profile');
 $navwhere['text2'] = $login;
 $navwhere['link2'] = getmyurl('user2', $login, 'profile');
-$navwhere['text3'] = $main_smarty->get_config_vars('PLIKLI_Visual_Profile_ModifyProfile');
+$navwhere['text3'] = $main_smarty->get_config_vars('KAHUK_Visual_Profile_ModifyProfile');
 $navwhere['link3'] = getmyurl('profile', '');
 $main_smarty->assign('navbar_where', $navwhere);
-$main_smarty->assign('posttitle', $main_smarty->get_config_vars('PLIKLI_Visual_Profile_ModifyProfile'));
+$main_smarty->assign('posttitle', $main_smarty->get_config_vars('KAHUK_Visual_Profile_ModifyProfile'));
 
 // read the users information from the database
 $user=new User();
 $user->username = $login;
 if(!$user->read()) {
-	header('Location: '.$my_base_url.$my_plikli_base);
+	header( 'Location: '.KAHUK_BASE_URL );
 	die;
 }
 
@@ -131,7 +126,7 @@ $main_smarty->assign('user_following', $user->getFollowingCount());
 			}			
 		
 			// create large avatar
-			include mnminclude . "class.pThumb.php";
+			include KAHUK_LIBS_DIR . "class.pThumb.php";
 			$img=new pThumb();
 			$img->pSetSize(Avatar_Large, Avatar_Large);
 			$img->pSetQuality(100);
@@ -173,11 +168,11 @@ if(isset($_POST['email'])){
 				
 	}else
 	{
-		$save_message_text=$main_smarty->get_config_vars("PLIKLI_Visual_Profile_DataUpdated");
+		$save_message_text=$main_smarty->get_config_vars("KAHUK_Visual_Profile_DataUpdated");
 		if($savemsg['username']==1)
-		 $save_message_text.="<br/>".$main_smarty->get_config_vars("PLIKLI_Visual_Profile_UsernameUpdated");
+		 $save_message_text.="<br/>".$main_smarty->get_config_vars("KAHUK_Visual_Profile_UsernameUpdated");
 		if($savemsg['pass']==1)
-		 $save_message_text.="<br/>".$main_smarty->get_config_vars("PLIKLI_Visual_Profile_PassUpdated");
+		 $save_message_text.="<br/>".$main_smarty->get_config_vars("KAHUK_Visual_Profile_PassUpdated");
 
 	    // Reload the page if no error
 	    $_SESSION['savemsg'] = $save_message_text;
@@ -236,7 +231,7 @@ function show_profile() {
 	$main_smarty->assign('user_published_votes', $user->published_votes);
 	
 	// If the user language setting is NULL, present the site's default language file
-	$main_smarty->assign('user_language', !empty($user->language) ? $user->language : plikli_language);
+	$main_smarty->assign('user_language', !empty($user->language) ? $user->language : KAHUK_LANG);
 
 	$languages = array();
 	$files = glob("languages/*.conf");
@@ -279,7 +274,7 @@ function show_profile() {
 
 	// show the template
 	$main_smarty->assign('tpl_center', $the_template . '/user_settings_center');
-	$main_smarty->display($the_template . '/plikli.tpl');	
+	$main_smarty->display($the_template . '/kahuk.tpl');	
 }
 
 function save_profile() {
@@ -345,23 +340,23 @@ function save_profile() {
 
 		if ($user->email!=sanitize($_POST['email'], 3)) {
 		    if(!check_email(sanitize($_POST['email'], 3))) {
-                $savemsg = $main_smarty->get_config_vars("PLIKLI_Visual_Profile_BadEmail");
+                $savemsg = $main_smarty->get_config_vars("KAHUK_Visual_Profile_BadEmail");
                 return $savemsg;
 		    } elseif (email_exists(trim(sanitize($_POST['email'], 3)))) { // if email already exists
-                $savemsg = $main_smarty->get_config_vars("PLIKLI_Visual_Register_Error_EmailExists");
+                $savemsg = $main_smarty->get_config_vars("KAHUK_Visual_Register_Error_EmailExists");
                 return $savemsg;
 		    } else {
-                if(plikli_validate()) {
-                    $encode=md5($_POST['email'] . $user->karma .  $user->username. plikli_hash().$main_smarty->get_config_vars('PLIKLI_Visual_Name'));
+                if(kahuk_validate()) {
+                    $encode=md5($_POST['email'] . $user->karma .  $user->username. kahuk_hash().$main_smarty->get_config_vars('KAHUK_Visual_Name'));
 
-                    $domain = $main_smarty->get_config_vars('PLIKLI_Visual_Name');			
-                    $validation = my_base_url . my_plikli_base . "/validation.php?code=$encode&uid=".urlencode($user->username)."&email=".urlencode($_POST['email']);
+                    $domain = $main_smarty->get_config_vars('KAHUK_Visual_Name');			
+                    $validation = my_base_url . my_kahuk_base . "/validation.php?code=$encode&uid=".urlencode($user->username)."&email=".urlencode($_POST['email']);
                     /*Redwine: fixed the $str to correctly print the username and the domain email address, in the message.*/
-                    $str = sprintf($main_smarty->get_config_vars('PLIKLI_PassEmail_Email_Change_Message'), $user->username, $main_smarty->get_config_vars('PLIKLI_PassEmail_From'));
+                    $str = sprintf($main_smarty->get_config_vars('KAHUK_PassEmail_Email_Change_Message'), $user->username, $main_smarty->get_config_vars('KAHUK_PassEmail_From'));
                     eval('$str = "'.str_replace('"','\"',$str).'";');
                     $message = "$str";
                     
-                    $subject = $main_smarty->get_config_vars('PLIKLI_Visual_User_Profile_Email_Change');
+                    $subject = $main_smarty->get_config_vars('KAHUK_Visual_User_Profile_Email_Change');
                     
                     $AddAddress = $_POST['email'];
                     
@@ -369,11 +364,11 @@ function save_profile() {
                     require('libs/phpmailer/sendEmail.php');
                         
                     if(!$mail->Send()) {
-                        $savemsg = $main_smarty->get_config_vars('PLIKLI_Visual_Login_Delivery_Failed');
+                        $savemsg = $main_smarty->get_config_vars('KAHUK_Visual_Login_Delivery_Failed');
                         return $savemsg;
                         exit;
                     }else{
-                        $savemsg = $main_smarty->get_config_vars("PLIKLI_Visual_Email_Change").'<br />' .$main_smarty->get_config_vars("PLIKLI_Visual_Register_Noemail").' '.sprintf($main_smarty->get_config_vars("PLIKLI_Visual_Register_ToDo"),$main_smarty->get_config_vars('PLIKLI_PassEmail_From'));
+                        $savemsg = $main_smarty->get_config_vars("KAHUK_Visual_Email_Change").'<br />' .$main_smarty->get_config_vars("KAHUK_Visual_Register_Noemail").' '.sprintf($main_smarty->get_config_vars("KAHUK_Visual_Register_ToDo"),$main_smarty->get_config_vars('KAHUK_PassEmail_From'));
                         
                         /*Redwine: to print on the page, FOR THE PURPOSE OF TESTING ON LOCALHOST ONLY!*/
                         if (allow_smtp_testing == 1 && smtp_fake_email == 1) {
@@ -476,19 +471,19 @@ function save_profile() {
 				
 			if (preg_match('/\pL/u', 'a')) {	// Check if PCRE was compiled with UTF-8 support
 			if (!preg_match('/^[_\d\p{L}\p{M}]+$/iu',$user_login)) { // if username contains invalid characters
-			$savemsg = $main_smarty->get_config_vars('PLIKLI_Visual_Register_Error_UserInvalid');
+			$savemsg = $main_smarty->get_config_vars('KAHUK_Visual_Register_Error_UserInvalid');
 			return $savemsg;
 			}
 			} else {
 				if (!preg_match('/^[^~`@%&=\\/;:\\.,<>!"\\\'\\^\\.\\[\\]\\$\\(\\)\\|\\*\\+\\-\\?\\{\\}\\\\]+$/', $user_login)) {
-				$savemsg = $main_smarty->get_config_vars('PLIKLI_Visual_Register_Error_UserInvalid');
+				$savemsg = $main_smarty->get_config_vars('KAHUK_Visual_Register_Error_UserInvalid');
 				 return $savemsg;
 				}
 			}
 		
 					
 			if(user_exists(trim($user_login)) ) {
-			  $savemsg = $main_smarty->get_config_vars("PLIKLI_Visual_Register_Error_UserExists");
+			  $savemsg = $main_smarty->get_config_vars("KAHUK_Visual_Register_Error_UserExists");
 			  $user->username= $user_login;
 			  return $savemsg;
 			
@@ -505,7 +500,7 @@ function save_profile() {
 			$userX=$db->get_row("SELECT user_id, user_pass, user_login FROM " . table_users . " WHERE user_login = '".$user->username."'");
             if(verifyPassHash($oldpass, $userX->user_pass)){
 				if(sanitize($_POST['newpassword'], 3) !== sanitize($_POST['newpassword2'], 3)) {
-					$savemsg = $main_smarty->get_config_vars("PLIKLI_Visual_Profile_BadPass");
+					$savemsg = $main_smarty->get_config_vars("KAHUK_Visual_Profile_BadPass");
 					return $savemsg;
 				} else {
 					$saltedpass=generatePassHash(sanitize($_POST['newpassword'], 3));
@@ -513,7 +508,7 @@ function save_profile() {
 					$saved['pass']=1;
 				}
 			} else {
-				$savemsg = $main_smarty->get_config_vars("PLIKLI_Visual_Profile_BadOldPass");
+				$savemsg = $main_smarty->get_config_vars("KAHUK_Visual_Profile_BadOldPass");
 				return $savemsg;
 			}
 		}
@@ -532,5 +527,3 @@ function save_profile() {
 		exit;
 	}
 }
-
-?>

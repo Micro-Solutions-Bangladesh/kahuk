@@ -9,7 +9,7 @@ $(function() {
 	  $.ajax({
 	  type: "POST",
 	  async: false,
-	  url:my_base_url+my_plikli_base+"/checkfield.php",
+	  url:my_base_url+my_kahuk_base+"/checkfield.php",
 	  data: dataString,
 	  beforeSend: function() {
       	parent.addClass("loader");
@@ -37,7 +37,7 @@ $(function() {
 	  $.ajax({
 	  type: "POST",
 	  async: false,
-	  url:my_base_url+my_plikli_base+"/checkfield.php",
+	  url:my_base_url+my_kahuk_base+"/checkfield.php",
 	  data: dataString,
 	  beforeSend: function() {
       	parent.addClass("loader");
@@ -66,7 +66,7 @@ $(function() {
 	  $.ajax({
 	  type: "POST",
 	  async: false,
-	  url:my_base_url+my_plikli_base+"/checkfield.php",
+	  url:my_base_url+my_kahuk_base+"/checkfield.php",
 	  data: dataString,
 	  beforeSend: function() {
       	parent.addClass("loader");

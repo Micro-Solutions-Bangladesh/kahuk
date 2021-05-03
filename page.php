@@ -4,12 +4,9 @@ include_once('internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'link.php');
-include(mnminclude.'tags.php');
-include(mnminclude.'user.php');
-include(mnminclude.'csrf.php');
-include(mnminclude.'smartyvariables.php');
+include(KAHUK_LIBS_DIR.'link.php');
+include(KAHUK_LIBS_DIR.'csrf.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
 
 // sidebar
 $main_smarty = do_sidebar($main_smarty);
@@ -41,13 +38,10 @@ if($_REQUEST['page']){
 	}
 	
 	if (!$page_results->link_id) {
-		header("Location: $my_plikli_base/error_404.php");
-		die();
+		kahuk_redirect_404();
 	}
 }
 
 // show the template
 $main_smarty->assign('tpl_center', $the_template . '/page_center');
-$main_smarty->display($the_template . '/plikli.tpl');
-
-?>
+$main_smarty->display($the_template . '/kahuk.tpl');

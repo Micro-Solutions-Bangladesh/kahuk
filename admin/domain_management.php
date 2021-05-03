@@ -5,9 +5,7 @@ include_once('../internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('../config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'user.php');
-include(mnminclude.'smartyvariables.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
 
 check_referrer();
 force_authentication();
@@ -18,8 +16,8 @@ $canIhaveAccess = $canIhaveAccess + checklevel('moderator');
 
 $is_moderator = checklevel('moderator'); // Moderators have a value of '1' for the variable $is_moderator
 
-// read the mysql database to get the plikli version
-/* Redwine: plikli version query removed and added to /libs/smartyvriables.php */
+// read the mysql database to get the kahuk version
+/* Redwine: kahuk version query removed and added to /libs/smartyvriables.php */
 
 // File locations
 global $USER_SPAM_RULESET, $FRIENDLY_DOMAINS;
@@ -31,9 +29,9 @@ $blacklist = '../'.$USER_SPAM_RULESET;
 $whitelist = '../'.$FRIENDLY_DOMAINS;
 
 // breadcrumbs and page title
-$navwhere['text1'] = $main_smarty->get_config_vars('PLIKLI_Visual_Ban_This_URL');
+$navwhere['text1'] = $main_smarty->get_config_vars('KAHUK_Visual_Ban_This_URL');
 $main_smarty->assign('navbar_where', $navwhere);
-$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('PLIKLI_Visual_Ban_This_URL'));
+$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('KAHUK_Visual_Ban_This_URL'));
 
 // pagename
 define('pagename', 'domain_management'); 
@@ -49,7 +47,7 @@ if($canIhaveAccess == 1){
 	
 	// if spam checking is not enabled in the admin panel
 	if(CHECK_SPAM == false){
-		$main_smarty->assign('errorText', "<b>Error:</b> You have <b>Enable spam checking</b> set to false. Please set it to true in the <a href='$my_base_url$my_plikli_base/admin/admin_config.php?page=AntiSpam' target='_blank' rel='noopener noreferrer'>admin panel</a>.");
+		$main_smarty->assign('errorText', "<b>Error:</b> You have <b>Enable spam checking</b> set to false. Please set it to true in the <a href='$my_base_url$my_kahuk_base/admin/admin_config.php?page=AntiSpam' target='_blank' rel='noopener noreferrer'>admin panel</a>.");
 		$main_smarty->assign('tpl_center', '/admin/domain_blacklist_add');
 		if ($is_moderator == '1'){
 			$main_smarty->display('/admin/moderator.tpl');
@@ -248,4 +246,3 @@ if($canIhaveAccess == 1){
 	// You need to login as an admin
 	header("Location: " . getmyurl('admin_login', $_SERVER['REQUEST_URI']));
 }
-?>

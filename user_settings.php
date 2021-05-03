@@ -4,13 +4,11 @@ include_once('internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'link.php');
-include(mnminclude.'group.php');
-include(mnminclude.'user.php');
-include(mnminclude.'friend.php');
-include(mnminclude.'smartyvariables.php');
-include(mnminclude.'csrf.php');
+include(KAHUK_LIBS_DIR.'link.php');
+include(KAHUK_LIBS_DIR.'group.php');
+include(KAHUK_LIBS_DIR.'friend.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
+include(KAHUK_LIBS_DIR.'csrf.php');
 
 check_referrer();
 $CSRF = new csrf();
@@ -63,7 +61,7 @@ $select_check = $_POST['chack'];
 		$url = strtolower(end(explode('/', $geturl)));
 		$vowels = array($url);
 		$Get_URL = str_replace($vowels, "", $geturl); */
-if ($_SERVER['HTTP_REFERER'] && strpos($_SERVER['HTTP_REFERER'],$my_base_url.$my_plikli_base)===0)
+if ($_SERVER['HTTP_REFERER'] && strpos($_SERVER['HTTP_REFERER'],KAHUK_BASE_URL)===0)
     $geturl = $_SERVER['HTTP_REFERER'];
 else
     $geturl = sanitize($_SERVER['HTTP_REFERER'],3);
@@ -85,5 +83,3 @@ $url = strtolower(end(explode('/', $geturl)));
 	$query = $db->query($sql);
 	$to_page = preg_replace("/&err=.+$/","",$geturl);
 	header("location:".$to_page."");
-
-?>

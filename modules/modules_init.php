@@ -8,9 +8,9 @@
 		$do_not_include_in_pages_core[] = 'upgrade';
 		$do_not_include_in_pages_core[] = 'modules_manage'; // we don't want a new module to break this page
 	//
-	if(!defined('mnmmodules')){die();}
+	if(!defined('KAHUK_MODULES_DIR')){die();}
 	$module_actions=array();
-	include_once(mnmmodules . 'modules_libs.php');
+	include_once(KAHUK_MODULES_DIR . 'modules_libs.php');
 
 	// find out what page we are on
 	$pos = strrpos($_SERVER["SCRIPT_NAME"], "/");
@@ -21,7 +21,7 @@
 		// get a list of all installed / enabled modules
 
 		if(caching == 1){
-			$db->cache_dir = mnmpath.'cache';
+			$db->cache_dir = KAHUKPATH.'cache';
 			$db->use_disk_cache = true;
 			$db->cache_queries = true;
 		}
@@ -33,7 +33,7 @@
 		if($modules){
 			// for each module...
 			foreach($modules as $module) {
-				 $file=mnmmodules . $module->folder . '/' . $module->folder . '_init.php';
+				 $file=KAHUK_MODULES_DIR . $module->folder . '/' . $module->folder . '_init.php';
 				
 				// if this module has an init file then include it
 				if (file_exists($file)) {		include_once($file);	}

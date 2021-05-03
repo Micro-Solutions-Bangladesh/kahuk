@@ -51,4 +51,3 @@ function EXPORT_TABLES($host,$user,$pass,$name, $tables=false, $backup_name=fals
 	fclose($handle);
 	echo $backupdir."/$backup_name";
 }
-?>

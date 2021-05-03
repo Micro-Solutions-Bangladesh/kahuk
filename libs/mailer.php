@@ -5,14 +5,14 @@ very basic mailer class
 howto:
 
 mailer_start();
-$mailer = new PlikliMailer('Welcome to Plikli', 'Welcome to Plikli.Com. Thanks for joining!', 'admin@plikli.com', 'user@user.com');
+$mailer = new KahukMailer('Welcome to Kahuk', 'Welcome to Kahuk.Com. Thanks for joining!', 'admin@kahuk.com', 'user@user.com');
 $mailer->send();
 
 mailer_start -- in utils.php, checks to see if another mailer is being used (like Swift Mailer)
   -- if it is, then include the code for that and use it
   -- if not, include this class, and use it
 
-PlikliMailer(subject, body, to, from);
+KahukMailer(subject, body, to, from);
 
 Currently only supports 1 to address
 
@@ -20,9 +20,11 @@ Returns true if success, false if failure.
 
 */
 
-if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
+if ( ! defined( 'KAHUKPATH' ) ) {
+	die();
+}
 
-class PlikliMailer{
+class KahukMailer{
 
 	var $subject = '';
 	var $body = '';

@@ -4,11 +4,9 @@ include_once('../internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('../config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'link.php');
-include(mnminclude.'tags.php');
-include(mnminclude.'smartyvariables.php');
-include(mnminclude.'admin_config.php');
+include(KAHUK_LIBS_DIR.'link.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
+include(KAHUK_LIBS_DIR.'admin_config.php');
 
 check_referrer();
 
@@ -27,19 +25,19 @@ if($canIhaveAccess == 0){
 }
 
 // breadcrumbs and page titles
-$navwhere['text1'] = $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel');
+$navwhere['text1'] = $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel');
 $navwhere['link1'] = getmyurl('admin', '');
-$navwhere['text2'] = $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel_5') . $main_smarty->get_config_vars('PLIKLI_Visual_Name');
-$navwhere['link2'] = my_plikli_base . "/admin/admin_config.php";
+$navwhere['text2'] = $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel_5') . $main_smarty->get_config_vars('KAHUK_Visual_Name');
+$navwhere['link2'] = my_kahuk_base . "/admin/admin_config.php";
 $main_smarty->assign('navbar_where', $navwhere);
-$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel'));
+$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel'));
 
 // pagename	
 define('pagename', 'admin_config'); 
 $main_smarty->assign('pagename', pagename);
 
-// read the mysql database to get the plikli version
-/* Redwine: plikli version query removed and added to /libs/smartyvriables.php */
+// read the mysql database to get the kahuk version
+/* Redwine: kahuk version query removed and added to /libs/smartyvriables.php */
 
 // show the template
 $main_smarty->assign('tpl_center', '/admin/configure');
@@ -67,7 +65,7 @@ function dowork(){
 		$action = isset($_REQUEST['action']) && sanitize($_REQUEST['action'], 3) != '' ? sanitize($_REQUEST['action'], 3) : "view";
 		
 		if($action == "view"){
-			$config = new plikliconfig;
+			$config = new kahukconfig;
 			if(isset($_REQUEST['page'])){
 				$config->var_page = sanitize($_REQUEST['page'], 3);
 				$config->showpage();
@@ -75,7 +73,7 @@ function dowork(){
 		}
 		
 		if($action == "save"){
-			$config = new plikliconfig;
+			$config = new kahukconfig;
 //			$config->var_id = substr(sanitize($_REQUEST['var_id'], 3), 6, 10);
 			$config->var_id = sanitize($_REQUEST['var_id'], 3);
 			$config->read();
@@ -85,19 +83,19 @@ function dowork(){
 			{
 				if (!file_exists('../templates/'.js_urldecode($_REQUEST['var_value'])))
 				{
-				    print "alert('".$main_smarty->get_config_vars('PLIKLI_Visual_AdminPanel_NoTemplate')."')";
+				    print "alert('".$main_smarty->get_config_vars('KAHUK_Visual_AdminPanel_NoTemplate')."')";
 				    exit;
 				}
 				else
 				{
 				    if (file_exists('../templates/'.js_urldecode($_REQUEST['var_value']).'/template_details.php'))
 					include ('../templates/'.js_urldecode($_REQUEST['var_value']).'/template_details.php');
-/* Redwine: replaced the plikli version() callwith the plikli version variable from /libs/smartyvriables.php */
-				    if ($template_info['designed_for_plikli_version'] < $plikli_version && !$_REQUEST['force'])
+/* Redwine: replaced the kahuk version() callwith the kahuk version variable from /libs/smartyvriables.php */
+				    if ($template_info['designed_for_kahuk_version'] < $kahuk_version && !$_REQUEST['force'])
 				    {
-					if (!$template_info['designed_for_plikli_version']) $template_info['designed_for_plikli_version'] = 'unknown';
-					print sprintf("if (confirm('".$main_smarty->get_config_vars('PLIKLI_Visual_AdminPanel_Template_Version')."')) {XMLHttpRequestObject.open('GET', '?action=save&var_id={$config->var_id}&var_value=".urlencode($_REQUEST['var_value'])."&force=1', true); XMLHttpRequestObject.send(null);}",
-								$template_info['designed_for_plikli_version'],plikli_version());
+					if (!$template_info['designed_for_kahuk_version']) $template_info['designed_for_kahuk_version'] = 'unknown';
+					print sprintf("if (confirm('".$main_smarty->get_config_vars('KAHUK_Visual_AdminPanel_Template_Version')."')) {XMLHttpRequestObject.open('GET', '?action=save&var_id={$config->var_id}&var_value=".urlencode($_REQUEST['var_value'])."&force=1', true); XMLHttpRequestObject.send(null);}",
+								$template_info['designed_for_kahuk_version'],kahuk_version());
 					exit;
 				    }
 				}
@@ -109,5 +107,3 @@ function dowork(){
 		}
 	}
 }
-
-?>

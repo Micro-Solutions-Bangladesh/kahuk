@@ -10,7 +10,7 @@
 		{$link_shakebox_votes}
 		<div class="user_comment_story_votebox">
 			<div class="user_comment_story_vote">
-				{checkActionsTpl location="tpl_plikli_story_votebox_start"}
+				{checkActionsTpl location="tpl_kahuk_story_votebox_start"}
 				<div class="user_comment_story_votenumber">
 					{$link_shakebox_votes}
 				</div>
@@ -36,7 +36,7 @@
 					{/if}
 					<!-- Votes: {$link_shakebox_currentuser_votes} Buries: {$link_shakebox_currentuser_reports} -->
 				</div><!-- /.votebutton -->
-				{checkActionsTpl location="tpl_plikli_story_votebox_end"}
+				{checkActionsTpl location="tpl_kahuk_story_votebox_end"}
 			</div><!-- /.vote -->
 		</div><!-- /.votebox -->
 	</span>
@@ -49,10 +49,10 @@
 		{if $UseAvatars neq "0"}
 			<a href="{$submitter_profile_url}"><img class="user_comment_story_author_avatar" src="{$Avatar_ImgSrcs}" /></a>
 		{/if}
-		<a href="{$submitter_profile_url}">{$link_submitter}</a> {checkActionsTpl location="tpl_plikli_link_submitter"}
+		<a href="{$submitter_profile_url}">{$link_submitter}</a> {checkActionsTpl location="tpl_kahuk_link_submitter"}
 	</span>
 	<span class="user_comment_story_timestamp">
-		{$link_submit_timeago} {#PLIKLI_Visual_Comment_Ago#}
+		{$link_submit_timeago} {#KAHUK_Visual_Comment_Ago#}
 	</span>
 
 	<div class="user_comment_data">
@@ -61,10 +61,10 @@
 				{if $UseAvatars neq "0"}
 					<a href="{$user_view_url}"><img class="user_comment_comment_author_avatar" src="{$Avatar.small}" /></a>
 				{/if}
-				<a href="{$user_view_url}">{$user_username}</a> {checkActionsTpl location="tpl_plikli_comment_username"}
+				<a href="{$user_view_url}">{$user_username}</a> {checkActionsTpl location="tpl_kahuk_comment_username"}
 			</span>
 			<span class="user_comment_timestamp">
-				{$comment_age} {#PLIKLI_Visual_Comment_Ago#}
+				{$comment_age} {#KAHUK_Visual_Comment_Ago#}
 			</span>
 		</div>
 		<div class="user_comment_content">

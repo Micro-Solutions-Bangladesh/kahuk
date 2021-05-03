@@ -4,11 +4,9 @@
 	$main_smarty = new Smarty;
 	
 	include('config.php');
-	include(mnminclude.'html1.php');
-	include(mnminclude.'link.php');
-	include(mnminclude.'tags.php');
-	include(mnminclude.'search.php');
-	include(mnminclude.'smartyvariables.php');
+	include(KAHUK_LIBS_DIR.'link.php');
+	include(KAHUK_LIBS_DIR.'search.php');
+	include(KAHUK_LIBS_DIR.'smartyvariables.php');
 
 	/*Redwine: function to validate the provided date*/
 	function validateDate($date, $format = 'Y-m-d') {
@@ -26,7 +24,6 @@ $purified = '';
 $expected_slink_values = array('3','1','2');
 	$expected_status_values = array('all','published','new');
 	$expected_scomments_values = array('1','0');
-	$expected_stags_values = array('1','0');
 	$expected_suser_values = array('1','0');
 $expected_sgroups_values = array('3','1','2');
 $expected_adv_values = array('1','0');
@@ -43,7 +40,6 @@ if (strstr($_REQUEST['search'],'/') && $URLMethod == 2 && strstr($_REQUEST['sear
 		if ($key == 'sgroup') $purified = in_array($purified, $expected_sgroups_values) ? $purified : 3;
 		if ($key == 'status') $purified = in_array($purified, $expected_status_values) ? $purified : 'all';
 		if ($key == 'scomments') $purified = in_array($purified, $expected_scomments_values) ? $purified : 1;
-		if ($key == 'stags') $purified = in_array($purified, $expected_stags_values) ? $purified : 1;
 		if ($key == 'suser') $purified = in_array($purified, $expected_suser_values) ? $purified : 1;
 		if ($key == 'date') $purified = validateDate($purified) ? $purified : '';
 		if ($key == 'date_to') $purified = validateDate($purified) ? $purified : '';
@@ -67,7 +63,7 @@ if (strstr($_REQUEST['search'],'/') && $URLMethod == 2 && strstr($_REQUEST['sear
 		if ($key == 'sgroup') $purified = in_array($purified, $expected_sgroups_values) ? $purified : 3;
 		if ($key == 'status') $purified = in_array($purified, $expected_status_values) ? $purified : 'new';
 		if ($key == 'scomments') $purified = in_array($purified, $expected_scomments_values) ? $purified : 1;
-		if ($key == 'stags') $purified = in_array($purified, $expected_stags_values) ? $purified : 1;
+		
 		if ($key == 'suser') $purified = in_array($purified, $expected_suser_values) ? $purified : 1;
 		if ($key == 'date') $purified = validateDate($purified) ? $purified : '';
 		if ($key == 'date_to') $purified = validateDate($purified) ? $purified : '';
@@ -199,13 +195,11 @@ if( isset( $search_array['adv'] ) && $search_array['adv'] == 1 ){
 	settype($_REQUEST['sgroup'], "integer");
 	settype($_REQUEST['status'], "string");
 	settype($_REQUEST['scomments'], "integer");
-	settype($_REQUEST['stags'], "integer");
 	settype($_REQUEST['suser'], "integer");
 	settype($_REQUEST['adv'], "integer");
 	
 	
 	if (isset($_REQUEST['sgroup'])) $search->s_group = $_REQUEST['sgroup'];
-	if (isset($_REQUEST['stags'])) $search->s_tags = $_REQUEST['stags'];
 	if (isset($_REQUEST['slink'])) $search->s_story = $_REQUEST['slink'];
 	if (isset($_REQUEST['status'])) $search->status = $_REQUEST['status'];
 	if (isset($_REQUEST['suser'])) $search->s_user = $_REQUEST['suser'];
@@ -223,10 +217,10 @@ $main_smarty->assign('get',$_GET);
 // breadcrumbs and page title
 $search->searchTerm = str_replace('/','',$search->searchTerm);
 
-$navwhere['text1'] = $main_smarty->get_config_vars('PLIKLI_Visual_Breadcrumb_Search') . stripslashes(str_replace('/','',$search->searchTerm));
+$navwhere['text1'] = $main_smarty->get_config_vars('KAHUK_Visual_Breadcrumb_Search') . stripslashes(str_replace('/','',$search->searchTerm));
 $navwhere['link1'] = getmyurl('search', urlencode($search->searchTerm));
 $main_smarty->assign('navbar_where', $navwhere);
-$main_smarty->assign('posttitle', $main_smarty->get_config_vars('PLIKLI_Visual_Breadcrumb_Search') . stripslashes($search->searchTerm));
+$main_smarty->assign('posttitle', $main_smarty->get_config_vars('KAHUK_Visual_Breadcrumb_Search') . stripslashes($search->searchTerm));
 
 //sidebar
 $main_smarty = do_sidebar($main_smarty);
@@ -238,7 +232,7 @@ $main_smarty->assign('URL_rss_page', getmyurl('rsssearch',sanitize($search->sear
 
 if((strlen($search->searchTerm) < 3 || strlen(html_entity_decode($search->searchTerm)) < 3) && strlen($search->url) < 3 && !$search->s_date)
 {
-	$main_smarty->assign('posttitle', $main_smarty->get_config_vars('PLIKLI_Visual_Search_Too_Short'));
+	$main_smarty->assign('posttitle', $main_smarty->get_config_vars('KAHUK_Visual_Search_Too_Short'));
 	$main_smarty->assign('pagename', 'noresults');
 }
 else
@@ -258,7 +252,7 @@ else
 
 	include('./libs/link_summary.php'); // this is the code that show the links / stories
 	if($rows == false){
-		$main_smarty->assign('posttitle', $main_smarty->get_config_vars('PLIKLI_Visual_Search_NoResults') . ' ' . stripslashes($search->searchTerm) . stripslashes($search->url));
+		$main_smarty->assign('posttitle', $main_smarty->get_config_vars('KAHUK_Visual_Search_NoResults') . ' ' . stripslashes($search->searchTerm) . stripslashes($search->url));
 		$main_smarty->assign('pagename', 'noresults');
 	}
 	
@@ -277,5 +271,4 @@ else
 
 // show the template
 $main_smarty->assign('tpl_center', $the_template . '/search_center');
-$main_smarty->display($the_template . '/plikli.tpl');
-?>
+$main_smarty->display($the_template . '/kahuk.tpl');

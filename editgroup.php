@@ -4,11 +4,10 @@ include_once('internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'link.php');
-include(mnminclude.'group.php');
-include(mnminclude.'smartyvariables.php');
-include(mnminclude.'csrf.php');
+include(KAHUK_LIBS_DIR.'link.php');
+include(KAHUK_LIBS_DIR.'group.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
+include(KAHUK_LIBS_DIR.'csrf.php');
 
 check_referrer();
 
@@ -106,7 +105,7 @@ if(isset($_POST["avatar"]) && $_POST["avatar"] == "uploaded")
 			}
 		}
 		// create large avatar
-		include mnminclude . "class.pThumb.php";
+		include KAHUK_LIBS_DIR . "class.pThumb.php";
 		$img=new pThumb();
 		$img->pSetSize(group_avatar_size_width, group_avatar_size_height);
 		$img->pSetQuality(100);
@@ -147,21 +146,21 @@ elseif(isset($_POST["action"]))
 	if(isset($_POST['group_privacy']))
 		$group_privacy = $db->escape(sanitize($_POST['group_privacy'],3));
 	
-	if (!$group_title) $errors = $main_smarty->get_config_vars('PLIKLI_Visual_Group_Empty_Title');
-	elseif ($group_vote_to_publish<=0) $errors = $main_smarty->get_config_vars('PLIKLI_Visual_Group_Empty_Votes');
+	if (!$group_title) $errors = $main_smarty->get_config_vars('KAHUK_Visual_Group_Empty_Title');
+	elseif ($group_vote_to_publish<=0) $errors = $main_smarty->get_config_vars('KAHUK_Visual_Group_Empty_Votes');
 	else
 	{
 		$exists = $db->get_var("select COUNT(*) from ".table_groups." WHERE group_name='$group_name' AND group_id != '$requestID'");
-	 	if ($exists) $errors = $main_smarty->get_config_vars('PLIKLI_Visual_Group_Title_Exists');
+	 	if ($exists) $errors = $main_smarty->get_config_vars('KAHUK_Visual_Group_Title_Exists');
 	}
 
 	if (empty($errors) && 
 	    $db->query("update ". table_groups ." set group_name = '".$group_title."', group_safename='$group_safename', group_description = '".$group_description."', group_privacy = '".$group_privacy."', group_vote_to_publish = '".$group_vote_to_publish."', group_notify_email=$group_notify_email where group_id = '".$requestID."'"))
-		$errors = $main_smarty->get_config_vars('PLIKLI_Visual_Group_Saved_Changes');
+		$errors = $main_smarty->get_config_vars('KAHUK_Visual_Group_Saved_Changes');
 
 		if (!empty($errors) && 
 			$db->query("update ". table_groups ." set group_name = '".$group_title."', group_safename='$group_safename', group_description = '".$group_description."', group_privacy = '".$group_privacy."', group_vote_to_publish = '".$group_vote_to_publish."', group_notify_email=$group_notify_email where group_id = '".$requestID."'")) {
-			$errors = $main_smarty->get_config_vars('PLIKLI_Visual_Group_Saved_Changes');
+			$errors = $main_smarty->get_config_vars('KAHUK_Visual_Group_Saved_Changes');
 			$main_smarty->assign("errors",$errors);
 		}
     } else {
@@ -176,7 +175,7 @@ if(isset($requestID))
 	group_display($requestID);
 
 $main_smarty->assign('tpl_center', $the_template . '/edit_group_center');
-$main_smarty->display($the_template . '/plikli.tpl');
+$main_smarty->display($the_template . '/kahuk.tpl');
 
 function cleanit($value)
 {
@@ -184,4 +183,3 @@ function cleanit($value)
 	$value = trim($value);
 	return $value;
 }
-?>

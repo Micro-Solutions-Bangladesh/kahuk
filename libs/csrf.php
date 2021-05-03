@@ -1,6 +1,8 @@
 <?php
 
-if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
+if ( ! defined( 'KAHUKPATH' ) ) {
+	die();
+}
 
 class CSRF {
 
@@ -187,7 +189,7 @@ function check_valid($token, $name) {
 		
 			if($this->do_log == true){
 				$this->datalog[] = $action;
-				$fh=fopen(mnmpath.'/logs/log_csrf.log',"a");
+				$fh=fopen(KAHUKPATH.'logs/log_csrf.log',"a");
 				fwrite($fh,$action . "\n");
 				fclose($fh);
 			}

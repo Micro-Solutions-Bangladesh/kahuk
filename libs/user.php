@@ -1,6 +1,8 @@
 <?php
 
-if(!defined('mnminclude')){header('Location: ../error_404.php');die();}
+if ( ! defined( 'KAHUKPATH' ) ) {
+	die();
+}
 
 class User
 {
@@ -47,7 +49,7 @@ class User
 
 	function Create()
 	{
-		global $db, $main_smarty, $the_template, $my_base_url, $my_plikli_base, $allow_smtp_testing;
+		global $db, $main_smarty, $my_base_url, $my_kahuk_base, $allow_smtp_testing;
 		
 		if ($this->username == ''){
 			return false;
@@ -60,30 +62,30 @@ class User
 		}
 		
 		if (!user_exists($this->username)) {
-			require_once(mnminclude.'check_behind_proxy.php');
-			$userip=check_ip_behind_proxy();
-			$saltedpass=generatePassHash($this->pass);
-			/*Redwine: the code below, plikli_validate() determines if the misc_validate settings is true or false.*/
-			if (plikli_validate()) {
-				if ($db->query("INSERT IGNORE INTO " . table_users . " (user_login, user_email, user_pass, user_date, user_ip,user_categories) VALUES ('".$this->username."', '".$this->email."', '".$saltedpass."', now(), '".$userip."', '')")) {
+			$userip     = check_ip_behind_proxy();
+			$saltedpass = generatePassHash($this->pass);
+
+			// the code below, kahuk_validate() determines if the misc_validate settings is true or false.
+			if (kahuk_validate()) {
+				if ($db->query("INSERT IGNORE INTO " . table_users . " (user_login, user_email, user_pass, user_date, user_ip,user_categories) VALUES ('".$this->username."', '".$this->email."', '".$saltedpass."', NOW(), '".$userip."', '')")) {
 				
 					$result = $db->get_row("SELECT user_email, user_pass, user_karma, user_lastlogin FROM " . table_users . " WHERE user_login = '".$this->username."'");
-					$encode = md5($this->email . $result->user_karma .  $this->username. plikli_hash().$main_smarty->get_config_vars('PLIKLI_Visual_Name'));
+					$encode = md5($this->email . $result->user_karma .  $this->username. kahuk_hash().$main_smarty->get_config_vars('KAHUK_Visual_Name'));
 
 					$username = $this->username;
 					$password = $this->pass;
 					
 					$my_base_url=$my_base_url;
-					$my_plikli_base=$my_plikli_base;
+					$my_kahuk_base=$my_kahuk_base;
 					$allow_smtp_testing = $allow_smtp_testing;
 					
-					$domain = $main_smarty->get_config_vars('PLIKLI_Visual_Name');			
-					$validation = my_base_url . my_plikli_base . "/validation.php?code=$encode&uid=".$this->username;
+					$domain = $main_smarty->get_config_vars('KAHUK_Visual_Name');			
+					$validation = my_base_url . my_kahuk_base . "/validation.php?code=$encode&uid=".$this->username;
                     /*Redwine: fixed the $str to correctly print the username in the message.*/
                     
                     $AddAddress = $this->email;
-                    $subject = $main_smarty->get_config_vars('PLIKLI_PassEmail_Subject_verification');
-                    $str = sprintf($main_smarty->get_config_vars('PLIKLI_PassEmail_verification_message'), $this->username, $main_smarty->get_config_vars('PLIKLI_PassEmail_From'));
+                    $subject = $main_smarty->get_config_vars('KAHUK_PassEmail_Subject_verification');
+                    $str = sprintf($main_smarty->get_config_vars('KAHUK_PassEmail_verification_message'), $this->username, $main_smarty->get_config_vars('KAHUK_PassEmail_From'));
 					eval('$str = "'.str_replace('"','\"',$str).'";');
 					$message = "$str";
 					
@@ -99,12 +101,12 @@ class User
                     require('libs/phpmailer/sendEmail.php');
 					
 					if (!$mail->Send()) {
-						$errorMsg = $main_smarty->get_config_vars('PLIKLI_Visual_Login_Delivery_Failed');
+						$errorMsg = $main_smarty->get_config_vars('KAHUK_Visual_Login_Delivery_Failed');
 						$main_smarty->assign('errorMsg', $errorMsg);
 						return false;
 						exit;
 					} else {
-                        $errorMsg = $main_smarty->get_config_vars("PLIKLI_PassEmail_SendSuccess");
+                        $errorMsg = $main_smarty->get_config_vars("KAHUK_PassEmail_SendSuccess");
                         return true;
                     }
 					
@@ -112,7 +114,7 @@ class User
 					return false;
 				}
 			} else {
-				if ($db->query("INSERT IGNORE INTO " . table_users . " (user_login, user_email, user_pass, user_date, user_ip, user_lastlogin,user_categories) VALUES ('".$this->username."', '".$this->email."', '".$saltedpass."', now(), '".$userip."', now(),'')")) {
+				if ($db->query("INSERT IGNORE INTO " . table_users . " (user_login, user_email, user_pass, user_date, user_ip, user_lastlogin,user_categories) VALUES ('".$this->username."', '".$this->email."', '".$saltedpass."', NOW(), '".$userip."', NOW(),'')")) {
 					return true;
 				} else {
 					return false;
@@ -372,13 +374,13 @@ class User
 
 function user_group_read($user_id,$order_by='')
 {
-	global $db, $main_smarty, $view, $user, $rows, $page_size, $offset;
+	global $db, $main_smarty;
 
 	if (!is_numeric($user_id)) die();
 
 	if ($order_by == "")
 		$order_by = "group_name DESC";
-	include_once(mnminclude.'smartyvariables.php');
+	include_once(KAHUK_LIBS_DIR.'smartyvariables.php');
 
 	$groups = $db->get_results($sql="SELECT * FROM " . table_group_member . "  	
 					LEFT JOIN " . table_groups . " ON group_id=member_group_id
@@ -399,12 +401,12 @@ function user_group_read($user_id,$order_by='')
 function adjustVotesCount($id) 
 {
 	global $db;
-	require_once(mnminclude.'link.php');
-	require_once(mnminclude.'votes.php');
+	require_once(KAHUK_LIBS_DIR.'link.php');
+	require_once(KAHUK_LIBS_DIR.'class-votes.php');
 	/* Redwine: used union query to make sure that all the comments of the spammer are also included, because it is very possible that he commented on more links than he voted */
 	$results = $db->get_results("SELECT `vote_link_id`, `vote_user_id` FROM " . table_votes . " WHERE `vote_user_id` = $id UNION SELECT `comment_link_id`, `comment_user_id` FROM " . table_comments . " WHERE `comment_user_id` = $id");
 	if ($results) {
-		$db->query('DELETE FROM `' . table_votes . "` WHERE `vote_user_id` = $id");
+		$db->query("DELETE FROM `" . table_votes . "` WHERE `vote_user_id` = $id");
 		$db->query("DELETE FROM `" . table_comments . "` WHERE `comment_user_id` =$id");
 		foreach ($results as $result) {
 			$link = new Link;
@@ -440,9 +442,8 @@ function killspam($id)
 {
 	global $db;
 
-	require_once(mnminclude.'link.php');
-	require_once(mnminclude.'votes.php');
-	require_once(mnminclude.'tags.php');
+	require_once(KAHUK_LIBS_DIR.'link.php');
+	require_once(KAHUK_LIBS_DIR.'class-votes.php');
 
 	$user= $db->get_row('SELECT * FROM ' . table_users ." where user_id=$id");
 	if (!$user->user_id) {
@@ -472,9 +473,9 @@ function killspam($id)
 
 	$results = $db->get_results("SELECT link_id, link_url FROM `" . table_links . "` WHERE `link_author` = $id");
 	global $USER_SPAM_RULESET, $FRIENDLY_DOMAINS;
-	$filename = mnmpath.$USER_SPAM_RULESET;
+	$filename = KAHUKPATH.$USER_SPAM_RULESET;
 	$lines = file($filename,FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-	$approved = file(mnmpath.$FRIENDLY_DOMAINS,FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+	$approved = file(KAHUKPATH.$FRIENDLY_DOMAINS,FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 	if ($results) {
 	    foreach ($results as $result) {
 			if (preg_match('/:\/\/(www\.)?([^\/]+)(\/|$)/',$result->link_url,$m)) {

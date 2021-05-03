@@ -6,12 +6,10 @@ if(!isset($main_smarty)){$main_smarty = new Smarty;}
 // If we're calling this page directly, set main_smarty
 
 include_once('config.php');
-include_once(mnminclude.'html1.php');
-include_once(mnminclude.'link.php');
-include_once(mnminclude.'tags.php');
-include_once(mnminclude.'search.php');
-include_once(mnminclude.'smartyvariables.php');
-include_once(mnminclude.'sidebarstories.php');
+include_once(KAHUK_LIBS_DIR.'link.php');
+include_once(KAHUK_LIBS_DIR.'search.php');
+include_once(KAHUK_LIBS_DIR.'smartyvariables.php');
+include_once(KAHUK_LIBS_DIR.'sidebarstories.php');
 
 global $the_template, $main_smarty;
 
@@ -25,18 +23,18 @@ global $the_template, $main_smarty;
 	
 	if(pagename == "index"){
 		$ss->filterToStatus = "new";
-		$ss->header = $main_smarty->get_config_vars("PLIKLI_Visual_Plikli_Queued");
+		$ss->header = $main_smarty->get_config_vars("KAHUK_Visual_Kahuk_Queued");
 		$ss->link = getmyurl("new");
 	}
 	elseif(pagename == "new"){
 		$ss->filterToStatus = "published";
-		$ss->header = $main_smarty->get_config_vars("PLIKLI_Visual_Published_News");
-		$ss->link = my_base_url.my_plikli_base;
+		$ss->header = $main_smarty->get_config_vars("KAHUK_Visual_Published_News");
+		$ss->link = my_base_url.my_kahuk_base;
 	}
 	else{
 		$ss->filterToStatus = "published";
-		$ss->header = $main_smarty->get_config_vars("PLIKLI_Visual_Published_News");
-		$ss->link = my_base_url.my_plikli_base;
+		$ss->header = $main_smarty->get_config_vars("KAHUK_Visual_Published_News");
+		$ss->link = my_base_url.my_kahuk_base;
 	}
 	
 	$ss->template = $my_base_url . './modules/sidebar_stories/templates/sidebar_stories.tpl';

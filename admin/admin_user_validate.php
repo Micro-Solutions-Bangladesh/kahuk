@@ -3,10 +3,8 @@
 include_once('../internal/Smarty.class.php');
 $main_smarty = new Smarty;
 include('../config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'user.php');
-include(mnminclude.'smartyvariables.php');
-include(mnminclude.'admin_config.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
+include(KAHUK_LIBS_DIR.'admin_config.php');
 global $db;
 check_referrer();
 force_authentication();
@@ -44,5 +42,3 @@ if($canIhaveAccess == 0){
 // pagename
 define('pagename', 'admin_user_validate');
 $main_smarty->assign('pagename', pagename);
-
-?>

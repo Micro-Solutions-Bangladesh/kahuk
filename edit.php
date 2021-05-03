@@ -4,10 +4,8 @@ include_once('internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'link.php');
-include(mnminclude.'tags.php');
-include(mnminclude.'smartyvariables.php');
+include(KAHUK_LIBS_DIR.'link.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
 
 check_referrer();
 
@@ -43,7 +41,7 @@ if(is_numeric($_GET['id'])) {
 	}	
 	if ($comments) {
 		$current_user->owncomment = "YES";
-		require_once(mnminclude.'comment.php');
+		require_once(KAHUK_LIBS_DIR.'comment.php');
 		$comment = new Comment;
 		foreach($comments as $dbcomment) {
 			$comment->id=$dbcomment->comment_id;
@@ -59,8 +57,8 @@ if(is_numeric($_GET['id'])) {
 		}
 	} else {
 		$current_user->owncomment = "NO";
-		echo $main_smarty->get_config_vars("PLIKLI_Visual_EditComment_NotYours") . '<br/><br/>';
-		echo $main_smarty->get_config_vars("PLIKLI_Visual_EditComment_Click") . '<a href = "'.getmyurl('story', sanitize($_GET['id'], 3)).'">'.$main_smarty->get_config_vars("PLIKLI_Visual_EditComment_Here").'</a> '.$main_smarty->get_config_vars("PLIKLI_Visual_EditComment_ToReturn").'<br/><br/>';
+		echo $main_smarty->get_config_vars("KAHUK_Visual_EditComment_NotYours") . '<br/><br/>';
+		echo $main_smarty->get_config_vars("KAHUK_Visual_EditComment_Click") . '<a href = "'.getmyurl('story', sanitize($_GET['id'], 3)).'">'.$main_smarty->get_config_vars("KAHUK_Visual_EditComment_Here").'</a> '.$main_smarty->get_config_vars("KAHUK_Visual_EditComment_ToReturn").'<br/><br/>';
 	}
 
 	if($current_user->authenticated) {
@@ -77,7 +75,7 @@ if(is_numeric($_GET['id'])) {
 
 	// show the template
 	$main_smarty->assign('tpl_center', $the_template . '/edit_comment_center');
-	$main_smarty->display($the_template . '/plikli.tpl');
+	$main_smarty->display($the_template . '/kahuk.tpl');
 }
 
 
@@ -112,7 +110,7 @@ function insert_comment () {
 			is_numeric(sanitize($_POST['randkey'], 3)) &&
 			sanitize($_POST['randkey'], 3) > 0 && 
 			sanitize($_POST['comment_content'], 4, $Story_Content_Tags_To_Allow) != '' ) {
-		require_once(mnminclude.'comment.php');
+		require_once(KAHUK_LIBS_DIR.'comment.php');
 		$comment = new Comment;
 		$comment->id=$link->commentid;
 		$comment->read();
@@ -124,7 +122,7 @@ function insert_comment () {
 		{
 			$main_smarty->assign('url', $_SERVER['REQUEST_URI']);
 			$main_smarty->assign('tpl_center', $the_template . '/comment_errors');
-			$main_smarty->display($the_template . '/plikli.tpl');
+			$main_smarty->display($the_template . '/kahuk.tpl');
 			exit;
 		}
 		$vars['comment'] = $comment->id;
@@ -139,5 +137,3 @@ function insert_comment () {
 		die;
 	}
 }
-
-?>

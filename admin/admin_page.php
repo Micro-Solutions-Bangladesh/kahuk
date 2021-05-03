@@ -4,10 +4,8 @@ include_once('../internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('../config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'link.php');
-include(mnminclude.'tags.php');
-include(mnminclude.'smartyvariables.php');
+include(KAHUK_LIBS_DIR.'link.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
 
 check_referrer();
 
@@ -39,8 +37,8 @@ $main_smarty->assign('isAdmin', $canIhaveAccess);
 define('pagename', 'admin_page'); 
 $main_smarty->assign('pagename', pagename);
 
-// read the mysql database to get the plikli version
-/* Redwine: plikli version query removed and added to /libs/smartyvriables.php */
+// read the mysql database to get the kahuk version
+/* Redwine: kahuk version query removed and added to /libs/smartyvriables.php */
 
 global $db;
 
@@ -55,7 +53,7 @@ $mode = $_REQUEST['mode'];
     			$vars = array('link_id' => $link_id);
     			check_actions('admin_story_delete', $vars);
 
-			header("Location: ".my_plikli_base."/admin/admin_page.php");
+			header("Location: ".my_kahuk_base."/admin/admin_page.php");
 			die();
 		}
 	}
@@ -71,10 +69,10 @@ if(!empty($page_id)) {
 							<a href="'.getmyurl("page", $page_results->link_title_url).'" title="'.$page_results->link_title.'" target="_blank" rel="noopener noreferrer">'.$page_results->link_title.'</a>
 						</td>
 						<td class="page_td_edit">
-							<a class="btn btn-default" href="'.$my_base_url.$my_plikli_base.'/admin/edit_page.php?link_id='.$page_results->link_id.'"><i class="fa fa-edit" title="'. $main_smarty->get_config_vars("PLIKLI_Visual_AdminPanel_Page_Edit") .'"></i></a>
+							<a class="btn btn-default" href="'.KAHUK_BASE_URL.'/admin/edit_page.php?link_id='.$page_results->link_id.'"><i class="fa fa-edit" title="'. $main_smarty->get_config_vars("KAHUK_Visual_AdminPanel_Page_Edit") .'"></i></a>
 						</td>
 						<td class="page_td_delete">
-							<a class="btn btn-danger" onclick="return confirm(\''.$main_smarty->get_config_vars('PLIKLI_Visual_Page_Delete_Confirm').'\');" href="'.$my_base_url.$my_plikli_base.'/admin/admin_page.php?link_id='.$page_results->link_id.'&mode=delete"><i class="fa fa-trash-o" title="'. $main_smarty->get_config_vars("PLIKLI_Visual_AdminPanel_Page_Delete") .'"></i></a>
+							<a class="btn btn-danger" onclick="return confirm(\''.$main_smarty->get_config_vars('KAHUK_Visual_Page_Delete_Confirm').'\');" href="'.KAHUK_BASE_URL.'/admin/admin_page.php?link_id='.$page_results->link_id.'&mode=delete"><i class="fa fa-trash-o" title="'. $main_smarty->get_config_vars("KAHUK_Visual_AdminPanel_Page_Delete") .'"></i></a>
 						</td>
 					</tr>';
 	}
@@ -82,9 +80,6 @@ if(!empty($page_id)) {
 	if (!empty($page_text)) $main_smarty->assign('page_text' , $page_text);
 }
 
-
-
 // show the template
 $main_smarty->assign('tpl_center', '/admin/pages');
 $main_smarty->display('/admin/admin.tpl');
-?>

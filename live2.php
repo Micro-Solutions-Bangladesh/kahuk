@@ -4,11 +4,10 @@ include_once('internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('config.php');
-include(mnminclude.'link.php');
+include(KAHUK_LIBS_DIR.'link.php');
 
 if(!Enable_Live) {
-	header("Location: $my_plikli_base/error_404.php");
-	die();
+	kahuk_redirect_404();
 }
 
 // number of items to show on the page
@@ -194,5 +193,3 @@ function get_status($status) {
 	}
 	return $status;
 }
-
-?>

@@ -3,11 +3,9 @@
 	$main_smarty = new Smarty;
 	
 	include('config.php');
-	include(mnminclude.'html1.php');
-	include(mnminclude.'link.php');
-	include(mnminclude.'tags.php');
-	include(mnminclude.'search.php');
-	include(mnminclude.'smartyvariables.php');
+	include(KAHUK_LIBS_DIR.'link.php');
+	include(KAHUK_LIBS_DIR.'search.php');
+	include(KAHUK_LIBS_DIR.'smartyvariables.php');
 
 	$search = new Search();
 	
@@ -28,4 +26,3 @@
 	
 	include('./libs/link_summary.php'); // this is the code that show the links / stories
 	echo $link_summary_output;
-?>

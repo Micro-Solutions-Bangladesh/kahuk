@@ -4,10 +4,8 @@ include_once('../internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('../config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'link.php');
-include(mnminclude.'user.php');
-include(mnminclude.'smartyvariables.php');
+include(KAHUK_LIBS_DIR.'link.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
 
 // If called from a browser, required authentication. Cron version does not require.
 if ($_SERVER['SERVER_ADDR'])
@@ -32,7 +30,7 @@ if ($_SERVER['SERVER_ADDR'])
 // $message = "";
 /* Redwine: new query created to get the optimize table query in one shot and therefore save some processing time and cpu.*/
 	include_once('../libs/dbconnect.php');
-    $query = "SELECT CONCAT('OPTIMIZE TABLE ', GROUP_CONCAT(table_name) , ';' ) AS statement FROM information_schema.tables WHERE table_schema = '".EZSQL_DB_NAME."' AND table_name LIKE '".table_prefix."%';";
+    $query = "SELECT CONCAT('OPTIMIZE TABLE ', GROUP_CONCAT(table_name) , ';' ) AS statement FROM information_schema.tables WHERE table_schema = '".EZSQL_DB_NAME."' AND table_name LIKE '".TABLE_PREFIX."%';";
     $result = $db->get_var($query);
     /*$table_list = "";
     while ($cur_table = mysql_fetch_object($result)) {
@@ -43,13 +41,13 @@ if ($_SERVER['SERVER_ADDR'])
 	<div class="modal-content">
 		<div class="modal-header">
 			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-			<h4 class="modal-title"><?php echo $main_smarty->get_config_vars('PLIKLI_Visual_AdminPanel_Optimized') ?></h4>
+			<h4 class="modal-title"><?php echo $main_smarty->get_config_vars('KAHUK_Visual_AdminPanel_Optimized') ?></h4>
 		</div>
 		<div class="modal-body">
 			<?php
 				if (!empty($result)) {
 					$db->query($result);
-					echo '<p>'.$main_smarty->get_config_vars("PLIKLI_Visual_AdminPanel_Optimized_Message").'</p>';
+					echo '<p>'.$main_smarty->get_config_vars("KAHUK_Visual_AdminPanel_Optimized_Message").'</p>';
 				}
 			?>
 		</div>

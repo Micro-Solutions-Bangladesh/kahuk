@@ -5,7 +5,6 @@ class Search {
 	var $searchTerm = '';
 	var $filterToStatus = 'all';
 	var $filterToTimeFrame = '';
-	var $isTag = false;
 	var $searchTable = '';
 	var $orderBy = NULL;
 	var $offset = 0;
@@ -429,7 +428,6 @@ class Search {
 
 	function new_search(){
 		// do various searches and put the results in the $foundlinks array
-		// if isTag == true then Just search JUST tags
 		// if !== true, then search normal (title, desc,etc) AND tags
 		
 		
@@ -438,7 +436,6 @@ class Search {
 		if(!isset($this->searchTerm)){return false;}
 
 		$foundlinks = array();
-		$original_isTag = $this->isTag;
 
 		// search comments
 		if (Search_Comments) {
@@ -461,7 +458,6 @@ class Search {
 		}
 		
 		// search tags
-		$this->isTag = true;
 		$this->doSearch($this->pagesize);
 		$links = $db->get_results($this->sql);
 		if ($links) {
@@ -475,7 +471,7 @@ class Search {
 			}
 		}
 
-		if($original_isTag !== true){
+
 			// search links
 			$this->isTag = false;
 			$this->doSearch($this->pagesize);
@@ -490,7 +486,7 @@ class Search {
 					}
 				}
 			}
-		}
+
 		
 		if(!empty($newfoundlinks)){
 			if (Voting_Method == 3)
@@ -545,98 +541,44 @@ class Search {
 			$words = $this->searchTerm;
 			$SearchMethod = SearchMethod; // create a temp variable so we can change the value without possibly affecting anything else
 
-			if($this->isTag == true){
-				// search the tags table
-				$this->searchTable = table_tags . " INNER JOIN " . table_links . " ON " . table_tags . ".tag_link_id = " . table_links . ".link_id";
-				
-				// thanks to jalso for this code
-					$x = explode(",",$words);
-					$sq = "(";
-					foreach($x as $k=>$v){
-					 $sq .= "`tag_words` = '".trim($x[$k])."'";
-					 if($k != (count($x) - 1))$sq .= " OR ";
-					}
-					$sq .= ")";
-					if(Voting_Method == 2)
-						$where = " AND ".$sq." GROUP BY " . table_links . ".link_id, `link_votes` ORDER BY avg(vote_value) DESC ";
-					else
-						$where = " AND ".$sq." GROUP BY " . table_links . ".link_id, `link_votes` ORDER BY `link_votes` DESC";
-				// ---
-				
-			} else {
-				// search the links table
-				$this->searchTable = table_links;
-				$words = str_replace(array('-','+','/','\\','?','=','$','%','^','&','*','(',')','!','@','|'),'',$words);
-				if($SearchMethod == 3){
-					$SearchMethod = $this->determine_search_method($words);
-				}
-				$matchfields = '';
-				
-				/*Redwine: to enhance the search result, I commented out the if($SearchMethod == 1){ & if($SearchMethod == 2){ statements. So the search conditions apply now to both.*/
-				/*if($SearchMethod == 1){
-					// use SQL "against" for searching
-					// doesn't work with "stopwords" or less than 4 characters
-
-					
-					if($this->search_extra_fields == true){
-						if(Enable_Extra_Fields){
-							if(Enable_Extra_Field_1 == true && Field_1_Searchable == true){$matchfields .= ', `link_field1`';}
-							if(Enable_Extra_Field_2 == true && Field_2_Searchable == true){$matchfields .= ', `link_field2`';}
-							if(Enable_Extra_Field_3 == true && Field_3_Searchable == true){$matchfields .= ', `link_field3`';}
-							if(Enable_Extra_Field_4 == true && Field_4_Searchable == true){$matchfields .= ', `link_field4`';}
-							if(Enable_Extra_Field_5 == true && Field_5_Searchable == true){$matchfields .= ', `link_field5`';}
-							if(Enable_Extra_Field_6 == true && Field_6_Searchable == true){$matchfields .= ', `link_field6`';}
-							if(Enable_Extra_Field_7 == true && Field_7_Searchable == true){$matchfields .= ', `link_field7`';}
-							if(Enable_Extra_Field_8 == true && Field_8_Searchable == true){$matchfields .= ', `link_field8`';}
-							if(Enable_Extra_Field_9 == true && Field_9_Searchable == true){$matchfields .= ', `link_field9`';}
-							if(Enable_Extra_Field_10 == true && Field_10_Searchable == true){$matchfields .= ', `link_field10`';}
-							if(Enable_Extra_Field_11 == true && Field_11_Searchable == true){$matchfields .= ', `link_field11`';}
-							if(Enable_Extra_Field_12 == true && Field_12_Searchable == true){$matchfields .= ', `link_field12`';}
-							if(Enable_Extra_Field_13 == true && Field_13_Searchable == true){$matchfields .= ', `link_field13`';}
-							if(Enable_Extra_Field_14 == true && Field_14_Searchable == true){$matchfields .= ', `link_field14`';}
-							if(Enable_Extra_Field_15 == true && Field_15_Searchable == true){$matchfields .= ', `link_field15`';}
-						}
-					}
-
-					//$where = " AND MATCH (link_url, link_url_title, link_title, link_content, link_tags $matchfields) AGAINST ('$words') ";
-					$words = $db->escape(str_replace('+','',stripslashes($words)));
-					if (preg_match_all('/("[^"]+"|[^\s]+)/',$words,$m))
-						$words = '+'.join(" +",$m[1]);
-					$where = " AND MATCH (link_title, link_content, link_tags $matchfields) AGAINST ('$words' IN BOOLEAN MODE) ";
-
-				}*/
-				//if($SearchMethod == 2){
-					// use % for searching
-
-					if($this->search_extra_fields == true){
-						if(Enable_Extra_Fields){
-							if(Enable_Extra_Field_1 == true && Field_1_Searchable == true){$matchfields .= " or `link_field1` like '%$words%' ";}
-							if(Enable_Extra_Field_2 == true && Field_2_Searchable == true){$matchfields .= " or `link_field2` like '%$words%' ";}
-							if(Enable_Extra_Field_3 == true && Field_3_Searchable == true){$matchfields .= " or `link_field3` like '%$words%' ";}
-							if(Enable_Extra_Field_4 == true && Field_4_Searchable == true){$matchfields .= " or `link_field4` like '%$words%' ";}
-							if(Enable_Extra_Field_5 == true && Field_5_Searchable == true){$matchfields .= " or `link_field5` like '%$words%' ";}
-							if(Enable_Extra_Field_6 == true && Field_6_Searchable == true){$matchfields .= " or `link_field6` like '%$words%' ";}
-							if(Enable_Extra_Field_7 == true && Field_7_Searchable == true){$matchfields .= " or `link_field7` like '%$words%' ";}
-							if(Enable_Extra_Field_8 == true && Field_8_Searchable == true){$matchfields .= " or `link_field8` like '%$words%' ";}
-							if(Enable_Extra_Field_9 == true && Field_9_Searchable == true){$matchfields .= " or `link_field9` like '%$words%' ";}
-							if(Enable_Extra_Field_10 == true && Field_10_Searchable == true){$matchfields .= " or `link_field10` like '%$words%' ";}
-							if(Enable_Extra_Field_11 == true && Field_11_Searchable == true){$matchfields .= " or `link_field11` like '%$words%' ";}
-							if(Enable_Extra_Field_12 == true && Field_12_Searchable == true){$matchfields .= " or `link_field12` like '%$words%' ";}
-							if(Enable_Extra_Field_13 == true && Field_13_Searchable == true){$matchfields .= " or `link_field13` like '%$words%' ";}
-							if(Enable_Extra_Field_14 == true && Field_14_Searchable == true){$matchfields .= " or `link_field14` like '%$words%' ";}
-							if(Enable_Extra_Field_15 == true && Field_15_Searchable == true){$matchfields .= " or `link_field15` like '%$words%' ";}
-						}
-					}
-					
-					$where = " AND ((";
-					$where .= $this->explode_search('link_url', $words) . ")  OR (";
-					$where .= $this->explode_search('link_url_title', $words) . " ) OR (";
-					$where .= $this->explode_search('link_title', $words) . " ) OR (";
-					$where .= $this->explode_search('link_content', $words) . " ) OR (";
-					$where .= $this->explode_search('link_tags', $words);
-					$where .= ") $matchfields) ";
-				//}
+			// search the links table
+			$this->searchTable = table_links;
+			$words = str_replace(array('-','+','/','\\','?','=','$','%','^','&','*','(',')','!','@','|'),'',$words);
+			
+			if($SearchMethod == 3){
+				$SearchMethod = $this->determine_search_method($words);
 			}
+
+			$matchfields = '';
+			
+			if($this->search_extra_fields == true){
+				if(Enable_Extra_Fields){
+					if(Enable_Extra_Field_1 == true && Field_1_Searchable == true){$matchfields .= " or `link_field1` like '%$words%' ";}
+					if(Enable_Extra_Field_2 == true && Field_2_Searchable == true){$matchfields .= " or `link_field2` like '%$words%' ";}
+					if(Enable_Extra_Field_3 == true && Field_3_Searchable == true){$matchfields .= " or `link_field3` like '%$words%' ";}
+					if(Enable_Extra_Field_4 == true && Field_4_Searchable == true){$matchfields .= " or `link_field4` like '%$words%' ";}
+					if(Enable_Extra_Field_5 == true && Field_5_Searchable == true){$matchfields .= " or `link_field5` like '%$words%' ";}
+					if(Enable_Extra_Field_6 == true && Field_6_Searchable == true){$matchfields .= " or `link_field6` like '%$words%' ";}
+					if(Enable_Extra_Field_7 == true && Field_7_Searchable == true){$matchfields .= " or `link_field7` like '%$words%' ";}
+					if(Enable_Extra_Field_8 == true && Field_8_Searchable == true){$matchfields .= " or `link_field8` like '%$words%' ";}
+					if(Enable_Extra_Field_9 == true && Field_9_Searchable == true){$matchfields .= " or `link_field9` like '%$words%' ";}
+					if(Enable_Extra_Field_10 == true && Field_10_Searchable == true){$matchfields .= " or `link_field10` like '%$words%' ";}
+					if(Enable_Extra_Field_11 == true && Field_11_Searchable == true){$matchfields .= " or `link_field11` like '%$words%' ";}
+					if(Enable_Extra_Field_12 == true && Field_12_Searchable == true){$matchfields .= " or `link_field12` like '%$words%' ";}
+					if(Enable_Extra_Field_13 == true && Field_13_Searchable == true){$matchfields .= " or `link_field13` like '%$words%' ";}
+					if(Enable_Extra_Field_14 == true && Field_14_Searchable == true){$matchfields .= " or `link_field14` like '%$words%' ";}
+					if(Enable_Extra_Field_15 == true && Field_15_Searchable == true){$matchfields .= " or `link_field15` like '%$words%' ";}
+				}
+			}
+				
+			$where = " AND ((";
+			$where .= $this->explode_search('link_url', $words) . ")  OR (";
+			$where .= $this->explode_search('link_url_title', $words) . " ) OR (";
+			$where .= $this->explode_search('link_title', $words) . " ) OR (";
+			$where .= $this->explode_search('link_content', $words) . " ) OR (";
+			$where .= $this->explode_search('link_tags', $words);
+			$where .= ") $matchfields) ";
+
 			return $where;
 		} else {
 			$this->searchTable = table_links;

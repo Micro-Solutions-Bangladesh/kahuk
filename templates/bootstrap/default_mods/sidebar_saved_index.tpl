@@ -11,11 +11,9 @@
 			$main_smarty = new Smarty;
 
 			include_once('config.php');
-			include_once(mnminclude.'html1.php');
-			include_once(mnminclude.'link.php');
-			include_once(mnminclude.'tags.php');
-			include_once(mnminclude.'search.php');
-			include_once(mnminclude.'smartyvariables.php');
+			include_once(KAHUK_LIBS_DIR.'link.php');
+			include_once(KAHUK_LIBS_DIR.'search.php');
+			include_once(KAHUK_LIBS_DIR.'smartyvariables.php');
 
 			// -------------------------------------------------------------------------------------
 			/* Redwine: added $current_user to the globals to accurately get the logged in user_id so that the logged in user will only see their saved stories and not someone's else */

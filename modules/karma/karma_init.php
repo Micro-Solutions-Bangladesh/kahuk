@@ -1,8 +1,8 @@
 <?php
-if(defined('mnminclude')){
+if(defined('KAHUK_LIBS_DIR')){
 	include_once('karma_settings.php');
 
-	// tell plikli what pages this modules should be included in
+	// tell kahuk what pages this modules should be included in
 	// pages are <script name> minus .php
 	// index.php becomes 'index' and new.php becomes 'new'
 	$do_not_include_in_pages = array();
@@ -24,7 +24,7 @@ if(defined('mnminclude')){
 		module_add_action('comment_spam', 'karma_comment_spam','');
 		module_add_action('link_remove_vote_post', 'karma_unvote','');
 
-		include_once(mnmmodules . 'karma/karma_main.php');
+		include_once(KAHUK_MODULES_DIR . 'karma/karma_main.php');
 	}
 
 	$include_in_pages = array('module');
@@ -34,7 +34,7 @@ if(defined('mnminclude')){
 		if($moduleName == 'karma'){
 			module_add_action('module_page', 'karma_showpage', '');
 		
-			include_once(mnmmodules . 'karma/karma_main.php');
+			include_once(KAHUK_MODULES_DIR . 'karma/karma_main.php');
 		}
 	}
 }

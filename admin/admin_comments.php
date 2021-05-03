@@ -4,12 +4,10 @@ include_once('../internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('../config.php');
-include(mnminclude.'html1.php');
-include(mnminclude.'comment.php');
-include(mnminclude.'link.php');
-include(mnminclude.'user.php');
-include(mnminclude.'smartyvariables.php');
-include(mnminclude.'csrf.php');
+include(KAHUK_LIBS_DIR.'comment.php');
+include(KAHUK_LIBS_DIR.'link.php');
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
+include(KAHUK_LIBS_DIR.'csrf.php');
 
 check_referrer();
 
@@ -54,7 +52,7 @@ if($canIhaveAccess == 1) {
 	
 	// if user is searching
 	$search_sql = '';
-	if(isset($_GET["keyword"]) && $_GET["keyword"]!= $main_smarty->get_config_vars('PLIKLI_Visual_Search_SearchDefaultText') && !empty($_GET["keyword"])){
+	if(isset($_GET["keyword"]) && $_GET["keyword"]!= $main_smarty->get_config_vars('KAHUK_Visual_Search_SearchDefaultText') && !empty($_GET["keyword"])){
 		$search_sql = " AND (comment_content LIKE '%".sanitize($_GET["keyword"], 3)."%' OR user_login LIKE '%".sanitize($_GET["keyword"], 3)."%')";
 	}
 	$user_sql = '';
@@ -136,11 +134,11 @@ if($canIhaveAccess == 1) {
 	}
 	
 	// breadcrumbs and page title
-	$navwhere['text1'] = $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel');
+	$navwhere['text1'] = $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel');
 	$navwhere['link1'] = getmyurl('admin', '');
-	$navwhere['text2'] = $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel_Comments');
+	$navwhere['text2'] = $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel_Comments');
 	$main_smarty->assign('navbar_where', $navwhere);
-	$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('PLIKLI_Visual_Header_AdminPanel'));
+	$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel'));
 	
 	if (isset($_GET['action']) && sanitize($_GET['action'], 3) == "bulkmod" && isset($_POST['admin_acction'])) {
 		// Redwine: if TOKEN is empty, no need to continue, just display the invalid token error.
@@ -180,7 +178,7 @@ if($canIhaveAccess == 1) {
 						
 			
 			}
-			header("Location: ".my_plikli_base."/admin/admin_comments.php?page=".sanitize($_GET['page'],3));
+			header("Location: ".my_kahuk_base."/admin/admin_comments.php?page=".sanitize($_GET['page'],3));
 			die();
 
 		} else {
@@ -195,8 +193,8 @@ if($canIhaveAccess == 1) {
 	define('pagename', 'admin_comments'); 
 	$main_smarty->assign('pagename', pagename);
 	
-	// read the mysql database to get the plikli version
-	/* Redwine: plikli version query removed and added to /libs/smartyvriables.php */
+	// read the mysql database to get the kahuk version
+	/* Redwine: kahuk version query removed and added to /libs/smartyvriables.php */
 	
 	// show the template
 	$main_smarty->assign('tpl_center', '/admin/comments');
@@ -211,6 +209,3 @@ if($canIhaveAccess == 1) {
 else {
 	echo 'not for you! go away!';
 }
-
-
-?>
