@@ -31,17 +31,29 @@ if($canIhaveAccess == 0){
 	die();
 }
 
+// Check for the install folder, which should not be exist, once website installation is completed.
+if ( file_exists( KAHUKPATH . 'setup/index.php' ) ) {
+    if ( !DEV_MODE_ON ) {
+		echo "<p style=\"text-align: center;\">Please delete [or rename] install folder from the site root directory!</p>";
+	}
+}
+
+//
 if (isset($_GET['action']) && $_GET['action']=='move')
 {
 	$column = $_GET['left']<600 ? 'left' : 'right';
 	if (!is_numeric($_GET['id'])) die("Wrong parameter 'id'");
 	if (!is_numeric($_GET['top'])) die("Wrong parameter 'top'");
-/* Redwine: using php explode() instead of the deprecated split() which generates warnings. */
+	
+	/* using php explode() instead of the deprecated split() which generates warnings. */
 	$list = explode(',',$_GET['list']);
-	foreach ($list as $item)
-	    if ($item && is_numeric($item))
-		$db->query($sql="UPDATE ".table_widgets." SET `position`=".(++$i).", `column`='$column' WHERE id=$item");
-	/* Redwine: extra query. add the update column to the query above */
+	foreach ($list as $item) {
+		if ($item && is_numeric($item)) {
+			$db->query($sql="UPDATE ".table_widgets." SET `position`=".(++$i).", `column`='$column' WHERE id=$item");
+		}
+	}
+
+	/* extra query. add the update column to the query above */
 	//$db->query($sql="UPDATE ".table_widgets." SET `column`='$column' WHERE id={$_GET['id']}");
 	exit;
 }
@@ -66,10 +78,9 @@ $main_smarty->assign('navbar_where', $navwhere);
 $main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel'));
 
 // Database Size
-include_once('../libs/dbconnect.php');
-/* Redwine: changed the query to mysqli to be compliant with php 5.5+ and added a filter to just get the size of tables belonging to the current kahuk site */
+/* changed the query to mysqli to be compliant with php 5.5+ and added a filter to just get the size of tables belonging to the current kahuk site */
 function CalcFullDatabaseSize($database, $db) {
-   $result = $db->query("SELECT CONCAT(GROUP_CONCAT(table_name) , ';' ) AS statement FROM information_schema.tables WHERE table_schema = '" . EZSQL_DB_NAME. "' AND table_name LIKE  '" .TABLE_PREFIX."%'");
+   $result = $db->query("SELECT CONCAT(GROUP_CONCAT(table_name) , ';' ) AS statement FROM information_schema.tables WHERE table_schema = '" . DB_NAME. "' AND table_name LIKE  '" .TABLE_PREFIX."%'");
 	if (!$result) { return -1; }
 	$arraytables = $result->fetch_array(MYSQLI_ASSOC);
 	$mytables = explode(",",$arraytables['statement']);
@@ -86,14 +97,14 @@ function CalcFullDatabaseSize($database, $db) {
     return round($size, 2).$units[$i];
 }
 /* Redwine: creating a mysqli connection */
-$handle = new mysqli(EZSQL_DB_HOST,EZSQL_DB_USER,EZSQL_DB_PASSWORD);
+$handle = new mysqli(DB_HOST,DB_USER,DB_PASSWORD);
 	/* check connection */
 	if (mysqli_connect_errno()) {
 		printf("Connect failed: %s\n", mysqli_connect_error());
 		exit();
 	}
 // get the size of all tables in this database:
-$dbsize = CalcFullDatabaseSize(EZSQL_DB_NAME, $handle);
+$dbsize = CalcFullDatabaseSize(DB_NAME, $handle);
 $handle->close();
 
 //Redwine: get the server host name

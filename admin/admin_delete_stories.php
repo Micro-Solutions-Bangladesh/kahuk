@@ -25,7 +25,7 @@ function delete_storylink($todelete) {
 	global $db;
 
 /* Redwine: creating a mysqli connection */
-$handle = new mysqli(EZSQL_DB_HOST,EZSQL_DB_USER,EZSQL_DB_PASSWORD,EZSQL_DB_NAME);
+$handle = new mysqli(DB_HOST,DB_USER,DB_PASSWORD,DB_NAME);
 	/* check connection */
 	if (mysqli_connect_errno()) {
 		printf("Connect failed: %s\n", mysqli_connect_error());
@@ -80,9 +80,8 @@ $db->query("UPDATE " . table_totals . " SET total = '0' WHERE name = 'discard'")
 		</div>
 		<div class="modal-body">
 			<?php
-			include_once('../libs/dbconnect.php');
-			/* Redwine: new query created to get the optimize table query in one shot and therefore save some processing time and cpu.*/
-			$query = "SELECT CONCAT('OPTIMIZE TABLE ', GROUP_CONCAT(table_name) , ';' ) AS statement FROM information_schema.tables WHERE table_schema = '".EZSQL_DB_NAME."' AND table_name LIKE '".TABLE_PREFIX."%';";
+			/* new query created to get the optimize table query in one shot and therefore save some processing time and cpu.*/
+			$query = "SELECT CONCAT('OPTIMIZE TABLE ', GROUP_CONCAT(table_name) , ';' ) AS statement FROM information_schema.tables WHERE table_schema = '".DB_NAME."' AND table_name LIKE '".TABLE_PREFIX."%';";
 
 				$sqlqry = $db->get_var($query);
 				$db->query($sqlqry);

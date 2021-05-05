@@ -1,9 +1,9 @@
 <?php
 
-$GonxAdmin["dbhost"] = EZSQL_DB_HOST;
-$GonxAdmin["dbname"] = EZSQL_DB_NAME;
-$GonxAdmin["dbuser"] = EZSQL_DB_USER;
-$GonxAdmin["dbpass"] = EZSQL_DB_PASSWORD;
+$GonxAdmin["dbhost"] = DB_HOST;
+$GonxAdmin["dbname"] = DB_NAME;
+$GonxAdmin["dbuser"] = DB_USER;
+$GonxAdmin["dbpass"] = DB_PASSWORD;
 $GonxAdmin["dbtype"] = "mysql";
 $GonxAdmin["compression"] = array("bz2","zlib");
 $GonxAdmin["compression_default"] = "zlib";
@@ -20,4 +20,3 @@ require_once("libs/backup.class.php");
 require_once("libs/locale.class.php");	// Localisation class
 
 
-?>

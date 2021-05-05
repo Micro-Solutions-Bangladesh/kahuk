@@ -2,10 +2,10 @@
 
 include_once('../config.php');
 
-$db_host = EZSQL_DB_HOST;	//---- Database host(usually localhost).
-$db_name = EZSQL_DB_NAME;	//---- Your database name.
-$db_user = EZSQL_DB_USER;	//---- Your database username.
-$db_pass = EZSQL_DB_PASSWORD;	//---- Your database password.
+$db_host = DB_HOST;	//---- Database host(usually localhost).
+$db_name = DB_NAME;	//---- Your database name.
+$db_user = DB_USER;	//---- Your database username.
+$db_pass = DB_PASSWORD;	//---- Your database password.
 $backupdir = "./backup";
 $dowhat = "backup";
 

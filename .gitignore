@@ -28,6 +28,5 @@ cache/
 
 
 #########
-#/kahuk-configs.php
-#/settings.php
-#/libs/dbconnect.php
+/kahuk-configs.php
+/settings.php

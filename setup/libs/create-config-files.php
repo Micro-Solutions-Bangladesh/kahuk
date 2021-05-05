@@ -1,33 +1,5 @@
 <?php
 /**
- * Create /libs/dbconnect.php file
- * 
- * @since 5.0.0
- */
-function create_dbconnect_file() {
-	$default_content = file_get_contents( KAHUKPATH . 'libs/dbconnect.php.default' );
-
-	$new_content = str_replace( "database_username_here", EZSQL_DB_USER, $default_content );
-	$new_content = str_replace( "database_login_password_here", EZSQL_DB_PASSWORD, $new_content );
-	$new_content = str_replace( "database_name_here", EZSQL_DB_NAME, $new_content );
-	$new_content = str_replace( "database_host_here", EZSQL_DB_HOST, $new_content );
-
-	$path_to_file = KAHUKPATH . 'libs/dbconnect.php';
-
-	if ( $handle = fopen( $path_to_file, 'w' ) ) {
-
-		if ( fwrite( $handle, $new_content ) ) {
-			fclose( $handle );
-
-			_kahuk_messages_markup( '<code>/libs/dbconnect.php</code> file has been created!', 'success' );
-		}
-
-		chmod( $path_to_file, 0644 );
-	}
-}
-
-
-/**
  * Create /settings.php file
  * 
  * @since 5.0.0
@@ -49,8 +21,6 @@ function create_settings_file() {
 		chmod( $path_to_file, 0644 );
 	}
 }
-
-
 
 
 /**
@@ -78,10 +48,10 @@ function create_kahuk_configs_file() {
 	// $default_file_path = KAHUKPATH . 'kahuk-configs.php.default';
 	$default_content = file_get_contents( KAHUKPATH . 'kahuk-configs.php.default' );
 
-	$new_content = str_replace( "database_name_here", EZSQL_DB_NAME, $default_content );
-	$new_content = str_replace( "database_username_here", EZSQL_DB_USER, $new_content );
-	$new_content = str_replace( "database_login_password_here", EZSQL_DB_PASSWORD, $new_content );
-	$new_content = str_replace( "database_host_here", EZSQL_DB_HOST, $new_content );
+	$new_content = str_replace( "database_name_here", DB_NAME, $default_content );
+	$new_content = str_replace( "database_username_here", DB_USER, $new_content );
+	$new_content = str_replace( "database_login_password_here", DB_PASSWORD, $new_content );
+	$new_content = str_replace( "database_host_here", DB_HOST, $new_content );
 	$new_content = str_replace( "database_tables_prefix_here", TABLE_PREFIX, $new_content );
 
 	$new_content = str_replace( "kahuk_base_url_here", $root_url . $path, $new_content );

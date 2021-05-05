@@ -7,7 +7,7 @@
 // | Used to simulate an internal mail for any syte                       |
 // +----------------------------------------------------------------------+
 // |                                                                      |
-// | Copyright (C) 2005 João Pereira, joaopedro17@netvisao.pt Portugal    |
+// | Copyright (C) 2005 Joï¿½o Pereira, joaopedro17@netvisao.pt Portugal    |
 // |                                                                      |
 // | This program is free software; you can redistribute it and/or        |
 // | modify it under the terms of the GNU General Public License          |
@@ -24,7 +24,7 @@
 // | Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA            |
 // | 02111-1307, USA.                                                     |
 // |                                                                      |
-// | Author: João Pereira, joaopedro17@netvisao.pt Portugal               |
+// | Author: Joï¿½o Pereira, joaopedro17@netvisao.pt Portugal               |
 // |                                                                      |
 // +----------------------------------------------------------------------+
 //
@@ -73,22 +73,22 @@ class KMessaging
 * @var Used to save the database name
 */
 // var $DBName = 'dbname';
-var $DBName = EZSQL_DB_NAME;
+var $DBName = DB_NAME;
 /*
 * @var Used to save the Username of the MySql Server
 */
 // var $DBUser = 'username';
-var $DBUser = EZSQL_DB_USER;
+var $DBUser = DB_USER;
 /*
 * @var Used to save the Password of the MySql Server
 */
 // var $DBPass = 'password';
-var $DBPass = EZSQL_DB_PASSWORD;
+var $DBPass = DB_PASSWORD;
 /*
 * @var Used to save the Host of the MySql Server
 */
 // var $DBHost = 'localhost';
-var $DBHost = EZSQL_DB_HOST;
+var $DBHost = DB_HOST;
 	/*
 	* @var  Used to save the table name
 	*/

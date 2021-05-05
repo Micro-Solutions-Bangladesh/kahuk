@@ -3,7 +3,7 @@ $lang['StartInstall'] = 'Start Install';
 $lang['StartUpgrade'] = 'Start Upgrade';
 
 // header
-	$lang['kahuk_version'] = '5.0.0';
+	$lang['kahuk_version'] = '5.0.1';
 	$lang['installer'] = 'Installer';
 	$lang['Welcome'] = 'Welcome';
     $lang['Terms'] = 'Terms & Conditions';
@@ -30,7 +30,6 @@ $lang['StartUpgrade'] = 'Start Upgrade';
 	<ol>
 		<li>Rename settings.php.default to settings.php</li>
 		<li>Rename /languages/lang_english.conf.default to lang_english.conf</li>
-		<li>Rename /libs/dbconnect.php.default to dbconnect.php</li>
 		<li>Rename the directory /logs.default to /logs</li>
 		<li>CHMOD 0777 the following folders:
 			<ol>
@@ -43,7 +42,6 @@ $lang['StartUpgrade'] = 'Start Upgrade';
 		</li>
 		<li>CHMOD 0666 the following files:
 			<ol>
-				<li>/libs/dbconnect.php</li>
 				<li>settings.php</li>
 			</ol>
 		</li>
@@ -65,12 +63,10 @@ $lang['StartUpgrade'] = 'Start Upgrade';
 // step 3
 	$lang['ConnectionEstab'] = 'Database connection established...';
 	$lang['FoundDb'] = 'Found database...';
-	$lang['dbconnect'] = '\'/libs/dbconnect.php\' was updated successfully.';
+
 	$lang['NoErrors'] = 'There were no errors, continue onto the next step...';
 	$lang['Next'] = 'Next Step';
 	$lang['GoBack'] = 'Go Back and Try Again';
-	$lang['Error2-1'] = 'Could not write to \'libs/dbconnect.php\' file.';
-	$lang['Error2-2'] = 'Could not open \'/libs/dbconnect.php\' file for writing.';
 	$lang['Error2-3'] = 'Connected to the database, but the database name is incorrect.';
 	$lang['Error2-4'] = 'Cannot connect to the database server using the information provided.';
 
@@ -95,8 +91,7 @@ $lang['StartUpgrade'] = 'Start Upgrade';
 	$lang['InstallSuccess'] = 'Installation Complete!';
 	$lang['InstallSuccessMessage'] = 'Congratulations, you have set up a Kahuk CMS website! While your site is fully functional at this point, you will want to do a little cleaning up by following the directions below to secure your site.';
 	$lang['WhatToDo'] = 'What to do next:';
-	$lang['WhatToDoList'] = '		<li>chmod "/libs/dbconnect.php" back to 644, we will not need to change this file again.</li>
-		<li><strong>DELETE</strong> the "/install" directory from your server if you have successfully installed Kahuk.</li>
+	$lang['WhatToDoList'] = '<li><strong>DELETE</strong> the "/install" directory from your server if you have successfully installed Kahuk.</li>
 		<li>Login to the <a href="../admin/admin_index.php">dashboard</a> using the user information you entered from the previous step. Once you log in you should be presented with more information about how to use Kahuk.</li>
 		<li><a href="../admin/admin_config.php">Configure your site</a> using the dashboard.</li>
 		<li>Visit the <a href="https://www.kahuk.com/forum-2/">Kahuk Support</a> website if you have any questions.</li>';
@@ -121,9 +116,6 @@ $lang['StartUpgrade'] = 'Start Upgrade';
 // Errors
 	$lang['NotFound'] = 'was not found!';
 	$lang['CacheNotFound'] = 'was not found! Create a directory called /cache in your root directory and set it to CHMOD 777.';
-	$lang['DbconnectNotFound'] = 'was not found! Try renaming dbconnect.php.default to dbconnect.php';
 	$lang['SettingsNotFound'] = 'was not found! Try renaming settings.php.default to settings.php';
 	$lang['ZeroBytes'] = 'is 0 bytes.';
 	$lang['NotEditable'] = 'is not writable. Please CHMOD it to 777';
-	
-?>

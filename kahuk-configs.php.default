@@ -123,6 +123,10 @@ $my_kahuk_base = my_kahuk_base; // TODO Delete
 define( 'caching', 1 );
 define( 'summarize_mysql', 1 );
 
-if ( ! defined( 'KAHUK_DEV_DEBUG' ) ) {
-	define( 'KAHUK_DEV_DEBUG', false ); // This should be always false unless a contributor developer is working on it.
+/**
+ * DEV_MODE_ON should be always false unless a contributor developer is working on it.
+ * DEV_MODE_ON constant will be used to store debug messages/notices into logs/debug.log file and show message about install folder in admin
+ */
+if ( ! defined( 'DEV_MODE_ON' ) ) {
+	define( 'DEV_MODE_ON', false );
 }
