@@ -3,7 +3,7 @@ $lang['StartInstall'] = 'Start Install';
 $lang['StartUpgrade'] = 'Start Upgrade';
 
 // header
-	$lang['kahuk_version'] = '5.0.0';
+	$lang['kahuk_version'] = '5.0.1';
 	$lang['installer'] = 'Installer';
 	$lang['Welcome'] = 'Welcome';
     $lang['Terms'] = 'Terms & Conditions';

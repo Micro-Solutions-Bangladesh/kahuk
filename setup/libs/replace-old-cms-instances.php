@@ -82,7 +82,7 @@ function kahuk_replace_old_cms_instances() {
      */
 
     //
-    $sql = "UPDATE `" . table_misc_data . "` SET `name` = 'kahuk_version', `data` = '5.0.0'  WHERE `name` = 'plikli_version';";
+    $sql = "UPDATE `" . table_misc_data . "` SET `name` = 'kahuk_version', `data` = '5.0.1'  WHERE `name` = 'plikli_version';";
     _kahuk_replace_old_cms_instances( $sql, table_misc_data );
 
     //
