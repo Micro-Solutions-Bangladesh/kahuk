@@ -241,8 +241,8 @@ function kahuk_redirect( $location, $status = 302 ) {
 
 /**
  * Log message to the debug.log file
- * Edit the constant KAHUK_DEV_DEBUG while you are debugging the Kahuk CMS
- * KAHUK_DEV_DEBUG should always false in a live/production site
+ * Edit the constant DEV_MODE_ON while you are debugging the Kahuk CMS
+ * DEV_MODE_ON should always false in a live/production site
  * 
  * @since 5.0.0
  */
@@ -250,7 +250,7 @@ function kahuk_debug_log($message, $line = '', $func = '', $file = '')
 {
 	$output = "";
 
-	if (defined('KAHUK_DEV_DEBUG') && (true == KAHUK_DEV_DEBUG)) {
+	if (defined('DEV_MODE_ON') && (true == DEV_MODE_ON)) {
 		$output .= "\n===";
 	}
 
@@ -280,7 +280,7 @@ function kahuk_debug_log($message, $line = '', $func = '', $file = '')
  */
 function _kahuk_debug_log( $message )
 {
-	if (defined('KAHUK_DEV_DEBUG') && (true == KAHUK_DEV_DEBUG)) {
+	if (defined('DEV_MODE_ON') && (true == DEV_MODE_ON)) {
 		error_log( "\n" . $message, 3, KAHUK_LOG_DIR . "debug.log");
 	} else {
 		kahuk_error_log( $message );
