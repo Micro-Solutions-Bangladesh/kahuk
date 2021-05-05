@@ -31,17 +31,29 @@ if($canIhaveAccess == 0){
 	die();
 }
 
+// Check for the install folder, which should not be exist, once website installation is completed.
+if ( file_exists( KAHUKPATH . 'setup/index.php' ) ) {
+    if ( !DEV_MODE_ON ) {
+		echo "<p style=\"text-align: center;\">Please delete [or rename] install folder from the site root directory!</p>";
+	}
+}
+
+//
 if (isset($_GET['action']) && $_GET['action']=='move')
 {
 	$column = $_GET['left']<600 ? 'left' : 'right';
 	if (!is_numeric($_GET['id'])) die("Wrong parameter 'id'");
 	if (!is_numeric($_GET['top'])) die("Wrong parameter 'top'");
-/* Redwine: using php explode() instead of the deprecated split() which generates warnings. */
+	
+	/* using php explode() instead of the deprecated split() which generates warnings. */
 	$list = explode(',',$_GET['list']);
-	foreach ($list as $item)
-	    if ($item && is_numeric($item))
-		$db->query($sql="UPDATE ".table_widgets." SET `position`=".(++$i).", `column`='$column' WHERE id=$item");
-	/* Redwine: extra query. add the update column to the query above */
+	foreach ($list as $item) {
+		if ($item && is_numeric($item)) {
+			$db->query($sql="UPDATE ".table_widgets." SET `position`=".(++$i).", `column`='$column' WHERE id=$item");
+		}
+	}
+
+	/* extra query. add the update column to the query above */
 	//$db->query($sql="UPDATE ".table_widgets." SET `column`='$column' WHERE id={$_GET['id']}");
 	exit;
 }
