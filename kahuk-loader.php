@@ -11,5 +11,7 @@ if ( ! file_exists( KAHUKPATH . 'kahuk-configs.php' ) && file_exists( KAHUKPATH 
 }
 
 if ( file_exists( KAHUKPATH . 'kahuk-configs.php' ) && file_exists( KAHUKPATH . 'setup/index.php' ) ) {
-    // echo "<p style=\"text-align: center;\">Please delete install folder from the site root directory!</p>";
+    if ( !KAHUK_DEV_DEBUG ) {
+        echo "<p style=\"text-align: center;\">Please delete install folder from the site root directory!</p>";
+    }
 }
