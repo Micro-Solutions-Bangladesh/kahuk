@@ -4,6 +4,14 @@ if (!defined('KAHUKPATH')) {
 }
 
 /**
+ * 
+ * @since 4.1.5
+ */
+if ( !function_exists( 'gettext' ) ) {
+	function _( $s ) {return $s;}
+}
+
+/**
  * Get messages from the session
  * 
  * @since 5.0.0

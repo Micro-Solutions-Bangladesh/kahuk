@@ -61,23 +61,16 @@ foreach($result as $comment)
 		</div>
 		<div class="modal-body">
 			<?php 
-			/* Redwine: code to optimize the table is not working. In addition, i changed it from the deprectaed mysql_ extension to mysqli. */
-			/*$query = "OPTIMIZE TABLE comments";
-			mysql_query($query);
-			if (mysql_error()){
-				echo '<p>'.mysql_error().'</p>';
-			}else{*/
 				echo '<p><strong>'.$num_rows.'</strong> '.$main_smarty->get_config_vars("KAHUK_Visual_AdminPanel_Discarded_Comments_Removed_Message").'</p>';
-			//}
-			include_once('../libs/dbconnect.php');
-			$handle = new mysqli(EZSQL_DB_HOST,EZSQL_DB_USER,EZSQL_DB_PASSWORD,EZSQL_DB_NAME);
-			/* check connection */
-			if (mysqli_connect_errno()) {
-				printf("Connect failed: %s\n", mysqli_connect_error());
-				exit();
-			}
+				$handle = new mysqli(DB_HOST,DB_USER,DB_PASSWORD,DB_NAME);
+				
+				/* check connection */
+				if (mysqli_connect_errno()) {
+					printf("Connect failed: %s\n", mysqli_connect_error());
+					exit();
+				}
 			/* Redwine: Modified the code from the deprecated mysql_ to mysqli and also fixed the Optimization code that was not working, and created a new function in /libs/utils.php for this purpose that will also be used from many other places. */
-			Repair_Optmize_Table($handle,EZSQL_DB_NAME,table_comments);
+			Repair_Optmize_Table($handle,DB_NAME,table_comments);
 			$handle->close();
 			?>
 		</div>

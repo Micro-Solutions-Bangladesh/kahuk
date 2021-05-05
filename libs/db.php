@@ -5,7 +5,7 @@ if ( ! defined( 'KAHUKPATH' ) ) {
 }
 
 include_once(dirname(__FILE__).'/ez_sql_core.php');
-include_once(dirname(__FILE__).'/dbconnect.php');
+
 
 /**********************************************************************
 *  Author: Justin Vincent (justin@visunet.ie)
@@ -53,10 +53,6 @@ $ezsql_mysql_str = array (
 							<legend>Error establishing a database connection!</legend>
 							<ol>
 								<li>Run the <a href = "../install/troubleshooter.php">Kahuk Installer</a> Troubleshooter</a> to fix all errors and set all the required files and persmissions!</li>
-								<!--<li>Does the file /libs/dbconnect.php exist?</li>
-								<li>Does the above file have the correct database username and password combination?</li>
-								<li>Are you sure that you have typed the correct hostname? Typically this value is set to "localhost".</li>
-								<li>Are you sure that the database server is running?</li>-->
 							</ol>
 						</div>
 					</div><!--/.row-->
@@ -103,7 +99,7 @@ $ezsql_mysql_str = array (
 						<div class="col-md-12">
 							<legend>Error establishing mySQL database connection!</legend>
 							<ol>
-								<li>Does the file /libs/dbconnect.php exist?</li>
+								<li>Does the file /kahuk-configs.php exist?</li>
 								<li>Does the above file have the correct database username and password combination?</li>
 								<li>Are you sure that you have typed the correct hostname? Typically this value is set to "localhost".</li>
 								<li>Are you sure that the database server is running?</li>
@@ -551,4 +547,4 @@ class ezSQL_mysql extends ezSQLcore {
 	}
 }
 
-$db = new ezSQL_mysql( EZSQL_DB_USER, EZSQL_DB_PASSWORD, EZSQL_DB_NAME, EZSQL_DB_HOST );
+$db = new ezSQL_mysql( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST );

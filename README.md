@@ -66,7 +66,7 @@ Once you read the readme page, proceed to "Troubleshooter" in the navigation men
 * Rename the `/favicon.ico.default` to `/favicon.ico`
 * Rename the `/settings.php.default` to `/settings.php`
 * Rename the `/languages/lang_english.conf.default` file to `/languages/lang_english.conf`. Same instructions apply to any other language file that you might use that are located in the `/languages` directory.
-* Rename the `/libs/dbconnect.php.default` file to `/libs/dbconnect.php`
+
 * Rename the directory `/logs.default` to `/logs`
 * Upload the files to your server.
 * CHMOD 755 the following directories and files. If you experience any errors try 777.
@@ -77,7 +77,6 @@ Once you read the readme page, proceed to "Troubleshooter" in the navigation men
     * `/languages/` (all files contained in this folder should be CHMOD 777)
     * `/logs/` (all files contained should be CHMOD 777)
 * CHMOD 666 the following files
-    * `/libs/dbconnect.php`
     * `/settings.php`
 * Open `/install/index.php` in your web browser. If you are reading this document after you uploaded it to your server, click on the install link at the top of the page.
     * Select a language from the list. 
@@ -85,7 +84,7 @@ Once you read the readme page, proceed to "Troubleshooter" in the navigation men
     * Create an admin account. Please write down the login credentials for future reference.
     * Make sure there are no error messages! If you see an error message, or if installation fails, [report it here](https://github.com/Micro-Solutions-Bangladesh/kahuk/issues) or [report it here](https://www.facebook.com/KahukCMS/).
 * Delete your `/install` folder.
-* CHMOD *644* `libs/dbconnect.php`
+
 * Open `/index.php`
 * Log in to the admin account using the credentials generated during the install process.
 * Log in to the admin panel ( `/admin` ).

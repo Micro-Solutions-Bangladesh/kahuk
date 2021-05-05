@@ -53,24 +53,7 @@ if ( in_array( $step, $securedSteps ) ) {
 switch( $step ) {
     case 1: // Ask for database detail
 
-        // setup_config_display_header();
-        // require_once( KAHUKPATH . "setup/templates/header-bar.php" );
-
-
         kahuk_template_header();
-
-
-        //
-        $file = KAHUKPATH . 'libs/dbconnect.php';
-        $fileDefault = KAHUKPATH . 'libs/dbconnect.php.default';
-
-        if ( file_exists( $file ) ) {
-            $messagesArray[]['warning'] = "We found <code>/libs/dbconnect.php</code>, please delete the <code>/libs/dbconnect.php</code> file. <strong>For security purpose, <code>/libs/dbconnect.php</code> file need to delete manually.</strong>";
-        }
-
-        if ( ! file_exists( $fileDefault ) ) {
-            $messagesArray[]['warning'] = "File <code>/libs/dbconnect.php.default</code> file does not found. Please upload all the files and folders from Kahuk package";
-        }
 
         //
         $file = KAHUKPATH . 'kahuk-configs.php';
@@ -131,10 +114,10 @@ switch( $step ) {
                 $dbname = $_POST['dbname'];
                 $dbhost = $_POST['dbhost'];
 
-                define( 'EZSQL_DB_USER', $dbuser );
-                define( 'EZSQL_DB_PASSWORD', $dbpass );
-                define( 'EZSQL_DB_NAME', $dbname );
-                define( 'EZSQL_DB_HOST', $dbhost );
+                define( 'DB_USER', $dbuser );
+                define( 'DB_PASSWORD', $dbpass );
+                define( 'DB_NAME', $dbname );
+                define( 'DB_HOST', $dbhost );
                 define( 'TABLE_PREFIX', $tblprefix );
 
                 if ( $conn = @mysqli_connect( $dbhost, $dbuser, $dbpass ) ) {
@@ -152,8 +135,6 @@ switch( $step ) {
                     create_kahuk_configs_file(); // create /kahuk-configs.php file
                     
                     create_settings_file(); // create /settings.php file
-                    
-                    create_dbconnect_file(); // create libs/dbconnect.php file
 
                     if ( 2 == $step ) {
                         include( KAHUKPATH . "setup/templates/admin-detail-form.php" );
@@ -207,15 +188,6 @@ switch( $step ) {
 
     case 4:
             kahuk_template_header();
-
-            //
-            $file = KAHUKPATH . 'libs/dbconnect.php';
-
-            if ( file_exists( $file ) ) {
-                // $messagesArray[]['success'] = "We find <code>/libs/dbconnect.php</code> file.";
-            } else {
-                $messagesArray[]['danger'] = "<strong>Error:</strong> <code>/libs/dbconnect.php</code> file is missing.";
-            }
 
             //
             $file = KAHUKPATH . 'kahuk-configs.php';

@@ -27,15 +27,9 @@ if ($_SERVER['SERVER_ADDR'])
 	}
 }
 
-// $message = "";
-/* Redwine: new query created to get the optimize table query in one shot and therefore save some processing time and cpu.*/
-	include_once('../libs/dbconnect.php');
-    $query = "SELECT CONCAT('OPTIMIZE TABLE ', GROUP_CONCAT(table_name) , ';' ) AS statement FROM information_schema.tables WHERE table_schema = '".EZSQL_DB_NAME."' AND table_name LIKE '".TABLE_PREFIX."%';";
+/* new query created to get the optimize table query in one shot and therefore save some processing time and cpu.*/
+    $query = "SELECT CONCAT('OPTIMIZE TABLE ', GROUP_CONCAT(table_name) , ';' ) AS statement FROM information_schema.tables WHERE table_schema = '".DB_NAME."' AND table_name LIKE '".TABLE_PREFIX."%';";
     $result = $db->get_var($query);
-    /*$table_list = "";
-    while ($cur_table = mysql_fetch_object($result)) {
-        $table_list .= $cur_table->Name.", ";
-    }*/
 ?>
 <div class="modal-dialog">
 	<div class="modal-content">

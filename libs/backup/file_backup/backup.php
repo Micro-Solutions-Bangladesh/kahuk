@@ -19,10 +19,9 @@ class FileBackup {
 		  
 		  	
 		   // exclude the backup folder so we don't add in old backups.
-		   // exclude the dbconnect.php file because it stores our passwords.
 		   // exclude avatars (we just want a code backup)
 		   // avatars are backed up seperately
-		   if($list['dir'] == 0 && $list['path'] != "./backup/" && $list['path'] != "./avatars/" && $list['path'] != "./avatars/user_uploaded/" && $list['name'] != "dbconnect.php"){
+		   if($list['dir'] == 0 && $list['path'] != "./backup/" && $list['path'] != "./avatars/" && $list['path'] != "./avatars/user_uploaded/"){
 		   		//echo $list['path'] . $list['name'] . "<BR>";
 			   	$xlist[] = $list['path'] . $list['name'];
 		   }
