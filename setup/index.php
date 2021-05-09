@@ -164,42 +164,12 @@ switch( $step ) {
                     
                     create_settings_file(); // create /settings.php file
 
+                    // create_kahuk_htaccess_file(); // create htaccess file
+
                     include( KAHUKPATH . "setup/templates/admin-detail-form.php" );
 
                     kahuk_template_footer();
                 }
-
-
-
-                // if ( $conn = @mysqli_connect( DB_HOST, DB_USER, DB_PASSWORD ) ) {
-                //     $db_selected = mysqli_select_db( $conn, DB_NAME );
-
-                //     if ( !$db_selected ) {
-                //         die ('Error: ' . DB_NAME . ' : '.mysqli_error( $conn ) );
-                //     }
-
-                //     kahuk_template_header();
-
-                //     //
-                //     require_once( KAHUKPATH . "setup/libs/create-config-files.php" );
-
-                //     create_kahuk_configs_file(); // create /kahuk-configs.php file
-                    
-                //     create_settings_file(); // create /settings.php file
-
-                //     include( KAHUKPATH . "setup/templates/admin-detail-form.php" );
-
-                //     // if ( 2 == $step ) {
-                //     //     include( KAHUKPATH . "setup/templates/admin-detail-form.php" );
-                //     // } elseif ( 12 == $step ) {
-                //     //     include( KAHUKPATH . "setup/templates/lets-upgrade.php" );
-                //     // }
-
-                //     kahuk_template_footer();
-
-                // } else {
-                //     die ('Error: fail to connect ' . $dbname );
-                // }
 
             } else {
                 header ("Location: ./index.php?step=1"); // Redirect to first page
@@ -225,6 +195,8 @@ switch( $step ) {
                 create_kahuk_configs_file(); // create `/kahuk-configs.php` file
                 
                 create_settings_file(); // create `/settings.php` file
+
+                // create_kahuk_htaccess_file(); // create htaccess file
 
                 include( KAHUKPATH . "setup/templates/lets-upgrade.php" );
 
@@ -307,6 +279,8 @@ switch( $step ) {
 
             //
             kahuk_template_header();
+
+            // create_kahuk_htaccess_file(); // create htaccess file
 
             kahuk_template_footer();
 

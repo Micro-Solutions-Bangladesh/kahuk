@@ -332,12 +332,11 @@ function create_settings_file() {
 
 
 /**
- * Create /kahuk-configs.php file
+ * Create site base path
  * 
  * @since 5.0.0
  */
-function create_kahuk_configs_file() {
-
+function kahuk_base_path() {
 	$pos = strrpos( $_SERVER['SCRIPT_NAME'], '/' );
 
 	if ( defined( 'KAHUK_INSTALLING' ) && KAHUK_INSTALLING ) {
@@ -349,6 +348,17 @@ function create_kahuk_configs_file() {
 	if ( $path == "/" ) {
 		$path = "";
 	}
+
+	return $path;
+}
+
+/**
+ * Create /kahuk-configs.php file
+ * 
+ * @since 5.0.0
+ */
+function create_kahuk_configs_file() {
+	$path = kahuk_base_path();
 
 	$root_url = ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] === 'on' ? "https" : "http" ) . "://$_SERVER[HTTP_HOST]";
 
@@ -377,5 +387,40 @@ function create_kahuk_configs_file() {
 		}
 
 		chmod( $path_to_kahuk_configs, 0644 );
+	}
+}
+
+
+
+
+/**
+ * Create /.htaccess file
+ * 
+ * @since 5.0.2
+ */
+function create_kahuk_htaccess_file() {
+	$site_base = '/';
+
+	if ( SEO_FRIENDLY_URL ) {
+		$path = defined( 'my_kahuk_base' ) ? my_kahuk_base : kahuk_base_path();
+
+		$site_base = $path . '/';
+	}
+
+	$default_content = file_get_contents( KAHUKPATH . 'htaccess.default' );
+
+	$new_content = str_replace( "__my_kahuk_base__", $site_base, $default_content );
+
+	//
+	$path_to_file = KAHUKPATH . '.htaccess';
+
+	if ( $handle = fopen( $path_to_file, 'w' ) ) {
+		if ( fwrite( $handle, $new_content ) ) {
+			fclose( $handle );
+
+			_kahuk_messages_markup( '<code>/.htaccess</code> file has been created!', 'success' );
+		}
+
+		chmod( $path_to_file, 0644 );
 	}
 }
