@@ -71,7 +71,7 @@ class UserAuth {
 					)
 				);
 				if($remember){
-					$time = time() + (86400 * 30); //Cookie will expire in 30 days if remember option is selected at login. 86400 = 1 day
+					$time = time() + (86400 * 10); //Cookie will expire in 10 days if remember option is selected at login. 86400 = 1 day
 				} else {
 					$time = 0; //Cookie will expire when browser session ends. Note: This may depend on your browser settings. Example: in Chrome if 'Continue where you left off' option is checked the cookie won't expire.
 				}
