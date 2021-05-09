@@ -50,7 +50,7 @@ function kahuk_insert_sample_data() {
 
     //
     $sql = "INSERT INTO `" . table_misc_data . "` ( `name` , `data` ) VALUES
-	('kahuk_version', '5.0.1'),
+	('kahuk_version', '5.0.2'),
 	('adcopy_lang', 'en'),
 	('adcopy_theme', 'white'),
 	('adcopy_pubkey', 'Q6OGz0qMg-ByU-3QZ7DevxgQfyqgrpEC'),
