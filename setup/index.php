@@ -93,11 +93,52 @@ switch( $step ) {
         break;
 
     case 11:
+        
+
+        // $messagesArray[]['info'] = "We are working on switch from Plikli 4.1.5 to Kahuk 5.0.x, Please stay tuned.";
+
+        // kahuk_template_step0();
+
+        $messagesArray = [];
+
+        $messagesArray[]['info'] = "<strong>MAKE SURE A FULL BACKUP OF THE WEBSITE BEFORE START UPGRADE.</strong><br>Sothat, you can restore your website anytime if something goes wrong!";
+
+        $errorMessages = [];
+
+        //
+        $file = KAHUKPATH . 'kahuk-configs.php';
+        $fileDefault = KAHUKPATH . 'kahuk-configs.php.default';
+
+        if ( file_exists( $file ) ) {
+            $errorMessages[]['warning'] = "We found <code>/kahuk-configs.php</code>, please delete the <code>/kahuk-configs.php</code> file. <strong>For security purpose, <code>/kahuk-configs.php</code> file need to delete manually.</strong>";
+        }
+
+        if ( ! file_exists( $fileDefault ) ) {
+            $errorMessages[]['warning'] = "File <code>/kahuk-configs.php.default</code> file does not found. Please upload all the files and folders from Kahuk package";
+        }
+
+        //
+        $file = KAHUKPATH . 'settings.php';
+        $fileDefault = KAHUKPATH . 'settings.php.default';
+
+        if ( file_exists( $file ) ) {
+            $errorMessages[]['warning'] = "We found <code>/settings.php</code>, please delete the <code>/settings.php</code> file. <strong>For security purpose, <code>/settings.php</code> file need to delete manually.</strong>";
+        }
+
+        if ( ! file_exists( $fileDefault ) ) {
+            $errorMessages[]['warning'] = "File <code>/settings.php.default</code> file does not found. Please upload all the files and folders from Kahuk package";
+        }
+
+        $messagesArray = array_merge( $messagesArray, $errorMessages );
+
+
         kahuk_template_header();
 
-        $messagesArray[]['info'] = "We are working on switch from Plikli 4.1.5 to Kahuk 5.0.x, Please stay tuned.";
-
-        kahuk_template_step0();
+        if ( empty( $errorMessages ) ) {
+            include( KAHUKPATH . "setup/templates/database-form.php" );
+        } else {
+            kahuk_template_step0();
+        }
 
         kahuk_template_footer();
 
@@ -107,46 +148,58 @@ switch( $step ) {
     case 2:  // Create all settings / configs files and ask for admin user detail
 
             if ( isset( $_POST['Submit'] ) ) {
-                $tblprefix = ( ! empty( trim( $_POST['tblprefix'] ) ) ) ? $_POST['tblprefix'] : 'kahuk_life_';
+                $settings_check = kahuk_check_db_settings();
 
-                $dbuser = $_POST['dbuser'];
-                $dbpass = $_POST['dbpass'];
-                $dbname = $_POST['dbname'];
-                $dbhost = $_POST['dbhost'];
+                if ( ! empty( $settings_check ) ) {
+                    header ( "Location: ./index.php?step=1&errors={$settings_check}" ); // Redirect to first page
+                    exit;
+                }
 
-                define( 'DB_USER', $dbuser );
-                define( 'DB_PASSWORD', $dbpass );
-                define( 'DB_NAME', $dbname );
-                define( 'DB_HOST', $dbhost );
-                define( 'TABLE_PREFIX', $tblprefix );
+                $connection_check = kahuk_check_db_connection();
 
-                if ( $conn = @mysqli_connect( $dbhost, $dbuser, $dbpass ) ) {
-                    $db_selected = mysqli_select_db( $conn, $dbname );
-
-                    if ( !$db_selected ) {
-                        die ('Error: '.$dbname.' : '.mysqli_error($conn) );
-                    }
-
+                if ( $connection_check ) {
                     kahuk_template_header();
-
-                    //
-                    require_once( KAHUKPATH . "setup/libs/create-config-files.php" );
 
                     create_kahuk_configs_file(); // create /kahuk-configs.php file
                     
                     create_settings_file(); // create /settings.php file
 
-                    if ( 2 == $step ) {
-                        include( KAHUKPATH . "setup/templates/admin-detail-form.php" );
-                    } elseif ( 12 == $step ) {
-                        include( KAHUKPATH . "setup/templates/lets-upgrade.php" );
-                    }
+                    include( KAHUKPATH . "setup/templates/admin-detail-form.php" );
 
                     kahuk_template_footer();
-
-                } else {
-                    die ('Error: fail to connect ' . $dbname );
                 }
+
+
+
+                // if ( $conn = @mysqli_connect( DB_HOST, DB_USER, DB_PASSWORD ) ) {
+                //     $db_selected = mysqli_select_db( $conn, DB_NAME );
+
+                //     if ( !$db_selected ) {
+                //         die ('Error: ' . DB_NAME . ' : '.mysqli_error( $conn ) );
+                //     }
+
+                //     kahuk_template_header();
+
+                //     //
+                //     require_once( KAHUKPATH . "setup/libs/create-config-files.php" );
+
+                //     create_kahuk_configs_file(); // create /kahuk-configs.php file
+                    
+                //     create_settings_file(); // create /settings.php file
+
+                //     include( KAHUKPATH . "setup/templates/admin-detail-form.php" );
+
+                //     // if ( 2 == $step ) {
+                //     //     include( KAHUKPATH . "setup/templates/admin-detail-form.php" );
+                //     // } elseif ( 12 == $step ) {
+                //     //     include( KAHUKPATH . "setup/templates/lets-upgrade.php" );
+                //     // }
+
+                //     kahuk_template_footer();
+
+                // } else {
+                //     die ('Error: fail to connect ' . $dbname );
+                // }
 
             } else {
                 header ("Location: ./index.php?step=1"); // Redirect to first page
