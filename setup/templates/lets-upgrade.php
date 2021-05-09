@@ -8,6 +8,7 @@
             </div>
 
             <div class="form-actions mt20">
+                <input type="hidden" name="step" value="<?php echo ( $step + 1); ?>">
                 <input type="submit" class="btn btn-primary" name="Submit" value="Start Upgrade" />
             </div>
         </form>

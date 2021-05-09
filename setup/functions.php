@@ -1,6 +1,28 @@
 <?php
 
 /**
+ * Check if table exist
+ * 
+ * @since 5.0.2
+ * 
+ * @return boolean true|false
+ */
+function kahuk_table_exist( $table_name ) {
+	global $kahukDB;
+	$output = false;
+
+	$sql = "select 1 from `{$table_name}` LIMIT 1";
+
+	$val = mysqli_query( $kahukDB, $sql );
+
+	if ( $val !== false ) {
+		$output = true;
+	}
+
+	return $output;
+}
+
+/**
  * Check database connection for Kahuk CMS setup
  * 
  * @since 5.0.2
@@ -114,26 +136,26 @@ function kahuk_template_action_messages() {
 /**
  * 
  */
-function kahuk_template_step4() {
-	global $messagesArray;
-	$hasError = false;
+// function kahuk_template_step4() {
+// 	global $messagesArray;
+// 	$hasError = false;
 
-    foreach( $messagesArray as $row ) {
-		foreach( $row as $i => $msg ) {
-			_kahuk_messages_markup( $msg, $i );
+//     foreach( $messagesArray as $row ) {
+// 		foreach( $row as $i => $msg ) {
+// 			_kahuk_messages_markup( $msg, $i );
 
-			if ( 'danger' == $i ) {
-				$hasError = true;
-			}
-		}
-    }
+// 			if ( 'danger' == $i ) {
+// 				$hasError = true;
+// 			}
+// 		}
+//     }
 
-	if ( $hasError ) {
-		_kahuk_messages_markup( '<strong>Installation Unsuccessfull!</strong>', 'danger' );
-	} else {
-		_kahuk_messages_markup( '<strong>Cheers! Installation Successfull!</strong>', 'danger' );
-	}
-}
+// 	if ( $hasError ) {
+// 		_kahuk_messages_markup( '<strong>Installation Unsuccessfull!</strong>', 'danger' );
+// 	} else {
+// 		_kahuk_messages_markup( '<strong>Cheers! Installation Successfull!</strong>', 'danger' );
+// 	}
+// }
 
 
 /**

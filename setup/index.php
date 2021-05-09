@@ -209,6 +209,32 @@ switch( $step ) {
 
     case 12: // Create all settings / configs files and ask for start switching to Kahuk from Plikli 4.1.5
 
+        if ( isset( $_POST['Submit'] ) ) {
+            $settings_check = kahuk_check_db_settings();
+
+            if ( ! empty( $settings_check ) ) {
+                header ( "Location: ./index.php?step=1&errors={$settings_check}" ); // Redirect to first page
+                exit;
+            }
+
+            $connection_check = kahuk_check_db_connection();
+
+            if ( $connection_check ) {
+                kahuk_template_header();
+
+                create_kahuk_configs_file(); // create `/kahuk-configs.php` file
+                
+                create_settings_file(); // create `/settings.php` file
+
+                include( KAHUKPATH . "setup/templates/lets-upgrade.php" );
+
+                kahuk_template_footer();
+            }
+
+        } else {
+            header ("Location: ./index.php?step=1"); // Redirect to first page
+        }
+
         break;
     
     case 3: // Create tables and initail data ( including admin user and sample posts)
@@ -236,29 +262,53 @@ switch( $step ) {
 
     case 13:
 
+        include_once KAHUKPATH . 'kahuk-configs.php';
+        include_once KAHUKPATH . 'libs/define_tables.php';
+        include_once KAHUKPATH . 'libs/html1.php';
+        
+        include_once KAHUKPATH . 'setup/libs/db.php';
+        include_once KAHUKPATH . 'setup/libs/replace-old-cms-instances.php';
+
+
+        kahuk_template_header();
+
+        $tbl_config_exist = kahuk_table_exist( table_config );
+
+        if ( $tbl_config_exist ) {
+            kahuk_replace_old_cms_instances();
+
+            kahuk_good_to_go_site_markup();
+        } else {
+            _kahuk_messages_markup(
+                "Table {$tbl_config_exist} not found! Upgrade not possible!",
+                'danger'
+            );
+        }
+
+        kahuk_template_footer();
+
+
         break;
     
 
+    case 14:
     case 4:
-            kahuk_template_header();
+            
+            $messagesArray[]['info'] = "PLEASE <strong>DELETE THE <code>/setup</code> FOLDER</strong>.";
 
             //
             $file = KAHUKPATH . 'kahuk-configs.php';
 
-            if ( file_exists( $file ) ) {
-                // $messagesArray[]['success'] = "We find <code>/kahuk-configs.php</code> file.";
-            } else {
+            if ( ! file_exists( $file ) ) {
                 $messagesArray[]['danger'] = "<strong>Error:</strong> <code>/kahuk-configs.php</code> file is missing.";
             }
 
-            kahuk_template_step4();
+            // TODO Clean the cache folder
+
+            //
+            kahuk_template_header();
 
             kahuk_template_footer();
-
-        break;
-
-
-    case 14:
 
         break;
 
