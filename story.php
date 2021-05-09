@@ -1,5 +1,4 @@
 <?php
-
 include_once('internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
@@ -10,17 +9,26 @@ include(KAHUK_LIBS_DIR.'smartyvariables.php');
 
 $requestID = isset($_GET['id']) && is_numeric($_GET['id']) ? $_GET['id'] : 0; 
 $thecat = array();
-if(isset($_GET['title']) && sanitize($_GET['title'], 3) != ''){$requestTitle = sanitize($_GET['title'], 3);}
+
+if(isset($_GET['title']) && sanitize($_GET['title'], 3) != ''){
+	$requestTitle = sanitize($_GET['title'], 3);
+}
+
+
 // if we're using "Friendly URL's for categories"
-if(isset($_GET['category']) && sanitize($_GET['category'], 3) != '')
-{	
+if(isset($_GET['category']) && sanitize($_GET['category'], 3) != '') {	
     // One or multiple categories in the URL
     $thecat = explode(',',$_GET['category']);
-    if (sizeof($thecat)<=1)
-        $thecat[0] = $db->get_var("SELECT category_id FROM " . table_categories . " WHERE `category_safe_name` = '".$db->escape(urlencode(sanitize($_GET['category'], 3)))."';"); 
-    else
-	foreach ($thecat as &$cat)
-            $cat = $db->get_var("SELECT category_id FROM " . table_categories . " WHERE `category_safe_name` = '".$db->escape(urlencode(sanitize($cat, 3)))."';"); 
+
+    if (sizeof($thecat)<=1) {
+		$sql = "SELECT category_id FROM " . table_categories . " WHERE `category_safe_name` = '".$db->escape(urlencode(sanitize($_GET['category'], 3)))."';";
+		$thecat[0] = $db->get_var($sql); 
+	} else {
+		foreach ($thecat as &$cat) {
+			$sql = "SELECT category_id FROM " . table_categories . " WHERE `category_safe_name` = '".$db->escape(urlencode(sanitize($cat, 3)))."';";
+			$cat = $db->get_var($sql); 
+		}
+	}       
 }
 
 if($requestID > 0 && enable_friendly_urls == true){
@@ -30,6 +38,7 @@ if($requestID > 0 && enable_friendly_urls == true){
 
 	$link = new Link;
 	$link->id=$requestID;
+	
 	if ($link->read() == false || (sizeof($thecat)>0 && 
 				      (array_diff($thecat, $link->additional_cats, array($link->category)) || 
 				       sizeof($thecat)!=sizeof($link->additional_cats)+1)))
@@ -47,16 +56,21 @@ if($requestID > 0 && enable_friendly_urls == true){
 
 // if we're using "Friendly URL's for stories"
 if(isset($requestTitle)){
-	$requestID = $db->get_var("SELECT link_id FROM " . table_links . " WHERE `link_title_url` = '".$db->escape(sanitize($requestTitle,4))."';");
+	$sql = "SELECT link_id FROM " . table_links . " WHERE `link_title_url` = '".$db->escape(sanitize($requestTitle,4))."';";	
+	$requestID = $db->get_var($sql);
+
 	// Search in old urls if not found
-	if (!is_numeric($requestID)) 
-		$requestID = $db->get_var("SELECT old_link_id FROM " . table_old_urls . " WHERE `old_title_url` = '".$db->escape(sanitize($requestTitle,4))."';");
+	if (!is_numeric($requestID)) {
+		$sql = "SELECT old_link_id FROM " . table_old_urls . " WHERE `old_title_url` = '".$db->escape(sanitize($requestTitle,4))."';";
+		$requestID = $db->get_var($sql);
+	}	
 }
 
 if(is_numeric($requestID)) {
 	$id = $requestID;
 	$link = new Link;
 	$link->id=$requestID;
+	
 	if ($link->read() == false || (sizeof($thecat)>0 && 
 				      (array_diff($thecat, $link->additional_cats, array($link->category)) || 
 				       sizeof($thecat)!=sizeof($link->additional_cats)+1)) ||
