@@ -9,7 +9,7 @@ function _kahuk_replace_old_cms_instances( $sql, $tablename ) {
 
     mysqli_query( $kahukDB, $sql );
 
-    $msg = sprintf( "Replace/update data in %s, %d rows affected.", $tablename, $kahukDB->affected_rows );
+    $msg = sprintf( "Replace/update data in %s, %d rows affected. %s", $tablename, $kahukDB->affected_rows, $sql );
     
     _kahuk_messages_markup( [ $msg ] );
 }
@@ -22,11 +22,16 @@ function _kahuk_replace_old_cms_instances( $sql, $tablename ) {
  * @since 5.0.0
  */
 function kahuk_replace_old_cms_instances() {
-    global $kahukDB;
+    // global $kahukDB;
 
     /**
      * Table config
      */
+    //
+    $sql = "UPDATE `" . table_config . "` SET `var_value` = 'bootstrap' WHERE `var_name` = '\$thetemp';";
+    _kahuk_replace_old_cms_instances( $sql, table_config );
+
+    //
     $sql = "UPDATE `" . table_config . "` set `var_value` = 'kahuk.com', `var_defaultvalue` = 'kahuk.com', `var_optiontext` = 'kahuk.com' WHERE `var_name` = '\$trackbackURL';";
     _kahuk_replace_old_cms_instances( $sql, table_config );
 
@@ -82,7 +87,7 @@ function kahuk_replace_old_cms_instances() {
      */
 
     //
-    $sql = "UPDATE `" . table_misc_data . "` SET `name` = 'kahuk_version', `data` = '5.0.1'  WHERE `name` = 'plikli_version';";
+    $sql = "UPDATE `" . table_misc_data . "` SET `name` = 'kahuk_version', `data` = '5.0.2'  WHERE `name` = 'plikli_version';";
     _kahuk_replace_old_cms_instances( $sql, table_misc_data );
 
     //
@@ -97,6 +102,14 @@ function kahuk_replace_old_cms_instances() {
     $sql = "UPDATE `" . table_misc_data . "` SET `name` = 'kahuk_update_url', `data` = 'https://kahuk.com/upgrade-cms/'  WHERE `name` = 'plikli_update_url';";
     _kahuk_replace_old_cms_instances( $sql, table_misc_data );
 
+    //
+    $sql = "UPDATE `" . table_misc_data . "` SET `data` = 'tpl_kahuk_story_who_voted_start'  WHERE `name` = 'upload_fileplace';";
+    _kahuk_replace_old_cms_instances( $sql, table_misc_data );
+
+    //
+    $sql = "UPDATE `" . table_misc_data . "` SET `data` = 'tpl_kahuk_profile_tab_insert'  WHERE `name` = 'status_place';";
+    _kahuk_replace_old_cms_instances( $sql, table_misc_data );
+
 
     /**
      * Table widgets
@@ -109,4 +122,20 @@ function kahuk_replace_old_cms_instances() {
     //
     $sql = "UPDATE `" . table_widgets . "` SET `name` = 'Kahuk News', `folder` = 'kahuk_news'  WHERE `folder` = 'plikli_news';";
     _kahuk_replace_old_cms_instances( $sql, table_widgets );
+
+    /**
+     * 
+     */
+
+    $tbl_snippets = TABLE_PREFIX . 'snippets';
+
+    $tbl_snippets_exist = kahuk_table_exist( $tbl_snippets );
+
+    if ( $tbl_snippets_exist ) {
+        $sql = "UPDATE `" . $tbl_snippets . "` SET `snippet_location` = REPLACE(`snippet_location`, 'plikli', 'kahuk'), `snippet_status` = 0;";
+        _kahuk_replace_old_cms_instances( $sql, $tbl_snippets );
+    } else {
+        // TODO message table snippets not exist to update
+    }
+    
 }

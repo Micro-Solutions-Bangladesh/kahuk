@@ -176,6 +176,8 @@ function sanitize_title( $title ) {
 			'&para;', // PILCROW SIGN
 			'&divide;', // DIVISION SIGN
 			'»',
+			'&amp;',
+			'&',
 		),
 		'',
 		$title

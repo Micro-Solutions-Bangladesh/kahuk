@@ -234,7 +234,12 @@ function do_submit2() {
 	$kahukVoting = new KahukVoting();
 	$kahukVoting->init( $args );
 
-	$story_url = getmyurl( "storyURL", $newPost['link_title_url'], urlencode($newPost['link_title_url']) );
+	//
+	$categories = kahuk_categories_init();
+	$category = $categories->get_item( $linksData['link_category'] );
+
+	$story_url = getmyurl( "storyURL", $category['category_safe_name'], urlencode( $newPost['link_title_url'] ) );
+
 	kahuk_redirect( $story_url );
 }
 

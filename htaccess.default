@@ -3,7 +3,7 @@ AddDefaultCharset UTF-8
 ## 404 Error Page
 ## IF KAHUK IS INSTALLED IN A SUBFOLDER, change LINE 7 to ErrorDocument 404 /NAME-OF-SUBFOLDER/error_404.php
 ############################################################################################################
-ErrorDocument 404 /error_404.php
+ErrorDocument 404 __my_kahuk_base__error_404.php
 
 ############################################ Re-directing Begin ############################################
 
@@ -12,7 +12,7 @@ RewriteEngine on
 ############################################################################################################
 ###### IF KAHUK IS INSTALLED IN A SUBFOLDER, change LINE 18 to RewriteBase /NAME-OF-SUBFOLDER ######
 ############################################################################################################
-RewriteBase /
+RewriteBase __my_kahuk_base__
 
 ############################################################################################################
 ################################## Force forward slash at the end of URL ###################################
@@ -24,7 +24,7 @@ RewriteCond %{REQUEST_URI} !(\.[a-zA-Z0-9]{1,5}|/)$
 ##Example:
 ## RewriteRule (.*)([^/])$ http://%{HTTP_HOST}/NAME-OF-SUBFOLDER/$1$2/ [R=301,L] #########################
 
-RewriteRule (.*)([^/])$ http://%{HTTP_HOST}/$1$2/ [R=301,L]
+RewriteRule (.*)([^/])$ http://%{HTTP_HOST}__my_kahuk_base__$1$2/ [R=301,L]
 
 ############################################################################################################
 ########### IF INSTALLED IN A SUBFOLDER you may need to add ## to the beginning of LINE 36 #################

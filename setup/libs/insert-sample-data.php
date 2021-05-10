@@ -50,7 +50,7 @@ function kahuk_insert_sample_data() {
 
     //
     $sql = "INSERT INTO `" . table_misc_data . "` ( `name` , `data` ) VALUES
-	('kahuk_version', '5.0.1'),
+	('kahuk_version', '5.0.2'),
 	('adcopy_lang', 'en'),
 	('adcopy_theme', 'white'),
 	('adcopy_pubkey', 'Q6OGz0qMg-ByU-3QZ7DevxgQfyqgrpEC'),
@@ -130,7 +130,9 @@ function kahuk_insert_sample_data() {
 
     $stmt = str_replace( "'table_prefix', 'kahuk_'", "'table_prefix', '" . TABLE_PREFIX . "'", $stmt );
 
-	$sql = str_replace( "---language---", "english", $stmt );
+	$stmt = str_replace( "---language---", "english", $stmt );
+
+	$sql = str_replace( "__url_method__", ( SEO_FRIENDLY_URL ? 2 : 1 ), $stmt );
 
 	_kahuk_insert_sample_data( $sql, table_config );
 
