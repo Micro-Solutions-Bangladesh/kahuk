@@ -87,12 +87,14 @@ function kahuk_check_db_settings() {
 	}
 
 	$tblprefix = ( ! empty( trim( $_POST['tblprefix'] ) ) ) ? $_POST['tblprefix'] : 'kahuk_life_';
+	$seourl    = ( isset( $_POST['seourl'] ) && ( 2 && intval( $_POST['seourl'] ) ) ) ? "true" : "false";
 
 	define( 'DB_USER', $dbuser );
 	define( 'DB_PASSWORD', $dbpass );
 	define( 'DB_NAME', $dbname );
 	define( 'DB_HOST', $dbhost );
 	define( 'TABLE_PREFIX', $tblprefix );
+	define( 'SEO_FRIENDLY_URL', $seourl );
 
 	return '';
 }
@@ -376,6 +378,8 @@ function create_kahuk_configs_file() {
 	$new_content = str_replace( "my_base_url_here", $root_url, $new_content );
 	$new_content = str_replace( "my_kahuk_base_here", $path, $new_content );
 
+	$new_content = str_replace( "seo_friendly_url_here", SEO_FRIENDLY_URL, $new_content );
+
 	//
 	$path_to_kahuk_configs = KAHUKPATH . 'kahuk-configs.php';
 
@@ -391,36 +395,32 @@ function create_kahuk_configs_file() {
 }
 
 
-
-
 /**
  * Create /.htaccess file
  * 
  * @since 5.0.2
  */
 function create_kahuk_htaccess_file() {
-	$site_base = '/';
 
 	if ( SEO_FRIENDLY_URL ) {
 		$path = defined( 'my_kahuk_base' ) ? my_kahuk_base : kahuk_base_path();
-
 		$site_base = $path . '/';
-	}
 
-	$default_content = file_get_contents( KAHUKPATH . 'htaccess.default' );
+		$default_content = file_get_contents( KAHUKPATH . 'htaccess.default' );
 
-	$new_content = str_replace( "__my_kahuk_base__", $site_base, $default_content );
+		$new_content = str_replace( "__my_kahuk_base__", $site_base, $default_content );
 
-	//
-	$path_to_file = KAHUKPATH . '.htaccess';
+		//
+		$path_to_file = KAHUKPATH . '.htaccess';
 
-	if ( $handle = fopen( $path_to_file, 'w' ) ) {
-		if ( fwrite( $handle, $new_content ) ) {
-			fclose( $handle );
+		if ( $handle = fopen( $path_to_file, 'w' ) ) {
+			if ( fwrite( $handle, $new_content ) ) {
+				fclose( $handle );
 
-			_kahuk_messages_markup( '<code>/.htaccess</code> file has been created!', 'success' );
+				_kahuk_messages_markup( '<code>/.htaccess</code> file has been created!', 'success' );
+			}
+
+			chmod( $path_to_file, 0644 );
 		}
-
-		chmod( $path_to_file, 0644 );
 	}
 }

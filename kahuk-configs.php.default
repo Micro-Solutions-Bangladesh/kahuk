@@ -95,6 +95,9 @@ define( 'USER_VOTE_KARMA', 3 );
 // Karma Value for USER When user comment
 define( 'USER_COMMENT_KARMA', 5 );
 
+//
+define( 'SEO_FRIENDLY_URL', seo_friendly_url_here );
+
 
 /** PLEASE STOP EDITING BELOW THE LINE */
 

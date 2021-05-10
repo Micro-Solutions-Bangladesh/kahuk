@@ -14,22 +14,10 @@ include_once( KAHUKPATH . 'setup/languages/lang_english.php' );
 require_once KAHUKPATH . 'setup/functions.php';
 
 
-
-// include( KAHUKPATH . "setup/templates/template.php" );
-// exit;
-
-
-
-
-
-
-$isNewSetup = true;
-
-$bodyClass = '';
-
+$isNewSetup    = true;
+$bodyClass     = '';
 $messagesArray = [];
-
-$step = isset( $_GET['step'] ) ? (int) $_GET['step'] : 0;
+$step          = isset( $_GET['step'] ) ? (int) $_GET['step'] : 0;
 
 // check kahuk-configs.php file exist, when step is more then 0
 if ( ( in_array( $step, [ 3, 13 ] ) ) && ! file_exists( KAHUKPATH . 'kahuk-configs.php' ) ) {
@@ -164,8 +152,6 @@ switch( $step ) {
                     
                     create_settings_file(); // create /settings.php file
 
-                    // create_kahuk_htaccess_file(); // create htaccess file
-
                     include( KAHUKPATH . "setup/templates/admin-detail-form.php" );
 
                     kahuk_template_footer();
@@ -195,8 +181,6 @@ switch( $step ) {
                 create_kahuk_configs_file(); // create `/kahuk-configs.php` file
                 
                 create_settings_file(); // create `/settings.php` file
-
-                // create_kahuk_htaccess_file(); // create htaccess file
 
                 include( KAHUKPATH . "setup/templates/lets-upgrade.php" );
 
@@ -280,7 +264,7 @@ switch( $step ) {
             //
             kahuk_template_header();
 
-            // create_kahuk_htaccess_file(); // create htaccess file
+            create_kahuk_htaccess_file(); // create htaccess file
 
             kahuk_template_footer();
 
