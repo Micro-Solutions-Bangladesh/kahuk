@@ -71,24 +71,6 @@ function kahuk_insert_sql_category( $data ) {
 }
 
 
-/**
- * TODO Check/Test
- */
-function kahuk_save_category( $data, $id = '' ) {
-    global $db;
-    $output = '';
-
-    if ( 0 < $id ) {
-        
-    } else {
-        $sql = kahuk_insert_sql_category( $data );
-    }
-
-    die( "kahuk_save_category: " . $sql );
-
-    return $output;
-}
-
 
 
 /**
@@ -107,7 +89,10 @@ class KahukCategories
 {
     public $errors;
 
+
+    public $rawItems;
     public $items;
+    public $indexedItems = [];
 
     /**
      * Class construcotr
@@ -129,6 +114,19 @@ class KahukCategories
         }
 
         return $instance;
+    }
+
+    /**
+     * 
+     */
+    function get_item( $id ) {
+        $output = [];
+
+        if ( isset( $this->indexedItems[$id] ) ) {
+            $output = $this->indexedItems[$id];
+        }
+
+        return $output;
     }
 
     /**
@@ -210,7 +208,13 @@ class KahukCategories
         global $db;
 
 	    $sql = "select * from " . table_categories . " ORDER BY lft ASC;";
-        $this->items = $db->get_results( $sql );
+        $this->rawItems = $db->get_results( $sql );
+        $this->items = $this->rawItems;
+
+        foreach( $this->rawItems as $row ) {
+            $cat_id = $row->category__auto_id;
+            $this->indexedItems[$cat_id] = $this->build_item( $row );
+        }
     }
 }
 
