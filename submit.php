@@ -61,7 +61,7 @@ if ( isset( $_POST['url'] ) && isset( $_POST['phase'] ) ) {
 }
 
 if ( ! empty( $urlFound ) ) {
-	kahuk_debug_log( "Phase: {$phase} and the URL: {$urlFound}\nreferrer: " . $_SERVER["HTTP_REFERER"], __LINE__, '', __FILE__ );
+	// kahuk_debug_log( "Phase: {$phase} and the URL: {$urlFound}\nreferrer: " . $_SERVER["HTTP_REFERER"], __LINE__, '', __FILE__ );
 	check_referrer( $urlFound );
 }
 

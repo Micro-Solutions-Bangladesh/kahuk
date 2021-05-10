@@ -63,7 +63,7 @@ $items = $this->_vars['news_count'];
 if (strstr(my_base_url,"localhost")) {
 	feedMe("http://feeds.feedburner.com/Kahuk",$items);
 }else{
-	feedMe("https://www.kahuk.com/feed/",$items);
+	feedMe("https://kahuk.com/feed/",$items);
 }
 
 {/php}

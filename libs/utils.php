@@ -251,7 +251,7 @@ function get_date($epoch) {
 }
 
 function get_base_url($url){
-	// get base of URL. For example, get_base_url will return www.kahuk.com if the URL was www.kahuk.com/support/
+	// get base of URL. For example, get_base_url will return kahuk.com if the URL was kahuk.com/support/
    $req = $url;
   
    $pos = strpos($req, '://');

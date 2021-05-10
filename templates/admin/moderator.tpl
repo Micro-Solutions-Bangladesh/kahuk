@@ -111,7 +111,7 @@
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</button>
-				<a class="navbar-brand" href="https://www.kahuk.com/">
+				<a class="navbar-brand" href="https://kahuk.com/">
 					<img src="{$kahuk_base_url}/templates/admin/img/kahuk-light.png" />
 				</a>
 			</div>
@@ -183,7 +183,7 @@
 		</div><!-- /row -->
 		<hr />
 		<footer>
-			<p>Powered by <a href="https://www.kahuk.com/">Kahuk CMS</a></p>
+			<p>Powered by <a href="https://kahuk.com/">Kahuk CMS</a></p>
 			{checkActionsTpl location="tpl_kahuk_admin_footer_end"}
 		</footer>
 	</div><!-- /container -->

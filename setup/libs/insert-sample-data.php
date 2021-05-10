@@ -71,9 +71,9 @@ function kahuk_insert_sample_data() {
 	('karma_story_spam','-10000'),
 	('karma_comment_delete','-50'),
 	('modules_update_date',DATE_FORMAT(NOW(),'%Y/%m/%d')),
-	('modules_update_url','https://www.kahuk.com/mods/version-update.txt'),
+	('modules_update_url','https://kahuk.com/mods/version-update.txt'),
 	('kahuk_update',''),
-	('kahuk_update_url','https://www.kahuk.com/download/'),
+	('kahuk_update_url','https://kahuk.com/download/'),
 	('modules_update_unins',''),
 	('modules_upd_versions','');";
 
