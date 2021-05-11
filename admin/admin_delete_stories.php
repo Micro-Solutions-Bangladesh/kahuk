@@ -81,10 +81,10 @@ $db->query("UPDATE " . table_totals . " SET total = '0' WHERE name = 'discard'")
 		<div class="modal-body">
 			<?php
 			/* new query created to get the optimize table query in one shot and therefore save some processing time and cpu.*/
-			$query = "SELECT CONCAT('OPTIMIZE TABLE ', GROUP_CONCAT(table_name) , ';' ) AS statement FROM information_schema.tables WHERE table_schema = '".DB_NAME."' AND table_name LIKE '".TABLE_PREFIX."%';";
+			// $query = "SELECT CONCAT('OPTIMIZE TABLE ', GROUP_CONCAT(table_name) , ';' ) AS statement FROM information_schema.tables WHERE table_schema = '".DB_NAME."' AND table_name LIKE '".TABLE_PREFIX."%';";
 
-				$sqlqry = $db->get_var($query);
-				$db->query($sqlqry);
+				// $sqlqry = $db->get_var($query);
+				// $db->query($sqlqry);
 			
 				echo '<p><strong>'.$num_rows.'</strong> '.$main_smarty->get_config_vars("KAHUK_Visual_AdminPanel_Discarded_Stories_Removed_Message");
 			?>
