@@ -20,35 +20,79 @@ if($canIhaveAccess == 0){
 	die();
 }
 
-$logFiles = [
-    "error" => KAHUK_LOG_DIR . "error.log",
-    "debug" => KAHUK_LOG_DIR . "debug.log",
-];
+
+/**
+ * Get the list of files
+ * 
+ * @return array
+ */
+function kahuk_log_files_list( $path = KAHUK_LOG_DIR ) {
+    $output = [];
+
+    $files = glob( $path . '*.log' );
+
+    foreach ( $files as $file ) {
+        $file_info = pathinfo( getcwd().'/'.$file );
+
+        $output[] = [
+            'filename' => $file_info['filename'],
+            'extension' => $file_info['extension'],
+            'basename' => $file_info['basename'],
+            'dirname' => $file_info['dirname'],
+        ];
+    }
+
+    return $output;
+}
 
 
-if ( isset( $_GET['clear'] ) && array_key_exists( $_GET['clear'], $logFiles ) ) {
-    $fp = fopen( $logFiles[ $_GET['clear'] ], "a" );
-    ftruncate( $fp,0 );
-    fclose( $fp );
+$logFiles = kahuk_log_files_list( KAHUK_LOG_DIR . 'error-logs/' );
+
+
+// Delete Error File Action
+$deleteFile = _get( 'delete' );
+
+if ( file_exists( KAHUK_LOG_DIR . "error-logs/" . $deleteFile . ".log" ) ) {
+    $deleteableFile = KAHUK_LOG_DIR . "error-logs/" . $deleteFile . ".log";
+
+    if ( ! unlink( $deleteableFile ) ) { 
+        trigger_error( "$deleteableFile cannot be deleted due to an error", E_USER_WARNING );
+    }
 
     header("Location: admin_log.php");
     exit;
 }
 
-//
-$showFile = '';
+// Display Error File Action
+$showFile = _get( 'show' );
+$viewableFile = '';
+$viewableFilePath = '';
 
-if ( isset( $_GET['show'] ) && array_key_exists( $_GET['show'], $logFiles ) ) {
-    // $showFile = $logFiles[ $_GET['show'] ];
-    $showFile = $_GET['show'];
+if ( file_exists( KAHUK_LOG_DIR . "error-logs/" . $showFile . ".log" ) ) {
+    $viewableFile = "error-logs/" . $showFile . ".log";
+    // $viewableFilePath = KAHUK_LOG_DIR . $viewableFile;
 }
+
+if ( empty( $viewableFile ) ) {
+    $defaultErrorLogFile = kahuk_error_log_file_name();
+
+    if ( file_exists( KAHUK_LOG_DIR . "error-logs/" . $defaultErrorLogFile ) ) {
+        $viewableFile = "error-logs/" . $defaultErrorLogFile;
+        // $viewableFilePath = KAHUK_LOG_DIR . "error-logs/" . $defaultErrorLogFile;
+    }
+}
+
+//
+$main_smarty->assign('kahuk_viewable_log_file', $viewableFile);
+
+$kahuk_logs = file_get_contents( KAHUK_LOG_DIR . $viewableFile );
+$main_smarty->assign('kahuk_logs', $kahuk_logs);
+
 
 // pagename
 define('pagename', 'admin_log'); 
 $main_smarty->assign('pagename', pagename);
-
 $main_smarty->assign('logfiles', $logFiles);
-$main_smarty->assign('showfile', $showFile);
 
 // show the template
 $main_smarty->assign('tpl_center', '/admin/error_log');

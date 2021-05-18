@@ -98,12 +98,7 @@ define( 'USER_COMMENT_KARMA', 5 );
 //
 define( 'SEO_FRIENDLY_URL', seo_friendly_url_here );
 
-
-/** PLEASE STOP EDITING BELOW THE LINE */
-
-/** */
-define( 'SALT_LENGTH', 9 );
-
+//
 if ( ! defined( 'KAHUK_BASE_URL' ) ) {
 	define( 'KAHUK_BASE_URL', 'kahuk_base_url_here' ); // ex: http://example.com/folder-name [ if installed in a folder ]
 
@@ -111,9 +106,28 @@ if ( ! defined( 'KAHUK_BASE_URL' ) ) {
 	define( 'my_kahuk_base', 'my_kahuk_base_here' ); // /folder-name [ if installed in a folder ]
 }
 
+
+
+/** PLEASE STOP EDITING BELOW THE LINE */
+
+/**
+ * Create a file name using the current date for error log
+ *
+ * @return string error log file name
+ */
+function kahuk_error_log_file_name() {
+	return date( "dMY" ) . ".log";
+}
+
+
+//
+define( 'SALT_LENGTH', 9 );
+
 ini_set( 'include_path', '.' );
 
-ini_set( 'error_log', LOG_FILE ); // Error log file location
+// Set Error Log File
+$error_log_file_name = kahuk_error_log_file_name();
+ini_set( 'error_log', KAHUK_LOG_DIR . "error-logs/" . $error_log_file_name ); // Error log file location
 
 error_reporting( E_CORE_ERROR | E_CORE_WARNING | E_COMPILE_ERROR | E_ERROR | E_WARNING | E_PARSE | E_USER_ERROR | E_USER_WARNING | E_RECOVERABLE_ERROR );
 
