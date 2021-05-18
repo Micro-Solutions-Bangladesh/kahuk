@@ -632,9 +632,11 @@ class Template_Lite
 
 		$output = $this->_compile_obj->_compile_file($file_contents);
 
-		$f = fopen($compiled_file, "w");
-		fwrite($f, $output);
-		fclose($f);
+		if ( file_exists( $compiled_file ) ) {
+			$f = fopen($compiled_file, "w");
+			fwrite($f, $output);
+			fclose($f);
+		}
 
 		ob_start();
 		eval(' ?>' . $output . '<?php ');
