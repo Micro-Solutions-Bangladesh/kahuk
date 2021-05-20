@@ -223,6 +223,7 @@
 				{checkActionsTpl location="tpl_link_summary_end"}
 			</div><!-- /.stories -->
 			{checkActionsTpl location="tpl_kahuk_story_end"}
+			{checkActionsTpl location="tpl_kahuk_submit_preview_end"}
 		</div>
 		{* END STORY PREVIEW *}
 	</form>
