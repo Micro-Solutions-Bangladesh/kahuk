@@ -1,11 +1,7 @@
-{************************************
-*********** Story Content ***********
-*************************************}
-<!-- link_summary.tpl -->
-<!-- Microdata markup added by ChuckRoast -->
-{checkActionsTpl location="tpl_link_summary_start"}
 <div itemscope itemtype="http://schema.org/Article" class="stories" id="xnews-{$link_shakebox_index}" {* if $link_shakebox_currentuser_reports gt 0} style="opacity:0.5;filter:alpha(opacity = 50)"{/if *}>
-{* Redwine: Roles and permissions and Groups fixes *}
+	{checkActionsTpl location="tpl_kahuk_story_starter"}
+
+	{* Roles and permissions and Groups fixes *}
 	{if $isAdmin eq '1' || $isModerator eq '1' || $user_logged_in eq $link_submitter || $is_gr_Creator eq '1' || $is_gr_Admin eq '1' || $is_gr_Moderator eq '1'}
 		<div class="btn-group pull-right admin-links">
 			<a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
@@ -38,7 +34,7 @@
 			
 		</div>		
 	{/if}
-	{checkActionsTpl location="tpl_kahuk_story_start"}
+
 	<div class="story_data">
 		{if $Voting_Method eq 2}
 			<h4 id="ls_title-{$link_shakebox_index}">
@@ -254,7 +250,6 @@
 		{/if}
 	</div><!-- /.storycontent -->
 	</span>
-	{checkActionsTpl location="tpl_link_summary_end"}
+	{checkActionsTpl location="tpl_kahuk_story_finisher"}
 </div><!-- /.stories -->
-{checkActionsTpl location="tpl_kahuk_story_end"}
 <!--/link_summary.tpl -->

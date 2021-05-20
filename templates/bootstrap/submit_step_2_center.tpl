@@ -115,7 +115,6 @@
 			{checkActionsTpl location="tpl_kahuk_submit_preview_start"}
 				{* Redwine: temporary solution to eliminate the warnings "Undefined index: link_shakebox_index" *}
 			<div class="stories" id="xnews-{if !empty($link_shakebox_index)}{$link_shakebox_index}{/if}">
-				{checkActionsTpl location="tpl_kahuk_story_start"}
 				<div class="headline">
 					{if $Voting_Method eq 2}
 						<h4 id="ls_title-{if !empty($link_shakebox_index)}{$link_shakebox_index}{/if}">
@@ -220,9 +219,7 @@
 					 </div><!-- /.story-tools-right -->
 					 <div style="clear:both;"></div>
 				</div><!-- /.storyfooter -->
-				{checkActionsTpl location="tpl_link_summary_end"}
 			</div><!-- /.stories -->
-			{checkActionsTpl location="tpl_kahuk_story_end"}
 			{checkActionsTpl location="tpl_kahuk_submit_preview_end"}
 		</div>
 		{* END STORY PREVIEW *}
