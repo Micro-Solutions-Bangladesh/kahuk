@@ -27,15 +27,57 @@ function kahuk_insert_sample_data() {
     global $kahukDB;
     $dblang = "en";
 
+    $ipAddress = mysqli_real_escape_string( $kahukDB, $_SERVER['REMOTE_ADDR'] );
+
+
     //
-    $sql = "INSERT INTO `" . table_categories . "` (`category__auto_id`, `category_lang`, `category_id`, `category_parent`, `category_name`, `category_safe_name`, `rgt`, `lft`, `category_enabled`, `category_order`, `category_desc`, `category_keywords`, `category_author_level`, `category_author_group`, `category_votes`) VALUES (0, '" . $dblang . "', 0, 0, 'all', 'all', 3, 0, 2, 0, '', '', 'normal', '', '');";
+	$saltedpass = generatePassHash( $_POST['upassword'] );
+
+    $kahukcmsPass = kahuk_generate_password();
+	$saltedpassForKahukcms = generatePassHash( $kahukcmsPass );
+
+    $sql = "INSERT INTO `" . table_users . "` (
+        `user_id`, `user_login`, `user_level`, 
+        `user_modification`, `user_date`, `user_pass`, 
+        `user_email`, `user_names`, `user_karma`, 
+        `user_url`, `user_lastlogin`, `user_ip`, 
+        `user_lastip`, `last_reset_request`, `user_enabled`
+    ) VALUES (
+        1, '" . mysqli_real_escape_string( $kahukDB, $_POST['uname'] ) . "', 'admin', 
+        NOW(), NOW(), '$saltedpass', 
+        '" . mysqli_real_escape_string( $kahukDB, $_POST['uemail'] ) . "', '', '10.00', 
+        'https://kahuk.com', NOW(), '$ipAddress', 
+        '0', NOW(), '1'
+    ),(
+        2, 'kahukcms', 'normal', 
+        NOW(), NOW(), '$saltedpassForKahukcms', 
+        'support@kahuk.com', '', '62.00', 
+        'https://kahuk.com', NOW(), '$ipAddress', 
+        '0', NOW(), '1'
+    );";
+	
+    _kahuk_insert_sample_data( $sql, table_users );
+
+
+
+    //
+    $stmt = file_get_contents( KAHUKPATH . 'setup/libs/sql/config-table-data.sql');
+	$stmt = str_replace( "INSERT INTO `table_config`", "INSERT INTO `" . table_config . "`", $stmt );
+
+    $stmt = str_replace( "'table_prefix', 'kahuk_'", "'table_prefix', '" . TABLE_PREFIX . "'", $stmt );
+
+	$stmt = str_replace( "---language---", "english", $stmt );
+
+	$sql = str_replace( "__url_method__", ( SEO_FRIENDLY_URL ? 2 : 1 ), $stmt );
+
+	_kahuk_insert_sample_data( $sql, table_config );
+
+
+    // Insert Categories
+    $stmt = file_get_contents( KAHUKPATH . 'setup/libs/sql/sample-data-categories.sql');
+	$sql = str_replace( "`PREFIX_categories`", "`" . table_categories. "`", $stmt );
+
 	_kahuk_insert_sample_data( $sql, table_categories );
-
-    $sql = "UPDATE `" . table_categories . "` SET `category__auto_id` = '0' WHERE `category_name` = 'all' LIMIT 1;";
-	mysqli_query( $kahukDB, $sql );
-
-    $sql = "INSERT INTO `" . table_categories . "` (`category__auto_id`, `category_lang`, `category_id`, `category_parent`, `category_name`, `category_safe_name`, `rgt`, `lft`, `category_enabled`, `category_order`, `category_desc`, `category_keywords`, `category_author_level`, `category_author_group`, `category_votes`) VALUES (1, '" . $dblang . "', 1, 0, 'News', 'News', 2, 1, 1, 0, '', '', 'normal', '', '');";
-    _kahuk_insert_sample_data( $sql, table_categories );
 
 
     //
@@ -44,8 +86,10 @@ function kahuk_insert_sample_data() {
 
 
     //
-    $sql = "INSERT INTO `" . table_links . "` (`link_id`, `link_author`, `link_status`, `link_randkey`, `link_votes`, `link_reports`, `link_comments`, `link_karma`, `link_modified`, `link_date`, `link_published_date`, `link_category`, `link_lang`, `link_url`, `link_url_title`, `link_title`, `link_title_url`, `link_content`, `link_summary`, `link_tags`, `link_field1`, `link_field2`, `link_field3`, `link_field4`, `link_field5`, `link_field6`, `link_field7`, `link_field8`, `link_field9`, `link_field10`, `link_field11`, `link_field12`, `link_field13`, `link_field14`, `link_field15`, `link_group_id`, `link_out`) VALUES (1, 1, 'page', 0, 0, 0, 0, '0.00', NOW(), NOW(), NULL, 0, 1, '', NULL, 'About', 'about', '<legend><strong>About Us</strong></legend>\r\n<p>Our site allows you to submit an article that will be voted on by other members. The most popular posts will be published to the front page, while the less popular articles are left in an \'New\' page until they acquire the set number of votes to move to the published page. This site is dependent on user contributed content and votes to determine the direction of the site.</p>\r\n', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 0, 0);";
-    _kahuk_insert_sample_data( $sql, table_links );
+    $stmt = file_get_contents( KAHUKPATH . 'setup/libs/sql/sample-data-links.sql');
+	$sql = str_replace( "`PREFIX_links`", "`" . table_links. "`", $stmt );
+
+	_kahuk_insert_sample_data( $sql, table_links );
 
 
     //
@@ -104,14 +148,10 @@ function kahuk_insert_sample_data() {
 
 
     //
-    $sql = "insert into `" . table_totals . "` (`name`, `total`) values
-	('published', 0),
-	('new', 0),
-	('discard', 0),
-	('draft', 0),
-	('scheduled', 0);";
+    $stmt = file_get_contents( KAHUKPATH . 'setup/libs/sql/sample-data-totals.sql');
+	$sql = str_replace( "`PREFIX_totals`", "`" . table_totals. "`", $stmt );
 
-    _kahuk_insert_sample_data( $sql, table_totals );
+	_kahuk_insert_sample_data( $sql, table_totals );
 
 
     //
@@ -125,36 +165,10 @@ function kahuk_insert_sample_data() {
 
 
     //
-    $stmt = file_get_contents( KAHUKPATH . 'setup/libs/sql/config-table-data.sql');
-	$stmt = str_replace( "INSERT INTO `table_config`", "INSERT INTO `" . table_config . "`", $stmt );
+    $stmt = file_get_contents( KAHUKPATH . 'setup/libs/sql/sample-data-votes.sql');
 
-    $stmt = str_replace( "'table_prefix', 'kahuk_'", "'table_prefix', '" . TABLE_PREFIX . "'", $stmt );
+	$stmt = str_replace( "`PREFIX_votes`", "`" . table_votes. "`", $stmt );
+	$sql = str_replace( "COLUMN_VOTE_IP", $ipAddress, $stmt );
 
-	$stmt = str_replace( "---language---", "english", $stmt );
-
-	$sql = str_replace( "__url_method__", ( SEO_FRIENDLY_URL ? 2 : 1 ), $stmt );
-
-	_kahuk_insert_sample_data( $sql, table_config );
-
-
-    //
-    $userip = mysqli_real_escape_string( $kahukDB, $_SERVER['REMOTE_ADDR'] );
-
-	$saltedpass = generatePassHash( $_POST['upassword'] );
-
-    $sql = "INSERT INTO `" . table_users . "` (
-        `user_id`, `user_login`, `user_level`, 
-        `user_modification`, `user_date`, `user_pass`, 
-        `user_email`, `user_names`, `user_karma`, 
-        `user_url`, `user_lastlogin`, `user_ip`, 
-        `user_lastip`, `last_reset_request`, `user_enabled`
-    ) VALUES (
-        1, '" . mysqli_real_escape_string( $kahukDB, $_POST['uname'] ) . "', 'admin', 
-        NOW(), NOW(), '$saltedpass', 
-        '" . mysqli_real_escape_string( $kahukDB, $_POST['uemail'] ) . "', '', '10.00', 
-        'https://kahuk.com', NOW(), '$userip', 
-        '0', NOW(), '1'
-    );";
-	
-    _kahuk_insert_sample_data( $sql, table_users );
+	_kahuk_insert_sample_data( $sql, table_votes );
 }

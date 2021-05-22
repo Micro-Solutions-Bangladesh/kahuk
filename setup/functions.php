@@ -1,4 +1,24 @@
 <?php
+/**
+ * Generate Password
+ * 
+ * @since 5.0.3
+ * 
+ * @return string
+ */
+function kahuk_generate_password( $psaa_length = 10 ) {
+	$output = [];
+
+	$alphabets = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890~!@#*';
+    $alphaLength = strlen($alphabets) - 1; //put the length -1 in cache
+    
+	for ($i = 0; $i < $psaa_length; $i++) {
+        $n = rand(0, $alphaLength);
+        $output[] = $alphabets[$n];
+    }
+
+    return implode($output); //turn the array into a string
+}
 
 /**
  * Check if table exist
@@ -402,7 +422,7 @@ function create_kahuk_configs_file() {
  */
 function create_kahuk_htaccess_file() {
 
-	if ( SEO_FRIENDLY_URL ) {
+	if ( defined( "SEO_FRIENDLY_URL" ) && SEO_FRIENDLY_URL ) {
 		$path = defined( 'my_kahuk_base' ) ? my_kahuk_base : kahuk_base_path();
 		$site_base = $path . '/';
 
