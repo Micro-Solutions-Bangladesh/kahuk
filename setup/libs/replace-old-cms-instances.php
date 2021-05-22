@@ -51,6 +51,13 @@ function kahuk_replace_old_cms_instances() {
     $sql = "UPDATE `" . table_config . "` SET `var_desc` = 'Allow users to change Kahuk language<br /><strong>When SET to 1, you have to rename the language file that you want to allow in /languages/ folder.</strong> Ex: <span style=\"font-style:italic;color:#004dff\">RENAME lang_italian.conf.default</span> to <span style=\"font-style:italic;color:#004dff\">lang_italian.conf</span>' WHERE `var_name` = 'user_language';";
     _kahuk_replace_old_cms_instances( $sql, table_config );
 
+    //
+    $urlMethodValue = ( SEO_FRIENDLY_URL ) ? 2 : 1;
+
+    $sql = "UPDATE `" . table_config . "` SET `var_value` = ". $urlMethodValue . " WHERE `var_name` = '\$URLMethod';";
+    _kahuk_replace_old_cms_instances( $sql, table_config );
+
+
     // We will use SALT_LENGTH constant from kahuk-configs file
     $sql = "DELETE FROM `" . table_config . "` WHERE `var_name` = 'SALT_LENGTH';";
     _kahuk_replace_old_cms_instances( $sql, table_config );
@@ -87,7 +94,7 @@ function kahuk_replace_old_cms_instances() {
      */
 
     //
-    $sql = "UPDATE `" . table_misc_data . "` SET `name` = 'kahuk_version', `data` = '5.0.2'  WHERE `name` = 'plikli_version';";
+    $sql = "UPDATE `" . table_misc_data . "` SET `name` = 'kahuk_version', `data` = '5.0.3'  WHERE `name` = 'plikli_version';";
     _kahuk_replace_old_cms_instances( $sql, table_misc_data );
 
     //

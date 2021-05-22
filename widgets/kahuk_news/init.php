@@ -4,7 +4,7 @@ $widget['widget_has_settings'] = 0;
 $widget['widget_shrink_icon'] = 1;
 $widget['widget_uninstall_icon'] = 0;
 $widget['name'] = 'Kahuk News';
-$widget['desc'] = 'The Kahuk News widget displays the latest news items from the <a href="https://www.kahuk.com/" target="_blank" rel="noopener noreferrer">Kahuk CMS Blog</a>.';
+$widget['desc'] = 'The Kahuk News widget displays the latest news items from the <a href="https://kahuk.com/" target="_blank" rel="noopener noreferrer">Kahuk CMS Blog</a>.';
 $widget['version'] = 0.1;
 
 $news_count = get_misc_data('news_count');

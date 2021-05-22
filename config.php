@@ -25,6 +25,7 @@ require_once KAHUK_LIBS_DIR . 'wp/functions.php';
 require_once KAHUK_LIBS_DIR . 'functions-table-user.php';
 require_once KAHUK_LIBS_DIR . 'functions-table-link.php';
 require_once KAHUK_LIBS_DIR . 'functions-table-vote.php';
+require_once KAHUK_LIBS_DIR . 'functions-table-total.php';
 
 require_once KAHUK_LIBS_DIR . 'html1.php';
 
@@ -149,14 +150,7 @@ $file = dirname(__FILE__) . '/templates/' . $thetemp . "/kahuk.tpl";
 unset($errors);
 if (!file_exists($file)) {
 	$errors[]='You may have typed the template name wrong or "'. $thetemp . '" does not exist.';
-}
-
-//Redwine: If an error was genrated from the above statement, we check using the default Kahuk template, bootstrap.
-$thetemp = "bootstrap";
-$file = dirname(__FILE__) . '/templates/' . $thetemp . "/kahuk.tpl";
-if (!file_exists($file)) {
-    $errors[] = 'The default template "bootstrap" does not exist anymore. Please fix this by re-uploading the bootstrap template!';
-}   
+} 
 
 //Redwine: if errors, then we output them.    
 if (isset($errors)) {

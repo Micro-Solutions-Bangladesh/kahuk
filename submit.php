@@ -61,7 +61,7 @@ if ( isset( $_POST['url'] ) && isset( $_POST['phase'] ) ) {
 }
 
 if ( ! empty( $urlFound ) ) {
-	kahuk_debug_log( "Phase: {$phase} and the URL: {$urlFound}\nreferrer: " . $_SERVER["HTTP_REFERER"], __LINE__, '', __FILE__ );
+	// kahuk_debug_log( "Phase: {$phase} and the URL: {$urlFound}\nreferrer: " . $_SERVER["HTTP_REFERER"], __LINE__, '', __FILE__ );
 	check_referrer( $urlFound );
 }
 
@@ -233,6 +233,9 @@ function do_submit2() {
 
 	$kahukVoting = new KahukVoting();
 	$kahukVoting->init( $args );
+
+	//
+	kahuk_regenerate_total_by_status( 'new' );
 
 	//
 	$categories = kahuk_categories_init();

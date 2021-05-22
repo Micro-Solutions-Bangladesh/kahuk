@@ -111,17 +111,25 @@
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</button>
-				<a class="navbar-brand" href="https://www.kahuk.com/">
+				<a class="navbar-brand" href="https://kahuk.com/">
 					<img src="{$kahuk_base_url}/templates/admin/img/kahuk-light.png" class="adm_logo" />
 				</a>
 			</div>
 			<nav role="navigation" class="collapse navbar-collapse bs-navbar-collapse">
 				<ul class="nav navbar-nav">
-					<li{if $pagename eq "admin_index"} class="active"{/if}><a href="{$kahuk_base_url}/admin/admin_index.php">{#KAHUK_Visual_Dashboard#}</a></li>
-					<li><a href="{$kahuk_base_url}/">{#KAHUK_Visual_Home#}</a></li>
-					<li><a href="{$URL_new}">{#KAHUK_Visual_Kahuk_Queued#}</a></li>
+					<li{if $pagename eq "admin_index"} class="active"{/if}>
+						<a href="{$kahuk_base_url}/admin/admin_index.php">{#KAHUK_Visual_Dashboard#}</a>
+					</li>
+					<li>
+						<a href="{$kahuk_base_url}/">{#KAHUK_Visual_Home#}</a>
+					</li>
+					<li>
+						<a href="{$URL_new}">{#KAHUK_Visual_Kahuk_Queued#}</a>
+					</li>
 					{checkActionsTpl location="tpl_header_admin_links"}
-					<li><a href="{$URL_logout}">{#KAHUK_Visual_Logout#}</a></li>
+					<li>
+						<a href="{$URL_logout}">{#KAHUK_Visual_Logout#}</a>
+					</li>
 				</ul><!--/.nav -->
 			</nav>
 		</div>
@@ -163,16 +171,50 @@
 								</div>
 								<div class="accordion-body " id="CollapseManage">
 									<ul class="accordion-inner">
-                                        <li{if $pagename eq "admin_settings"} class="active"{/if} id="manage_submissions"><a href="{$kahuk_base_url}/admin/admin_settings.php">Recommended Settings</a></li>
-										<li{if $pagename eq "admin_links"} class="active"{/if} id="manage_submissions"><a href="{$kahuk_base_url}/admin/admin_links.php">Submissions {if $moderated_submissions_count != '0'}<span class="pull-right badge badge-gray">{$moderated_submissions_count}</span>{/if}</a></li>
-										<li{if $pagename eq "admin_comments"} class="active"{/if} id="manage_comments"><a href="{$kahuk_base_url}/admin/admin_comments.php">Comments {if $moderated_comments_count != '0'}<span class="pull-right badge badge-gray">{$moderated_comments_count}</span>{/if}</a></li>
-										<li{if $pagename eq "admin_users" || $pagename eq "admin_user_validate"} class="active"{/if} id="manage_users"><a href="{$kahuk_base_url}/admin/admin_users.php">Users {if $moderated_users_count != '0'}<span class="pull-right badge badge-gray">{$moderated_users_count}</span>{/if}</a></li>
-										<li{if $pagename eq "admin_group"} class="active"{/if} id="manage_groups"><a href="{$kahuk_base_url}/admin/admin_group.php">Groups {if $moderated_groups_count != '0'}<span class="pull-right badge badge-gray">{$moderated_groups_count}</span>{/if}</a></li>
-										<li{if $pagename eq "admin_page" || $pagename eq "edit_page" || $pagename eq "submit_page"} class="active"{/if} id="manage_pages"><a href="{$kahuk_base_url}/admin/admin_page.php">Pages</a></li> 
-										<li{if $pagename eq "admin_categories" || $pagename eq "admin_categories_tasks"} class="active"{/if} id="manage_categories"><a href="{$kahuk_base_url}/admin/admin_categories.php">Categories</a></li> 
-										{if $CHECK_SPAM}<li{if $pagename eq "domain_management"} class="active"{/if} id="domain_management"><a href="{$kahuk_base_url}/admin/domain_management.php">Manage Domains</a></li>{/if}
-										<li{if $pagename eq "admin_log"} class="active"{/if} id="manage_errors"><a href="{$kahuk_base_url}/admin/admin_log.php">Error Log {if $error_count != '0'}<span class="pull-right badge badge-gray">{$error_count}</span>{/if}</a></li>
-										<li{if $pagename eq "admin_backup"} class="active"{/if} id="settings_backup"><a href="{$kahuk_base_url}/admin/admin_backup.php">{#KAHUK_Visual_AdminPanel_Backup#}{if $backup_count != '0'}<span class="pull-right badge badge-gray">{$backup_count}</span>{/if}</a></li>
+                                        <li{if $pagename eq "admin_settings"} class="active"{/if} id="manage_submissions">
+											<a href="{$kahuk_base_url}/admin/admin_settings.php">Recommended Settings</a>
+										</li>
+										<li{if $pagename eq "admin_links"} class="active"{/if} id="manage_submissions">
+											<a href="{$kahuk_base_url}/admin/admin_links.php">
+												Submissions {if $moderated_submissions_count != '0'}<span class="pull-right badge badge-gray">{$moderated_submissions_count}</span>{/if}
+											</a>
+										</li>
+										<li{if $pagename eq "admin_comments"} class="active"{/if} id="manage_comments">
+											<a href="{$kahuk_base_url}/admin/admin_comments.php">
+												Comments {if $moderated_comments_count != '0'}<span class="pull-right badge badge-gray">{$moderated_comments_count}</span>{/if}
+											</a>
+										</li>
+										<li{if $pagename eq "admin_users" || $pagename eq "admin_user_validate"} class="active"{/if} id="manage_users">
+											<a href="{$kahuk_base_url}/admin/admin_users.php">
+												Users {if $moderated_users_count != '0'}<span class="pull-right badge badge-gray">{$moderated_users_count}</span>{/if}
+											</a>
+										</li>
+										<li{if $pagename eq "admin_group"} class="active"{/if} id="manage_groups">
+											<a href="{$kahuk_base_url}/admin/admin_group.php">
+												Groups {if $moderated_groups_count != '0'}<span class="pull-right badge badge-gray">{$moderated_groups_count}</span>{/if}
+											</a>
+										</li>
+										<li{if $pagename eq "admin_page" || $pagename eq "edit_page" || $pagename eq "submit_page"} class="active"{/if} id="manage_pages">
+											<a href="{$kahuk_base_url}/admin/admin_page.php">Pages</a>
+										</li> 
+										<li{if $pagename eq "admin_categories" || $pagename eq "admin_categories_tasks"} class="active"{/if} id="manage_categories">
+											<a href="{$kahuk_base_url}/admin/admin_categories.php">Categories</a>
+										</li> 
+										{if $CHECK_SPAM}
+											<li{if $pagename eq "domain_management"} class="active"{/if} id="domain_management">
+												<a href="{$kahuk_base_url}/admin/domain_management.php">Manage Domains</a>
+											</li>
+										{/if}
+										<li{if $pagename eq "admin_log"} class="active"{/if} id="manage_errors">
+											<a href="{$kahuk_base_url}/admin/admin_log.php">
+												Error Log {if $error_count != '0'}<span class="pull-right badge badge-gray">{$error_count}</span>{/if}
+											</a>
+										</li>
+										<li{if $pagename eq "admin_backup"} class="active"{/if} id="settings_backup">
+											<a href="{$kahuk_base_url}/admin/admin_backup.php">
+												{#KAHUK_Visual_AdminPanel_Backup#}{if $backup_count != '0'}<span class="pull-right badge badge-gray">{$backup_count}</span>{/if}
+											</a>
+										</li>
 										{checkActionsTpl location="tpl_kahuk_admin_manage_sidebarnav_end"}
                                     </ul>
 								</div>
@@ -185,20 +227,48 @@
 								</div>
 								<div class="accordion-body " id="CollapseSettings">
 									<ul class="accordion-inner">
-										<li{if $pagename eq "admin_config" && $templatelite.get.page eq "Logo"} class="active"{/if} id="settings_logo"><a href="{$kahuk_base_url}/admin/admin_config.php?page=Logo">Logo</a></li>
-										<li{if $pagename eq "admin_config" && $templatelite.get.page eq "Anonymous"} class="active"{/if} id="settings_anonymous"><a href="{$kahuk_base_url}/admin/admin_config.php?page=Anonymous">Anonymous</a></li>
-										<li{if $pagename eq "admin_config" && $templatelite.get.page eq "AntiSpam"} class="active"{/if} id="settings_antispam"><a href="{$kahuk_base_url}/admin/admin_config.php?page=AntiSpam">AntiSpam</a></li>
-										<li{if $pagename eq "admin_config" && $templatelite.get.page eq "Avatars"} class="active"{/if} id="settings_avatars"><a href="{$kahuk_base_url}/admin/admin_config.php?page=Avatars">Avatars</a></li>
-										<li{if $pagename eq "admin_config" && $templatelite.get.page eq "Comments"} class="active"{/if} id="settings_comments"><a href="{$kahuk_base_url}/admin/admin_config.php?page=Comments">Comments</a></li>
-										<li{if $pagename eq "admin_config" && $templatelite.get.page eq "Groups"} class="active"{/if} id="settings_groups"><a href="{$kahuk_base_url}/admin/admin_config.php?page=Groups">Groups</a></li>
-										<li{if $pagename eq "admin_config" && $templatelite.get.page eq "Live"} class="active"{/if} id="settings_live"><a href="{$kahuk_base_url}/admin/admin_config.php?page=Live">Live</a></li>
-										<li{if $pagename eq "admin_config" && $templatelite.get.page eq "Location Installed"} class="active"{/if} id="settings_location"><a href="{$kahuk_base_url}/admin/admin_config.php?page=Location Installed">Location Installed</a></li>
-										<li{if $pagename eq "admin_config" && $templatelite.get.page eq "Misc"} class="active"{/if} id="settings_misc"><a href="{$kahuk_base_url}/admin/admin_config.php?page=Misc">Miscellaneous</a></li>
-										<li{if $pagename eq "admin_config" && $templatelite.get.page eq "OutGoing"} class="active"{/if} id="settings_outgoing"><a href="{$kahuk_base_url}/admin/admin_config.php?page=OutGoing">OutGoing</a></li>
-										<li{if $pagename eq "admin_config" && $templatelite.get.page eq "SEO"} class="active"{/if} id="settings_seo"><a href="{$kahuk_base_url}/admin/admin_config.php?page=SEO">SEO</a></li>
-										<li{if $pagename eq "admin_config" && $templatelite.get.page eq "Story"} class="active"{/if} id="settings_story"><a href="{$kahuk_base_url}/admin/admin_config.php?page=Story">Story</a></li>
-										<li{if $pagename eq "admin_config" && $templatelite.get.page eq "Submit"} class="active"{/if} id="settings_submit"><a href="{$kahuk_base_url}/admin/admin_config.php?page=Submit">Submit</a></li>
-										<li{if $pagename eq "admin_config" && $templatelite.get.page eq "Voting"} class="active"{/if} id="settings_voting"><a href="{$kahuk_base_url}/admin/admin_config.php?page=Voting">Voting</a></li>
+										<li{if $pagename eq "admin_config" && $templatelite.get.page eq "Logo"} class="active"{/if} id="settings_logo">
+											<a href="{$kahuk_base_url}/admin/admin_config.php?page=Logo">Logo</a>
+										</li>
+										<li{if $pagename eq "admin_config" && $templatelite.get.page eq "Anonymous"} class="active"{/if} id="settings_anonymous">
+											<a href="{$kahuk_base_url}/admin/admin_config.php?page=Anonymous">Anonymous</a>
+										</li>
+										<li{if $pagename eq "admin_config" && $templatelite.get.page eq "AntiSpam"} class="active"{/if} id="settings_antispam">
+											<a href="{$kahuk_base_url}/admin/admin_config.php?page=AntiSpam">AntiSpam</a>
+										</li>
+										<li{if $pagename eq "admin_config" && $templatelite.get.page eq "Avatars"} class="active"{/if} id="settings_avatars">
+											<a href="{$kahuk_base_url}/admin/admin_config.php?page=Avatars">Avatars</a>
+										</li>
+										<li{if $pagename eq "admin_config" && $templatelite.get.page eq "Comments"} class="active"{/if} id="settings_comments">
+											<a href="{$kahuk_base_url}/admin/admin_config.php?page=Comments">Comments</a>
+										</li>
+										<li{if $pagename eq "admin_config" && $templatelite.get.page eq "Groups"} class="active"{/if} id="settings_groups">
+											<a href="{$kahuk_base_url}/admin/admin_config.php?page=Groups">Groups</a>
+										</li>
+										<li{if $pagename eq "admin_config" && $templatelite.get.page eq "Live"} class="active"{/if} id="settings_live">
+											<a href="{$kahuk_base_url}/admin/admin_config.php?page=Live">Live</a>
+										</li>
+										<li{if $pagename eq "admin_config" && $templatelite.get.page eq "Location Installed"} class="active"{/if} id="settings_location">
+											<a href="{$kahuk_base_url}/admin/admin_config.php?page=Location Installed">Location Installed</a>
+										</li>
+										<li{if $pagename eq "admin_config" && $templatelite.get.page eq "Misc"} class="active"{/if} id="settings_misc">
+											<a href="{$kahuk_base_url}/admin/admin_config.php?page=Misc">Miscellaneous</a>
+										</li>
+										<li{if $pagename eq "admin_config" && $templatelite.get.page eq "OutGoing"} class="active"{/if} id="settings_outgoing">
+											<a href="{$kahuk_base_url}/admin/admin_config.php?page=OutGoing">OutGoing</a>
+										</li>
+										<li{if $pagename eq "admin_config" && $templatelite.get.page eq "SEO"} class="active"{/if} id="settings_seo">
+											<a href="{$kahuk_base_url}/admin/admin_config.php?page=SEO">SEO</a>
+										</li>
+										<li{if $pagename eq "admin_config" && $templatelite.get.page eq "Story"} class="active"{/if} id="settings_story">
+											<a href="{$kahuk_base_url}/admin/admin_config.php?page=Story">Story</a>
+										</li>
+										<li{if $pagename eq "admin_config" && $templatelite.get.page eq "Submit"} class="active"{/if} id="settings_submit">
+											<a href="{$kahuk_base_url}/admin/admin_config.php?page=Submit">Submit</a>
+										</li>
+										<li{if $pagename eq "admin_config" && $templatelite.get.page eq "Voting"} class="active"{/if} id="settings_voting">
+											<a href="{$kahuk_base_url}/admin/admin_config.php?page=Voting">Voting</a>
+										</li>
 										{checkActionsTpl location="tpl_kahuk_admin_navtabs_end"}
 									</ul>
 								</div>
@@ -211,8 +281,12 @@
 								</div>
 								<div class="accordion-body " id="CollapseTemplate">
 									<ul class="accordion-inner">
-										<li{if $pagename eq "admin_config" && $templatelite.get.page eq "Template"} class="active"{/if} id="template_settings"><a href="{$kahuk_base_url}/admin/admin_config.php?page=Template">Template Settings</a></li>
-										<li{if $pagename eq "admin_editor"} class="active"{/if} id="template_editor"><a href="{$kahuk_base_url}/admin/admin_editor.php">{#KAHUK_Visual_AdminPanel_Template_Nav#} Editor</a></li>
+										<li{if $pagename eq "admin_config" && $templatelite.get.page eq "Template"} class="active"{/if} id="template_settings">
+											<a href="{$kahuk_base_url}/admin/admin_config.php?page=Template">Template Settings</a>
+										</li>
+										<li{if $pagename eq "admin_editor"} class="active"{/if} id="template_editor">
+											<a href="{$kahuk_base_url}/admin/admin_editor.php">{#KAHUK_Visual_AdminPanel_Template_Nav#} Editor</a>
+										</li>
 									    {checkActionsTpl location="tpl_kahuk_admin_template_sidebarnav_end"}
                                     </ul>
 								</div>
@@ -225,7 +299,9 @@
 								</div>
 								<div class="accordion-body " id="CollapseXtraFields">
 									<ul class="accordion-inner">
-										<li{if $pagename eq "extra_fields_editor"} class="active"{/if} id="xtra_fields_editor"><a href="{$kahuk_base_url}/admin/admin_xtra_fields_editor.php">{#KAHUK_Visual_AdminPanel_Extra_Fields_Nav#} Editor</a></li>
+										<li{if $pagename eq "extra_fields_editor"} class="active"{/if} id="xtra_fields_editor">
+											<a href="{$kahuk_base_url}/admin/admin_xtra_fields_editor.php">{#KAHUK_Visual_AdminPanel_Extra_Fields_Nav#} Editor</a>
+										</li>
                                     </ul>
 								</div>
 							</div>
@@ -242,8 +318,16 @@
 								</div>
 								<div class="accordion-body " id="CollapseModules">
 									<ul class="accordion-inner">
-										<li{if $pagename eq "admin_modules"}{php} if ($_GET["status"] == ""){ echo ' class="active"'; } {/php}{/if} id="modules_installed"><a href="{$kahuk_base_url}/admin/admin_modules.php" {if $pagename eq "admin_modules"}class="active"{/if} >Installed {#KAHUK_Visual_AdminPanel_Modules_Nav#} {if $in_no_module_update_require neq "0"}<span class="pull-right badge badge-gray">{$in_no_module_update_require}</span>{/if}</a></li> 
-										<li{if $pagename eq "admin_modules"}{php} if ($_GET["status"] == "uninstalled"){ echo ' class="active"'; } {/php}{/if} id="modules_uninstalled"><a href="{$kahuk_base_url}/admin/admin_modules.php?status=uninstalled" {if $pagename eq "admin_modules"}{php} if ($_GET["status"] == "uninstalled"){ echo ' class="active"'; } {/php}{/if} >Uninstalled {#KAHUK_Visual_AdminPanel_Modules_Nav#} {if $un_no_module_update_require neq "0"}<span class="pull-right badge badge-gray">{$un_no_module_update_require}</span>{/if}</a></li> 
+										<li{if $pagename eq "admin_modules"}{php} if ($_GET["status"] == ""){ echo ' class="active"'; } {/php}{/if} id="modules_installed">
+											<a href="{$kahuk_base_url}/admin/admin_modules.php" {if $pagename eq "admin_modules"}class="active"{/if} >
+												Installed {#KAHUK_Visual_AdminPanel_Modules_Nav#} {if $in_no_module_update_require neq "0"}<span class="pull-right badge badge-gray">{$in_no_module_update_require}</span>{/if}
+											</a>
+										</li> 
+										<li{if $pagename eq "admin_modules"}{php} if ($_GET["status"] == "uninstalled"){ echo ' class="active"'; } {/php}{/if} id="modules_uninstalled">
+											<a href="{$kahuk_base_url}/admin/admin_modules.php?status=uninstalled" {if $pagename eq "admin_modules"}{php} if ($_GET["status"] == "uninstalled"){ echo ' class="active"'; } {/php}{/if} >
+												Uninstalled {#KAHUK_Visual_AdminPanel_Modules_Nav#} {if $un_no_module_update_require neq "0"}<span class="pull-right badge badge-gray">{$un_no_module_update_require}</span>{/if}
+											</a>
+										</li> 
 										{checkActionsTpl location="tpl_header_admin_main_links"}
 									</ul>
 								</div>
@@ -259,8 +343,14 @@
 								</div>
 								<div class="accordion-body " id="CollapseWidgets">
 									<ul class="accordion-inner">
-										<li {if $pagename eq "admin_widgets"}{php} if ($_GET["status"] == ""){ echo 'class="active"'; } {/php}{/if} id="widgets_installed"><a href="{$kahuk_base_url}/admin/admin_widgets.php">Installed {#KAHUK_Visual_AdminPanel_Widgets_Nav#} <span class="pull-right badge badge-gray"></span></a></li> 
-										<li {if $pagename eq "admin_widgets"}{php} if ($_GET["status"] == "uninstalled"){ echo 'class="active"'; } {/php}{/if} id="widgets_uninstalled"><a href="{$kahuk_base_url}/admin/admin_widgets.php?status=uninstalled">Uninstalled {#KAHUK_Visual_AdminPanel_Widgets_Nav#}</a></li>
+										<li {if $pagename eq "admin_widgets"}{php} if ($_GET["status"] == ""){ echo 'class="active"'; } {/php}{/if} id="widgets_installed">
+											<a href="{$kahuk_base_url}/admin/admin_widgets.php">
+												Installed {#KAHUK_Visual_AdminPanel_Widgets_Nav#} <span class="pull-right badge badge-gray"></span>
+											</a>
+										</li> 
+										<li {if $pagename eq "admin_widgets"}{php} if ($_GET["status"] == "uninstalled"){ echo 'class="active"'; } {/php}{/if} id="widgets_uninstalled">
+											<a href="{$kahuk_base_url}/admin/admin_widgets.php?status=uninstalled">Uninstalled {#KAHUK_Visual_AdminPanel_Widgets_Nav#}</a>
+										</li>
 								        {checkActionsTpl location="tpl_kahuk_admin_widgets_sidebarnav_end"}
                                     </ul>
 								</div>
@@ -294,7 +384,7 @@
 		</div><!-- /row -->
 		<hr />
 		<footer>
-			<p>Powered by <a href="https://www.kahuk.com/">Kahuk CMS</a></p>
+			<p>Powered by <a href="https://kahuk.com/">Kahuk CMS</a></p>
 			{checkActionsTpl location="tpl_kahuk_admin_footer_end"}
 		</footer>
 	</div><!-- /container -->

@@ -27,7 +27,7 @@
 				<div id="footer">
 					<span class="subtext"> 
 						Copyright &copy; {php} echo date('Y'); {/php} {#KAHUK_Visual_Name#} 
-						| <a href="https://www.kahuk.com/" target="_blank" rel="noopener noreferrer">Kahuk CMS</a> 
+						| <a href="https://kahuk.com/" target="_blank" rel="noopener noreferrer">Kahuk CMS</a> 
 					</span>
 				</div>
 			</footer>

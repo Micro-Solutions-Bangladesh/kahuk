@@ -300,7 +300,8 @@ $moderated_groups_count = $db->get_var('SELECT count(*) from ' . table_groups . 
 $main_smarty->assign('moderated_groups_count', $moderated_groups_count);*/
 
 // Count the number of errors
-$error_log_path = KAHUK_LIBS_DIR.'../logs/error.log';
+// $error_log_path = KAHUK_LIBS_DIR.'../logs/error.log';
+$error_log_path = KAHUK_LOG_DIR . "error-logs/" . kahuk_error_log_file_name();
 $error_log_content = file_get_contents($error_log_path);
 $error_count = preg_match_all('/\[(\d{2})-(\w{3})-(\d{4}) (\d{2}:\d{2}:\d{2})/', $error_log_content, $matches);
 $main_smarty->assign('error_count', $error_count);

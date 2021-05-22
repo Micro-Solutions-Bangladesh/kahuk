@@ -25,6 +25,11 @@ define('admin_snippet_tpl_path', '../modules/admin_snippet/templates/');
 
 // Hooks list
 $locations = array(
+	array("tpl_kahuk_story_starter","Single Page Story Header"),
+	array("tpl_kahuk_story_finisher","Single Page Story Footer"),
+array("tpl_kahuk_story_start","Very beginning of link_summary.tpl"),
+array("tpl_kahuk_story_end","Very end of link_summary.tpl"),
+
 array("tpl_kahuk_head_start","After &lt;head&gt; tag"),
 array("tpl_kahuk_head_end","Before &lt;/head&gt; tag"),
 array("tpl_kahuk_body_start","After &lt;body&gt; tag"),
@@ -63,10 +68,10 @@ array("tpl_kahuk_submit_step1_end","After Submit step 1 link field"),
 array("tpl_kahuk_submit_step2_start","After step 2 of 3"),
 array("tpl_kahuk_submit_step2_middle","Before Submit Step 2 description"),
 array("tpl_kahuk_submit_step2_end","After Submit Step 2 continue button"),
+	array("tpl_kahuk_submit_preview_start","Submit Step 2 Before the Story Preview"),
+	array("tpl_kahuk_submit_preview_end","Submit Step 2 After the Story Preview"),
 array("tpl_kahuk_submit_step3_start","After step 3 of 3"),
 array("tpl_kahuk_submit_step3_end","After Submit Step 3 continue button"),
-array("tpl_kahuk_story_start","Very beginning of link_summary.tpl"),
-array("tpl_kahuk_story_end","Very end of link_summary.tpl"),
 array("tpl_kahuk_story_votebox_start","Before votebox"),
 array("tpl_kahuk_story_votebox_end","After votebox"),
 array("tpl_kahuk_story_title_start","Before title"),

@@ -3,7 +3,7 @@ $lang['StartInstall'] = 'Start Install';
 $lang['StartUpgrade'] = 'Start Upgrade';
 
 // header
-	$lang['kahuk_version'] = '5.0.2';
+	$lang['kahuk_version'] = '5.0.3';
 	$lang['installer'] = 'Installer';
 	$lang['Welcome'] = 'Welcome';
     $lang['Terms'] = 'Terms & Conditions';
@@ -23,8 +23,8 @@ $lang['StartUpgrade'] = 'Start Upgrade';
 // intro / step 1
 	$lang['WelcomeToInstaller'] = 'Welcome to Kahuk CMS Installer!';
 	$lang['Introduction'] = 'Introduction';
-	$lang['WelcomeToThe'] = 'Welcome to <a href="https://www.kahuk.com" target="_blank" rel="noopener noreferrer">Kahuk</a>, the CMS that powers thousands of community websites. If this is your first time installing Kahuk CMS, please read all of the provided instructions carefully so that you don\'t miss any important directions.';
-	$lang['Bugs'] = 'Please familiarize yourself with some of the documentation provided by the Kahuk community at the <a href="https://www.kahuk.com/forum-2/">Kahuk Forum</a> website. We also suggest that you register an account so that you will have access to free support, modules, widgets, templates and other great resources.';
+	$lang['WelcomeToThe'] = 'Welcome to <a href="https://kahuk.com" target="_blank" rel="noopener noreferrer">Kahuk</a>, the CMS that powers thousands of community websites. If this is your first time installing Kahuk CMS, please read all of the provided instructions carefully so that you don\'t miss any important directions.';
+	$lang['Bugs'] = 'Please familiarize yourself with some of the documentation provided by the Kahuk community at the <a href="https://kahuk.com/forum-2/">Kahuk Forum</a> website. We also suggest that you register an account so that you will have access to free support, modules, widgets, templates and other great resources.';
 	$lang['Installation'] = 'Installation (Please Read Carefully)';
 	$lang['OnceFamiliar'] = '<p>If this is your first time installing Kahuk you should continue on this page after carefully following the directions below. If you need to <a href="./upgrade.php">upgrade your site</a> from a previous version, please run the upgrade script by clicking on the Upgrade link above. WARNING: running the installation process on an existing Kahuk site database will overwrite all the data, so please make sure that you want to perform an installation if you choose to continue below.</p><br />
 	<ol>
@@ -94,7 +94,7 @@ $lang['StartUpgrade'] = 'Start Upgrade';
 	$lang['WhatToDoList'] = '<li><strong>DELETE</strong> the "/install" directory from your server if you have successfully installed Kahuk.</li>
 		<li>Login to the <a href="../admin/admin_index.php">dashboard</a> using the user information you entered from the previous step. Once you log in you should be presented with more information about how to use Kahuk.</li>
 		<li><a href="../admin/admin_config.php">Configure your site</a> using the dashboard.</li>
-		<li>Visit the <a href="https://www.kahuk.com/forum-2/">Kahuk Support</a> website if you have any questions.</li>';
+		<li>Visit the <a href="https://kahuk.com/forum-2/">Kahuk Support</a> website if you have any questions.</li>';
 	$lang['ContinueToSite'] = 'Continue to Your New Website';
 	
 // Upgrade

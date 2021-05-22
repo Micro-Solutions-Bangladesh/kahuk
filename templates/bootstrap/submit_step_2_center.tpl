@@ -25,7 +25,7 @@
 						{section name=thecat loop=$submit_cat_array}
 							{$submit_cat_array[thecat].spacercount|repeat_count:'&nbsp;&nbsp;&nbsp;&nbsp;'}
 								{*Redwine: I added the $submit_cat_array[thecat].name as the title attribute to the input checkbox so that we are able to use it to get the category name to be added in the preview section on the submit step 2*}
-								 <input type="radio" class="form-control" id="id_{$submit_cat_array[thecat].auto_id}" name="category" value="{$submit_cat_array[thecat].auto_id}" title="{$submit_cat_array[thecat].name}" {if $submit_cat_array[thecat].auto_id == $submit_category  || in_array($submit_cat_array[thecat].auto_id,$submit_additional_cats)}checked{/if}>
+								 <input type="radio" class="form-control" id="id_{$submit_cat_array[thecat].auto_id}" name="category" value="{$submit_cat_array[thecat].auto_id}" title="{$submit_cat_array[thecat].name}" {if $submit_cat_array[thecat].auto_id == $submit_category}checked{/if}>
 								 <label for="id_{$submit_cat_array[thecat].auto_id}">{$submit_cat_array[thecat].name}</label>
 								 <br />							
 						{/section}
@@ -34,7 +34,7 @@
 						<select class="form-control category" tabindex="2" name="category" id="category">
 							<option value="">{#KAHUK_Visual_Submit2_CatInstructSelect#}</option>
 							{section name=thecat loop=$submit_cat_array}
-								<option value="{$submit_cat_array[thecat].auto_id}" {if $submit_cat_array[thecat].auto_id == $submit_category  || in_array($cat_array[thecat].auto_id,$submit_additional_cats)}selected{/if}>
+								<option value="{$submit_cat_array[thecat].auto_id}" {if $submit_cat_array[thecat].auto_id == $submit_category}selected{/if}>
 									{if $submit_cat_array[thecat].spacercount lt $submit_lastspacer}{$submit_cat_array[thecat].spacerdiff|repeat_count:''}{/if}
 									{if $submit_cat_array[thecat].spacercount gt $submit_lastspacer}{/if}
 									{$submit_cat_array[thecat].spacercount|repeat_count:'&nbsp;&nbsp;&nbsp;'}
@@ -115,7 +115,6 @@
 			{checkActionsTpl location="tpl_kahuk_submit_preview_start"}
 				{* Redwine: temporary solution to eliminate the warnings "Undefined index: link_shakebox_index" *}
 			<div class="stories" id="xnews-{if !empty($link_shakebox_index)}{$link_shakebox_index}{/if}">
-				{checkActionsTpl location="tpl_kahuk_story_start"}
 				<div class="headline">
 					{if $Voting_Method eq 2}
 						<h4 id="ls_title-{if !empty($link_shakebox_index)}{$link_shakebox_index}{/if}">
@@ -220,9 +219,8 @@
 					 </div><!-- /.story-tools-right -->
 					 <div style="clear:both;"></div>
 				</div><!-- /.storyfooter -->
-				{checkActionsTpl location="tpl_link_summary_end"}
 			</div><!-- /.stories -->
-			{checkActionsTpl location="tpl_kahuk_story_end"}
+			{checkActionsTpl location="tpl_kahuk_submit_preview_end"}
 		</div>
 		{* END STORY PREVIEW *}
 	</form>
