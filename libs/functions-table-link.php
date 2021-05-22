@@ -31,10 +31,14 @@ function kahuk_get_link_by_slug( $title_slug ) {
  * 
  * @since 5.0.0
  */
-function kahuk_link_title_url( $title_slug ) {
+function kahuk_link_title_url( $title_slug, $isLike = true ) {
 	global $db;
 
-    return $db->count_rows( table_links, 'link_title_url', "link_title_url LIKE '" . $db->escape( $title_slug ) . "%'" );
+    if ( $isLike ) {
+        return $db->count_rows( table_links, 'link_title_url', "link_title_url LIKE '" . $db->escape( $title_slug ) . "%'" );
+    } else {
+        return $db->count_rows( table_links, 'link_title_url', "link_title_url = '" . $db->escape( $title_slug ) . "'" );
+    }    
 }
 
 /**

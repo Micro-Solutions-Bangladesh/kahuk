@@ -48,35 +48,32 @@ function kahuk_has_url_in_record( $randkey, $url ) {
  * 
  */
 function kahuk_unique_title_slug( $title_slug ) {
-    $countSlug = kahuk_link_title_url( $title_slug );
+    $countSlug = kahuk_link_title_url( $title_slug, false );
 
     if ( 0 == $countSlug ) {
         return $title_slug;
     }
 
+    $maxNumberOfDuplicateTitle = 20;
 
     $uniqueSlug = '';
     $slugNameCheck = true;
     $maxLoopCount = 0;
 
-    // echo "title_slug: " . $title_slug . "<br>";
-
     do {
-        $proposedSlug = $title_slug . "-" . ( $countSlug + 1 );
+        $proposedSlug = $title_slug . "-" . ( $maxLoopCount + 1 );
         // echo "proposedSlug: " . $proposedSlug . "<br>";
-        $countSlugNew = kahuk_link_title_url( $proposedSlug );
+        $countSlugNew = kahuk_link_title_url( $proposedSlug, false );
 
         if ( 0 == $countSlugNew ) {
             $slugNameCheck = false;
             $uniqueSlug = $proposedSlug;
-        } else {
-            $countSlug++;            
         }
 
         //
         $maxLoopCount++;
 
-        if ( 20 < $maxLoopCount ) {
+        if ( $maxNumberOfDuplicateTitle < $maxLoopCount ) {
             $slugNameCheck = false;
             $uniqueSlug = false;
 
@@ -84,6 +81,5 @@ function kahuk_unique_title_slug( $title_slug ) {
         }
     } while ( $slugNameCheck );
 
-    // echo "return uniqueSlug: " . $uniqueSlug . "<br>";
     return $uniqueSlug;
 }
