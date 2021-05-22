@@ -25,6 +25,7 @@ require_once KAHUK_LIBS_DIR . 'wp/functions.php';
 require_once KAHUK_LIBS_DIR . 'functions-table-user.php';
 require_once KAHUK_LIBS_DIR . 'functions-table-link.php';
 require_once KAHUK_LIBS_DIR . 'functions-table-vote.php';
+require_once KAHUK_LIBS_DIR . 'functions-table-total.php';
 
 require_once KAHUK_LIBS_DIR . 'html1.php';
 

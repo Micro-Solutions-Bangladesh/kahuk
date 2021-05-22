@@ -235,6 +235,9 @@ function do_submit2() {
 	$kahukVoting->init( $args );
 
 	//
+	kahuk_regenerate_total_by_status( 'new' );
+
+	//
 	$categories = kahuk_categories_init();
 	$category = $categories->get_item( $linksData['link_category'] );
 
