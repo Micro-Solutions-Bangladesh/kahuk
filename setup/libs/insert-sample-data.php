@@ -61,7 +61,7 @@ function kahuk_insert_sample_data() {
 
 
     //
-    $stmt = file_get_contents( KAHUKPATH . 'setup/libs/sql/config-table-data.sql');
+    $stmt = file_get_contents( KAHUKPATH . 'setup/libs/sql/sample-data-configs.sql');
 	$stmt = str_replace( "INSERT INTO `table_config`", "INSERT INTO `" . table_config . "`", $stmt );
 
     $stmt = str_replace( "'table_prefix', 'kahuk_'", "'table_prefix', '" . TABLE_PREFIX . "'", $stmt );
