@@ -74,6 +74,12 @@ function kahuk_insert_sample_data() {
 
 
     // Insert Categories
+    $sql = "INSERT INTO `" . table_categories . "` (`category__auto_id`, `category_lang`, `category_id`, `category_parent`, `category_name`, `category_safe_name`, `rgt`, `lft`, `category_enabled`, `category_order`, `category_desc`, `category_keywords`, `category_author_level`, `category_author_group`, `category_votes`) VALUES (0, '" . $dblang . "', 0, 0, 'all', 'all', 3, 0, 2, 0, '', '', 'normal', '', '');";
+	_kahuk_insert_sample_data( $sql, table_categories );
+
+    $sql = "UPDATE `" . table_categories . "` SET `category__auto_id` = '0' WHERE `category_name` = 'all' LIMIT 1;";
+	mysqli_query( $kahukDB, $sql );
+
     $stmt = file_get_contents( KAHUKPATH . 'setup/libs/sql/sample-data-categories.sql');
 	$sql = str_replace( "`PREFIX_categories`", "`" . table_categories. "`", $stmt );
 
