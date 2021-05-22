@@ -249,15 +249,9 @@ switch( $step ) {
 
     case 14:
     case 4:
+            include_once KAHUKPATH . 'kahuk-configs.php';
             
             $messagesArray[]['info'] = "PLEASE <strong>DELETE THE <code>/setup</code> FOLDER</strong>.";
-
-            //
-            $file = KAHUKPATH . 'kahuk-configs.php';
-
-            if ( ! file_exists( $file ) ) {
-                $messagesArray[]['danger'] = "<strong>Error:</strong> <code>/kahuk-configs.php</code> file is missing.";
-            }
 
             // TODO Clean the cache folder
 
