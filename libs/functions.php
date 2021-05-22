@@ -355,6 +355,28 @@ function kahuk_allowed_protocols() {
 }
 
 /**
+ * Generate Password
+ * 
+ * @since 5.0.3
+ * 
+ * @return string
+ */
+function kahuk_generate_password( $psaa_length = 8 ) {
+	$output = [];
+
+	$alphabets = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890~!@#*';
+    $alphaLength = strlen($alphabets) - 1; //put the length -1 in cache
+    
+	for ($i = 0; $i < $psaa_length; $i++) {
+        $n = rand(0, $alphaLength);
+        $output[] = $alphabets[$n];
+    }
+
+    return implode($output); //turn the array into a string
+}
+
+
+/**
  * Returns either a GET value or the default
  * 
  * @since 5.0.0
