@@ -98,6 +98,9 @@ define( 'USER_COMMENT_KARMA', 5 );
 //
 define( 'SEO_FRIENDLY_URL', seo_friendly_url_here );
 
+// Maximum number of duplicate title allowed
+define( 'MAX_NUMBER_OF_DUPLICATE_TITLE', 5 );
+
 //
 if ( ! defined( 'KAHUK_BASE_URL' ) ) {
 	define( 'KAHUK_BASE_URL', 'kahuk_base_url_here' ); // ex: http://example.com/folder-name [ if installed in a folder ]

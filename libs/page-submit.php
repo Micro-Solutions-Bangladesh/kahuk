@@ -54,11 +54,11 @@ function kahuk_unique_title_slug( $title_slug ) {
         return $title_slug;
     }
 
-    $maxNumberOfDuplicateTitle = 20;
+    $maxNumberOfDuplicateTitle = MAX_NUMBER_OF_DUPLICATE_TITLE;
 
     $uniqueSlug = '';
     $slugNameCheck = true;
-    $maxLoopCount = 0;
+    $maxLoopCount = 1;
 
     do {
         $proposedSlug = $title_slug . "-" . ( $maxLoopCount + 1 );
