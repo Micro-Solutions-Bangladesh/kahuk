@@ -88,6 +88,7 @@ class KahukVoting {
         }
 
         $dataForVote = [];
+        $dataForVote['vote_user_id'] = $this->userId;
         $dataForVote['vote_link_id'] = $this->linkId;
         $dataForVote['vote_value'] = $this->isPositiveVote ? 10 : -10;
 
