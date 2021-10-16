@@ -76,6 +76,8 @@ define( 'LOG_DB_QUERY', false );
 define( 'LOG_DB_QUERY_FILE', 'logs/query.log' );
 define( 'LOG_DB_QUERY_ERROR', 'logs/query_error.log' );
 
+// Karma Value to upgrade status of a story into PUBLISHED from NEW
+define( 'STORY_KARMA_PUBLISHED', 30 );
 
 // Karma Value for LINK When A Link Get/Loss Vote
 define( 'LINK_VOTE_KARMA', 2 );
