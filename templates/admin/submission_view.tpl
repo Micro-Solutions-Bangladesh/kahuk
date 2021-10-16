@@ -5,6 +5,7 @@
 	<p><a class="btn btn-primary" href="{$admin_published_url}">Set as Published</a> &ndash; {#KAHUK_Visual_Change_Link_Published#}</p>
 	<p><a class="btn btn-danger" href="{$admin_discard_url}">Discard the Story</a> &ndash; {#KAHUK_Visual_Change_Link_Discard#}</p>
 	<hr />
+	<p><strong>Story Karma:</strong> {$link_karma} </p>
 	<p><strong>{#KAHUK_Visual_Change_Link_Title#}:</strong> {$link_title} </p>
 	<p><strong>{#KAHUK_Visual_Change_Link_URL#}:</strong> <a href="{$link_url}" target="_blank" rel="noopener noreferrer">{$link_url}</a> &ndash; <a class="btn btn-danger btn-xs" href="{$kahuk_base_url}/admin/domain_management.php?id={$link_id}&add={$banned_domain_url}">{#KAHUK_Visual_Ban_This_URL#}</a></p>
 	<p><strong>{#KAHUK_Visual_Change_Link_Content#}:</strong> {$link_content}</p>

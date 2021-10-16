@@ -34,6 +34,7 @@ if($canIhaveAccess == 1)
 				$main_smarty->assign('link_url',$link->link_url);
 				$main_smarty->assign('link_content',$link->link_content);
 				$main_smarty->assign('link_status',$link->link_status);
+				$main_smarty->assign('link_karma',$link->link_karma);
 				$main_smarty->assign('user_login',$author->user_login);
 				$main_smarty->assign('banned_domain_url',get_base_url($link->link_url));
 				$main_smarty->assign('admin_discard_url',getmyurl('admin_discard', $link->link_id));
@@ -47,7 +48,8 @@ if($canIhaveAccess == 1)
 				
 				// show the template
 				$main_smarty->assign('tpl_center', '/admin/submission_view');
-/* Redwine: To properly display the template according to the Roles and Permissions */
+
+				// To properly display the template according to the Roles and Permissions
 				if ($is_moderator == '1'){
 					$main_smarty->display('/admin/moderator.tpl');
 				} else {
