@@ -50,7 +50,7 @@ function kahuk_count_story_by_slug( $story_slug, $statuses = [], $isLike = false
     $where .= " AND link_status IN ('" . implode( "','", $statuses ) . "')";
 
     //
-    $output = $db->count_rows( table_links, 'link_url', $where, true );
+    $output = $db->count_rows( table_links, 'link_url', $where );
     
     // return output
     return $output;
@@ -133,29 +133,35 @@ function kahuk_update_story_karma( $link_id, $is_add, $karma_value ) {
     global $db;
 
     $post = kahuk_get_story_by_id( $link_id );
+    $link_votes_new = intval( $post['link_votes'] );
 
+    $sql = "UPDATE `" . table_links . "` SET";
+
+    //
     $karma_value_new = 0.00;
-    $link_votes_new = 0;
 
     if ( $is_add ) {
         $karma_value_new = floatval( $post['link_karma'] ) + floatval( $karma_value );
-        $link_votes_new = intval( $post['link_votes'] ) + 1;
     } else {
         $karma_value_new = floatval( $post['link_karma'] ) - floatval( $karma_value );
-        $link_votes_new = intval( $post['link_votes'] ) - 1;
     }
 
     $karma_value_new = number_format( $karma_value_new, 2, ".", "" );
-    
+    $sql .= " link_karma = '" . $db->escape( $karma_value_new ) . "'";
 
-    // SQL Query
-    $sql = "UPDATE `" . table_links . "` SET";
+    // Check if the karma score for voting/unvoting action not for favorite/unfavorite action
+    if ( LINK_VOTE_KARMA == $karma_value ) {
+        if ( $is_add ) {
+            $link_votes_new = ( $link_votes_new + 1 );
+        } else {
+            $link_votes_new = ( $link_votes_new - 1 );
+        }
 
-    $sql .= " link_votes = " . $link_votes_new . ", link_karma = '" . $db->escape( $karma_value_new ) . "'";
-    
+        $sql .= ", link_votes = " . $link_votes_new;
+    }
+
     $sql .= " WHERE link_id = " . intval( $link_id );
     
-
     // Execute Query and return
 	$rs = $db->query( $sql );
 

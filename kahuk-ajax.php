@@ -61,6 +61,12 @@ if ( in_array( $action, ['save-story', 'unsave-story'] ) ) {
 				$sql="INSERT INTO " . table_saved_links . " (saved_user_id, saved_link_id) VALUES ({$current_user_id}, {$linkid})";
 				$db->query($sql);
 				echo "1";
+
+				// Calculate Story Karma Score
+				kahuk_update_story_karma( $linkid, true, LINK_SAVE_KARMA );
+
+				// Check for Story karma and status
+				kahuk_change_story_status( $story_id );
 			} else {
 				echo "Error";
 			}
@@ -72,6 +78,12 @@ if ( in_array( $action, ['save-story', 'unsave-story'] ) ) {
 				$sql="DELETE FROM " . table_saved_links . " WHERE saved_user_id={$current_user_id} AND saved_link_id={$linkid}";
 				$db->query($sql);
 				echo "2";
+
+				// Calculate Story Karma Score
+				kahuk_update_story_karma( $linkid, false, LINK_SAVE_KARMA );
+
+				// Check for Story karma and status
+				kahuk_change_story_status( $story_id );
 			} else {
 				echo "Error";
 			}
