@@ -83,6 +83,46 @@ function kahuk_get_story_by_slug( $title_slug ) {
 }
 
 /**
+ * Change story status depending on karma value
+ * 
+ * @since 5.0.4
+ * 
+ * @return string Mentioning the status updated as yes, not updated as no, and not applicable as na
+ */
+function kahuk_change_story_status( $story_id ) {
+    global $db, $globalStory;
+
+    if ( ! $globalStory || ( $story_id != $globalStory['link_id'] ) ) {
+        $globalStory = kahuk_get_story_by_id( $story_id );
+    }
+
+    /**
+     * Check if the story status is NEW and the karma meet score to be PUBLISHED
+     */
+    if ( ( "new" == $globalStory['link_status'] ) && ( STORY_KARMA_PUBLISHED <= intval( $globalStory['link_karma'] ) ) ) {
+        // SQL Query
+        $sql = "UPDATE `" . table_links . "` SET";
+
+        $sql .= " link_status = 'published'";
+        
+        $sql .= " WHERE link_id = " . intval( $story_id );
+
+        // Execute Query and return
+        $rs = $db->query( $sql );
+
+        if ( 0 == $rs ) {
+            kahuk_error_log( "FAIL to Change Story Status:\nQuery: {$sql}", __FILE__, __LINE__ );
+
+            return 'no';
+        } else {
+            return 'yes';
+        }
+    }
+
+    return 'na';
+}
+
+/**
  * Edit story karma and vote
  * 
  * @since 5.0.0

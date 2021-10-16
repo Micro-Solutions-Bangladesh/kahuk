@@ -33,6 +33,9 @@ if ( in_array( $action, ['vote', 'unvote'] ) ) {
 	$kahukVoting = new KahukVoting();
 	$kahukVoting->init( $args );
 
+	// Check for Story karma and status
+	kahuk_change_story_status( $story_id );
+
 	if ( $kahukVoting->errors->has_errors() ) {
 		echo "ERROR: " . $kahukVoting->errors->get_error_message();
 	} else {
