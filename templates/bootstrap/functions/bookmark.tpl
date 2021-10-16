@@ -16,7 +16,7 @@
 			
 			$.ajax({
 				type: "POST",
-				url:my_base_url+my_kahuk_base+"/user_add_remove_links.php",
+				url:my_base_url+my_kahuk_base+"/kahuk-ajax.php",
 				data: dataString,
 				beforeSend: function() {
 					parent.addClass("loader");
@@ -24,6 +24,7 @@
 				cache: false,
 				success: function(html)	{
 					return_value=html;
+					
 					if(return_value==1){
 						parent.attr('btnaction','unsave-story');
 						message='Saved \"'+link_title+'\" to <a href="'+UserURLSave+'">Favorites</a>.';
@@ -45,9 +46,14 @@
 							pnotify_notice_icon: 'fa fa-star-o'
 						});
 					}else{
-						var tag = $("<div></div>");
-						tag.html(html).dialog({modal: true}).dialog('open');
+						$.pnotify({
+							pnotify_text: "Error",
+							pnotify_sticker: false,
+							pnotify_history: false,
+							pnotify_notice_icon: 'fa fa-exclamation-circle'
+						});
 					}
+
 					parent.removeClass("loader");
 				}
 			});

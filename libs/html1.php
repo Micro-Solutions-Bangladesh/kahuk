@@ -866,8 +866,6 @@ function getmyurl($x, $var1 = "", $var2 = "", $var3 = "")
 		elseif ($x == "user") $ret = "/user.php?login=" . $var1 . ($var2 ? '&amp;view=' . $var2 : '');
 		elseif ($x == "user_inbox") $ret = "/user.php?view=" . $var1;
 		elseif ($x == "user_add_remove") $ret = "/user.php?login=" . $var2 . "&amp;view=" . $var1;
-		// elseif ($x == "user_add_links") $ret = "/user_add_remove_links.php?action=add&amp;link=" . $var1;
-		// elseif ($x == "user_remove_links") $ret = "/user_add_remove_links.php?action=remove&amp;link=" . $var1;
 		elseif ($x == "user_friends") $ret = "/user.php?login=" . $var1 . "&amp;view=" . $var2;
 		elseif ($x == "index_sort") $ret = "/index.php?part=" . $var1 . ($var2 ? "&amp;category=" . $var2 : '');
 		elseif ($x == "new_sort") $ret = "/new.php?part=" . $var1 . ($var2 ? "&amp;category=" . $var2 : '');
@@ -943,8 +941,6 @@ function getmyurl($x, $var1 = "", $var2 = "", $var3 = "")
 		elseif ($x == "group_banned") $ret = "/groupadmin.php?id=" . $var1 . "&amp;role=banned&amp;userid=" . $var3;
 		elseif ($x == "group_avatar") $ret = "/group_avatar.php?id=" . $var1;
 		elseif ($x == "group_sort") $ret = "/groups.php?sortby=" . $var1 . $var2;
-		// elseif ($x == "user_add_links_private") $ret = "/user_add_remove_links.php?action=addprivate&amp;link=" . $var1;
-		// elseif ($x == "user_add_links_public") $ret = "/user_add_remove_links.php?action=addpublic&amp;link=" . $var1;
 		/* Redwine: Roles and permissions and Groups fixes */
 		elseif ($x == "group_story_links_publish") $ret = "/join_group.php?action=published&amp;link=" . $var1;
 		elseif ($x == "group_story_links_new") $ret = "/join_group.php?action=new&amp;link=" . $var1;
@@ -957,9 +953,7 @@ function getmyurl($x, $var1 = "", $var2 = "", $var3 = "")
 		if ($x == "maincategory") $ret = "/" . $var1;
 		elseif ($x == "newcategory") $ret = "/new/" . $var1;
 		elseif ($x == "discardedcategory") $ret = "/discarded/" . $var1 . "/";
-		//		elseif ($x == "newcategory") $ret = "/new/category/" . $var1 . "/";
-		//		elseif ($x == "maincategory") $ret = "/category/" . $var1 . "/";
-		//		elseif ($x == "discardedcategory") $ret = "/discarded/category/" . $var1 . "/";
+		
 		elseif ($x == "editlink") $ret = "/story/" . $var1 . "/edit/";
 		elseif ($x == "edit") $ret = "/story/" . $var1 . "/editcomment/" . $var2 . "/";
 		elseif ($x == "user") $ret = "/user/" . $var1 . ($var1 ? '/' : '');
@@ -972,8 +966,6 @@ function getmyurl($x, $var1 = "", $var2 = "", $var3 = "")
 		elseif ($x == "user2") $ret = "/user/" . $var1 . "/" . $var2 . "/";
 		elseif ($x == "index") $ret = "/";
 		elseif ($x == "index_sort") $ret = "/" . $var1 . ($var2 ? '/' . $var2 : '') . "/";
-		//		elseif ($x == "index_sort") $ret = "/".$var1.($var2 ? '/category/'.$var2 : '') . "/";
-		//		elseif ($x == "new_sort") $ret = "/new/".$var1.($var2 ? '/category/'.$var2 : '') . "/";
 		elseif ($x == "new_sort") $ret = "/new/" . $var1 . ($var2 ? '/' . $var2 : '') . "/";
 		elseif ($x == "search") $ret = "/search" . ($var1 ? '/' . $var1 : '') . "/";
 		elseif ($x == "advancedsearch") $ret = "/advanced-search/";
@@ -986,7 +978,7 @@ function getmyurl($x, $var1 = "", $var2 = "", $var3 = "")
 		elseif ($x == "story") $ret = "/story/" . $var1 . "/";
 		elseif ($x == "storytitle") $ret = "/story/" . $var1 . "/";
 		elseif ($x == "storycattitle") $ret = "/" . $var1 . "/" . $var2 . "/";
-		//		elseif ($x == "storycattitle") $ret = "/category/" . $var1 . "/" . $var2 ."/";
+		
 		elseif ($x == "out") $ret = "/out/" . $var1 . "/";
 		elseif ($x == "outtitle") $ret = "/out/" . $var1 . "/";
 		elseif ($x == "outurl") $ret = "/out/" . $var1 . "/";
@@ -1040,8 +1032,6 @@ function getmyurl($x, $var1 = "", $var2 = "", $var3 = "")
 		elseif ($x == "group_banned") $ret = "/groups/member/banned/id/" . $var1 . "/role/banned/userid/" . $var3 . "/";
 		elseif ($x == "group_avatar") $ret = "/group_avatar/" . $var1 . "/";
 		elseif ($x == "group_sort") $ret = "/groups/" . $var1 . ($var2 ? "/$var2" : '') . "/";
-		// elseif ($x == "user_add_links_private") $ret = "/user_add_remove_links/action/addprivate/link/" . $var1 . "/";
-		// elseif ($x == "user_add_links_public") $ret = "/user_add_remove_links/action/addpublic/link/" . $var1 . "/";
 		elseif ($x == "editgroup") $ret = "/groups/edit/" . $var1 . "/";
 		elseif ($x == "deletegroup") $ret = "/groups/delete/" . $var1 . "/";
 		elseif ($x == "group_story_links_publish") $ret = "/join_group/action/published/link/" . $var1 . "/";

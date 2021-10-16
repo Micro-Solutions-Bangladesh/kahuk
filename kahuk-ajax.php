@@ -44,3 +44,39 @@ if ( in_array( $action, ['vote', 'unvote'] ) ) {
 
 	exit;
 }
+
+/**
+ * Save or Unsave story
+ */
+if ( in_array( $action, ['save-story', 'unsave-story'] ) ) {
+	$current_user_id = ( $current_user ? $current_user->user_id : 0 );
+
+	if ( 0 < $current_user_id ) {
+		$linkid = intval( _post( 'link_id' ) );
+
+		if ( $action == 'save-story' ) {
+			$count = $db->get_var("SELECT count(*) FROM " . table_saved_links . " WHERE saved_link_id = {$linkid} AND saved_user_id = {$current_user_id}");
+			
+			if ( $count == 0 ) {
+				$sql="INSERT INTO " . table_saved_links . " (saved_user_id, saved_link_id) VALUES ({$current_user_id}, {$linkid})";
+				$db->query($sql);
+				echo "1";
+			} else {
+				echo "Error";
+			}
+
+		} else if ( $action == 'unsave-story' ) {
+			$count = $db->get_var("SELECT count(*) FROM " . table_saved_links . " WHERE saved_link_id = {$linkid} AND saved_user_id = {$current_user_id}");
+			
+			if ( $count != 0 ) {
+				$sql="DELETE FROM " . table_saved_links . " WHERE saved_user_id={$current_user_id} AND saved_link_id={$linkid}";
+				$db->query($sql);
+				echo "2";
+			} else {
+				echo "Error";
+			}
+		}
+	}
+
+	exit;
+}
