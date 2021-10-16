@@ -1,4 +1,30 @@
 <?php
+/**
+ * Count the rows of story in table_links table by url
+ * 
+ * @since 5.0.4
+ * 
+ * @return int
+ */
+function kahuk_count_story_by_url( $url, $statuses = [] ) {
+	global $db;
+
+    $output = 0;
+    $where = "link_url = '" . $db->escape( $url ) . "'";
+
+    //
+    if ( empty( $statuses ) ) {
+        $statuses = [ 'published', 'new' ];
+    }
+
+    $where .= " AND link_status IN ('" . implode( "','", $statuses ) . "')";
+
+    //
+    $output = $db->count_rows( table_links, 'link_url', $where );
+    
+    // return output
+    return $output;
+}
 
 /**
  * Count the story slug in database
