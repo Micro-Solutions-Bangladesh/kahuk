@@ -45,7 +45,7 @@ require_once KAHUK_LIBS_DIR . 'user.php';
 require_once KAHUK_LIBS_DIR . 'kahuk-categories.php';
 
 
-
+global $globalStory;
 
 
 
