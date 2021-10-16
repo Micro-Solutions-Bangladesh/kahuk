@@ -17,7 +17,7 @@ global $db;
 if($current_user->user_id != 0)
 {	
 	$action = isset($_POST['action']) ? sanitize($_POST['action'], 3) : '';
-	if($action == 'add') {	
+	if($action == 'save-story') {	
 		
 		/*if(!($linkid = check_integer('link_id')))
 		{	
@@ -37,7 +37,7 @@ if($current_user->user_id != 0)
 		}else
 		echo "Error";
 		
-	} elseif ($action == 'remove') {
+	} elseif ($action == 'unsave-story') {
 		
 		/*if(!($linkid = check_integer('link')))
 		{	

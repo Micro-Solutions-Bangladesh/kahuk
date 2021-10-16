@@ -6,7 +6,7 @@
 	{literal}
 	$(function() {
 		$(".favorite").live("click", function(){
-			var oparation = $(this).attr("id");
+			var oparation = $(this).attr("btnaction");
 			var return_value="";
 			var link_id=$(this).attr("linkid");
 			var dataString = 'action='+oparation+'&link_id='+link_id;
@@ -25,7 +25,7 @@
 				success: function(html)	{
 					return_value=html;
 					if(return_value==1){
-						parent.attr('id','remove');
+						parent.attr('btnaction','unsave-story');
 						message='Saved \"'+link_title+'\" to <a href="'+UserURLSave+'">Favorites</a>.';
 						parent.html(remove_lang_text);
 						$.pnotify({
@@ -34,10 +34,8 @@
 							pnotify_history: false,
 							pnotify_notice_icon: 'fa fa-star'
 						});
-						
-						
 					}else if(return_value==2){
-						parent.attr('id','add');
+						parent.attr('btnaction','save-story');
 						message='Removed \"'+link_title+'\" from <a href="'+UserURLSave+'">Favorites</a>.';
 						parent.html(save_lang_text);
 						$.pnotify({
@@ -51,17 +49,7 @@
 						tag.html(html).dialog({modal: true}).dialog('open');
 					}
 					parent.removeClass("loader");
-					
-					$.ajax({
-						type: "POST",
-						cache:false,
-						url: my_base_url+my_kahuk_base+'/modules/sidebar_saved/update_rightpanel.php',
-						success: function(html)	{
-							$("#saved_stories").html('');
-							$("#saved_stories").html(html);
-						}
-					});
-				} 
+				}
 			});
 			return false;
 		});
