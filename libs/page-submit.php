@@ -48,13 +48,13 @@ function kahuk_has_url_in_record( $randkey, $url ) {
  * 
  */
 function kahuk_unique_title_slug( $title_slug ) {
-    $countSlug = kahuk_link_title_url( $title_slug, false );
+    $countSlug = kahuk_count_story_by_slug( $title_slug );
 
     if ( 0 == $countSlug ) {
         return $title_slug;
     }
 
-    $maxNumberOfDuplicateTitle = MAX_NUMBER_OF_DUPLICATE_TITLE;
+    $maxNumberOfDuplicateTitle = MAX_NUMBER_OF_DUPLICATE_STORY;
 
     $uniqueSlug = '';
     $slugNameCheck = true;
@@ -63,7 +63,7 @@ function kahuk_unique_title_slug( $title_slug ) {
     do {
         $proposedSlug = $title_slug . "-" . ( $maxLoopCount + 1 );
         // echo "proposedSlug: " . $proposedSlug . "<br>";
-        $countSlugNew = kahuk_link_title_url( $proposedSlug, false );
+        $countSlugNew = kahuk_count_story_by_slug( $proposedSlug );
 
         if ( 0 == $countSlugNew ) {
             $slugNameCheck = false;
@@ -75,7 +75,7 @@ function kahuk_unique_title_slug( $title_slug ) {
 
         if ( $maxNumberOfDuplicateTitle < $maxLoopCount ) {
             $slugNameCheck = false;
-            $uniqueSlug = false;
+            $uniqueSlug = '';
 
             kahuk_debug_log( "Fail to create new slug for {$title_slug}", __LINE__, __FILE__, __FILE__ );
         }

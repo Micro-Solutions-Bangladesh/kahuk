@@ -150,7 +150,7 @@ $file = dirname(__FILE__) . '/templates/' . $thetemp . "/kahuk.tpl";
 unset($errors);
 if (!file_exists($file)) {
 	$errors[]='You may have typed the template name wrong or "'. $thetemp . '" does not exist.';
-} 
+}
 
 //Redwine: if errors, then we output them.    
 if (isset($errors)) {

@@ -1,11 +1,41 @@
 <?php
 
 /**
- * Get row by link id
+ * Count the story slug in database
+ * 
+ * @since 5.0.4
+ * 
+ * @return int
+ */
+function kahuk_count_story_by_slug( $story_slug, $statuses = [], $isLike = false ) {
+	global $db;
+
+    $where = "link_title_url = '" . $db->escape( $story_slug ) . "'";
+
+    if ( $isLike ) {
+        $where = "link_title_url LIKE '" . $db->escape( $story_slug ) . "%'";
+    }
+
+    //
+    if ( empty( $statuses ) ) {
+        $statuses = [ 'published', 'new' ];
+    }
+
+    $where .= " AND link_status IN ('" . implode( "','", $statuses ) . "')";
+
+    //
+    $output = $db->count_rows( table_links, 'link_url', $where, true );
+    
+    // return output
+    return $output;
+}
+
+/**
+ * Get row by story id
  * 
  * @since 5.0.0
  */
-function kahuk_get_link_by_id( $id ) {
+function kahuk_get_story_by_id( $id ) {
 	global $db;
 
     $sql = "SELECT * FROM " . table_links . " WHERE link_id = " . $db->escape( $id );
@@ -14,11 +44,11 @@ function kahuk_get_link_by_id( $id ) {
 }
 
 /**
- * Get row by link slug
+ * Get row by story slug
  * 
  * @since 5.0.0
  */
-function kahuk_get_link_by_slug( $title_slug ) {
+function kahuk_get_story_by_slug( $title_slug ) {
 	global $db;
 
     $sql = "SELECT * FROM " . table_links . " WHERE link_title_url = '" . $db->escape( $title_slug ) . "'";
@@ -27,31 +57,16 @@ function kahuk_get_link_by_slug( $title_slug ) {
 }
 
 /**
- * Count the title slug in database
- * 
- * @since 5.0.0
- */
-function kahuk_link_title_url( $title_slug, $isLike = true ) {
-	global $db;
-
-    if ( $isLike ) {
-        return $db->count_rows( table_links, 'link_title_url', "link_title_url LIKE '" . $db->escape( $title_slug ) . "%'" );
-    } else {
-        return $db->count_rows( table_links, 'link_title_url', "link_title_url = '" . $db->escape( $title_slug ) . "'" );
-    }    
-}
-
-/**
- * Edit link karma and vote
+ * Edit story karma and vote
  * 
  * @since 5.0.0
  * 
  * @return array link table row or false on failing to update the row
  */
-function kahuk_update_link_karma( $link_id, $is_add, $karma_value ) {
+function kahuk_update_story_karma( $link_id, $is_add, $karma_value ) {
     global $db;
 
-    $post = kahuk_get_link_by_id( $link_id );
+    $post = kahuk_get_story_by_id( $link_id );
 
     $karma_value_new = 0.00;
     $link_votes_new = 0;
@@ -138,7 +153,7 @@ function kahuk_update_link_karma( $link_id, $is_add, $karma_value ) {
  * @since 5.0.0
  *
  */
-function kahuk_insert_link( $initialData ) {
+function kahuk_insert_story( $initialData ) {
     global $db, $current_user;
 
     $defaultData = [
