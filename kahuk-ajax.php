@@ -52,18 +52,18 @@ if ( in_array( $action, ['save-story', 'unsave-story'] ) ) {
 	$current_user_id = ( $current_user ? $current_user->user_id : 0 );
 
 	if ( 0 < $current_user_id ) {
-		$linkid = intval( _post( 'link_id' ) );
+		$story_id = intval( _post( 'link_id' ) );
 
 		if ( $action == 'save-story' ) {
-			$count = $db->get_var("SELECT count(*) FROM " . table_saved_links . " WHERE saved_link_id = {$linkid} AND saved_user_id = {$current_user_id}");
+			$count = $db->get_var("SELECT count(*) FROM " . table_saved_links . " WHERE saved_link_id = {$story_id} AND saved_user_id = {$current_user_id}");
 			
 			if ( $count == 0 ) {
-				$sql="INSERT INTO " . table_saved_links . " (saved_user_id, saved_link_id) VALUES ({$current_user_id}, {$linkid})";
+				$sql="INSERT INTO " . table_saved_links . " (saved_user_id, saved_link_id) VALUES ({$current_user_id}, {$story_id})";
 				$db->query($sql);
 				echo "1";
 
 				// Calculate Story Karma Score
-				kahuk_update_story_karma( $linkid, true, LINK_SAVE_KARMA );
+				kahuk_update_story_karma( $story_id, true, LINK_SAVE_KARMA );
 
 				// Check for Story karma and status
 				kahuk_change_story_status( $story_id );
@@ -72,15 +72,15 @@ if ( in_array( $action, ['save-story', 'unsave-story'] ) ) {
 			}
 
 		} else if ( $action == 'unsave-story' ) {
-			$count = $db->get_var("SELECT count(*) FROM " . table_saved_links . " WHERE saved_link_id = {$linkid} AND saved_user_id = {$current_user_id}");
+			$count = $db->get_var("SELECT count(*) FROM " . table_saved_links . " WHERE saved_link_id = {$story_id} AND saved_user_id = {$current_user_id}");
 			
 			if ( $count != 0 ) {
-				$sql="DELETE FROM " . table_saved_links . " WHERE saved_user_id={$current_user_id} AND saved_link_id={$linkid}";
+				$sql="DELETE FROM " . table_saved_links . " WHERE saved_user_id={$current_user_id} AND saved_link_id={$story_id}";
 				$db->query($sql);
 				echo "2";
 
 				// Calculate Story Karma Score
-				kahuk_update_story_karma( $linkid, false, LINK_SAVE_KARMA );
+				kahuk_update_story_karma( $story_id, false, LINK_SAVE_KARMA );
 
 				// Check for Story karma and status
 				kahuk_change_story_status( $story_id );
