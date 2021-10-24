@@ -80,7 +80,7 @@ class KahukVoting {
         }
 
         // Update karma in Link Table
-        $this->linkRecord = kahuk_update_link_karma( $this->linkId, $isVoteIncrease, LINK_VOTE_KARMA );
+        $this->linkRecord = kahuk_update_story_karma( $this->linkId, $isVoteIncrease, LINK_VOTE_KARMA );
 
         if ( false == $this->linkRecord ) {
             $this->errors->add( 'error', 'Unexpected error found!' );
@@ -88,6 +88,7 @@ class KahukVoting {
         }
 
         $dataForVote = [];
+        $dataForVote['vote_user_id'] = $this->userId;
         $dataForVote['vote_link_id'] = $this->linkId;
         $dataForVote['vote_value'] = $this->isPositiveVote ? 10 : -10;
 

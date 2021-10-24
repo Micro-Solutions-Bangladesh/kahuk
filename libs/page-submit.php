@@ -45,45 +45,87 @@ function kahuk_has_url_in_record( $randkey, $url ) {
 }
 
 /**
+ * Check for the uniqueness of story title and url
+ * 
+ * @return array
+ */
+function kahuk_check_unique_story( $story_url, $story_slug ) {
+    $output = [
+        'status' => false
+    ];
+
+    //
+    $storyCountByUrl = kahuk_count_story_by_url( $story_url );
+
+    if ( MAX_NUMBER_OF_DUPLICATE_STORY <= $storyCountByUrl ) {
+        $output['code'] = "duplicate_url_reject";
+        $output['message'] = MAX_NUMBER_OF_DUPLICATE_STORY . " or more stories found with the submitted url."; // TODO dynamic
+
+        return $output;
+    }
+
+    //
+    $storyCountBySlug = kahuk_count_story_by_slug( $story_slug );
+
+    if ( MAX_NUMBER_OF_DUPLICATE_STORY_TITLE <= $storyCountBySlug ) {
+        $output['code'] = "duplicate_title_reject";
+        $output['message'] = "Seems like matching title for the story exist, please try to make it unique and more readable."; // TODO dynamic
+
+        return $output;
+    }
+
+    //
+    $stroy_slug_new = kahuk_unique_title_slug( $story_slug );
+
+    if ( empty( $stroy_slug_new ) ) { // This should not happen // TODO
+        $output['code'] = "story_slug_fail";
+        $output['message'] = sprintf( 'Sorry, We are unable to create an unique slug from your title!', $story_url ); // TODO dynamic
+
+        kahuk_debug_log( "Unable to create unique slug from: {$story_slug} :: {$story_url}", __LINE__, __FILE__, __FILE__ );
+    } else {
+        $output['status'] = true;
+        $output['story_slug'] = $stroy_slug_new;
+    }
+
+    return $output;
+}
+
+/**
  * 
  */
 function kahuk_unique_title_slug( $title_slug ) {
-    $countSlug = kahuk_link_title_url( $title_slug );
+    $countSlug = kahuk_count_story_by_slug( $title_slug );
 
     if ( 0 == $countSlug ) {
         return $title_slug;
     }
 
+    $maxNumberOfDuplicateTitle = MAX_NUMBER_OF_DUPLICATE_STORY;
 
     $uniqueSlug = '';
     $slugNameCheck = true;
-    $maxLoopCount = 0;
-
-    // echo "title_slug: " . $title_slug . "<br>";
+    $maxLoopCount = 1;
 
     do {
-        $proposedSlug = $title_slug . "-" . ( $countSlug + 1 );
+        $proposedSlug = $title_slug . "-" . ( $maxLoopCount + 1 );
         // echo "proposedSlug: " . $proposedSlug . "<br>";
-        $countSlugNew = kahuk_link_title_url( $proposedSlug );
+        $countSlugNew = kahuk_count_story_by_slug( $proposedSlug );
 
         if ( 0 == $countSlugNew ) {
             $slugNameCheck = false;
             $uniqueSlug = $proposedSlug;
-        } else {
-            $countSlug++;            
         }
 
         //
         $maxLoopCount++;
 
-        if ( 20 < $maxLoopCount ) {
+        if ( $maxNumberOfDuplicateTitle < $maxLoopCount ) {
             $slugNameCheck = false;
-            $uniqueSlug = false;
+            $uniqueSlug = '';
 
             kahuk_debug_log( "Fail to create new slug for {$title_slug}", __LINE__, __FILE__, __FILE__ );
         }
     } while ( $slugNameCheck );
 
-    // echo "return uniqueSlug: " . $uniqueSlug . "<br>";
     return $uniqueSlug;
 }

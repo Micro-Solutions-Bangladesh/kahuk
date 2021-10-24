@@ -76,6 +76,8 @@ define( 'LOG_DB_QUERY', false );
 define( 'LOG_DB_QUERY_FILE', 'logs/query.log' );
 define( 'LOG_DB_QUERY_ERROR', 'logs/query_error.log' );
 
+// Karma Value to upgrade status of a story into PUBLISHED from NEW
+define( 'STORY_KARMA_PUBLISHED', 30 );
 
 // Karma Value for LINK When A Link Get/Loss Vote
 define( 'LINK_VOTE_KARMA', 2 );
@@ -97,6 +99,12 @@ define( 'USER_COMMENT_KARMA', 5 );
 
 //
 define( 'SEO_FRIENDLY_URL', seo_friendly_url_here );
+
+// Maximum number of story with same url
+define( 'MAX_NUMBER_OF_DUPLICATE_STORY', 5 );
+
+// Maximum number of story with same title
+define( 'MAX_NUMBER_OF_DUPLICATE_STORY_TITLE', 1 );
 
 //
 if ( ! defined( 'KAHUK_BASE_URL' ) ) {

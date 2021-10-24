@@ -219,13 +219,18 @@
 					{/if}
 				</span> </div>
 				{if $user_logged_in}  
-					<div style="float:left;margin-top:10px;"><iframe height="0px;" width="0px;" frameborder="0" name="add_stories"></iframe>
-					
+					<div style="float:left;margin-top:10px;">
+						<iframe height="0px;" width="0px;" frameborder="0" name="add_stories"></iframe>
 						<i class="fa fa-star fa-lg faicons"></i>
                         <span id="{if $link_mine eq 0}linksummarySaveLink{else}linksummaryRemoveLink{/if}">
-						<a id="{if $link_mine eq 0}add{else}remove{/if}" linkid="{$link_id}" title="{$title_short}" class="favorite" >{if $link_mine eq 0}{#KAHUK_MiscWords_Save_Links_Save#}{else}{#KAHUK_MiscWords_Save_Links_Remove#}{/if}</a>
-					</span>&nbsp;
-					<span id="stories-{$link_shakebox_index}" class="label label-success" style="display:none;line-height:1em;">{#KAHUK_MiscWords_Save_Links_Success#}</span></div>
+							<a id="{if $link_mine eq 0}add{else}remove{/if}" btnaction="{if $link_mine eq 0}save-story{else}unsave-story{/if}" linkid="{$link_id}" title="{$title_short}" class="favorite">
+								{if $link_mine eq 0}{#KAHUK_MiscWords_Save_Links_Save#}{else}{#KAHUK_MiscWords_Save_Links_Remove#}{/if}
+							</a>
+						</span>&nbsp;
+						<span id="stories-{$link_shakebox_index}" class="label label-success" style="display:none;line-height:1em;">
+							{#KAHUK_MiscWords_Save_Links_Success#}
+						</span>
+					</div>
 				{/if}
 				{if $link_shakebox_currentuser_votes eq 1 && $link_shakebox_currentuser_reports eq 1}
 					<div style="float:left;margin-top:10px;"><i class="fa fa-minus-sign fa-lg faicons"></i> 

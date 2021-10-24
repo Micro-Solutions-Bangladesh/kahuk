@@ -164,10 +164,10 @@ function do_submit2() {
 
 
 	// Check for the Link Title
-	$title = sanitize_text_field( $_POST['title'] );
-	$title_url = sanitize_title( $title ); // START TODO
+	$story_title = sanitize_text_field( $_POST['title'] );
+	$story_slug = sanitize_title( $story_title ); // START TODO
 
-	if ( empty( $title ) || empty( $title_url ) ) {
+	if ( empty( $story_title ) || empty( $story_slug ) ) {
 		kahuk_set_session_message(
 			'Please write a appropriate title!',
 			'error'
@@ -177,16 +177,17 @@ function do_submit2() {
 	}
 
 	//
-	$unique_title_slug = kahuk_unique_title_slug( $title_url );
+	$story_check = kahuk_check_unique_story( $urlFound, $story_slug );
 
-	if ( false == $unique_title_slug ) {
+	if ( false == $story_check['status'] ) {
 		kahuk_set_session_message(
-			sprintf( 'Sorry, We are unable to create an unique slug from your title!', $urlFound ),
-			'error'
+			$story_check['message'], 'error'
 		);
 
 		kahuk_redirect( KAHUK_BASE_URL . '/submit.php' );
 	}
+
+	$story_slug_unique = $story_check['story_slug'];
 
 	// Store Link
 	$linksData = [];
@@ -195,24 +196,24 @@ function do_submit2() {
 	$linksData['link_randkey'] = ''; // TODO Delete
 	$linksData['link_category'] = sanitize_number( $_POST['category'] );
 	$linksData['link_url'] = $urlFound;
-	$linksData['link_url_title'] = $title;
-	$linksData['link_title'] = $title;
-	$linksData['link_title_url'] = $unique_title_slug;
+	$linksData['link_url_title'] = $story_title;
+	$linksData['link_title'] = $story_title;
+	$linksData['link_title_url'] = $story_slug_unique;
 	$linksData['link_content'] = $link_content;
 	$linksData['link_summary'] = $link_summary;
 
 	$linksData['link_group_id'] = sanitize_number( _post( "link_group_id", '0' ) );
 	$linksData['link_tags'] = kahuk_slashes( sanitize_text_field( $_POST['link_tags'] ) );
 
-	$linkId = kahuk_insert_link( $linksData ); //
+	$linkId = kahuk_insert_story( $linksData ); //
 	$newPost = [];
 
 	if ( 0 < $linkId ) {
-		$newPost = kahuk_get_link_by_id( $linkId );
+		$newPost = kahuk_get_story_by_id( $linkId );
 	}
 
 	if ( ! $newPost ) {
-		kahuk_debug_log( "Unable to fetch newly created post using the slug {$unique_title_slug}", "", "", __FILE__ );
+		kahuk_debug_log( "Unable to fetch newly created post using the slug {$story_slug_unique}", "", "", __FILE__ );
 
 		kahuk_set_session_message(
 			sprintf( 'Got an unexpected error, we will fix it!', $urlFound ),

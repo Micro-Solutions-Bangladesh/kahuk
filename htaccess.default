@@ -144,7 +144,6 @@ RewriteRule ^new/page/([0-9]+)/?$ new.php?page=$1 [L]
 RewriteRule ^new/(year|month|week|today|yesterday|recent|alltime|upvoted|downvoted|commented|curmonth)/page/(\d+)/?$ new.php?part=$1&page=$2 [L]
 RewriteRule ^new/(year|month|week|today|yesterday|recent|alltime|upvoted|downvoted|commented|curmonth)/category/([^/]+)/page/(\d+)/?$ new.php?part=$1&category=$2&page=$3 [L]
 RewriteRule ^user/search/([^/]+)/?$ user.php?view=search&keyword=$1 [L]
-RewriteRule ^user/([^/]+)/link/([0-9+]+)/?$ user_add_remove_links.php?action=$1&link=$2 [L]
 
 # Profile
 RewriteRule ^user/([^/]+)/profile/?$ user/$1/ [R=permanent]

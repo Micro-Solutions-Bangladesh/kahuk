@@ -2,6 +2,9 @@ node_modules/
 /node_modules/
 cache/
 /cache/
+/kahuk-configs.php
+/settings.php
+.htaccess
 
 # Packages #
 ############
@@ -25,8 +28,3 @@ cache/
 **/.sass-cache
 **/.sass-cache/*
 **/.map
-
-
-#########
-/kahuk-configs.php
-/settings.php

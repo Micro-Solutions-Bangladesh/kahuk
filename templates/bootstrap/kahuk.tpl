@@ -139,7 +139,6 @@
 	{/if}
 
 	{include file=$the_template"/functions/bookmark.tpl"}
-	{checkActionsTpl location="tpl_kahuk_body_end"}
 	
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
 	<link href="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/smoothness/jquery-ui.css" media="all" rel="stylesheet" type="text/css" />
@@ -245,15 +244,12 @@
 	{/if}
 	
 	{literal}
-		<script> 
+		<script>
 		$('.avatar-tooltip').tooltip()
 		</script>
 	{/literal}
 
-	{*if $pagename eq "profile" || $pagename eq "user_edit"*}
-		{* Masonry JavaScript *}
-		<!--<script type="text/javascript" src="{$my_kahuk_base}/templates/{$the_template}/js/masonry.min.js"></script> -->	
-	{*/if*}
+	{checkActionsTpl location="tpl_kahuk_body_end"}
 </body>
 </html>
 {/if}{*END Maintenance Mode *}

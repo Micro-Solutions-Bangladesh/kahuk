@@ -159,14 +159,23 @@
 				{if $user_logged_in}  
 					<iframe height="0px;" width="0px;" frameborder="0" name="add_stories"></iframe>
 					{if $link_mine eq 0}
-						<i class="fa fa-star"></i> <span id="linksummarySaveLink">
-						<a id="add" linkid="{$link_id}" title="{$title_short}" class="favorite" >{#KAHUK_MiscWords_Save_Links_Save#}</a>
+						<i class="fa fa-star"></i> 
+						<span id="linksummarySaveLink">
+							<a id="add" btnaction="save-story" linkid="{$link_id}" title="{$title_short}" class="favorite" >
+								{#KAHUK_MiscWords_Save_Links_Save#}
+							</a>
+						</span>&nbsp;
 					{else}
-						<i class="fa fa-star-o"></i> <span id="linksummaryRemoveLink">
-						<a id="remove" linkid="{$link_id}" title="{$title_short}" class="favorite" >{#KAHUK_MiscWords_Save_Links_Remove#}</a>
+						<i class="fa fa-star-o"></i> 
+						<span id="linksummaryRemoveLink">
+							<a id="remove" btnaction="unsave-story" linkid="{$link_id}" title="{$title_short}" class="favorite" >
+								{#KAHUK_MiscWords_Save_Links_Remove#}
+							</a>
+						</span>&nbsp;
 					{/if}
-					</span>&nbsp;
-					<span id="stories-{$link_shakebox_index}" class="label label-success" style="display:none;line-height:1em;">{#KAHUK_MiscWords_Save_Links_Success#}</span>
+					<span id="stories-{$link_shakebox_index}" class="label label-success" style="display:none;line-height:1em;">
+						{#KAHUK_MiscWords_Save_Links_Success#}
+					</span>
 				{/if}
 				{if $link_shakebox_currentuser_votes eq 1 && $link_shakebox_currentuser_reports eq 1}
 					<i class="fa fa-minus-sign"></i> 

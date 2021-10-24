@@ -47,15 +47,17 @@ function kahuk_insert_vote( $initialData ) {
         'vote_type' => 'links',
         'vote_link_id' => 0, // Required
         'vote_value' => 10,
+        'vote_user_id' => '',
     ];
 
     $data = array_merge( $defaultData, $initialData );
 
     $ip = check_ip_behind_proxy();
 
+    $vote_user_id = empty( $data['vote_user_id'] ) ? $current_user->user_id : $data['vote_user_id'];
 
     // SQL Query
-    $sql = "INSERT INTO `" . table_votes . "` SET vote_user_id = '" . $db->escape( $current_user->user_id ) . "'";
+    $sql = "INSERT INTO `" . table_votes . "` SET vote_user_id = '" . $db->escape( $vote_user_id ) . "'";
 
     $sql .= ", vote_type = '" . $db->escape( $data['vote_type'] ) . "'";
 
