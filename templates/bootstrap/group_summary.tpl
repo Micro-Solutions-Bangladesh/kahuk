@@ -5,7 +5,9 @@
 <div class="group_container">
 	{*Redwine: Roles and permissions and Groups fixes. To make sure that no matter what size we define in admin panel, the div and the image here will be resized accordingly without editing the file*}
 	<div style="float:left;width:{$group_avatar_size_width}px;margin:0 0 10px 0;">
-		<a href="{$group_story_url}"><img src="{$imgsrc}{$upload_time}" alt="{$group_name} Avatar" class="img-thumbnail" width="{$group_avatar_size_width}px" height="auto" /></a>
+		<a href="{$group_story_url}">
+			<img src="{$imgsrc}{$upload_time}" alt="{$group_name} Avatar" class="img-thumbnail" width="{$group_avatar_size_width}px" height="auto" />
+		</a>
 	</div>
 	<div style="float:left;margin:0 0 10px 10px;" class="col-md-7">
 		<span class="group_title">

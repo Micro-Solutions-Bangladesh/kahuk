@@ -162,6 +162,7 @@ function validate_all_user_action(){
 {if isset($usererror)}
 	<span class="error">{$usererror}</span><br/>
 {/if}
+
 <form name="user_list_form" id="user_list_form" action="{$kahuk_base_url}/admin/admin_users.php" method="post" onsubmit="return validate_all_user_action()">
 	<input type="hidden" name="frmsubmit" value="userlist" />	
 	<input type="hidden" name="admin_acction"  value="" id="admin_action"/>
@@ -182,7 +183,6 @@ function validate_all_user_action(){
 		</thead>
 		<tbody>
 			{section name=nr loop=$userlist}
-				
 				<tr class="{if $userlist[nr].user_enabled eq '0'}tr_moderated {/if}">
 					<td style="text-align:center;vertical-align:middle;">
 						{if $userlist[nr].user_level neq 'admin'}      
@@ -191,7 +191,18 @@ function validate_all_user_action(){
 					</td>
 					{checkActionsTpl location="tpl_kahuk_admin_users_td_start"}
 					<td style="text-align:center;vertical-align:middle;">{$userlist[nr].user_id}</td>
-					<td style="vertical-align:middle;"><img src="{$userlist[nr].Avatar}" style="height:18px;width:18px;" /> <a href = "?mode=view&user={$userlist[nr].user_id}">{$userlist[nr].user_login}</a> {checkActionsTpl location="tpl_kahuk_admin_users_extra"} </td>	
+
+					<td style="vertical-align:middle;">
+						<img src="{$userlist[nr].Avatar.small}" style="height:18px;width:18px;" />
+
+
+						
+
+						<a href = "?mode=view&user={$userlist[nr].user_id}">
+							{$userlist[nr].user_login}
+						</a> {checkActionsTpl location="tpl_kahuk_admin_users_extra"} 
+					</td>
+
 					<td style="text-align:center;vertical-align:middle;">{$userlist[nr].user_level}</td>
 					<td style="vertical-align:middle;">
 						{* Redwine: Roles and permissions and Groups fixes. Only display email field to Site Admins*}

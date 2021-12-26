@@ -47,7 +47,9 @@
 	<span class="user_comment_story_author">
 		by 
 		{if $UseAvatars neq "0"}
-			<a href="{$submitter_profile_url}"><img class="user_comment_story_author_avatar" src="{$Avatar_ImgSrcs}" /></a>
+			<a href="{$submitter_profile_url}">
+				<img class="user_comment_story_author_avatar" src="{$Avatar.large}" />
+			</a>
 		{/if}
 		<a href="{$submitter_profile_url}">{$link_submitter}</a> {checkActionsTpl location="tpl_kahuk_link_submitter"}
 	</span>

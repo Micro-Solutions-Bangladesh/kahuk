@@ -12,7 +12,7 @@
 			</tr>
 			<tr>
 				<td><strong>{#KAHUK_Visual_Profile_CurrentAvatar#} </strong></td>
-				<td><img src="{$userdata[nr].Avatar}" align="absmiddle"/></td>
+				<td><img src="{$userdata[nr].Avatar.large}" align="absmiddle"/></td>
 			</tr>
 			<tr>
 				<td><strong>{#KAHUK_Visual_View_User_Level#}: </strong></td>

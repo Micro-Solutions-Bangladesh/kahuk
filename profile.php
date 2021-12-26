@@ -195,9 +195,11 @@ function show_profile() {
 
 	// assign avatar source to smarty
 	$main_smarty->assign('UseAvatars', do_we_use_avatars());
-	$main_smarty->assign('Avatar', $avatars = get_avatar('all', '', $user->username, $user->email));
-	$main_smarty->assign('Avatar_ImgLarge', $avatars['large']);
-	$main_smarty->assign('Avatar_ImgSmall', $avatars['small']);
+
+	$avatar_all = kahuk_gravatar( $user->email, ['note' => 'function show_profile'] );
+	$main_smarty->assign('Avatar', $avatar_all);
+
+
 
 	// module system hook
 	$vars = '';

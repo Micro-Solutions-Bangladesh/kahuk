@@ -82,15 +82,18 @@
 						}
 
 						// Assign smarty variables to use in the template.
-							$main_smarty->assign('Avatar_ImgLarge', get_avatar('large', $user->avatar_source, $user->username, $user->email));
-							$main_smarty->assign('Avatar_ImgSmall', get_avatar('small', $user->avatar_source, $user->username, $user->email));
-							$main_smarty->assign('user_names', $user->names);
-							$main_smarty->assign('user_id', $user->id);
-							$main_smarty->assign('user_username', $user->username);
+						$avatar_all = kahuk_gravatar( $user->email, ['note' => 'header.tpl file'] );
+						$main_smarty->assign('Avatar', $avatar_all);
 
+						// $main_smarty->assign('Avatar_ImgLarge', get_avatar('large', $user->avatar_source, $user->username, $user->email));
+						// $main_smarty->assign('Avatar_ImgSmall', get_avatar('small', $user->avatar_source, $user->username, $user->email));
+
+						$main_smarty->assign('user_names', $user->names);
+						$main_smarty->assign('user_id', $user->id);
+						$main_smarty->assign('user_username', $user->username);
 						{/php}
 						{checkActionsTpl location="tpl_kahuk_user_button_dropdown_start"}
-						<img src="{$Avatar_ImgSmall}" onerror="this.src='{$my_kahuk_base}/avatars/Avatar_32.png'; this.title='Loading...';" style="height:16px;width:16px;" /> &nbsp;  {$user_logged_in}
+						<img src="{$Avatar.small}" onerror="this.src='{$my_kahuk_base}/avatars/Avatar_32.png'; this.title='Loading...';" style="height:16px;width:16px;" /> &nbsp;  {$user_logged_in}
 						<span class="caret"></span>{checkActionsTpl location="tpl_kahuk_user_button_dropdown_end"}
 					</a>
 					<ul class="dropdown-menu">

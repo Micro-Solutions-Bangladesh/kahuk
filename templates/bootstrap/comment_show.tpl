@@ -32,10 +32,13 @@
 			{/if}
 			{if $UseAvatars neq "0"}
 				<div class="comment_avatar">
-					<a href="{$user_view_url}"><img src="{$Avatar.small}" class="img-thumbnail" alt="{$user_username}" title="{$user_username}" /></a>
+					<a href="{$user_view_url}">
+						<img src="{$Avatar.small}" class="img-thumbnail" alt="{$user_username}" title="{$user_username}" />
+					</a>
 				</div>
 			{/if}      
 		</div>
+
 		<div class="media-body comment-content" id="wholecomment{$comment_id}">
 			{if $user_logged_in == $user_userlogin || $isadmin eq 1}
 				<div class="btn-group pull-right admin-links">

@@ -82,27 +82,27 @@ if ($view == 'search') {
 	$friend = new Friend;
 	if(isset($_REQUEST['keyword'])){$keyword = $db->escape(sanitize(trim($_REQUEST['keyword']), 3));}
 
-	if ($keyword) 
-	{
+	if ($keyword) {
 		$searchsql = "SELECT * FROM " . table_users . " where ((user_login LIKE '%".$keyword."%' AND user_login !='".$current_user->user_login."') OR public_email LIKE '%".$keyword."%') AND user_level!='Spammer' ";
 		$results = $db->get_results($searchsql);
 		$results = object_2_array($results);
+
 		foreach($results as $key => $val){
-			if ($val['user_login'] != 'anonymous' || $val['user_lastip'] > 0)
-			{
-				$results[$key]['Avatar'] = get_avatar('small', "", $val['user_login'], $val['user_email']);
+			if ($val['user_login'] != 'anonymous' || $val['user_lastip'] > 0) {
+				$results[$key]['Avatar'] = kahuk_gravatar( $val['user_email'], ['note' => 'user.php file'] );
 				$results[$key]['status'] = $friend->get_friend_status($val['user_id']);
+
 				if ($results[$key]['status'] =='' || $results[$key]['status'] == 'follower') {
 					$results[$key]['add_friend'] = getmyurl('user_add_remove', 'addfriend', $val['user_login']);
 				}elseif ($results[$key]['status'] == 'following' || $results[$key]['status'] =='mutual') {
 					$results[$key]['remove_friend'] = getmyurl('user_add_remove', 'removefriend', $val['user_login']);
 				}
-				
-			}
-			else
-			unset ($results[$key]);
+			} else {
+				unset ($results[$key]);
+			}			
 		}
 
+		
 		$main_smarty->assign('userlist', $results);
 	}
 	$main_smarty->assign('search', $keyword);
@@ -119,8 +119,9 @@ if ($view == 'search') {
 
 // avatars
 $main_smarty->assign('UseAvatars', do_we_use_avatars());
-$main_smarty->assign('Avatar', $avatars = get_avatar('all', '', $user->username, $user->email));
-$main_smarty->assign('Avatar_ImgSrc', $avatars['large']);
+
+$avatar_all = kahuk_gravatar( $user->email, ['note' => 'user.php file'] );
+$main_smarty->assign('Avatar', $avatar_all);
 
 if ($user->url != "") {
 	if(substr(strtoupper($user->url), 0, 8) == "HTTPS://"){

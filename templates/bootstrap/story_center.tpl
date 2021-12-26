@@ -88,7 +88,9 @@ var story_link="{$story_url}";
 					{section name=upvote loop=$voter}
 						<li>
 							{if $UseAvatars neq "0"}
-								<a href="{$URL_user, $voter[upvote].user_login}" rel="tooltip" title="{$voter[upvote].user_login}" class="avatar-tooltip"><img class="img-thumbnail" src="{$voter[upvote].Avatar_ImgSrc}" alt="" align="top" title="" /></a>
+								<a href="{$URL_user, $voter[upvote].user_login}" rel="tooltip" title="{$voter[upvote].user_login}" class="avatar-tooltip">
+									<img class="img-thumbnail" src="{$voter[upvote].Avatar.medium}" alt="" align="top" title="" />
+								</a>
 							{else}
 								<a href="{$URL_user, $voter[upvote].user_login}">{$voter[upvote].user_login}</a>
 							{/if}
@@ -108,7 +110,9 @@ var story_link="{$story_url}";
 					{section name=downvote loop=$downvoter}
 						<li>
 							{if $UseAvatars neq "0"}
-								<a href="{$URL_user, $downvoter[downvote].user_login}" rel="tooltip" title="{$downvoter[downvote].user_login}" class="avatar-tooltip"><img class="img-thumbnail" src="{$downvoter[downvote].Avatar_ImgSrc}" alt="" align="top" title="" /></a>
+								<a href="{$URL_user, $downvoter[downvote].user_login}" rel="tooltip" title="{$downvoter[downvote].user_login}" class="avatar-tooltip">
+								<img class="img-thumbnail" src="{$downvoter[downvote].Avatar.medium}" alt="" align="top" title="" />
+								</a>
 							{/if}
 							{if $UseAvatars eq "0"}<a href="{$URL_user, $downvoter[downvote].user_login}">{$downvoter[downvote].user_login}</a>{/if}
 						</li>

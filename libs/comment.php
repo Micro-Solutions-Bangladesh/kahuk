@@ -152,28 +152,30 @@ class Comment {
 	
 	}
 	
-	function fill_smarty($smarty){
+	function fill_smarty($smarty) {
 		global $current_user, $the_template, $comment_counter, $link, $ranklist, $db, $Story_Content_Tags_To_Allow;  
-	    if (!$ranklist)
-	    {
-		$users = $db->get_results("SELECT user_karma, COUNT(*) FROM ".table_users." WHERE user_level NOT IN ('Spammer') AND user_karma>0 GROUP BY user_karma ORDER BY user_karma DESC",ARRAY_N);
-		$ranklist = array();
-		$rank = 1;
-		if ($users)
-		    foreach ($users as $dbuser)
-		    {
-			$ranklist[$dbuser[0]] = $rank;
-			$rank += $dbuser[1];
-		    }
+	    if (!$ranklist) {
+			$users = $db->get_results("SELECT user_karma, COUNT(*) FROM ".table_users." WHERE user_level NOT IN ('Spammer') AND user_karma>0 GROUP BY user_karma ORDER BY user_karma DESC",ARRAY_N);
+			$ranklist = array();
+			$rank = 1;
+
+			if ($users) {
+				foreach ($users as $dbuser) {
+					$ranklist[$dbuser[0]] = $rank;
+					$rank += $dbuser[1];
+				}
+			}
+		    
 	    }
 
 		$smarty->assign('comment_counter', $comment_counter);
 
-		if ($Story_Content_Tags_To_Allow == ''){
-		$text = save_text_to_html($this->content);
-		}else{
+		if ( $Story_Content_Tags_To_Allow == '' ) {
+			$text = save_text_to_html($this->content);
+		} else {
 			$text =  nl2br($this->content);
 		}
+
 		$vars = array('comment_text' => $text, 'comment_id' => $this->id, 'smarty' => $smarty);
 		check_actions('show_comment_content', $vars); 
 		$smarty->assign('comment_content', $vars['comment_text']); 
@@ -219,9 +221,11 @@ class Comment {
 
 		// avatars
 		$smarty->assign('UseAvatars', do_we_use_avatars());
-		$smarty->assign('Avatar', $avatars = get_avatar('all', '', $this->username, ''));
-		$smarty->assign('Avatar_ImgSrc', $avatars['large']);
-		$smarty->assign('Avatar_ImgSrc_Small', $avatars['small']);
+
+		$user_email = kahuk_user_email_by_userlogin( $this->username );
+		$avatar_all = kahuk_gravatar( $user_email , ['note' => 'libs - comment.php file']);
+
+		$smarty->assign('Avatar', $avatar_all);
 
 		// does the person logged in have admin or moderator status?
 		$canIhaveAccess = 0;

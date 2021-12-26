@@ -50,10 +50,11 @@ function who_voted($storyid, $avatar_size, $condition)
 			WHERE vote_value $condition AND vote_link_id=$storyid AND vote_type='links' AND user_level NOT IN('Spammer')";
 	$voters = $db->get_results($sql);
 	$voters = object_2_array($voters);
+
 	foreach ($voters as $key => $val) {
-		$voters[$key]['Avatar'] = get_avatar('all', "", $val['user_login'], $val['user_email']);
-		$voters[$key]['Avatar_ImgSrc'] = $voters[$key]['Avatar']['large'];
+		$voters[$key]['Avatar'] = kahuk_gravatar( $val['user_email'], ['note' => 'libs - html1.php file'] );
 	}
+
 	return $voters;
 }
 
@@ -142,6 +143,83 @@ function do_we_use_avatars()
 	return "0";
 }
 
+
+/**
+ * Get either a Gravatar URL or complete image tag for a specified email address.
+ *
+ * @param string $email The email address
+ * @param string $imgsize Size in large, small, defaults to 256 [ 1 - 2048 ]
+ *
+ * @source https://gravatar.com/site/implement/images/php/
+ * 
+ * @since 5.0.5
+ */
+function kahuk_gravatar( $id_or_email, $customArgs = [] ) {
+
+	$defaults = array(
+		'rating'        => 'g',
+		'class'         => null,
+		'img'			=> false,
+		'alt'			=> '',
+		'imgsize'		=> '',
+		'imgSizes'		=> [
+			'large' => Avatar_Large,
+			'medium' => 80,
+			'small' => Avatar_Small,
+		],
+		'default'		=> 'mp',
+		'note' => '',
+	);
+
+	$args = array_merge($defaults, $customArgs);
+	$output = [];
+	$hasEmailError = false;
+
+	$imgsize = $args['imgsize'];
+	$default = $args['default'];
+
+	$email = is_email( sanitize_text_field( $id_or_email ) );
+
+	if ( is_array( $email ) ) {
+		$email = kahuk_user_email_by_id( $id_or_email ); // Get user email by user id
+
+		if ( !$email ) {
+			$hasEmailError = true;
+		}
+	}
+
+	foreach( $args['imgSizes'] as $sizeName => $sizeNumber ) {
+		$imgUrl = 'https://www.gravatar.com/avatar/';
+		$imgUrl .= md5( strtolower( trim( $email ) ) );
+		$imgUrl .= "?s=" . $sizeNumber . "&d=$default&r=" . $args['rating'];
+
+		if ( $hasEmailError ) {
+			$imgUrl = "Error: {$email} :: " . $args['note']; // TODO Error handle
+		}
+
+		if ( $args['img'] ) {
+			$imgMarkup = '<img src="' . $imgUrl . '" alt="' . $args['alt'] . '"';
+
+			if ( $args['class'] ) {
+				$imgMarkup .= ' class="' . $args['class'] . '"';
+			}
+	
+			$imgMarkup .= ' />';
+
+			$output[$sizeName] = $imgMarkup;
+		} else {
+			$output[$sizeName] = $imgUrl;
+		}
+	}
+
+	if ( isset( $output[$imgsize] ) ) {
+		return $output[$imgsize];
+	}
+
+    return $output;
+}
+
+
 /** Update client cache when image has changed:
  * Generate the image URL based on the date and time that the file on the
  * server has changed, so that the client will request the updated version of
@@ -153,9 +231,16 @@ function latest_avatar($client_url, $server_path)
 	return $client_url . '?cache_timestamp=' . filemtime($server_path);
 }
 
+
+/**
+ * Depricated: since 5.0.5
+ * 
+ * Use kahuk_gravatar()
+ * 
+ * 
+ */
 function get_avatar($size = "large", $avatarsource, $user_name = "", $user_email = "", $user_id = "")
 {
-	// returns the location of a user's avatar
 	global $globals;
 
 	$user = new User();
@@ -203,6 +288,7 @@ function get_avatar($size = "large", $avatarsource, $user_name = "", $user_email
 			}
 		} else {
 			$dir = KAHUKPATH . 'avatars/user_uploaded/';
+			
 			if ($dh = opendir($dir)) {
 				while (($file = readdir($dh)) !== false)
 					if (preg_match("/^$user_id\_(.+)\.jpg\$/", $file, $m)) {

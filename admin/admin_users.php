@@ -193,23 +193,33 @@ if($canIhaveAccess == 1)
 		}
 		if (sanitize($_GET["mode"], 3) == "view"){ // view single user
 			$usersql = $db->get_results('SELECT * FROM ' . table_users . ' where user_id="'.sanitize($_GET["user"], 3).'" or user_login="'.sanitize($_GET["user"], 3).'"',ARRAY_A);
-			$userdata = array();				
-			foreach($usersql as $rows) array_push ($userdata, $rows);
+			$userdata = array();
+			
+			foreach($usersql as $rows) {
+				array_push ($userdata, $rows);
+			}
 		  
 			foreach($userdata as $key => $val){
-				$userdata[$key]['Avatar'] = get_avatar('large', "", $val['user_login'], $val['user_email']);
+				$userdata[$key]['Avatar'] = kahuk_gravatar( $val['user_email'], ['note' => 'admin_users.php file 1'] );
+
 				$created = $db->get_results('SELECT * FROM ' . table_groups . ' where group_status="Enable" AND group_creator='.$userdata[$key]['user_id'],ARRAY_A);
-				/* Redwine: added a check for the $created result, to eliminate the PHP Warning:  Invalid argument supplied for foreach() */
+				
 				if (!empty($created)) {
-				$arr = array();
-				foreach ($created as $group)
-				    $arr[] = $group['group_name'];
-				$userdata[$key]['created']= join(',',$arr);
-				$belongs = $db->get_results('SELECT * FROM ' . table_group_member . ' LEFT JOIN  ' . table_groups . ' ON member_group_id=group_id where group_status="Enable" AND member_status="active" AND member_user_id='.$userdata[$key]['user_id'],ARRAY_A);
-				$arr = array();
-				foreach ($belongs as $group)
-				    $arr[] = $group['group_name'];
-				$userdata[$key]['belongs']= join(',',$arr);
+					$arr = array();
+
+					foreach ($created as $group) {
+						$arr[] = $group['group_name'];
+					}
+				    
+					$userdata[$key]['created']= join(',',$arr);
+					$belongs = $db->get_results('SELECT * FROM ' . table_group_member . ' LEFT JOIN  ' . table_groups . ' ON member_group_id=group_id where group_status="Enable" AND member_status="active" AND member_user_id='.$userdata[$key]['user_id'],ARRAY_A);
+					
+					$arr = array();
+					foreach ($belongs as $group) {
+						$arr[] = $group['group_name'];
+					}
+				    
+					$userdata[$key]['belongs']= join(',',$arr);
 				}
 			}
 		  
@@ -712,13 +722,19 @@ if($canIhaveAccess == 1)
 			$searchsql = $db->get_results("SELECT SQL_CALC_FOUND_ROWS * FROM " . table_users . " where $filter_sql $search_sql ORDER BY `user_date` LIMIT $offset,$pagesize",ARRAY_A);
 			$rows = $db->get_var("SELECT FOUND_ROWS()");
 			$userlist = array();
+
 			if (!empty($searchsql)) {
-			foreach($searchsql as $row) array_push ($userlist, $row);
+				foreach($searchsql as $row) {
+					array_push ($userlist, $row);
+				}
+
 				foreach($userlist as $key => $val){
-					$userlist[$key]['Avatar'] = get_avatar('large', "", $val['user_login'], $val['user_email']);
-				}					
+					$userlist[$key]['Avatar'] = kahuk_gravatar( $val['user_email'], ['note' => 'admin_users.php file 2'] );
+				}
+
 				$main_smarty->assign('userlist', $userlist);					
 			}
+
 			// breadcrumbs and page title
 			$navwhere['text1'] = $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel');
 			$navwhere['link1'] = getmyurl('admin', '');
@@ -727,7 +743,7 @@ if($canIhaveAccess == 1)
 			$navwhere['text3'] = $main_smarty->get_config_vars('KAHUK_Visual_Breadcrumb_Search'). sanitize($_GET["keyword"], 3);
 			$main_smarty->assign('navbar_where', $navwhere);
 			$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel'));
-			
+
 			// pagename	
 			define('pagename', 'admin_users'); 
 			$main_smarty->assign('pagename', pagename);
@@ -788,10 +804,15 @@ if($canIhaveAccess == 1)
 		$rows = $db->get_var("SELECT FOUND_ROWS()");
 		$userlist = array();
 		
-		foreach($users as $row) array_push ($userlist, $row);
-		foreach($userlist as $key => $val){
-			$userlist[$key]['Avatar'] = get_avatar('large', "", $val['user_login'], $val['user_email']);
+		foreach($users as $row) {
+			array_push ($userlist, $row);
 		}
+
+		foreach($userlist as $key => $val){
+			$userlist[$key]['Avatar'] = kahuk_gravatar( $val['user_email'], ['note' => 'admin_users.php file 3'] );
+		}
+
+		
 		
 		$main_smarty->assign('userlist', $userlist);
 		
