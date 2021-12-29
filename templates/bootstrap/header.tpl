@@ -49,20 +49,7 @@
 					<li><a href="{$URL_admin}"><span>{#KAHUK_Visual_Dashboard#}</span></a></li>
 				{/if}
 			</ul>
-			{*
-			<script type="text/javascript">
-				{if !isset($searchboxtext)}
-					{assign var=searchboxtext value=#KAHUK_Visual_Search_SearchDefaultText#}			
-				{/if}
-				var some_search='{$searchboxtext}';
-			</script>
-			<form action="{$my_kahuk_base}/search.php" method="get" name="thisform-search" id="thisform-search" class="navbar-form navbar-left custom_nav_search" role="search" {if $urlmethod==2}onsubmit='document.location.href="{$kahuk_base_url}/search/"+this.search.value.replace(/\//g,"|").replace(/\?/g,"%3F"); return false;'{/if}>
-				<div class="form-group">
-					<input type="text" class="form-control" placeholder="Search" tabindex="20" name="search" value="{$searchboxtext}" onfocus="if(this.value == some_search) {ldelim}this.value = '';{rdelim}" onblur="if (this.value == '') {ldelim}this.value = some_search;{rdelim}"/>
-				</div>
-				<button type="submit" tabindex="21" class="btn btn-default custom_nav_search_button" />{#KAHUK_Visual_Search_Go#}</button>
-			</form>
-			*}
+
 			{if $user_authenticated eq true}
 				<div class="btn-group navbar-right">
 					<a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">

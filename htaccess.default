@@ -113,7 +113,6 @@ RewriteRule ^rssfeeds/?$ rssfeeds.php [L]
 
 ##### URL Method 2 Begin #####
 RewriteRule ^/?$ index.php [L]
-RewriteRule ^advanced-search/?$ advancedsearch.php [L]
 RewriteRule ^category/([^/]+)/?$ index.php?category=$1 [L]
 RewriteRule ^category/([^/]+)/([^/]+)/?$ story.php?title=$2 [L]
 RewriteRule ^login/?$ login.php [L]
@@ -125,9 +124,15 @@ RewriteRule ^out/([\d]+)/?$ out.php?id=$1 [L]
 RewriteRule ^out/(https?:.+)$ out.php?url=$1 [L]
 RewriteRule ^out/([^/]+)/?$ out.php?title=$1 [L]
 RewriteRule ^register/?$ register.php [L]
+
+# Search Pages
+RewriteRule ^advanced-search/?$ advancedsearch.php [L]
+RewriteRule ^search/?$ search.php [L]
 RewriteRule ^search/([^/]+)/page/(\d+)/?$ search.php?search=$1&page=$2 [L]
 RewriteRule ^search/(.+)/?$ search.php?search=$1 [L]
 RewriteRule ^searchurl/(.+)/?$ search.php?url=$1 [L]
+
+#
 RewriteRule ^settemplate/?$ settemplate.php [L]
 RewriteRule ^story/([0-9]+)/?$ story.php?id=$1 [L]
 RewriteRule ^story/([^/]+)/?$ story.php?title=$1 [L]

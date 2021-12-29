@@ -47,22 +47,33 @@ if (strstr($_REQUEST['search'], '/') && $URLMethod == 2 && strstr($_REQUEST['sea
 		if ($key == 'search') $purified = preg_replace('/[^\p{L}\p{N}-_\s\/]/u', '', $purified);
 		if ($key == 'adv') $purified = in_array($purified, $expected_adv_values) ? $purified : 1;
 		if ($key == 'advancesearch') $purified = 'Search ';
+		
 		if ($key == 'date' && $purified != '') {
 			$isdate_Valid = true;
 		}
+
 		if ($key == 'date_to' && $isdate_Valid == false) {
 			$purified = '';
 		}
+
 		$search_elements[$key] = $purified;
 	}
+
 	foreach ($search_elements as $key => $value) {
 		$joined .= $key . "/" . $value . "/";
 	}
+
 	$_GET['search'] = $_REQUEST['search'] = $joined;
-	//Redwine: if not advance search 
+
 } else {
+
 	foreach ($_GET as $key => $value) {
 		$purified = sanitize($value, 2);
+
+		if ($key == 'search') {
+			$purified = sanitize_text_field( _request('search') );
+		}
+
 		if ($key == 'slink') $purified = in_array($purified, $expected_slink_values) ? $purified : 3;
 		if ($key == 'scategory') $purified = (int)$purified ? $purified : 0;
 		if ($key == 'sgroup') $purified = in_array($purified, $expected_sgroups_values) ? $purified : 3;
@@ -72,26 +83,23 @@ if (strstr($_REQUEST['search'], '/') && $URLMethod == 2 && strstr($_REQUEST['sea
 		if ($key == 'suser') $purified = in_array($purified, $expected_suser_values) ? $purified : 1;
 		if ($key == 'date') $purified = validateDate($purified) ? $purified : '';
 		if ($key == 'date_to') $purified = validateDate($purified) ? $purified : '';
-		if ($key == 'search') $purified = preg_replace('/[^\p{L}\p{N}-_\s\/]/u', '', $purified);
+
 		if ($key == 'adv') $purified = in_array($purified, $expected_adv_values) ? $purified : 1;
 		if ($key == 'advancesearch') $purified = 'Search ';
+		
 		if ($key == 'date' && $purified != '') {
 			$isdate_Valid = true;
 		}
+
 		if ($key == 'date_to' && $isdate_Valid == false) {
 			$purified = '';
 		}
+
 		$sanitezedGET[$key] = $purified;
 	}
+
 	$_GET = $_REQUEST = $sanitezedGET;
 }
-
-//Redwine: sanitize and filter the search GET and then make the seacrh REQUEST equal to it.
-$_GET['search'] = htmlentities(sanitize($_GET['search'], 2));
-$_GET['search'] = preg_replace('/[^\p{L}\p{N}-_\s\/]/u', ' ', $_GET['search']);
-$_REQUEST['search'] = $_GET['search'];
-
-
 
 if (isset($_REQUEST['status'])) {
 	// if "status" is set, filter to that status
@@ -116,7 +124,11 @@ if (strstr($_REQUEST['search'], '/') && $URLMethod == 2 && strstr($_REQUEST['sea
 
 	//Redwine: re-assigning the $_GET and $_REQUEST arrays
 	$_REQUEST = $_GET = $search_array;
-	if (isset($_GET['return'])) $_GET['return'] = addslashes($_GET['return']);
+
+	if (isset($_GET['return'])) {
+		$_GET['return'] = addslashes($_GET['return']);
+	}
+
 	$main_smarty->assign('get', $_GET);
 }
 
@@ -142,18 +154,21 @@ if (isset($_REQUEST['from'])) {
 	$search->newerthan = sanitize($_REQUEST['from'], 3);
 }
 
-if (preg_match('/^\s*((http[s]?:\/+)?(www\.)?([\w_\-\d]+\.)+\w{2,4}(\/[\w_\-\d\.]+)*\/?(\?[^\s]*)?)\s*$/i', $_REQUEST['search'], $m))
+if (preg_match('/^\s*((http[s]?:\/+)?(www\.)?([\w_\-\d]+\.)+\w{2,4}(\/[\w_\-\d\.]+)*\/?(\?[^\s]*)?)\s*$/i', $_REQUEST['search'], $m)) {
 	$_REQUEST['url'] = $m[1];
-else
+} else {
 	$search->searchTerm = $db->escape(sanitize($_REQUEST['search']), 3);
+}
 
 if (!isset($_REQUEST['search'])) {
 	$search->orderBy = "link_modified DESC";
 }
+
 if (isset($_REQUEST['tag'])) {
 	$search->searchTerm = sanitize($_REQUEST['search'], 3);
 	$search->isTag = true;
 }
+
 if (isset($_REQUEST['url'])) {
 	$search->url = sanitize(preg_replace('/^(http[s]?:\/+)?(www\.)?/i', '', $_REQUEST['url']), 3);
 }
@@ -163,9 +178,8 @@ $search->offset = (get_current_page() - 1) * $page_size;
 
 if (isset($_REQUEST['pagesize'])) {
 	$search->pagesize = sanitize($_REQUEST['pagesize'], 3);
-} else
-// $page_size is set in the admin panel
-{
+} else {
+	// $page_size is set in the admin panel
 	$search->pagesize = $page_size;
 }
 
@@ -184,6 +198,7 @@ $main_smarty->assign('index_url_commented', $request_uri . 'commented'  . ($URLM
 //Advanced Search
 if (isset($search_array['adv']) && $search_array['adv'] == 1) {
 	$search->adv = true;
+	
 	if (isset($search_array['date']) && !empty($search_array['date'])) {
 		//Redwine: if date is not valid, we set $_GET['date'] and $_GET['date_to'] to empty and we make $_REQUEST['date'] and $_REQUEST['date_to'] equal to them
 
@@ -227,6 +242,7 @@ if (isset($search_array['adv']) && $search_array['adv'] == 1) {
 	if (intval($_REQUEST['sgroup']) > 0)
 		$display_grouplinks = true;
 }
+
 //Redwine: we need to make sure to re-assign $_GET equal to $_REQUEST to also affect all the changes in the validation checks to be reflected in the breadcrumb.
 $_GET = $_REQUEST;
 $main_smarty->assign('get', $_GET);
