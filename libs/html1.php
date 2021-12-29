@@ -134,15 +134,6 @@ function sanitize($var, $santype = 1, $allowable_tags = '')
 	}
 }
 
-function do_we_use_avatars()
-{
-	// checks to see if avatars are enabled
-	if (Enable_User_Upload_Avatar == true) {
-		return "1";
-	}
-	return "0";
-}
-
 
 /**
  * Get either a Gravatar URL or complete image tag for a specified email address.
@@ -230,89 +221,6 @@ function latest_avatar($client_url, $server_path)
 {
 	clearstatcache();
 	return $client_url . '?cache_timestamp=' . filemtime($server_path);
-}
-
-
-/**
- * Depricated: since 5.0.5
- * 
- * Use kahuk_gravatar()
- * 
- * 
- */
-function get_avatar($size = "large", $avatarsource, $user_name = "", $user_email = "", $user_id = "")
-{
-	global $globals;
-
-	$user = new User();
-	if ($user_name != "") {
-		$user->username = $user_name;
-	} else {
-		$user->id = $user_id;
-	}
-
-	if (!$user->read()) {
-		echo "invalid username or userid in get_avatar";
-		die;
-	} else {
-		$avatarsource = $user->avatar_source;
-		$user_name = $user->username;
-		$user_id = $user->id;
-		if (isset($user->login)) {
-			$user_email = $user->login;
-		}
-	}
-	$user = "";
-	/* Redwine declared $imgsize below to eliminate all the Notice: Undefined variable: */
-	$imgsize = '';
-	if ($size == "large") {
-		$imgsize = Avatar_Large;
-	} elseif ($size == "small") {
-		$imgsize = Avatar_Small;
-	} elseif ($size == "original") {
-		$imgsize = 'original';
-	}
-
-	// use the user uploaded avatars ?
-	$avatars = array(
-		'large' => my_base_url . my_kahuk_base . Default_Gravatar_Large,
-		'small' => my_base_url . my_kahuk_base . Default_Gravatar_Small
-	);
-	if (Enable_User_Upload_Avatar == true && $avatarsource == "useruploaded") {
-		if ($imgsize) {
-			$imgsrc = my_base_url . my_kahuk_base . '/avatars/user_uploaded/' . $user_id . "_" . $imgsize . ".jpg";
-			if (file_exists(KAHUKPATH . 'avatars/user_uploaded/' . $user_id . "_" . $imgsize . ".jpg"))
-				return latest_avatar($imgsrc, KAHUKPATH . 'avatars/user_uploaded/' . $user_id . "_" . $imgsize . ".jpg");
-			elseif (file_exists(KAHUKPATH . 'avatars/user_uploaded/' . $user_name . "_" . $imgsize . ".jpg")) {
-				$imgsrc = my_base_url . my_kahuk_base . '/avatars/user_uploaded/' . $user_name . "_" . $imgsize . ".jpg";
-				return latest_avatar($imgsrc, KAHUKPATH . 'avatars/user_uploaded/' . $user_name . "_" . $imgsize . ".jpg");
-			}
-		} else {
-			$dir = KAHUKPATH . 'avatars/user_uploaded/';
-
-			if ($dh = opendir($dir)) {
-				while (($file = readdir($dh)) !== false)
-					if (preg_match("/^$user_id\_(.+)\.jpg\$/", $file, $m)) {
-						$imgsrc = my_base_url . my_kahuk_base . '/avatars/user_uploaded/' . $file;
-						$avatars[$m[1]] = latest_avatar($imgsrc, $dir . $file);
-						if ($m[1] == Avatar_Large)
-							$avatars['large'] = $avatars[$m[1]];
-						elseif ($m[1] == Avatar_Small)
-							$avatars['small'] = $avatars[$m[1]];
-					}
-				closedir($dh);
-			}
-			return $avatars;
-		}
-	} elseif (!$imgsize)
-		return $avatars;
-
-	if ($size == "large") {
-		return my_base_url . my_kahuk_base . Default_Gravatar_Large;
-	}
-	if ($size == "small") {
-		return my_base_url . my_kahuk_base . Default_Gravatar_Small;
-	}
 }
 
 function do_sidebar($var_smarty, $navwhere = '')

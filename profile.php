@@ -31,12 +31,10 @@ if ($_GET['login'] && $canIhaveAccess) {
 	$login = $_GET['login'];
 } elseif ($current_user->user_id > 0 && $current_user->authenticated) {
 	$login = $current_user->user_login;
-	if ($_GET['avatar'] != 'edit')
-		if (urlmethod == 1) {
-			header("Location: $my_base_url$my_kahuk_base/profile.php?login=$login");
-		} elseif (urlmethod == 2) {
-			header("Location: $my_base_url$my_kahuk_base/user/$login/");
-		}
+
+	if ($_GET['avatar'] != 'edit') {
+		header("Location: $my_base_url$my_kahuk_base/user/$login/");
+	}
 } else {
 	$myname = KAHUK_BASE_URL;
 }
@@ -83,79 +81,6 @@ $main_smarty->assign('user_url_member_groups', getmyurl('user2', $login, 'member
 $main_smarty->assign('user_followers', $user->getFollowersCount());
 $main_smarty->assign('user_following', $user->getFollowingCount());
 
-// uploading avatar
-if (isset($_POST["avatar"]) && sanitize($_POST["avatar"], 3) == "uploaded" && Enable_User_Upload_Avatar == true) {
-	// Redwine: if TOKEN is empty, no need to continue, just display the invalid token error.
-	if (empty($_POST['token'])) {
-		$CSRF->show_invalid_error(1);
-		exit;
-	}
-	// Redwine: if valid TOKEN, proceed. A valid integer must be equal to 2.
-	if ($CSRF->check_valid(sanitize($_POST['token'], 3), 'profile_change') == 2) {
-		$user_image_path = "avatars/user_uploaded" . "/";
-		$user_image_apath = "/" . $user_image_path;
-		$allowedFileTypes = array("image/jpeg", "image/gif", "image/png", 'image/x-png', 'image/pjpeg');
-		unset($imagename);
-
-		$myfile = $_FILES['image_file']['name'];
-		$imagename = basename($myfile);
-
-		$mytmpfile = $_FILES['image_file']['tmp_name'];
-		if ($_FILES['image_file']["size"] / 1024 > max_avatar_size) {
-			$error[] = 'Maximum file size ' . max_avatar_size . 'Kb exceeded';
-		}
-
-		if (!in_array($_FILES['image_file']['type'], $allowedFileTypes)) {
-			$error[] = 'Only these file types are allowed : jpeg, gif, png';
-		}
-
-		if (empty($error)) {
-			$imagesize = getimagesize($mytmpfile);
-			$width = $imagesize[0];
-			$height = $imagesize[1];
-
-			$imagename = $user->id . "_original.jpg";
-
-			$newimage = $user_image_path . $imagename;
-
-			$result = move_uploaded_file($_FILES['image_file']['tmp_name'], $newimage);
-			if (empty($result))
-				$error["result"] = "There was an error moving the uploaded file.";
-		} else {
-			$main_smarty->assign('error', $error);
-		}
-
-		// create large avatar
-		include KAHUK_LIBS_DIR . "class.pThumb.php";
-		$img = new pThumb();
-		$img->pSetSize(Avatar_Large, Avatar_Large);
-		$img->pSetQuality(100);
-		$img->pCreate($newimage);
-		$img->pSave($user_image_path . $user->id . "_" . Avatar_Large . ".jpg");
-		$img = "";
-
-		// create small avatar
-		$img = new pThumb();
-		$img->pSetSize(Avatar_Small, Avatar_Small);
-		$img->pSetQuality(100);
-		$img->pCreate($newimage);
-		$img->pSave($user_image_path . $user->id . "_" . Avatar_Small . ".jpg");
-		$img = "";
-
-		$db->query($sql = "UPDATE " . table_users . " SET user_avatar_source='useruploaded' WHERE user_id='$user->id'");
-		unset($cached_users[$user->id]);
-	} else {
-		$CSRF->show_invalid_error(1);
-		exit;
-	}
-}
-if (isset($error) && is_array($error)) {
-	foreach ($error as $key => $val) {
-		echo $val;
-		echo "<br>";
-	}
-}
-
 // Save changes
 if (isset($_POST['email'])) {
 
@@ -189,9 +114,6 @@ function show_profile()
 	global $user, $main_smarty, $the_template, $CSRF, $db;
 
 	$CSRF->create('profile_change', true, true);
-
-	// assign avatar source to smarty
-	$main_smarty->assign('UseAvatars', do_we_use_avatars());
 
 	$avatar_all = kahuk_gravatar($user->email, ['note' => 'function show_profile']);
 	$main_smarty->assign('Avatar', $avatar_all);

@@ -180,13 +180,9 @@
 								$main_smarty->assign('Avatar', $avatar_all);
 							{/php}
 
-							{if $UseAvatars neq "0"}
-								<span id="ls_avatar-{if !empty($link_shakebox_index)}{$link_shakebox_index}{/if}">
-									<img src="{$Avatar.small}" width="16px" height="16px" alt="" title="Avatar">
-								</span>
-							{else}
-								<i class="fa fa-user"></i>
-							{/if}
+							<span id="ls_avatar-{if !empty($link_shakebox_index)}{$link_shakebox_index}{/if}">
+								<img src="{$Avatar.small}" width="16px" height="16px" alt="" title="Avatar">
+							</span>
 
 							<a href="{$submitter_profile_url}">{$link_submitter}</a> 
 							<i class="fa fa-time"></i>

@@ -170,13 +170,9 @@
             </span>
 
             <span class="subtext">
-                {if $UseAvatars neq "0"}
-                    <span id="ls_avatar-{$link_shakebox_index}">
-                        <img itemprop="image" src="{$Avatar.small}" width="32px" height="32px" alt="{$link_submitter}" title="{$link_submitter}" />
-                    </span>
-                {else}
-                    <i class="fa fa-user"></i>
-                {/if}
+                <span id="ls_avatar-{$link_shakebox_index}">
+                    <img itemprop="image" src="{$Avatar.small}" width="32px" height="32px" alt="{$link_submitter}" title="{$link_submitter}" />
+                </span>
 
                 <span itemprop="author" itemscope itemtype="http://schema.org/Person">
                     <span itemprop="name">

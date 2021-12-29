@@ -220,8 +220,6 @@ class Comment {
 		$smarty->assign('delete_comment_url', my_kahuk_base.'/delete.php?comment_id='.$this->id);
 
 		// avatars
-		$smarty->assign('UseAvatars', do_we_use_avatars());
-
 		$user_email = kahuk_user_email_by_userlogin( $this->username );
 		$avatar_all = kahuk_gravatar( $user_email , ['note' => 'libs - comment.php file']);
 

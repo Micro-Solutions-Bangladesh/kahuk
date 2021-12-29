@@ -121,8 +121,6 @@ if ($view == 'search') {
 } else {
 
 	// avatars
-	$main_smarty->assign('UseAvatars', do_we_use_avatars());
-
 	$avatar_all = kahuk_gravatar($user->email, ['note' => 'user.php file']);
 	$main_smarty->assign('Avatar', $avatar_all);
 

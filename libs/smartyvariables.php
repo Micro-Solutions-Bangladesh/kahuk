@@ -67,7 +67,6 @@ $main_smarty->assign('my_base_url', my_base_url);
 $main_smarty->assign('my_kahuk_base', my_kahuk_base);
 $main_smarty->assign('Allow_User_Change_Templates', Allow_User_Change_Templates);
 $main_smarty->assign('urlmethod', urlmethod);
-$main_smarty->assign('UseAvatars', do_we_use_avatars());
 $main_smarty->assign('Allow_Friends', Allow_Friends);
 $main_smarty->assign('Pager_setting', Auto_scroll);
 

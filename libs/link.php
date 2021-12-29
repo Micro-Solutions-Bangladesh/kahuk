@@ -820,8 +820,6 @@ class Link
 		$smarty->assign('instpath', my_base_url . my_kahuk_base . "/");
 
 		$avatar_all = kahuk_gravatar( $this->userid, ['note' => 'libs - link.php file'] );
-
-		$smarty->assign('UseAvatars', do_we_use_avatars());
 		$smarty->assign('Avatar', $avatar_all);
 
 		// Get the Group creator/Admin/Moderator to use the assigned permissions, when $this->link_group_id is greater than 0 

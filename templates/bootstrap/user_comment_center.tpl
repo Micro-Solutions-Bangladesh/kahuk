@@ -45,13 +45,11 @@
 		<a href="{$story_url}">{$title_short}</a>
 	</span>
 	<span class="user_comment_story_author">
-		by 
-		{if $UseAvatars neq "0"}
-			<a href="{$submitter_profile_url}">
-				<img class="user_comment_story_author_avatar" src="{$Avatar.large}" />
-			</a>
-		{/if}
-		<a href="{$submitter_profile_url}">{$link_submitter}</a> {checkActionsTpl location="tpl_kahuk_link_submitter"}
+		by <a href="{$submitter_profile_url}">
+			<img class="user_comment_story_author_avatar" src="{$Avatar.large}" />
+		</a>
+		<a href="{$submitter_profile_url}">{$link_submitter}</a> 
+		{checkActionsTpl location="tpl_kahuk_link_submitter"}
 	</span>
 	<span class="user_comment_story_timestamp">
 		{$link_submit_timeago} {#KAHUK_Visual_Comment_Ago#}
@@ -60,9 +58,9 @@
 	<div class="user_comment_data">
 		<div class="user_comment_details">
 			<span class="user_comment_author">
-				{if $UseAvatars neq "0"}
-					<a href="{$user_view_url}"><img class="user_comment_comment_author_avatar" src="{$Avatar.small}" /></a>
-				{/if}
+				<a href="{$user_view_url}">
+					<img class="user_comment_comment_author_avatar" src="{$Avatar.small}" />
+				</a>
 				<a href="{$user_view_url}">{$user_username}</a> {checkActionsTpl location="tpl_kahuk_comment_username"}
 			</span>
 			<span class="user_comment_timestamp">
