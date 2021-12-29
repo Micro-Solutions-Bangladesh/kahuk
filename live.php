@@ -1,18 +1,18 @@
 <?php
-
 include_once('internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('config.php');
-include(KAHUK_LIBS_DIR.'smartyvariables.php');
+include(KAHUK_LIBS_DIR . 'smartyvariables.php');
 
-if(!Enable_Live) {
+if (!Enable_Live) {
 	kahuk_redirect_404();
 }
 
 // breadcrumbs and page title
 $navwhere['text1'] = $main_smarty->get_config_vars('KAHUK_Visual_Breadcrumb_Live');
 $navwhere['link1'] = getmyurl('live', '');
+
 $main_smarty->assign('navbar_where', $navwhere);
 $main_smarty->assign('posttitle', $main_smarty->get_config_vars('KAHUK_Visual_Breadcrumb_Live'));
 $main_smarty->assign('page_header', $main_smarty->get_config_vars('KAHUK_Visual_Breadcrumb_Live'));
@@ -25,7 +25,7 @@ $main_smarty->assign('showsideleftsidebar', "no");
 $main_smarty->assign('showsiderightsidebar', "no");
 
 // pagename
-define('pagename', 'live'); 
+define('pagename', 'live');
 $main_smarty->assign('pagename', pagename);
 
 // sidebar

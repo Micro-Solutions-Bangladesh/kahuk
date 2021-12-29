@@ -85,9 +85,6 @@
 						$avatar_all = kahuk_gravatar( $user->email, ['note' => 'header.tpl file'] );
 						$main_smarty->assign('Avatar', $avatar_all);
 
-						// $main_smarty->assign('Avatar_ImgLarge', get_avatar('large', $user->avatar_source, $user->username, $user->email));
-						// $main_smarty->assign('Avatar_ImgSmall', get_avatar('small', $user->avatar_source, $user->username, $user->email));
-
 						$main_smarty->assign('user_names', $user->names);
 						$main_smarty->assign('user_id', $user->id);
 						$main_smarty->assign('user_username', $user->username);

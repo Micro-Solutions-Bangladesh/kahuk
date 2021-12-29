@@ -5,7 +5,7 @@ global $main_smarty;
 $main_smarty = new Smarty;
 
 include('config.php');
-include(KAHUK_LIBS_DIR.'smartyvariables.php');
+include(KAHUK_LIBS_DIR . 'smartyvariables.php');
 
 
 $lines = file('C:/Users/George/Desktop/Misc-CMS/Kahuk-language-files/lang.txt');
@@ -25,11 +25,11 @@ foreach ($lines as $line_num => $line) {
 		if ($langConstant == '') {
 			$langConstant = 'EMPTY';
 		}
-		$tempLine = $line . ' = "' .$langConstant.'"';
-		fwrite($fp, $tempLine ."\n");
+		$tempLine = $line . ' = "' . $langConstant . '"';
+		fwrite($fp, $tempLine . "\n");
 		echo $line . ' = "' . htmlspecialchars($langConstant) . '"<br />';
-	}else{
-		echo htmlspecialchars($line)."<br />";
+	} else {
+		echo htmlspecialchars($line) . "<br />";
 		fwrite($fp, $line);
 	}
 }

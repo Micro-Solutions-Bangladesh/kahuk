@@ -108,7 +108,8 @@
 							{if $following}
 								{foreach from=$following item=myfriend}
 									{php}
-										$this->_vars['friend_avatar'] = get_avatar('small', $this->_vars['myfriend']['user_avatar_source'], $this->_vars['myfriend']['user_login'], $this->_vars['myfriend']['user_email']);
+										$this->_vars['friend_avatar'] = $this->_vars['friend_avatar'] = kahuk_gravatar($this->_vars['myfriend']['user_email'], ['imgsize' => 'small']);
+										// get_avatar('small', $this->_vars['myfriend']['user_avatar_source'], $this->_vars['myfriend']['user_login'], $this->_vars['myfriend']['user_email']);
 										$this->_vars['profileURL'] = getmyurl('user2', $this->_vars['myfriend']['user_login'], 'profile');
 										$this->_vars['removeURL'] = getmyurl('user_add_remove', 'removefriend', $this->_vars['myfriend']['user_login']);
 										$this->_vars['addURL'] = getmyurl('user_add_remove', 'addfriend', $this->_vars['myfriend']['user_login']);

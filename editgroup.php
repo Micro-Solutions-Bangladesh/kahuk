@@ -4,16 +4,22 @@ include_once('internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('config.php');
-include(KAHUK_LIBS_DIR.'link.php');
-include(KAHUK_LIBS_DIR.'group.php');
-include(KAHUK_LIBS_DIR.'smartyvariables.php');
-include(KAHUK_LIBS_DIR.'csrf.php');
+include(KAHUK_LIBS_DIR . 'link.php');
+include(KAHUK_LIBS_DIR . 'group.php');
+include(KAHUK_LIBS_DIR . 'smartyvariables.php');
+include(KAHUK_LIBS_DIR . 'csrf.php');
 
 check_referrer();
 
-if(isset($_REQUEST['id'])){$requestID = strip_tags($_REQUEST['id']);}
-if(!is_numeric($requestID)){$requestID = 0;}
-if(isset($_REQUEST['title'])){$requestTitle = $db->escape(strip_tags($_REQUEST['title']));}
+if (isset($_REQUEST['id'])) {
+	$requestID = strip_tags($_REQUEST['id']);
+}
+if (!is_numeric($requestID)) {
+	$requestID = 0;
+}
+if (isset($_REQUEST['title'])) {
+	$requestTitle = $db->escape(strip_tags($_REQUEST['title']));
+}
 
 /* Redwine: Roles and permissions and Groups fixes. We need the user_level to determine the site wide Admin & Moderators to give access according to their permissions */
 global $main_smarty;
@@ -36,59 +42,57 @@ $is_gr_Admin = 0;
 $is_gr_Moderator = 0;
 if ($role == "admin") {
 	$is_gr_Admin = 1;
-}elseif ($role == "moderator") {
+} elseif ($role == "moderator") {
 	$is_gr_Moderator = 1;
 }
 $main_smarty->assign('is_gr_Admin', $is_gr_Admin);
 $main_smarty->assign('is_gr_Moderator', $is_gr_Moderator);
-if($is_gr_creator != 1 && $isAdmin != 1 && $isModerator != 1 && $is_gr_Admin != 1 && $is_gr_Moderator != 1)
-{
+if ($is_gr_creator != 1 && $isAdmin != 1 && $isModerator != 1 && $is_gr_Admin != 1 && $is_gr_Moderator != 1) {
 	//page redirect
 	$redirect = '';
 	$redirect = getmyurl("group_story", $requestID);
-//	header("Location: $redirect");
+	//	header("Location: $redirect");
 	die;
 }
 
 // pagename
-define('pagename', 'editgroup'); 
-$main_smarty->assign('pagename', pagename); 
+define('pagename', 'editgroup');
+$main_smarty->assign('pagename', pagename);
 
 $CSRF = new csrf();
 
 // uploading avatar
-if(isset($_POST["avatar"]) && $_POST["avatar"] == "uploaded")
-{
-    // Redwine: if TOKEN is empty, no need to continue, just display the invalid token error.
+if (isset($_POST["avatar"]) && $_POST["avatar"] == "uploaded") {
+	// Redwine: if TOKEN is empty, no need to continue, just display the invalid token error.
 	if (empty($_POST['token'])) {
 		$CSRF->show_invalid_error(1);
 		exit;
 	}
 	// Redwine: if valid TOKEN, proceed. A valid integer must be equal to 2.
-    if ($CSRF->check_valid(sanitize($_POST['token'], 3), 'edit_group') == 2){
+	if ($CSRF->check_valid(sanitize($_POST['token'], 3), 'edit_group') == 2) {
 		$user_image_path = "avatars/groups_uploaded" . "/";
 		$user_image_apath = "/" . $user_image_path;
-		$allowedFileTypes = array("image/jpeg","image/gif","image/png",'image/x-png','image/pjpeg');
+		$allowedFileTypes = array("image/jpeg", "image/gif", "image/png", 'image/x-png', 'image/pjpeg');
 		unset($imagename);
 		$myfile = $_FILES['image_file']['name'];
 		$imagename = basename($myfile);
 		$mytmpfile = $_FILES['image_file']['tmp_name'];
-		if(!in_array($_FILES['image_file']['type'],$allowedFileTypes))
-		{
+		if (!in_array($_FILES['image_file']['type'], $allowedFileTypes)) {
 			$error['Type'] = 'Only these file types are allowed : jpeg, gif, png';
 		}
-	 
-		if(empty($error))
-		{
+
+		if (empty($error)) {
 			$imagesize = getimagesize($mytmpfile);
 			$width = $imagesize[0];
 			$height = $imagesize[1];
 			$idname = $_POST["idname"];
-			if(!is_numeric($idname)){die();}
+			if (!is_numeric($idname)) {
+				die();
+			}
 			$imagename = $idname . "_original.jpg";
-			$newimage = $user_image_path . $imagename ;
+			$newimage = $user_image_path . $imagename;
 			$result = @move_uploaded_file($_FILES['image_file']['tmp_name'], $newimage);
-			if(empty($result))
+			if (empty($result))
 				$error["result"] = "There was an error moving the uploaded file.";
 			else {
 				$avatar_source = cleanit($_POST['avatarsource']);
@@ -106,72 +110,73 @@ if(isset($_POST["avatar"]) && $_POST["avatar"] == "uploaded")
 		}
 		// create large avatar
 		include KAHUK_LIBS_DIR . "class.pThumb.php";
-		$img=new pThumb();
+		$img = new pThumb();
 		$img->pSetSize(group_avatar_size_width, group_avatar_size_height);
 		$img->pSetQuality(100);
 		$img->pCreate($newimage);
-		$img->pSave($user_image_path . $idname . "_".group_avatar_size_width.".jpg");
+		$img->pSave($user_image_path . $idname . "_" . group_avatar_size_width . ".jpg");
 		$img = "";
-    } else {
-    	$CSRF->show_invalid_error(1);
+	} else {
+		$CSRF->show_invalid_error(1);
 		exit;
-    }
-}
-elseif(isset($_POST["action"]))
-{
-    // Redwine: if TOKEN is empty, no need to continue, just display the invalid token error.
+	}
+} elseif (isset($_POST["action"])) {
+	// Redwine: if TOKEN is empty, no need to continue, just display the invalid token error.
 	if (empty($_POST['token'])) {
 		$CSRF->show_invalid_error(1);
 		exit;
 	}
 	// Redwine: if valid TOKEN, proceed. A valid integer must be equal to 2.
-    if ($CSRF->check_valid(sanitize($_POST['token'], 3), 'edit_group') == 2){
-	if(isset($_POST['group_title'])){
-		$group_title = $db->escape(stripslashes(strip_tags(trim($_POST['group_title']))));
-		$group_title = preg_replace('/[^\p{L}\p{N}-_\s]/u', ' ', $group_title);
-	}
-	if(isset($_POST['group_description'])){
-		$group_description = $db->escape(stripslashes(strip_tags(trim($_POST['group_description']))));
-	}
-	if(isset($_POST['group_vote_to_publish'])){
-		$group_vote_to_publish = $db->escape(stripslashes(strip_tags(trim($_POST['group_vote_to_publish']))));
-	}
-	if(isset($_POST['group_notify_email']) && $_POST['group_notify_email']>0) {
-		$group_notify_email = 1;
-	}else{
-		$group_notify_email = 0;
-	}
-	$group_name = $group_title;
-	$group_safename = makeUrlFriendly($group_title, true);
-	if(isset($_POST['group_privacy']))
-		$group_privacy = $db->escape(sanitize($_POST['group_privacy'],3));
-	
-	if (!$group_title) $errors = $main_smarty->get_config_vars('KAHUK_Visual_Group_Empty_Title');
-	elseif ($group_vote_to_publish<=0) $errors = $main_smarty->get_config_vars('KAHUK_Visual_Group_Empty_Votes');
-	else
-	{
-		$exists = $db->get_var("select COUNT(*) from ".table_groups." WHERE group_name='$group_name' AND group_id != '$requestID'");
-	 	if ($exists) $errors = $main_smarty->get_config_vars('KAHUK_Visual_Group_Title_Exists');
-	}
-
-	if (empty($errors) && 
-	    $db->query("update ". table_groups ." set group_name = '".$group_title."', group_safename='$group_safename', group_description = '".$group_description."', group_privacy = '".$group_privacy."', group_vote_to_publish = '".$group_vote_to_publish."', group_notify_email=$group_notify_email where group_id = '".$requestID."'"))
-		$errors = $main_smarty->get_config_vars('KAHUK_Visual_Group_Saved_Changes');
-
-		if (!empty($errors) && 
-			$db->query("update ". table_groups ." set group_name = '".$group_title."', group_safename='$group_safename', group_description = '".$group_description."', group_privacy = '".$group_privacy."', group_vote_to_publish = '".$group_vote_to_publish."', group_notify_email=$group_notify_email where group_id = '".$requestID."'")) {
-			$errors = $main_smarty->get_config_vars('KAHUK_Visual_Group_Saved_Changes');
-			$main_smarty->assign("errors",$errors);
+	if ($CSRF->check_valid(sanitize($_POST['token'], 3), 'edit_group') == 2) {
+		if (isset($_POST['group_title'])) {
+			$group_title = $db->escape(stripslashes(strip_tags(trim($_POST['group_title']))));
+			$group_title = preg_replace('/[^\p{L}\p{N}-_\s]/u', ' ', $group_title);
 		}
-    } else {
-    	$CSRF->show_invalid_error(1);
-	exit;
-    }
+		if (isset($_POST['group_description'])) {
+			$group_description = $db->escape(stripslashes(strip_tags(trim($_POST['group_description']))));
+		}
+		if (isset($_POST['group_vote_to_publish'])) {
+			$group_vote_to_publish = $db->escape(stripslashes(strip_tags(trim($_POST['group_vote_to_publish']))));
+		}
+		if (isset($_POST['group_notify_email']) && $_POST['group_notify_email'] > 0) {
+			$group_notify_email = 1;
+		} else {
+			$group_notify_email = 0;
+		}
+		$group_name = $group_title;
+		$group_safename = makeUrlFriendly($group_title, true);
+		if (isset($_POST['group_privacy']))
+			$group_privacy = $db->escape(sanitize($_POST['group_privacy'], 3));
+
+		if (!$group_title) $errors = $main_smarty->get_config_vars('KAHUK_Visual_Group_Empty_Title');
+		elseif ($group_vote_to_publish <= 0) $errors = $main_smarty->get_config_vars('KAHUK_Visual_Group_Empty_Votes');
+		else {
+			$exists = $db->get_var("select COUNT(*) from " . table_groups . " WHERE group_name='$group_name' AND group_id != '$requestID'");
+			if ($exists) $errors = $main_smarty->get_config_vars('KAHUK_Visual_Group_Title_Exists');
+		}
+
+		if (
+			empty($errors) &&
+			$db->query("update " . table_groups . " set group_name = '" . $group_title . "', group_safename='$group_safename', group_description = '" . $group_description . "', group_privacy = '" . $group_privacy . "', group_vote_to_publish = '" . $group_vote_to_publish . "', group_notify_email=$group_notify_email where group_id = '" . $requestID . "'")
+		)
+			$errors = $main_smarty->get_config_vars('KAHUK_Visual_Group_Saved_Changes');
+
+		if (
+			!empty($errors) &&
+			$db->query("update " . table_groups . " set group_name = '" . $group_title . "', group_safename='$group_safename', group_description = '" . $group_description . "', group_privacy = '" . $group_privacy . "', group_vote_to_publish = '" . $group_vote_to_publish . "', group_notify_email=$group_notify_email where group_id = '" . $requestID . "'")
+		) {
+			$errors = $main_smarty->get_config_vars('KAHUK_Visual_Group_Saved_Changes');
+			$main_smarty->assign("errors", $errors);
+		}
+	} else {
+		$CSRF->show_invalid_error(1);
+		exit;
+	}
 }
 $CSRF->create('edit_group', true, true);
 
 //displaying group as story
-if(isset($requestID))
+if (isset($requestID))
 	group_display($requestID);
 
 $main_smarty->assign('tpl_center', $the_template . '/edit_group_center');

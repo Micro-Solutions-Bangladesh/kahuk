@@ -52,7 +52,7 @@ function who_voted($storyid, $avatar_size, $condition)
 	$voters = object_2_array($voters);
 
 	foreach ($voters as $key => $val) {
-		$voters[$key]['Avatar'] = kahuk_gravatar( $val['user_email'], ['note' => 'libs - html1.php file'] );
+		$voters[$key]['Avatar'] = kahuk_gravatar($val['user_email'], ['note' => 'libs - html1.php file']);
 	}
 
 	return $voters;
@@ -154,7 +154,8 @@ function do_we_use_avatars()
  * 
  * @since 5.0.5
  */
-function kahuk_gravatar( $id_or_email, $customArgs = [] ) {
+function kahuk_gravatar($id_or_email, $customArgs = [])
+{
 
 	$defaults = array(
 		'rating'        => 'g',
@@ -178,32 +179,32 @@ function kahuk_gravatar( $id_or_email, $customArgs = [] ) {
 	$imgsize = $args['imgsize'];
 	$default = $args['default'];
 
-	$email = is_email( sanitize_text_field( $id_or_email ) );
+	$email = is_email(sanitize_text_field($id_or_email));
 
-	if ( is_array( $email ) ) {
-		$email = kahuk_user_email_by_id( $id_or_email ); // Get user email by user id
+	if (is_array($email)) {
+		$email = kahuk_user_email_by_id($id_or_email); // Get user email by user id
 
-		if ( !$email ) {
+		if (!$email) {
 			$hasEmailError = true;
 		}
 	}
 
-	foreach( $args['imgSizes'] as $sizeName => $sizeNumber ) {
+	foreach ($args['imgSizes'] as $sizeName => $sizeNumber) {
 		$imgUrl = 'https://www.gravatar.com/avatar/';
-		$imgUrl .= md5( strtolower( trim( $email ) ) );
+		$imgUrl .= md5(strtolower(trim($email)));
 		$imgUrl .= "?s=" . $sizeNumber . "&d=$default&r=" . $args['rating'];
 
-		if ( $hasEmailError ) {
+		if ($hasEmailError) {
 			$imgUrl = "Error: {$email} :: " . $args['note']; // TODO Error handle
 		}
 
-		if ( $args['img'] ) {
+		if ($args['img']) {
 			$imgMarkup = '<img src="' . $imgUrl . '" alt="' . $args['alt'] . '"';
 
-			if ( $args['class'] ) {
+			if ($args['class']) {
 				$imgMarkup .= ' class="' . $args['class'] . '"';
 			}
-	
+
 			$imgMarkup .= ' />';
 
 			$output[$sizeName] = $imgMarkup;
@@ -212,11 +213,11 @@ function kahuk_gravatar( $id_or_email, $customArgs = [] ) {
 		}
 	}
 
-	if ( isset( $output[$imgsize] ) ) {
+	if (isset($output[$imgsize])) {
 		return $output[$imgsize];
 	}
 
-    return $output;
+	return $output;
 }
 
 
@@ -288,7 +289,7 @@ function get_avatar($size = "large", $avatarsource, $user_name = "", $user_email
 			}
 		} else {
 			$dir = KAHUKPATH . 'avatars/user_uploaded/';
-			
+
 			if ($dh = opendir($dir)) {
 				while (($file = readdir($dh)) !== false)
 					if (preg_match("/^$user_id\_(.+)\.jpg\$/", $file, $m)) {
@@ -1039,7 +1040,7 @@ function getmyurl($x, $var1 = "", $var2 = "", $var3 = "")
 		if ($x == "maincategory") $ret = "/" . $var1;
 		elseif ($x == "newcategory") $ret = "/new/" . $var1;
 		elseif ($x == "discardedcategory") $ret = "/discarded/" . $var1 . "/";
-		
+
 		elseif ($x == "editlink") $ret = "/story/" . $var1 . "/edit/";
 		elseif ($x == "edit") $ret = "/story/" . $var1 . "/editcomment/" . $var2 . "/";
 		elseif ($x == "user") $ret = "/user/" . $var1 . ($var1 ? '/' : '');
@@ -1064,7 +1065,7 @@ function getmyurl($x, $var1 = "", $var2 = "", $var3 = "")
 		elseif ($x == "story") $ret = "/story/" . $var1 . "/";
 		elseif ($x == "storytitle") $ret = "/story/" . $var1 . "/";
 		elseif ($x == "storycattitle") $ret = "/" . $var1 . "/" . $var2 . "/";
-		
+
 		elseif ($x == "out") $ret = "/out/" . $var1 . "/";
 		elseif ($x == "outtitle") $ret = "/out/" . $var1 . "/";
 		elseif ($x == "outurl") $ret = "/out/" . $var1 . "/";

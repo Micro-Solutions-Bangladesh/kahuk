@@ -1,117 +1,117 @@
 <?php
-if ( ! defined( 'KAHUKPATH' ) ) {
-	define( 'KAHUKPATH', dirname( __FILE__ ) . '/' );
+if (!defined('KAHUKPATH')) {
+	define('KAHUKPATH', dirname(__FILE__) . '/');
 }
 
-if ( ! defined( 'KAHUK_CONTENT_DIR' ) ) {
-	define( 'KAHUK_CONTENT_DIR', KAHUKPATH . 'kahuk-content/' );
+if (!defined('KAHUK_CONTENT_DIR')) {
+	define('KAHUK_CONTENT_DIR', KAHUKPATH . 'kahuk-content/');
 }
 
 /** */
-define( 'KAHUK_LANG_DIR', KAHUKPATH . 'languages/' );
+define('KAHUK_LANG_DIR', KAHUKPATH . 'languages/');
 
 /** */
-define( 'KAHUK_LIBS_DIR', KAHUKPATH . 'libs/' );
+define('KAHUK_LIBS_DIR', KAHUKPATH . 'libs/');
 
 /** */
-define( 'KAHUK_MODULES_DIR', KAHUKPATH . 'modules/' );
+define('KAHUK_MODULES_DIR', KAHUKPATH . 'modules/');
 
 /** */
-define( 'KAHUK_SMARTY_DIR', KAHUKPATH . 'internal/' );
+define('KAHUK_SMARTY_DIR', KAHUKPATH . 'internal/');
 
 // ** MySQL settings - You can get this info from your web host ** //
 /** The name of the database for Kahuk */
-if ( ! defined( 'DB_NAME' ) ) {
-	define( 'DB_NAME', 'database_name_here' );
+if (!defined('DB_NAME')) {
+	define('DB_NAME', 'database_name_here');
 }
 
 /** MySQL database username */
-if ( ! defined( 'DB_USER' ) ) {
-	define( 'DB_USER', 'database_username_here' );
+if (!defined('DB_USER')) {
+	define('DB_USER', 'database_username_here');
 }
 
 /** MySQL database password */
-if ( ! defined( 'DB_PASSWORD' ) ) {
-	define( 'DB_PASSWORD', 'database_login_password_here' );
+if (!defined('DB_PASSWORD')) {
+	define('DB_PASSWORD', 'database_login_password_here');
 }
 
 /** MySQL hostname */
-if ( ! defined( 'DB_HOST' ) ) {
-	define( 'DB_HOST', 'database_host_here' ); // ex: localhost
+if (!defined('DB_HOST')) {
+	define('DB_HOST', 'database_host_here'); // ex: localhost
 }
 
 /** DB TABLES PREFIX */
-if ( ! defined( 'TABLE_PREFIX' ) ) {
-	define( 'TABLE_PREFIX', 'database_tables_prefix_here' ); // ex: kahuk_life_
+if (!defined('TABLE_PREFIX')) {
+	define('TABLE_PREFIX', 'database_tables_prefix_here'); // ex: kahuk_life_
 }
 
 /** Database Charset to use in creating database tables. */
-if ( ! defined( 'DB_CHARSET' ) ) {
-	define( 'DB_CHARSET', 'utf8' );
+if (!defined('DB_CHARSET')) {
+	define('DB_CHARSET', 'utf8');
 }
 
 /** The Database Collate type. Don't change this if in doubt. */
-if ( ! defined( 'DB_COLLATE' ) ) {
-	define( 'DB_COLLATE', 'utf8_general_ci' );
+if (!defined('DB_COLLATE')) {
+	define('DB_COLLATE', 'utf8_general_ci');
 }
 
 /** */
-if ( ! defined( 'KAHUK_DEBUG' ) ) {
-	define( 'KAHUK_DEBUG', false );
+if (!defined('KAHUK_DEBUG')) {
+	define('KAHUK_DEBUG', false);
 }
 
 /** */
-if ( ! defined( 'KAHUK_DEBUG_DISPLAY' ) ) {
-	define( 'KAHUK_DEBUG_DISPLAY', false );
+if (!defined('KAHUK_DEBUG_DISPLAY')) {
+	define('KAHUK_DEBUG_DISPLAY', false);
 }
 
 /** */
-define( 'KAHUK_LANG', 'english' );
+define('KAHUK_LANG', 'english');
 
 /** Used by the Admin Panel error log file viewer */
-define( 'KAHUK_LOG_DIR', KAHUKPATH . 'logs/' );
-define( 'LOG_FILE', 'logs/error.log' );
+define('KAHUK_LOG_DIR', KAHUKPATH . 'logs/');
+define('LOG_FILE', 'logs/error.log');
 
-define( 'LOG_DB_QUERY', false );
-define( 'LOG_DB_QUERY_FILE', 'logs/query.log' );
-define( 'LOG_DB_QUERY_ERROR', 'logs/query_error.log' );
+define('LOG_DB_QUERY', false);
+define('LOG_DB_QUERY_FILE', 'logs/query.log');
+define('LOG_DB_QUERY_ERROR', 'logs/query_error.log');
 
 // Karma Value to upgrade status of a story into PUBLISHED from NEW
-define( 'STORY_KARMA_PUBLISHED', 30 );
+define('STORY_KARMA_PUBLISHED', 30);
 
 // Karma Value for LINK When A Link Get/Loss Vote
-define( 'LINK_VOTE_KARMA', 2 );
+define('LINK_VOTE_KARMA', 2);
 
 // Karma Value for LINK When A Link is saved by user
-define( 'LINK_SAVE_KARMA', 3 );
+define('LINK_SAVE_KARMA', 3);
 
 // Karma Value for USER When user submit a new LINK
-define( 'USER_POST_KARMA', 8 );
+define('USER_POST_KARMA', 8);
 
 // Karma Value for USER When user's LINK updated from NEW to PUBLISHED
-define( 'USER_POST_PUBLISHED_KARMA', 5 );
+define('USER_POST_PUBLISHED_KARMA', 5);
 
 // Karma Value for USER When user vote
-define( 'USER_VOTE_KARMA', 3 );
+define('USER_VOTE_KARMA', 3);
 
 // Karma Value for USER When user comment
-define( 'USER_COMMENT_KARMA', 5 );
+define('USER_COMMENT_KARMA', 5);
 
 //
-define( 'SEO_FRIENDLY_URL', seo_friendly_url_here );
+define('SEO_FRIENDLY_URL', seo_friendly_url_here);
 
 // Maximum number of story with same url
-define( 'MAX_NUMBER_OF_DUPLICATE_STORY', 5 );
+define('MAX_NUMBER_OF_DUPLICATE_STORY', 5);
 
 // Maximum number of story with same title
-define( 'MAX_NUMBER_OF_DUPLICATE_STORY_TITLE', 1 );
+define('MAX_NUMBER_OF_DUPLICATE_STORY_TITLE', 1);
 
 //
-if ( ! defined( 'KAHUK_BASE_URL' ) ) {
-	define( 'KAHUK_BASE_URL', 'kahuk_base_url_here' ); // ex: http://example.com/folder-name [ if installed in a folder ]
+if (!defined('KAHUK_BASE_URL')) {
+	define('KAHUK_BASE_URL', 'kahuk_base_url_here'); // ex: http://example.com/folder-name [ if installed in a folder ]
 
-	define( 'my_base_url', 'my_base_url_here' ); // ex: http://example.com
-	define( 'my_kahuk_base', 'my_kahuk_base_here' ); // /folder-name [ if installed in a folder ]
+	define('my_base_url', 'my_base_url_here'); // ex: http://example.com
+	define('my_kahuk_base', 'my_kahuk_base_here'); // /folder-name [ if installed in a folder ]
 }
 
 
@@ -123,21 +123,22 @@ if ( ! defined( 'KAHUK_BASE_URL' ) ) {
  *
  * @return string error log file name
  */
-function kahuk_error_log_file_name() {
-	return date( "dMY" ) . ".log";
+function kahuk_error_log_file_name()
+{
+	return date("dMY") . ".log";
 }
 
 
 //
-define( 'SALT_LENGTH', 9 );
+define('SALT_LENGTH', 9);
 
-ini_set( 'include_path', '.' );
+ini_set('include_path', '.');
 
 // Set Error Log File
 $error_log_file_name = kahuk_error_log_file_name();
-ini_set( 'error_log', KAHUK_LOG_DIR . "error-logs/" . $error_log_file_name ); // Error log file location
+ini_set('error_log', KAHUK_LOG_DIR . "error-logs/" . $error_log_file_name); // Error log file location
 
-error_reporting( E_CORE_ERROR | E_CORE_WARNING | E_COMPILE_ERROR | E_ERROR | E_WARNING | E_PARSE | E_USER_ERROR | E_USER_WARNING | E_RECOVERABLE_ERROR );
+error_reporting(E_CORE_ERROR | E_CORE_WARNING | E_COMPILE_ERROR | E_ERROR | E_WARNING | E_PARSE | E_USER_ERROR | E_USER_WARNING | E_RECOVERABLE_ERROR);
 
 $my_base_url = my_base_url; // TODO Delete
 $my_kahuk_base = my_kahuk_base; // TODO Delete
@@ -145,13 +146,13 @@ $my_kahuk_base = my_kahuk_base; // TODO Delete
 // Template Caching
 // 0 = off
 // 1 = on
-define( 'caching', 1 );
-define( 'summarize_mysql', 1 );
+define('caching', 1);
+define('summarize_mysql', 1);
 
 /**
  * DEV_MODE_ON should be always false unless a contributor developer is working on it.
  * DEV_MODE_ON constant will be used to store debug messages/notices into logs/debug.log file and show message about install folder in admin
  */
-if ( ! defined( 'DEV_MODE_ON' ) ) {
-	define( 'DEV_MODE_ON', false );
+if (!defined('DEV_MODE_ON')) {
+	define('DEV_MODE_ON', false);
 }
