@@ -180,25 +180,6 @@ function get_group_roles($group_id)
  * 
  */
 //to return name from userid
-function get_group_username($uid)
-{
-	$user_id = $uid;
-
-	if (!is_numeric($user_id)) {
-		die();
-	}
-
-	$user = new User;
-	$user->id = $user_id;
-	$user->read('short');
-
-	return $user->username;
-}
-
-/**
- * 
- */
-//to return name from userid
 function get_group_user_email($uid)
 {
 	$user_id = $uid;
@@ -331,7 +312,7 @@ function group_display($requestID)
 		$main_smarty->assign('imgsrc', $imgsrc);
 
 		//get group creator and his urls
-		$g_name = get_group_username($group_creator);
+		$g_name = get_group_submitter_username($group_creator);
 		$main_smarty->assign('group_submitter', $g_name);
 		$main_smarty->assign('submitter_profile_url', getmyurl('user', $g_name));
 		$main_smarty->assign('group_avatar_url', getmyurl('group_avatar', $group_id));
@@ -448,7 +429,7 @@ function member_display($requestID)
 			$member_bannedchange_url = getmyurl('group_banned', $requestID, 'banned', $member_user_id);
 
 			//get group creator and his url,avatar
-			$member_name = get_group_username($member_user_id);
+			$member_name = get_group_submitter_username($member_user_id);
 			$group_member_url = getmyurl('user', $member_name);
 			$group_member_avatar = kahuk_gravatar($member_user_id, ['imgsize' => 'small']);
 
@@ -711,7 +692,7 @@ function group_shared($requestID, $catId, $flag = 0)
 }
 
 /**
- * 
+ * Depricated in favor of create_markup_group_summery() function
  */
 //displaying group as story
 function group_print_summary($requestID)
@@ -763,7 +744,7 @@ function group_print_summary($requestID)
 		$main_smarty->assign('imgsrc', $imgsrc);
 
 		//get group creator and his url
-		$g_name = get_group_username($group_creator);
+		$g_name = get_group_submitter_username($group_creator);
 		$main_smarty->assign('group_submitter', $g_name);
 		$submitter_profile_url = getmyurl('user', $g_name);
 		$main_smarty->assign('submitter_profile_url', $submitter_profile_url);

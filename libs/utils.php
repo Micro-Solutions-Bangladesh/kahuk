@@ -237,11 +237,9 @@ function check_string($which) {
 }
 
 function get_current_page() {
-	if(($var=check_integer('page'))) {
-		return $var;
-	} else {
-		return 1;
-	}
+	$pagenum = intval(_request('page'));
+
+	return ((0<$pagenum) ? $pagenum : 1);
 }
 
 

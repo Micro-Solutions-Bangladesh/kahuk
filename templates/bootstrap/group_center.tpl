@@ -1,7 +1,4 @@
-{************************************
-******* Groups Main Template ********
-*************************************}
-<!-- group_center.tpl -->
+{******* Groups Main Template ********}
 {if $enable_group eq "true"}
 	{if $pagename eq "groups"}
 		<div class="well group_explain">
@@ -40,6 +37,7 @@
 			</div>
 		</div>
 	{/if}
+
 	{if !empty($get.keyword)}
 		{if !empty($group_display)}
 			<legend>{#KAHUK_Visual_Search_SearchResults#} &quot;{$search}&quot;</legend>
@@ -47,19 +45,27 @@
 			<legend>{#KAHUK_Visual_Search_NoResults#} &quot;{$search}&quot;</legend>
 		{/if}
 	{/if}
-	{if !empty($group_display)}{$group_display}{/if}
+
+	{if !empty($group_display)}
+		{$group_display}
+	{/if}
+
 	<div style="clear:both;"></div>
-	{if !empty($group_pagination)}{$group_pagination}{/if}
+	
+	{if !empty($group_pagination)}
+		{$group_pagination}
+	{/if}
 {/if}
-   {if $enable_group neq "true"}
-       {literal}
-			<script type="text/javascript">
-			   <!--
-			   window.location="{/literal}{$kahuk_base_url}/error_404.php{literal}";
-			   //-->
-			</script>
-      {/literal}
-   {/if}
+
+{if $enable_group neq "true"}
+	{literal}
+		<script type="text/javascript">
+			<!--
+			window.location="{/literal}{$kahuk_base_url}/error_404.php{literal}";
+			//-->
+		</script>
+	{/literal}
+{/if}
  
  {literal}
 <script type="text/javascript">

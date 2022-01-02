@@ -26,6 +26,7 @@ require_once KAHUK_LIBS_DIR . 'functions-table-user.php';
 require_once KAHUK_LIBS_DIR . 'functions-table-link.php';
 require_once KAHUK_LIBS_DIR . 'functions-table-vote.php';
 require_once KAHUK_LIBS_DIR . 'functions-table-total.php';
+require_once KAHUK_LIBS_DIR . 'functions-table-group.php';
 
 require_once KAHUK_LIBS_DIR . 'html1.php';
 
@@ -45,7 +46,11 @@ require_once KAHUK_LIBS_DIR . 'user.php';
 require_once KAHUK_LIBS_DIR . 'kahuk-categories.php';
 
 
-global $globalStory;
+global $globalStory, $globalGroups, $pagenum;
+
+// Set the global variables from REQUEST
+$pagenum = intval(_request('pagenum'));
+
 
 
 
