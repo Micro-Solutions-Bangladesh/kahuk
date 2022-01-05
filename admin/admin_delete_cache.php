@@ -1,11 +1,10 @@
 ﻿<?php
-
 include_once('../internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('../config.php');
-include(KAHUK_LIBS_DIR.'link.php');
-include(KAHUK_LIBS_DIR.'smartyvariables.php');
+include(KAHUK_LIBS_DIR . 'link.php');
+include(KAHUK_LIBS_DIR . 'smartyvariables.php');
 
 check_referrer();
 
@@ -16,13 +15,12 @@ force_authentication();
 $canIhaveAccess = 0;
 $canIhaveAccess = $canIhaveAccess + checklevel('admin');
 
-if($canIhaveAccess == 0){	
+if ($canIhaveAccess == 0) {
 	header("Location: " . getmyurl('admin_login', $_SERVER['REQUEST_URI']));
 	die();
 }
 
-recursive_remove_directory('../cache',TRUE);
-
+recursive_remove_directory('../cache', TRUE);
 ?>
 <div class="modal-dialog">
 	<div class="modal-content">

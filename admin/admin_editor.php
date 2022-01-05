@@ -1,12 +1,11 @@
 <?php
-
 include_once('../internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('../config.php');
-include(KAHUK_LIBS_DIR.'link.php');
-include(KAHUK_LIBS_DIR.'smartyvariables.php');
-include(KAHUK_LIBS_DIR.'csrf.php');
+include(KAHUK_LIBS_DIR . 'link.php');
+include(KAHUK_LIBS_DIR . 'smartyvariables.php');
+include(KAHUK_LIBS_DIR . 'csrf.php');
 
 check_referrer();
 
@@ -17,9 +16,7 @@ force_authentication();
 $canIhaveAccess = 0;
 $canIhaveAccess = $canIhaveAccess + checklevel('admin');
 
-if($canIhaveAccess == 0){	
-//	$main_smarty->assign('tpl_center', '/admin/access_denied');
-//	$main_smarty->display('/admin/admin.tpl');			
+if ($canIhaveAccess == 0) {
 	header("Location: " . getmyurl('admin_login', $_SERVER['REQUEST_URI']));
 	die();
 }
@@ -32,107 +29,108 @@ $main_smarty->assign('navbar_where', $navwhere);
 $main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel'));
 
 // pagename
-define('pagename', 'admin_editor'); 
+define('pagename', 'admin_editor');
 $main_smarty->assign('pagename', pagename);
 
 // read the mysql database to get the kahuk version
-/* Redwine: kahuk version query removed and added to /libs/smartyvriables.php */
+/* kahuk version query removed and added to /libs/smartyvriables.php */
 
-$filedir = "../templates/".The_Template;
-#echo $filedir;
+$filedir = "../templates/" . The_Template;
 
 $valid_ext[1] = "css";
 $valid_ext[2] = "tpl";
 
-if ($_SERVER['REQUEST_METHOD'] != 'POST')
-{
-    $files = array();
-    if (is_readable($filedir)) {
-	$filelist = directoryToArray($filedir, true);
-	foreach ($filelist as $file) {
-	    $ext = substr(strrchr($file, '.'), 1);
-		if (in_array($ext,$valid_ext) && is_writable($file)) {
-			$files[] = $file;
+if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+	$files = array();
+
+	if (is_readable($filedir)) {
+		$filelist = directoryToArray($filedir, true);
+		foreach ($filelist as $file) {
+			$ext = substr(strrchr($file, '.'), 1);
+			if (in_array($ext, $valid_ext) && is_writable($file)) {
+				$files[] = $file;
+			}
 		}
 	}
-    }
-    $main_smarty->assign('files', $files);
-}
-elseif ($_POST["the_file"])
-{
-	/* Redwine: added sanitization and removing ".." from the name of the file and making sure that nothing can be loaded to edit other than the allowed file extensions TPL and CSS. */
-	$_POST["the_file"] = sanitize ($_POST["the_file"],3);
+
+	$main_smarty->assign('files', $files);
+} elseif ($_POST["the_file"]) {
+	/* added sanitization and removing ".." from the name of the file and making sure that nothing can be loaded to edit other than the allowed file extensions TPL and CSS. */
+	$_POST["the_file"] = sanitize($_POST["the_file"], 3);
 	$dir_name = dirname($_POST["the_file"]);
 	$base_name = basename($_POST["the_file"]);
 	$base_name = str_replace('..', '', $base_name);
 	$_POST["the_file"] = $dir_name . "/" . $base_name;
 	$ext = substr(strrchr($_POST["the_file"], '.'), 1);
+
 	if (!empty($ext)) {
-		if (in_array($ext,$valid_ext)) {
-    $file2open = fopen($_POST["the_file"], "r");
-    if ($file2open) {
-	    $current_data = @fread($file2open, filesize($_POST["the_file"]));
-	    $current_data = str_ireplace("</textarea>", "<END-TA-DO-NOT-EDIT>", $current_data);
-	    $main_smarty->assign('filedata', htmlspecialchars($current_data));
-	    fclose($file2open);
-    } else 
-	    $main_smarty->assign('error', 1);
-    $main_smarty->assign('the_file', sanitize($_POST['the_file'],3));
-		}else{
+		if (in_array($ext, $valid_ext)) {
+			$file2open = fopen($_POST["the_file"], "r");
+
+			if ($file2open) {
+				$current_data = @fread($file2open, filesize($_POST["the_file"]));
+				$current_data = str_ireplace("</textarea>", "<END-TA-DO-NOT-EDIT>", $current_data);
+				$main_smarty->assign('filedata', htmlspecialchars($current_data));
+				fclose($file2open);
+			} else
+				$main_smarty->assign('error', 1);
+			$main_smarty->assign('the_file', sanitize($_POST['the_file'], 3));
+		} else {
 			header("Location: admin_editor.php");
 			die();
 		}
-	}else{
+	} else {
 		header("Location: admin_editor.php");
 		die();
 	}
-}
-elseif ($_POST["save"])
-{
-	if (!$_POST["updatedfile"] && !$_POST['isempty'])
+} elseif ($_POST["save"]) {
+	if (!$_POST["updatedfile"] && !$_POST['isempty']) {
 		$error = "<h3>ERROR!</h3><p>File NOT saved! <br /> You can't save blank file without confirmation. <br />  <a href=\"\">Click here to go back to the editor.</a></p>";
-	elseif ($file2ed = fopen($_POST["the_file2"], "w+")) {
+	} elseif ($file2ed = fopen($_POST["the_file2"], "w+")) {
 		$data_to_save = $_POST["updatedfile"];
 		$data_to_save = str_ireplace("<END-TA-DO-NOT-EDIT>", "</textarea>", $data_to_save);
 		$data_to_save = stripslashes($data_to_save);
-		if (fwrite($file2ed,$data_to_save)!==FALSE) { 
-			$error = "<h3>File Saved</h3><p><a href=\"\">Click here to go back to the editor.</a></p>";	
+
+		if (fwrite($file2ed, $data_to_save) !== FALSE) {
+			$error = "<h3>File Saved</h3><p><a href=\"\">Click here to go back to the editor.</a></p>";
 			fclose($file2ed);
-		}
-		else {	
+		} else {
 			$error = "<h3>ERROR!</h3><p>cant File NOT saved! <br /> Check your CHMOD settings in case it is a file/folder permissions problem. <br />  <a href=\"\">Click here to go back to the editor.</a></p>";
 			fclose($file2ed);
 		}
-	}
-	else 
+	} else {
 		$error = "<h3>ERROR!</h3><p>writable File NOT saved! <br />Check your CHMOD settings in case it is a file/folder permissions problem.</p>";
-     	$main_smarty->assign('error', $error);
+	}
+
+	$main_smarty->assign('error', $error);
 }
 
 // show the template
 $main_smarty->assign('tpl_center', '/admin/template_editor');
-$main_smarty->display('/admin/admin.tpl');	
+$main_smarty->display('/admin/admin.tpl');
 
-	
-function directoryToArray($directory, $recursive) {
-$me = basename($_SERVER['PHP_SELF']);	
-$array_items = array();
+function directoryToArray($directory, $recursive)
+{
+	$me = basename($_SERVER['PHP_SELF']);
+	$array_items = array();
+
 	if ($handle = opendir($directory)) {
-  	while (false !== ($file = readdir($handle))) {
-			if ($file != "." && $file != ".." && $file != $me && substr($file,0,1) != '.') {
-        if (is_dir($directory. "/" . $file)) {
-					if($recursive) {
-						$array_items = array_merge($array_items, directoryToArray($directory. "/" . $file, $recursive));
-          }						 
+		while (false !== ($file = readdir($handle))) {
+			if ($file != "." && $file != ".." && $file != $me && substr($file, 0, 1) != '.') {
+				if (is_dir($directory . "/" . $file)) {
+					if ($recursive) {
+						$array_items = array_merge($array_items, directoryToArray($directory . "/" . $file, $recursive));
+					}
+				} else {
+					$file = $directory . "/" . $file;
+					$array_items[] = preg_replace("/\/\//si", "/", $file);
 				}
-				else {
-            $file = $directory . "/" . $file;
-            $array_items[] = preg_replace("/\/\//si", "/", $file);
-				}
-      }
-    }
-    closedir($handle);
+			}
+		}
+
+		closedir($handle);
 		asort($array_items);
-  }
-  return $array_items;
+	}
+
+	return $array_items;
 }
