@@ -82,7 +82,7 @@ INSERT INTO `table_config` (`var_id`, `var_page`, `var_name`, `var_value`, `var_
 (NULL, 'Live', 'how_often_refresh', '20', '20', 'number', 'How often to refresh', 'How many seconds between refreshes - not recommended to set it less than 5.', 'define', NULL),
 (NULL, 'Template', 'Allow_User_Change_Templates', 'false', 'false', 'true / false', 'Allow User to Change Templates', 'Allow user to change the template. They can do this from the user settings page.', 'define', ''),
 (NULL, 'Template', '$thetemp', 'bootstrap', 'bootstrap', 'Text', 'Template', 'Default Template', 'normal', ''''),
-(NULL, 'Template', 'Use_New_Story_Layout', 'false', 'false', 'true / false', 'Use the new Story layout?', 'If you want to use the new Story layout, set this to true.', 'define', ''),
+(NULL, 'Template', 'Use_New_Story_Layout', 'default', 'default', 'Text', 'Use the Story layout?', 'If you want to use any additional custom Story layout, set here.', 'define', ''),
 (NULL, 'Misc', '$trackbackURL', 'kahuk.com', 'kahuk.com', 'kahuk.com', 'Trackback URL', 'The url to be used in <a href="http://en.wikipedia.org/wiki/Trackback">trackbacks</a>.', 'normal', '"'),
 (NULL, 'Misc', 'Enable_Extra_Fields', 'false', 'false', 'true / false', 'Enable Extra Fields', 'Enable extra fields when submitting stories?<br /><strong>When SET to TRUE, you have to edit the /libs/extra_fields.php file, using the NEW <a href="../admin/admin_xtra_fields_editor.php" target="_blank" rel="noopener noreferrer">Extra Fields Editor</a> in the Dashboard!</strong>', 'define', NULL),
 (NULL, 'Misc', 'Allow_Friends', 'true', 'true', 'true / false', 'Allow friends', 'Allow adding, removing, and viewing friends.', 'define', NULL),
