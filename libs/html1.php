@@ -538,7 +538,7 @@ function do_pages($total, $page_size, $thepage, $fetch = false)
 				} else {
 					$output .= '<li><a href="' . my_kahuk_base . '/' . pagename . '/' . $query . '/page/' . $i . '">' . $i . '</a></li>';
 				}
-				$output .= '<li class="active"><a href="#">...</a></li>';
+				$output .= '<li class="dots disabled"><a href="#" aria-disabled="true">...</a></li>';
 			}
 			for ($i = $start; $i <= $end && $i <= $total_pages; $i++) {
 				if ($i == $current) {
@@ -564,7 +564,7 @@ function do_pages($total, $page_size, $thepage, $fetch = false)
 
 			if ($total_pages > $end) {
 				$i = $total_pages;
-				$output .= '<li class="active"><a href="#">...</a></li>';
+				$output .= '<li class="dots disabled"><a href="#" aria-disabled="true">...</a></li>';
 				if ($pagename == "admin_users") {
 					$output .= '<li><a href="' . my_kahuk_base . '/admin/' . pagename . '.php?page=' . $i . '">' . $i . '</a></li>';
 				} elseif (pagename == "admin_links") {
@@ -600,7 +600,7 @@ function do_pages($total, $page_size, $thepage, $fetch = false)
 					$output .= '<li><a href="' . my_kahuk_base . '/' . pagename . '/' . $query . '/page/' . $i . '"> ' . $main_smarty->get_config_vars("KAHUK_Visual_Page_Next") . ' &#187;' . '</a></li>';
 				}
 			} else {
-				$output .= '<li class="active"><a href="#">' . $main_smarty->get_config_vars("KAHUK_Visual_Page_Next") . ' &#187;' . '</a></li>';
+				$output .= '<li class="disabled"><a href="#" aria-disabled="true">' . $main_smarty->get_config_vars("KAHUK_Visual_Page_Next") . ' &#187;' . '</a></li>';
 			}
 
 			$output .= "</ul></div>";
