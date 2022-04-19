@@ -16,8 +16,11 @@
 <p>
 	{#KAHUK_Visual_Register_Thankyou#|sprintf:$get.user}
 	{#KAHUK_Visual_Register_Noemail#}
-	{assign var="email" value=#KAHUK_PassEmail_From#}
-	{#KAHUK_Visual_Register_ToDo#|sprintf:$email}
 </p>
+
+{assign var="email" value=#KAHUK_PassEmail_From#}
+<ul>
+	{#KAHUK_Visual_Register_ToDo#|sprintf:$email}
+</ul>
 {checkActionsTpl location="tpl_kahuk_register_complete_end"}
 <!--/register_complete_center.tpl -->

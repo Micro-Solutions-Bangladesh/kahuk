@@ -20,7 +20,9 @@
 				<li {if $pagename eq "submit"}class="active"{/if}><a href="{$URL_submit}">{#KAHUK_Visual_Submit_A_New_Story#}</a></li>
 				{checkActionsTpl location="tpl_kahuk_submit_link_end"}
 				{if $enable_group eq "true"}	
-					<li {if $pagename eq "groups" || $pagename eq "submit_groups" || $pagename eq "group_story"}class="active"{/if}><a href="{$URL_groups}"><span>{#KAHUK_Visual_Groups#}</span></a></li>
+					<li {if $pagename eq "groups" || $pagename eq "submit_groups" || $pagename eq "group_story"}class="active"{/if}>
+						<a href="{$URL_groups}"><span>{#KAHUK_Visual_Groups#}</span></a>
+					</li>
 				{/if}
 				{if $Auto_scroll == '2'}
 					<li class="dropdown">

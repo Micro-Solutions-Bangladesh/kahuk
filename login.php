@@ -170,19 +170,27 @@ if ((isset($_POST["processlogin"]) && is_numeric($_POST["processlogin"])) || (is
 				$headers = 'From: ' . $main_smarty->get_config_vars("KAHUK_PassEmail_From") . "\r\n";
 				$headers .= "Content-type: text/html; charset=utf-8\r\n";
 
-				/***************************
-				Redwine: if we are testing the smtp email send, WITH A FAKE EMAIL ADDRESS, the SESSION variable will allow us to print the email message when the register_complete.php is loaded, so that the account that is created can be validated and activated.
-				 ***************************/
-				if (allow_smtp_testing == 1 && smtp_fake_email == 1) {
-					$main_smarty->assign('validationEmail', $message);
-				}
-
-				//Redwine: require the file for email sending.
+				// require the file for email sending.
 				require('libs/phpmailer/sendEmail.php');
 
-				if (!$mail->Send()) {
+				$isMailSent = $mail->Send();
+
+				if (!$isMailSent) {
 					$errorMsg = $main_smarty->get_config_vars('KAHUK_Visual_Login_Delivery_Failed');
-				} else {
+				}
+				
+				if (DEV_MODE_ON || $isMailSent) {
+
+					/**
+					 * Save The Email message in log file for developer
+					 */
+					if (DEV_MODE_ON) {
+						kahuk_debug_log($message);
+					}
+
+					/**
+					 * 
+					 */
 					$main_smarty->assign('user_login', $user->user_login);
 					$main_smarty->assign('profile_url', getmyurl('profile'));
 					$main_smarty->assign('login_url', getmyurl('loginNoVar'));

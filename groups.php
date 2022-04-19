@@ -8,30 +8,31 @@ include(KAHUK_LIBS_DIR . 'smartyvariables.php');
 
 global $globalGroups, $page_size;
 
+if (!("true" == enable_group)) {
+	kahuk_redirect_404();
+}
+
 // pagename
 define('pagename', 'groups');
 $main_smarty->assign('pagename', pagename);
 $main_smarty = do_sidebar($main_smarty);
 
-// kahuk_reset_groups( ['debug' => false, 'columns_all' => false] );
-kahuk_reset_groups();
+$args = ["debug" => false]; // TODO Fix Searching and pagination
+$groups = $globalGroups->get_groups($args);
+$groups_count = $globalGroups->count_groups($args);
 
 $group_display = "";
 
-foreach ($globalGroups['rows'] as $index => $group) {
-	// $group_display .= group_print_summary($group->group_id);
-
+foreach ($groups as $index => $group) {
 	$group_display .= create_markup_group_summery($group);
 }
 
-$main_smarty->assign('group_rows', $globalGroups['rows']);
+$main_smarty->assign('group_rows', $groups);
 $main_smarty->assign('group_display', $group_display);
 
-$main_smarty->assign('total_row_for_group', $globalGroups['count_enable']);
+$main_smarty->assign('total_row_for_group', $groups_count);
 
-$main_smarty->assign('group_pagination', do_pages($globalGroups['count_enable'], $page_size, "groups", true));
-
-// $main_smarty->assign('link_pagination', do_pages($globalGroups['count_enable'], $page_size, "published", true));
+$main_smarty->assign('group_pagination', do_pages($groups_count, $page_size, "groups", true));
 
 // show the template
 $main_smarty->assign('tpl_center', $the_template . '/group_center');

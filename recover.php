@@ -69,16 +69,26 @@ if ($user) {
 					$headers = 'From: ' . $main_smarty->get_config_vars("KAHUK_PassEmail_From") . "\r\n";
 					$headers .= "Content-type: text/html; charset=utf-8\r\n";
 
-					if (allow_smtp_testing == 1 && smtp_fake_email == 1) {
-						$main_smarty->assign('validationEmail', $message);
-					}
-
 					//Redwine: require the file for email sending.
 					require('libs/phpmailer/sendEmail.php');
 
-					if (!$mail->Send()) {
+					$isMailSent = $mail->Send();
+
+					if (!$isMailSent) {
 						$errorMsg = $main_smarty->get_config_vars('KAHUK_Visual_Login_Delivery_Failed');
-					} else {
+					}
+
+					if (DEV_MODE_ON || $isMailSent) {
+						/**
+						 * Save The Email message in log file for developer
+						 */
+						if (DEV_MODE_ON) {
+							kahuk_debug_log($message);
+						}
+
+						/**
+						 * 
+						 */
 						$errorMsg = $main_smarty->get_config_vars("KAHUK_PassEmail_SendSuccess");
 
 						$db->query("UPDATE `" . table_users . "` SET `last_reset_code` = '" . $saltedlogin . "/" . $salt . "', `last_reset_request` = FROM_UNIXTIME('" . $times . "') WHERE `user_login` = '" . $username . "'");
@@ -109,15 +119,28 @@ if ($user) {
 					$headers = 'From: ' . $main_smarty->get_config_vars("KAHUK_PassEmail_From") . "\r\n";
 					$headers .= "Content-type: text/html; charset=utf-8\r\n";
 
-					//Redwine: if smtp testing is set to true, we use it on localhost to test the email sending.
-					if (allow_smtp_testing == 1) {
-						$_SESSION['recoveryConfirmation'] = $message;
-					}
-
-					//Redwine: require the file for email sending.
+					/**
+					 * require the file for email sending.
+					 */
 					require('libs/phpmailer/sendEmail.php');
 
-					if ($mail->Send()) {
+					$isMailSent = $mail->Send();
+
+					if (!$isMailSent) {
+						$errorMsg = $main_smarty->get_config_vars('KAHUK_Visual_Login_Delivery_Failed');
+					}
+
+					if (DEV_MODE_ON || $isMailSent) {
+						/**
+						 * Save The Email message in log file for developer
+						 */
+						if (DEV_MODE_ON) {
+							kahuk_debug_log($message);
+						}
+
+						/**
+						 * 
+						 */
 						$saltedPass = generatePassHash($password);
 						$db->query("UPDATE `" . table_users . "` SET `user_pass` = '" . $saltedPass . "', `last_reset_request` = FROM_UNIXTIME('" . time() . "'), `last_reset_code` = '' WHERE `user_login` = '" . $user->user_login . "'");
 
@@ -129,12 +152,12 @@ if ($user) {
 						} else {
 							header('Location: ' . $return);
 						}
-					} else {
-						$errorMsg = $main_smarty->get_config_vars('KAHUK_Visual_Login_Delivery_Failed');
 					}
 				}
 
-				if (!empty($form_password_error)) $main_smarty->assign('form_password_error', $form_password_error);
+				if (!empty($form_password_error)) {
+					$main_smarty->assign('form_password_error', $form_password_error);
+				}
 			}
 		}
 	} else {

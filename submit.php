@@ -149,10 +149,9 @@ function do_submit2()
 	}
 
 	// Check Summary For the Link
-	$desc = kahuk_kses($_POST['summarytext'], $Story_Content_Tags_To_Allow);
+	$link_content = kahuk_kses($_POST['summarytext'], $Story_Content_Tags_To_Allow);
 
-	$link_content = kahuk_autop($desc);
-	$link_summary = kahuk_link_summary($desc);
+	$link_summary = kahuk_link_summary($link_content);
 
 	if (empty($link_content)) {
 		kahuk_set_session_message(
