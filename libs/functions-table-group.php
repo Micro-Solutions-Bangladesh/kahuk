@@ -1,147 +1,4 @@
 <?php
-
-/**
- * Count the rows of group in table_groups table
- * 
- * @since 5.0.4
- * 
- * @return int
- */
-function kahuk_count_groups($customArgs = [])
-{
-    global $db;
-
-    $defaults = [
-        'status'       => [
-            'Enable'
-        ],
-        'debug'        => false,
-    ];
-
-    $args = array_merge($defaults, $customArgs);
-
-    $where = "group_status IN ('" . implode("','", $args['status']) . "')";
-
-    $output = $db->count_rows(table_groups, 'group_id', $where);
-
-    if ($args['debug']) {
-        echo "<pre>Where Condition: {$where}\nOutput: {$output}</pre>";
-    }
-
-    // return output
-    return $output;
-}
-
-
-/**
- * Reset global `$globalGroups` variable
- */
-function kahuk_get_groups($customArgs = [])
-{
-    // global $db, $main_smarty, $rows, $page_size, $offset;
-    global $db, $page_size;
-
-    $defaults = [
-        'columns_all'   => false,
-        'columns'       => [
-            'group_id',
-            'group_creator', 'group_status', 
-            'group_members', 'group_date', 
-            'group_name', 'group_safename', 
-            'group_description', 'group_privacy', 
-            'group_avatar', 
-            'group_vote_to_publish', 
-            'group_field1', 'group_field2',
-            'group_field3', 'group_field4', 
-            'group_field5', 'group_field6', 
-            'group_notify_email',
-        ],
-        'columns_minimum'       => [
-            'group_id',
-            'group_creator', 'group_status', 
-            'group_members', 'group_date', 
-            'group_name', 'group_safename', 
-            'group_description', 'group_privacy', 
-            'group_avatar',
-        ],
-        'status'        => [
-            'Enable'
-        ],
-        'order_by'      => 'group_members DESC, group_date DESC',
-        'output_type'    => 'array', // or object
-        'debug'         => false,
-    ];
-
-    $args = array_merge($defaults, $customArgs);
-
-    $pagesize = ((0 < $args['page_size']) ? $args['page_size'] : $page_size);
-    $offset = (get_current_page() - 1) * $pagesize;
-
-    // $orederby = ((empty($args['order_by']) ? '' : 'OREDE BY ' . $args['order_by']));
-
-    $where = "group_status IN ('" . implode("','", $args['status']) . "')";
-
-    if (!empty($args['order_by'])) {
-        $where .= ' ORDER BY ' . $args['order_by'];
-    }
-
-    
-    $sql = "SELECT " . implode(',', $args['columns']);
-
-    if ($args['columns_all']) {
-        $sql = "SELECT *";
-    }
-
-    $sql .= " FROM " . table_groups . " WHERE " . $where . " LIMIT {$offset}, {$pagesize}";
-
-    $output = $db->get_results($sql);
-
-    if ('array' == $args['output_type']) {
-        $outputArray = [];
-        $counter = 0;
-
-        foreach($output as $row) {
-            $outputColumns = $args['columns_minimum'];
-
-            if ($args['columns_all']) {
-                $outputColumns = $args['columns'];
-            }
-
-            foreach($outputColumns as $column_name) {
-                $outputArray[$counter][$column_name] = $row->$column_name;
-            }
-
-            $counter++;
-        }
-
-        $output = $outputArray;
-    }
-
-    if ($args['debug']) {
-        echo "<pre>pagesize: {$pagesize}, page_size: {$page_size}, SQL: {$sql}<br>";
-        print_r($args);
-        print_r($output);
-        echo "</pre>";
-    }
-
-    return $output;
-}
-
-/**
- * Reset global `$globalGroups` variable
- */
-function kahuk_reset_groups($args = [])
-{
-    global $globalGroups;
-    // global $db, $main_smarty, $rows, $page_size, $offset;
-
-    $globalGroups['count_enable'] = kahuk_count_groups($args);
-    // $globalGroups['count_disable'] = kahuk_count_groups(['status' => ['disable']]);
-
-    $globalGroups['rows'] = kahuk_get_groups($args);
-}
-
-
 /**
  * Return group submitter username
  */
@@ -241,4 +98,84 @@ function create_markup_group_summery($group) {
     $group_output = $main_smarty->fetch(The_Template . '/group_summary.tpl');
 
     return $group_output;		
+}
+
+
+/**
+ * Get the list of users in a group
+ * 
+ * @params $group_ids array required
+ * @params $customArgs array optional
+ * 
+ * @return array | empty
+ */
+function kahuk_get_members_by_group($group_ids, $customArgs = [])
+{
+    global $db, $page_size, $globalUsers;
+
+    $defaults = [       
+        "columns_all"   => true,
+
+        'columns'       => [
+            'member_id',
+            'member_user_id',
+            'member_group_id', 
+            'member_role',
+            'member_status',
+        ],
+
+        "page_size" => 0,
+        "member_status" => '',
+        'output_type'    => 'array', // or empty (consider as object)
+        "debug" => false,
+    ];
+
+    $args = array_merge($defaults, $customArgs);
+
+    $where = "member_user_id != 0 AND member_group_id IN ('" . implode(",", $group_ids) . "')";
+
+    if (!empty($args['member_status'])) {
+        $where .= " AND member_status = '" . $args['member_status'] . "'";
+    }
+
+    $pagesize = ((0 < $args['page_size']) ? $args['page_size'] : $page_size);
+    $offset = (get_current_page() - 1) * $pagesize;
+    
+    $sql = "SELECT *";
+
+    if (!($args['columns_all'] || empty($args['columns']))) {
+        $sql = "SELECT " . implode(',', $args['columns']);
+    }
+
+    $sql .= " FROM " . table_group_member . " WHERE " . $where . " LIMIT {$offset}, {$pagesize}";
+
+    $output = $db->get_results($sql);
+
+    if ('array' == $args['output_type']) {
+        $outputArray = [];
+        $counter = 0;
+
+        $outputColumns = $args['columns'];
+
+        foreach($output as $row) {
+            foreach($outputColumns as $column_name) {
+                $outputArray[$counter][$column_name] = $row->$column_name;
+            }
+
+            $outputArray[$counter]["user"] = $globalUsers->get_user_profile($row->member_user_id);
+
+            $counter++;
+        }
+
+        $output = $outputArray;
+    }
+
+    if ($args['debug']) {
+        echo "<pre>SQL: {$sql}<br>";
+        print_r($args);
+        print_r($output);
+        echo "</pre>";
+    }
+
+    return $output;
 }

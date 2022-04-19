@@ -407,17 +407,27 @@ function member_display($requestID)
 	$role_moderator = $main_smarty->get_config_vars("KAHUK_Visual_Group_Role_Moderator");
 	$role_flagged = $main_smarty->get_config_vars("KAHUK_Visual_Group_Role_Flagged");
 	$role_banned = $main_smarty->get_config_vars("KAHUK_Visual_Group_Role_Banned");
-	/* Redwine: Roles and permissions and Groups fixes */
+
 	$gcreator = get_group_creator($requestID);
 
+	$args = [];
+
 	if ($gcreator == $current_user->user_id || $isAdmin == '1' || $is_gr_Admin == '1' || $is_gr_Moderator == '1') {
-		$member = $db->get_results("SELECT * FROM " . table_group_member . " WHERE member_group_id = $requestID AND member_user_id!=0");
-	} else {
-		$member = $db->get_results("SELECT * FROM " . table_group_member . " WHERE member_group_id = $requestID AND member_user_id!=0 and member_status = 'active'");
+		$args["member_status"] = 'active';
 	}
 
-	if ($member) {
-		foreach ($member as $memberid) {
+	// $args["debug"] = true;
+	$args["output_type"] = 'array';
+	$members_from_group = kahuk_get_members_by_group([$requestID], $args);
+
+	$main_smarty->assign('members_from_group', $members_from_group);
+
+	// $args["debug"] = false;
+	$args["output_type"] = '';
+	$members_from_group = kahuk_get_members_by_group([$requestID], $args);
+
+	if ($members_from_group) {
+		foreach ($members_from_group as $memberid) {
 			$member_user_id = $memberid->member_user_id;
 			$member_role = $memberid->member_role;
 
@@ -434,11 +444,9 @@ function member_display($requestID)
 			$group_member_avatar = kahuk_gravatar($member_user_id, ['imgsize' => 'small']);
 
 			$member_display .= '<tr><td><a href="' . $group_member_url . '" class="group_member"><img src="' . $group_member_avatar . '" alt="' . $member_name . '" align="absmiddle" /></a></td><td><a href="' . $group_member_url . '" class="group_member">' . $member_name . '</a></td>';
-			
-			/* Redwine: Roles and permissions and Groups fixes */
+
 			if ($gcreator == $current_user->user_id || $isAdmin == '1' || $is_gr_Admin == '1' || $is_gr_Moderator == '1') {
 				if ($memberid->member_status == 'active') {
-					/* Redwine: Roles and permissions and Groups fixes */
 					if ($gcreator == $current_user->user_id || $is_gr_Admin == '1') {
 						if ($member_user_id == $current_user->user_id) {
 							$main_smarty->assign('is_group_admin', 'true');
@@ -474,15 +482,12 @@ function member_display($requestID)
 						$member_display .= '<td>' . $member_role . '</td><td>&nbsp;</td><td>&nbsp;</td>';
 					}
 				} else {
-					/* Redwine: Roles and permissions and Groups fixes */
 					if ($gcreator == $current_user->user_id || $is_gr_Admin == '1' || $is_gr_Moderator == '1') {
 						$member_display .= '<td>&nbsp;</td><td>&nbsp;</td><td><a class="btn btn-success" href="' . my_base_url . my_kahuk_base . '/join_group.php?activate=true&group_id=' . $requestID . '&user_id=' . $member_user_id . '">Activate</a></td>';
-						/* Redwine: Roles and permissions and Groups fixes */
 					} else {
 						$member_display .= '<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>';
 					}
 				}
-				/* Redwine: Roles and permissions and Groups fixes */
 			} else {
 				$member_display .= '<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>';
 			}
@@ -492,7 +497,6 @@ function member_display($requestID)
 		}
 	}
 
-	//echo $member_display;
 	$main_smarty->assign('member_display', $member_display);
 }
 

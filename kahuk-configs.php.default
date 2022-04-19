@@ -56,11 +56,6 @@ if (!defined('DB_COLLATE')) {
 }
 
 /** */
-if (!defined('KAHUK_DEBUG')) {
-	define('KAHUK_DEBUG', false);
-}
-
-/** */
 if (!defined('KAHUK_DEBUG_DISPLAY')) {
 	define('KAHUK_DEBUG_DISPLAY', false);
 }
@@ -106,6 +101,18 @@ define('MAX_NUMBER_OF_DUPLICATE_STORY', 5);
 // Maximum number of story with same title
 define('MAX_NUMBER_OF_DUPLICATE_STORY_TITLE', 1);
 
+// Minimum number of word for group name
+define( 'MIN_NUMBER_OF_WORD_GROUP_NAME', 2 );
+
+// Maximum number of word for group name
+define( 'MAX_NUMBER_OF_WORD_GROUP_NAME', 20 );
+
+// Minimum number of word for group description
+define( 'MIN_NUMBER_OF_WORD_GROUP_DESC', 30 );
+
+// Maximum number of word for group description
+define( 'MAX_NUMBER_OF_WORD_GROUP_DESC', 200 );
+
 //
 if (!defined('KAHUK_BASE_URL')) {
 	define('KAHUK_BASE_URL', 'kahuk_base_url_here'); // ex: http://example.com/folder-name [ if installed in a folder ]
@@ -114,6 +121,19 @@ if (!defined('KAHUK_BASE_URL')) {
 	define('my_kahuk_base', 'my_kahuk_base_here'); // /folder-name [ if installed in a folder ]
 }
 
+
+/** */
+if (!defined('KAHUK_DEBUG')) {
+	define('KAHUK_DEBUG', false);
+}
+
+/**
+ * DEV_MODE_ON should be always false unless a contributor developer is working on it.
+ * DEV_MODE_ON constant will be used to store debug messages/notices into logs/debug.log file and show message about install folder in admin
+ */
+if (!defined('DEV_MODE_ON')) {
+	define('DEV_MODE_ON', false);
+}
 
 
 /** PLEASE STOP EDITING BELOW THE LINE */
@@ -126,6 +146,15 @@ if (!defined('KAHUK_BASE_URL')) {
 function kahuk_error_log_file_name()
 {
 	return date("dMY") . ".log";
+}
+
+/**
+ * Create a file path using file name from kahuk_error_log_file_name() for error log
+ *
+ * @return string error log file path
+ */
+function kahuk_error_log_file_path() {
+	return KAHUK_LOG_DIR . "error-logs/" . kahuk_error_log_file_name();
 }
 
 
@@ -148,11 +177,3 @@ $my_kahuk_base = my_kahuk_base; // TODO Delete
 // 1 = on
 define('caching', 1);
 define('summarize_mysql', 1);
-
-/**
- * DEV_MODE_ON should be always false unless a contributor developer is working on it.
- * DEV_MODE_ON constant will be used to store debug messages/notices into logs/debug.log file and show message about install folder in admin
- */
-if (!defined('DEV_MODE_ON')) {
-	define('DEV_MODE_ON', false);
-}

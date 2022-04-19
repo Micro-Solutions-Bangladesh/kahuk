@@ -4,11 +4,13 @@ require_once dirname(__FILE__) . '/kahuk-loader.php';
 require_once KAHUKPATH . 'kahuk-configs.php';
 
 //
-require_once KAHUK_LIBS_DIR . 'class-kahuk-error.php';
+require_once KAHUK_LIBS_DIR . 'kahuk-class-error.php';
 
 //
 require_once KAHUK_LIBS_DIR . 'db.php';
 require_once KAHUK_LIBS_DIR . 'utils.php';
+
+require_once KAHUK_LIBS_DIR . 'functions-user-authentication.php';
 
 //
 require_once KAHUK_LIBS_DIR . 'functions.php';
@@ -41,17 +43,18 @@ require_once KAHUK_LIBS_DIR . 'wp/kses.php';
 
 
 // Lately included functions and class files
-require_once KAHUK_LIBS_DIR . 'user.php';
+require_once KAHUK_LIBS_DIR . 'user.php'; // To be depricate
+require_once KAHUK_LIBS_DIR . 'kahuk-class-users.php';
 
 require_once KAHUK_LIBS_DIR . 'kahuk-categories.php';
 
+require_once KAHUK_LIBS_DIR . 'kahuk-class-groups.php';
 
-global $globalStory, $globalGroups, $pagenum;
+
+global $globalStory, $pagenum;
 
 // Set the global variables from REQUEST
 $pagenum = intval(_request('pagenum'));
-
-
 
 
 /**

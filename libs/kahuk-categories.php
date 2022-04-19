@@ -132,6 +132,32 @@ class KahukCategories
     /**
      * 
      */
+    function get_sub_items( $id, $isHierarchical ) {
+        if ( ! $this->items ) {
+            return [];
+        }
+
+        $output = [];
+        $loopCounter = 0;
+
+        foreach( $this->items as $row ) {
+            if ( $id == $row->category_parent ) {
+                $output[$loopCounter] = $this->build_item( $row );
+
+                if ( $isHierarchical ) {
+                    $output[$loopCounter]['sub_items'] = $this->get_sub_items( $row->category__auto_id, $isHierarchical );
+                }
+
+                $loopCounter++;
+            }            
+        }
+
+        return $output;
+    }
+
+    /**
+     * 
+     */
     function get_items( $isHierarchical = true, $skipIds = [ 0 ] ) {
         if ( ! $this->items ) {
             return [];
@@ -152,29 +178,10 @@ class KahukCategories
 
             if ( $isHierarchical ) {
                 // $sub_items = 
-                $rowData['sub_items'] = $this->get_sub_items( $row->category__auto_id );
+                $rowData['sub_items'] = $this->get_sub_items( $row->category__auto_id, $isHierarchical );
             }
 
             $output[] = $rowData;
-        }
-
-        return $output;
-    }
-
-    /**
-     * 
-     */
-    function get_sub_items( $id ) {
-        if ( ! $this->items ) {
-            return [];
-        }
-
-        $output = [];
-
-        foreach( $this->items as $row ) {
-            if ( $id == $row->category_parent ) {
-                $output[] = $this->build_item( $row );
-            }            
         }
 
         return $output;

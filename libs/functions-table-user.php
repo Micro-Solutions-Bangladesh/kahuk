@@ -25,7 +25,9 @@ function kahuk_update_user_karma( $is_add, $karma_value ) {
 
 
 /**
+ * Get user record
  * 
+ * Depricated in favour of the get_user() function in KahukUsers class
  * 
  * @since 5.0.0
  */
@@ -35,6 +37,8 @@ function kahuk_get_user( $argsCustom = [] ) {
     $defaults = [
         'user_login'      => '',
 		'user_id'         => '',
+
+        "debug" => false,
     ];
 
 	$args = array_merge($defaults, $argsCustom);
@@ -54,7 +58,16 @@ function kahuk_get_user( $argsCustom = [] ) {
 
     $sql = "SELECT * FROM " . table_users . " " . $where;
 
-    return $db->get_row( $sql, ARRAY_A );
+    $output = $db->get_row( $sql, ARRAY_A );
+
+    if ($args['debug']) {
+        echo "<pre>SQL: {$sql}<br>";
+        print_r($args);
+        print_r($output);
+        echo "</pre>";
+    }
+
+    return $output;
 }
 
 

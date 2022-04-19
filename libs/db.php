@@ -537,11 +537,20 @@ class ezSQL_mysql extends ezSQLcore {
 	 * 
 	 * @since 5.0.0
 	 */
-	function count_rows( $table, $column, $where ) {
-		$sql = "select count('".$column."') from $table WHERE " . $where;
-		
+	function count_rows( $table, $column, $where = '', $isDebug = false ) {
+		$sql = "select count('".$column."') from $table";
+
+		if (!empty($where)) {
+			$sql .= " WHERE " . $where;
+		}
+
 		$result = mysqli_query( $this->dbh, $sql );
 		$output = mysqli_fetch_array( $result );
+
+		if ($isDebug) {
+			echo "<pre class=\"debug\">SQL: $sql</pre>";
+			echo "<pre class=\"debug\">OUTPUT: " . $output[0] . "</pre>";
+		}
 
 		return $output[0];
 	}

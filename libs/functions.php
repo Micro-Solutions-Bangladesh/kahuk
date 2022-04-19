@@ -11,6 +11,33 @@ if ( !function_exists( 'gettext' ) ) {
 	function _( $s ) {return $s;}
 }
 
+
+/**
+ * Convert object of database return into array
+ * 
+ * @params $dbResult object required
+ * @params $columnsName array required
+ * 
+ * @since 5.0.4
+ */
+function kahuk_db_object_to_array( $dbResult, $columnsName ) {
+	$output = [];
+	$counter = 0;
+
+	foreach($dbResult as $row) {
+		foreach($columnsName as $column_name) {
+			if ($row->$column_name) {
+				$output[$counter][$column_name] = $row->$column_name;
+			}
+		}
+
+		$counter++;
+	}
+
+	return $output;
+}
+
+
 /**
  * Get messages from the session
  * 
@@ -250,10 +277,6 @@ function kahuk_debug_log($message, $line = '', $func = '', $file = '')
 {
 	$output = "";
 
-	if (defined('DEV_MODE_ON') && (true == DEV_MODE_ON)) {
-		$output .= "\n===";
-	}
-
 	if (!empty($file)) {
 		$output .= "\n" . "File: " . $file;
 	}
@@ -281,14 +304,14 @@ function kahuk_debug_log($message, $line = '', $func = '', $file = '')
 function _kahuk_debug_log( $message )
 {
 	if (defined('DEV_MODE_ON') && (true == DEV_MODE_ON)) {
-		error_log( "\n" . $message, 3, KAHUK_LOG_DIR . "debug.log");
+		error_log( "\n===\n" . $message, 3, KAHUK_LOG_DIR . "debug.log");
 	} else {
 		kahuk_error_log( $message );
 	}
 }
 
 /**
- * Log message to the error.log file
+ * Log message to the file comes from kahuk_error_log_file_path()
  * 
  * @since 5.0.0
  */
@@ -308,7 +331,9 @@ function kahuk_error_log($message, $file = '', $line = '')
 
 	$output .= "\n" . $message;
 
-	error_log($output, 3, KAHUK_LOG_DIR . "error.log");
+	$logFile = kahuk_error_log_file_path();
+
+	error_log($output, 3, $logFile);
 }
 
 
@@ -464,6 +489,16 @@ function is_email( $email ) {
 
 	// Congratulations, your email made it!
 	return $email;
+}
+
+/**
+ * Counts the number of words inside string.
+ * 
+ * @since 5.0.3
+ */
+function kahuk_word_count($str)
+{
+	return str_word_count($str);
 }
 
 /**

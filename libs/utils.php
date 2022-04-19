@@ -273,8 +273,13 @@ function get_trackback($id) {
 	return getmyurl("trackback", $id);
 }
 
+/**
+ * depricated in favor of the kahuk_check_user_role() function
+ * 
+ */
 function checklevel($levl){
 	global $current_user;
+
 	if(isset($current_user->user_level)){
 		if ($current_user->user_level == $levl)
 		{
