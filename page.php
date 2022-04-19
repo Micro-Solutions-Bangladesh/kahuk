@@ -4,39 +4,39 @@ include_once('internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('config.php');
-include(KAHUK_LIBS_DIR.'link.php');
-include(KAHUK_LIBS_DIR.'csrf.php');
-include(KAHUK_LIBS_DIR.'smartyvariables.php');
+include(KAHUK_LIBS_DIR . 'link.php');
+include(KAHUK_LIBS_DIR . 'csrf.php');
+include(KAHUK_LIBS_DIR . 'smartyvariables.php');
 
 // sidebar
 $main_smarty = do_sidebar($main_smarty);
 
 // pagename	
-define('pagename', 'page'); 
+define('pagename', 'page');
 $main_smarty->assign('pagename', pagename);
 
-if($_REQUEST['page']){
+if ($_REQUEST['page']) {
 	global $db, $main_smarty;
-	$page = $db->escape(sanitize($_REQUEST['page'],4));
+	$page = $db->escape(sanitize($_REQUEST['page'], 4));
 
-	$page_results=$db->get_row($sql = " SELECT * from ".table_links." where link_title_url='$page' and link_status='page'");
+	$page_results = $db->get_row($sql = " SELECT * from " . table_links . " where link_title_url='$page' and link_status='page'");
 
 	// Search in old urls if not found
 	if (!$page_results->link_id) {
-		$page_results=$db->get_row($sql="SELECT * FROM " . table_old_urls . " 
-							LEFT JOIN ".table_links." ON old_link_id=link_id AND link_status='page'
+		$page_results = $db->get_row($sql = "SELECT * FROM " . table_old_urls . " 
+							LEFT JOIN " . table_links . " ON old_link_id=link_id AND link_status='page'
 							WHERE `old_title_url` = '$page' AND !ISNULL(link_id)");
 	}
-	
-	if($page_results->link_id){
-		$main_smarty->assign('page_title' , $page_results->link_title);
-		$main_smarty->assign('meta_keywords' , $page_results->link_field1);
-		$main_smarty->assign('meta_description' , $page_results->link_field2);
-		$main_smarty->assign('page_content' , $page_results->link_content);
+
+	if ($page_results->link_id) {
+		$main_smarty->assign('page_title', $page_results->link_title);
+		$main_smarty->assign('meta_keywords', $page_results->link_field1);
+		$main_smarty->assign('meta_description', $page_results->link_field2);
+		$main_smarty->assign('page_content', $page_results->link_content);
 		$main_smarty->assign('posttitle', $page_results->link_title);
 		$main_smarty->assign('link_id', $page_results->link_id);
 	}
-	
+
 	if (!$page_results->link_id) {
 		kahuk_redirect_404();
 	}

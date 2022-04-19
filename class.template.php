@@ -878,10 +878,7 @@ class Template_Lite
 
         } else {
             $this->_cache_include_info = null;
-
         }
-
-//        return $_results;
     }
 
     /**
@@ -892,6 +889,4 @@ class Template_Lite
     {
         return eval($code);
     }
-    /////
 }
-?>

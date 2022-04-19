@@ -38,8 +38,11 @@
 				{section name=nr loop=$userlist}
 					<tr>
 						<td>
-							<img src="{$userlist[nr].Avatar}" align="absmiddle" /> 
-							<a href="{$URL_user, $userlist[nr].user_login}">{$userlist[nr].user_login|capitalize}</a> {checkActionsTpl location="tpl_kahuk_search_friend_center"}</td>
+							<img src="{$userlist[nr].Avatar.large}" align="absmiddle" /> 
+							<a href="{$URL_user, $userlist[nr].user_login}">
+								{$userlist[nr].user_login|capitalize}
+							</a> {checkActionsTpl location="tpl_kahuk_search_friend_center"}
+						</td>
 						<td>
 							{* {$userlist[nr].user_date} *}
 							{php}

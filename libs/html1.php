@@ -50,10 +50,11 @@ function who_voted($storyid, $avatar_size, $condition)
 			WHERE vote_value $condition AND vote_link_id=$storyid AND vote_type='links' AND user_level NOT IN('Spammer')";
 	$voters = $db->get_results($sql);
 	$voters = object_2_array($voters);
+
 	foreach ($voters as $key => $val) {
-		$voters[$key]['Avatar'] = get_avatar('all', "", $val['user_login'], $val['user_email']);
-		$voters[$key]['Avatar_ImgSrc'] = $voters[$key]['Avatar']['large'];
+		$voters[$key]['Avatar'] = kahuk_gravatar($val['user_email'], ['note' => 'libs - html1.php file']);
 	}
+
 	return $voters;
 }
 
@@ -133,14 +134,83 @@ function sanitize($var, $santype = 1, $allowable_tags = '')
 	}
 }
 
-function do_we_use_avatars()
+
+/**
+ * Get either a Gravatar URL or complete image tag for a specified email address.
+ *
+ * @param string $email The email address
+ * @param string $imgsize Size in large, small, defaults to 256 [ 1 - 2048 ]
+ *
+ * @source https://gravatar.com/site/implement/images/php/
+ * 
+ * @since 5.0.5
+ */
+function kahuk_gravatar($id_or_email, $customArgs = [])
 {
-	// checks to see if avatars are enabled
-	if (Enable_User_Upload_Avatar == true) {
-		return "1";
+
+	$defaults = array(
+		'rating'        => 'g',
+		'class'         => null,
+		'img'			=> false,
+		'alt'			=> '',
+		'imgsize'		=> '',
+		'imgSizes'		=> [
+			'large' => Avatar_Large,
+			'medium' => 80,
+			'small' => Avatar_Small,
+		],
+		'default'		=> 'mp',
+		'note' => '',
+	);
+
+	$args = array_merge($defaults, $customArgs);
+	$output = [];
+	$hasEmailError = false;
+
+	$imgsize = $args['imgsize'];
+	$default = $args['default'];
+
+	$email = is_email(sanitize_text_field($id_or_email));
+
+	if (is_array($email)) {
+		$email = kahuk_user_email_by_id($id_or_email); // Get user email by user id
+
+		if (!$email) {
+			$hasEmailError = true;
+		}
 	}
-	return "0";
+
+	foreach ($args['imgSizes'] as $sizeName => $sizeNumber) {
+		$imgUrl = 'https://www.gravatar.com/avatar/';
+		$imgUrl .= md5(strtolower(trim($email)));
+		$imgUrl .= "?s=" . $sizeNumber . "&d=$default&r=" . $args['rating'];
+
+		if ($hasEmailError) {
+			$imgUrl = "Error: {$email} :: " . $args['note']; // TODO Error handle
+		}
+
+		if ($args['img']) {
+			$imgMarkup = '<img src="' . $imgUrl . '" alt="' . $args['alt'] . '"';
+
+			if ($args['class']) {
+				$imgMarkup .= ' class="' . $args['class'] . '"';
+			}
+
+			$imgMarkup .= ' />';
+
+			$output[$sizeName] = $imgMarkup;
+		} else {
+			$output[$sizeName] = $imgUrl;
+		}
+	}
+
+	if (isset($output[$imgsize])) {
+		return $output[$imgsize];
+	}
+
+	return $output;
 }
+
 
 /** Update client cache when image has changed:
  * Generate the image URL based on the date and time that the file on the
@@ -151,81 +221,6 @@ function latest_avatar($client_url, $server_path)
 {
 	clearstatcache();
 	return $client_url . '?cache_timestamp=' . filemtime($server_path);
-}
-
-function get_avatar($size = "large", $avatarsource, $user_name = "", $user_email = "", $user_id = "")
-{
-	// returns the location of a user's avatar
-	global $globals;
-
-	$user = new User();
-	if ($user_name != "") {
-		$user->username = $user_name;
-	} else {
-		$user->id = $user_id;
-	}
-
-	if (!$user->read()) {
-		echo "invalid username or userid in get_avatar";
-		die;
-	} else {
-		$avatarsource = $user->avatar_source;
-		$user_name = $user->username;
-		$user_id = $user->id;
-		if (isset($user->login)) {
-			$user_email = $user->login;
-		}
-	}
-	$user = "";
-	/* Redwine declared $imgsize below to eliminate all the Notice: Undefined variable: */
-	$imgsize = '';
-	if ($size == "large") {
-		$imgsize = Avatar_Large;
-	} elseif ($size == "small") {
-		$imgsize = Avatar_Small;
-	} elseif ($size == "original") {
-		$imgsize = 'original';
-	}
-
-	// use the user uploaded avatars ?
-	$avatars = array(
-		'large' => my_base_url . my_kahuk_base . Default_Gravatar_Large,
-		'small' => my_base_url . my_kahuk_base . Default_Gravatar_Small
-	);
-	if (Enable_User_Upload_Avatar == true && $avatarsource == "useruploaded") {
-		if ($imgsize) {
-			$imgsrc = my_base_url . my_kahuk_base . '/avatars/user_uploaded/' . $user_id . "_" . $imgsize . ".jpg";
-			if (file_exists(KAHUKPATH . 'avatars/user_uploaded/' . $user_id . "_" . $imgsize . ".jpg"))
-				return latest_avatar($imgsrc, KAHUKPATH . 'avatars/user_uploaded/' . $user_id . "_" . $imgsize . ".jpg");
-			elseif (file_exists(KAHUKPATH . 'avatars/user_uploaded/' . $user_name . "_" . $imgsize . ".jpg")) {
-				$imgsrc = my_base_url . my_kahuk_base . '/avatars/user_uploaded/' . $user_name . "_" . $imgsize . ".jpg";
-				return latest_avatar($imgsrc, KAHUKPATH . 'avatars/user_uploaded/' . $user_name . "_" . $imgsize . ".jpg");
-			}
-		} else {
-			$dir = KAHUKPATH . 'avatars/user_uploaded/';
-			if ($dh = opendir($dir)) {
-				while (($file = readdir($dh)) !== false)
-					if (preg_match("/^$user_id\_(.+)\.jpg\$/", $file, $m)) {
-						$imgsrc = my_base_url . my_kahuk_base . '/avatars/user_uploaded/' . $file;
-						$avatars[$m[1]] = latest_avatar($imgsrc, $dir . $file);
-						if ($m[1] == Avatar_Large)
-							$avatars['large'] = $avatars[$m[1]];
-						elseif ($m[1] == Avatar_Small)
-							$avatars['small'] = $avatars[$m[1]];
-					}
-				closedir($dh);
-			}
-			return $avatars;
-		}
-	} elseif (!$imgsize)
-		return $avatars;
-
-	if ($size == "large") {
-		return my_base_url . my_kahuk_base . Default_Gravatar_Large;
-	}
-	if ($size == "small") {
-		return my_base_url . my_kahuk_base . Default_Gravatar_Small;
-	}
 }
 
 function do_sidebar($var_smarty, $navwhere = '')
@@ -543,7 +538,7 @@ function do_pages($total, $page_size, $thepage, $fetch = false)
 				} else {
 					$output .= '<li><a href="' . my_kahuk_base . '/' . pagename . '/' . $query . '/page/' . $i . '">' . $i . '</a></li>';
 				}
-				$output .= '<li class="active"><a href="#">...</a></li>';
+				$output .= '<li class="dots disabled"><a href="#" aria-disabled="true">...</a></li>';
 			}
 			for ($i = $start; $i <= $end && $i <= $total_pages; $i++) {
 				if ($i == $current) {
@@ -569,7 +564,7 @@ function do_pages($total, $page_size, $thepage, $fetch = false)
 
 			if ($total_pages > $end) {
 				$i = $total_pages;
-				$output .= '<li class="active"><a href="#">...</a></li>';
+				$output .= '<li class="dots disabled"><a href="#" aria-disabled="true">...</a></li>';
 				if ($pagename == "admin_users") {
 					$output .= '<li><a href="' . my_kahuk_base . '/admin/' . pagename . '.php?page=' . $i . '">' . $i . '</a></li>';
 				} elseif (pagename == "admin_links") {
@@ -605,7 +600,7 @@ function do_pages($total, $page_size, $thepage, $fetch = false)
 					$output .= '<li><a href="' . my_kahuk_base . '/' . pagename . '/' . $query . '/page/' . $i . '"> ' . $main_smarty->get_config_vars("KAHUK_Visual_Page_Next") . ' &#187;' . '</a></li>';
 				}
 			} else {
-				$output .= '<li class="active"><a href="#">' . $main_smarty->get_config_vars("KAHUK_Visual_Page_Next") . ' &#187;' . '</a></li>';
+				$output .= '<li class="disabled"><a href="#" aria-disabled="true">' . $main_smarty->get_config_vars("KAHUK_Visual_Page_Next") . ' &#187;' . '</a></li>';
 			}
 
 			$output .= "</ul></div>";
@@ -953,7 +948,7 @@ function getmyurl($x, $var1 = "", $var2 = "", $var3 = "")
 		if ($x == "maincategory") $ret = "/" . $var1;
 		elseif ($x == "newcategory") $ret = "/new/" . $var1;
 		elseif ($x == "discardedcategory") $ret = "/discarded/" . $var1 . "/";
-		
+
 		elseif ($x == "editlink") $ret = "/story/" . $var1 . "/edit/";
 		elseif ($x == "edit") $ret = "/story/" . $var1 . "/editcomment/" . $var2 . "/";
 		elseif ($x == "user") $ret = "/user/" . $var1 . ($var1 ? '/' : '');
@@ -978,7 +973,7 @@ function getmyurl($x, $var1 = "", $var2 = "", $var3 = "")
 		elseif ($x == "story") $ret = "/story/" . $var1 . "/";
 		elseif ($x == "storytitle") $ret = "/story/" . $var1 . "/";
 		elseif ($x == "storycattitle") $ret = "/" . $var1 . "/" . $var2 . "/";
-		
+
 		elseif ($x == "out") $ret = "/out/" . $var1 . "/";
 		elseif ($x == "outtitle") $ret = "/out/" . $var1 . "/";
 		elseif ($x == "outurl") $ret = "/out/" . $var1 . "/";

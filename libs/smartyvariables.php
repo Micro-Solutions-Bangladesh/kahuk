@@ -67,13 +67,12 @@ $main_smarty->assign('my_base_url', my_base_url);
 $main_smarty->assign('my_kahuk_base', my_kahuk_base);
 $main_smarty->assign('Allow_User_Change_Templates', Allow_User_Change_Templates);
 $main_smarty->assign('urlmethod', urlmethod);
-$main_smarty->assign('UseAvatars', do_we_use_avatars());
 $main_smarty->assign('Allow_Friends', Allow_Friends);
 $main_smarty->assign('Pager_setting', Auto_scroll);
 
-if($current_user->user_login){
-	$main_smarty->assign('Current_User_Avatar', $avatars = get_avatar('all', "", "", "", $current_user->user_id));
-	$main_smarty->assign('Current_User_Avatar_ImgSrc', $avatars['small']);
+if ($current_user->user_login) {
+	$avatar_all = kahuk_gravatar( $user_email, ['note' => 'libs - smartyvariables.php file'] );
+	$main_smarty->assign('Current_User_Avatar', $avatar_all);
 }
 
 //groups
@@ -301,7 +300,7 @@ $main_smarty->assign('moderated_groups_count', $moderated_groups_count);*/
 
 // Count the number of errors
 // $error_log_path = KAHUK_LIBS_DIR.'../logs/error.log';
-$error_log_path = KAHUK_LOG_DIR . "error-logs/" . kahuk_error_log_file_name();
+$error_log_path = kahuk_error_log_file_path();
 $error_log_content = file_get_contents($error_log_path);
 $error_count = preg_match_all('/\[(\d{2})-(\w{3})-(\d{4}) (\d{2}:\d{2}:\d{2})/', $error_log_content, $matches);
 $main_smarty->assign('error_count', $error_count);
@@ -385,10 +384,11 @@ if($sql_get_mods_update) {
 }
 
 /* Redwine: 2- verify if the check for updates should run today. */
+/*
 $proceed_check_update = 'false';
 if(time() >= strtotime($check_for_update)) {
 	$proceed_check_update = 'true'; // meaning go ahead and check the latest versions.
-	/* Redwine: checking if modules updates exist. It runs only if today is equal or greater than the date in the misc_data table. $versionupdate is an array that holds the name and latest version of each module that is due for update. */
+	// Redwine: checking if modules updates exist. It runs only if today is equal or greater than the date in the misc_data table. $versionupdate is an array that holds the name and latest version of each module that is due for update.
 	$versionupdate = array();
 	$versionkahukupdate = array();
 	$lines = file($update_link, FILE_IGNORE_NEW_LINES);
@@ -400,9 +400,10 @@ if(time() >= strtotime($check_for_update)) {
 			$versionupdate[$key] = str_getcsv($value);
 		}
 	}
-	/* Redwine: the only way to mantain the $versionupdate if it not the time to check is to insert it in the misc_data table. */
+	// the only way to mantain the $versionupdate if it not the time to check is to insert it in the misc_data table.
 	misc_data_update('modules_upd_versions',serialize($versionupdate));
-	/* Redwine: first let's check if there is a new kahuk version. */
+	
+	// first let's check if there is a new kahuk version.
 	if ($update_available == '0' || $update_available == ''|| $update_available == $kahuk_version) {
 		$update_kahuk = '';
 		if ($proceed_check_update == 'true') {
@@ -417,12 +418,11 @@ if(time() >= strtotime($check_for_update)) {
 			}	
 		}
 	}
-	/* END CHECKING KAHUK NEW VERSION. */
+	// END CHECKING KAHUK NEW VERSION.
 	
-	/* Redwine: we need to maintain a copy to pass on to the installed modules instead of running the process again. */
+	// we need to maintain a copy to pass on to the installed modules instead of running the process again.
 	$versionupdate_to_pass_to_installed = $versionupdate;
 
-	
 	$module_info_data=array();
 	if(isset($foundfolders) && is_array($foundfolders)) {
 		asort($foundfolders);
@@ -442,7 +442,7 @@ if(time() >= strtotime($check_for_update)) {
 								if($mod[1]>$module_info['version']) {
 									$update_key[$updatecount] = array($value,$mod[1]);
 									$updatecount++;
-									//we want to pass on the latest version to smarty in the $module_info array
+									// we want to pass on the latest version to smarty in the $module_info array
 									$module_info_data[$i]['version'] = $mod[1];
 								}
 							}
@@ -526,9 +526,7 @@ if(time() >= strtotime($check_for_update)) {
 		$main_smarty->assign('updatekey', $updatekey);
 	}
 	update_module_update_date($check_for_update);
-	
-	
-}else{
+} else {
 	if ($update_uninstalled != ''){
 		$versionupdate = unserialize($update_uninstalled);
 	}else{
@@ -546,8 +544,9 @@ $res_update_mod=$db->get_results('SELECT folder from ' . table_modules . ' where
 $num_update_mod=0;
 if($res_update_mod) {
 foreach($res_update_mod as $modules_folders){
-	if (file_exists(KAHUK_MODULES_DIR . $modules_folders->folder))
-			$num_update_mod++;
+	if (file_exists(KAHUK_MODULES_DIR . $modules_folders->folder)) {
+		$num_update_mod++;
+	}
  }
 }
 $main_smarty->assign('update_kahuk', $update_kahuk);
@@ -560,19 +559,17 @@ $data_for_update_uninstall_mod=$res_for_update;
 $main_smarty->assign('un_no_module_update_require', $data_for_update_uninstall_mod);
 }
 
-
 function update_module_update_date($update_new_date){
 	$date = strtotime($update_new_date);
 	$date = strtotime("+1 day", $date);
 	misc_data_update('modules_update_date',date('Y/m/d', $date));
 }
+// END CHECKING FOR UNINSTALLED MODULES.
 
 
-/* END CHECKING FOR UNINSTALLED MODULES.*/
-
-/********************** END NEW FOR KAHUK VERSION, INSTALLED / UNINSTALLED MODULES UPDATES **********************/
+// ********************** END NEW FOR KAHUK VERSION, INSTALLED / UNINSTALLED MODULES UPDATES **********************
 //count installed module with updates available
-
+*/
 
 //count total module updates required
 $total_update_required_mod=$num_update_mod+$data_for_update_uninstall_mod;
@@ -647,5 +644,6 @@ if ($current_user->user_id > 0 && $current_user->authenticated)
 	$main_smarty->assign('user_url_member_groups', getmyurl('user2', $login, 'member_groups	'));
 	$main_smarty->assign('isAdmin', checklevel('admin'));
 	$main_smarty->assign('isModerator', checklevel('moderator'));
+
+	$main_smarty->assign('user_role', kahuk_current_user_role());
 }
-?>

@@ -81,34 +81,37 @@ class User
 					
 					$domain = $main_smarty->get_config_vars('KAHUK_Visual_Name');			
 					$validation = my_base_url . my_kahuk_base . "/validation.php?code=$encode&uid=".$this->username;
-                    /*Redwine: fixed the $str to correctly print the username in the message.*/
                     
                     $AddAddress = $this->email;
                     $subject = $main_smarty->get_config_vars('KAHUK_PassEmail_Subject_verification');
                     $str = sprintf($main_smarty->get_config_vars('KAHUK_PassEmail_verification_message'), $this->username, $main_smarty->get_config_vars('KAHUK_PassEmail_From'));
 					eval('$str = "'.str_replace('"','\"',$str).'";');
 					$message = "$str";
-					
-					/***************************
-					Redwine: if we are testing the smtp email send, WITH A FAKE EMAIL ADDRESS, the SESSION variable will allow us to print the email message when the register_complete.php is loaded, so that the account that is created can be validated and activated.
-					***************************/
-					
-					if (allow_smtp_testing == 1 && smtp_fake_email == 1) {
-						$_SESSION['validationEmail'] = $message;
-					}
 
 					//Redwine: require the file for email sending.
                     require('libs/phpmailer/sendEmail.php');
+
+					$isMailSent = $mail->Send();
 					
-					if (!$mail->Send()) {
+					if ($isMailSent || DEV_MODE_ON) {
+						/**
+						 * Save The Email message in log file for developer
+						 */
+						if (DEV_MODE_ON) {
+							kahuk_debug_log($message);
+						}
+
+						/**
+						 * 
+						 */
+						$errorMsg = $main_smarty->get_config_vars("KAHUK_PassEmail_SendSuccess");
+                        return true;
+					} else {
 						$errorMsg = $main_smarty->get_config_vars('KAHUK_Visual_Login_Delivery_Failed');
 						$main_smarty->assign('errorMsg', $errorMsg);
 						return false;
 						exit;
-					} else {
-                        $errorMsg = $main_smarty->get_config_vars("KAHUK_PassEmail_SendSuccess");
-                        return true;
-                    }
+					}
 					
 				} else {
 					return false;

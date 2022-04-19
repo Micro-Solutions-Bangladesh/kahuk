@@ -1,139 +1,138 @@
 <?php
-
 include_once('../internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('../config.php');
-include(KAHUK_LIBS_DIR.'link.php');
-include(KAHUK_LIBS_DIR.'smartyvariables.php');
-
-//check_referrer();
+include(KAHUK_LIBS_DIR . 'link.php');
+include(KAHUK_LIBS_DIR . 'smartyvariables.php');
 
 // restrict access to admins and moderators
 force_authentication();
 $canIhaveAccess = 0;
 $canIhaveAccess = $canIhaveAccess + checklevel('admin');
 $canIhaveAccess = $canIhaveAccess + checklevel('moderator');
-/* Redwine: Roles and permissions and Groups fixes */
+
+/* Roles and permissions and Groups fixes */
 $is_moderator = checklevel('moderator'); // Moderators have a value of '1' for the variable $is_moderator
-if($canIhaveAccess == 1)
-{
-	if(isset($_REQUEST["action"])){
-		
+
+if ($canIhaveAccess == 1) {
+	if (isset($_REQUEST["action"])) {
 		$id = sanitize($_REQUEST["id"], 3);
 		$action = sanitize($_REQUEST["action"], 3);
-		if (!is_numeric($id)) die();
-		
-		if ($action == "main"){
-			if(($link = $db->get_row("SELECT * FROM " . table_links . " WHERE link_id = $id"))) {
+
+		if (!is_numeric($id)) {
+			die();
+		}
+
+		if ($action == "main") {
+			if (($link = $db->get_row("SELECT * FROM " . table_links . " WHERE link_id = $id"))) {
 				$author = $db->get_row("Select * from " . table_users . " where user_id = $link->link_author");
-				
+
 				//misc smarty
-				$main_smarty->assign('link_id',$link->link_id);
-				$main_smarty->assign('link_title',$link->link_title);
-				$main_smarty->assign('link_url',$link->link_url);
-				$main_smarty->assign('link_content',$link->link_content);
-				$main_smarty->assign('link_status',$link->link_status);
-				$main_smarty->assign('link_karma',$link->link_karma);
-				$main_smarty->assign('user_login',$author->user_login);
-				$main_smarty->assign('banned_domain_url',get_base_url($link->link_url));
-				$main_smarty->assign('admin_discard_url',getmyurl('admin_discard', $link->link_id));
-				$main_smarty->assign('admin_new_url',getmyurl('admin_new', $link->link_id));
-				$main_smarty->assign('admin_published_url',getmyurl('admin_published', $link->link_id));
-				$main_smarty->assign('story',getmyurl('story', $link->link_id));
-				
+				$main_smarty->assign('link_id', $link->link_id);
+				$main_smarty->assign('link_title', $link->link_title);
+				$main_smarty->assign('link_url', $link->link_url);
+				$main_smarty->assign('link_content', $link->link_content);
+				$main_smarty->assign('link_status', $link->link_status);
+				$main_smarty->assign('link_karma', $link->link_karma);
+				$main_smarty->assign('user_login', $author->user_login);
+				$main_smarty->assign('banned_domain_url', get_base_url($link->link_url));
+				$main_smarty->assign('admin_discard_url', getmyurl('admin_discard', $link->link_id));
+				$main_smarty->assign('admin_new_url', getmyurl('admin_new', $link->link_id));
+				$main_smarty->assign('admin_published_url', getmyurl('admin_published', $link->link_id));
+				$main_smarty->assign('story', getmyurl('story', $link->link_id));
+
 				// pagename
-				define('pagename', 'linkadmin'); 
+				define('pagename', 'linkadmin');
 				$main_smarty->assign('pagename', pagename);
-				
+
 				// show the template
 				$main_smarty->assign('tpl_center', '/admin/submission_view');
 
 				// To properly display the template according to the Roles and Permissions
-				if ($is_moderator == '1'){
+				if ($is_moderator == '1') {
 					$main_smarty->display('/admin/moderator.tpl');
 				} else {
 					$main_smarty->display('/admin/admin.tpl');
 				}
-			}
-			else
-			{
+			} else {
 				echo 'Error: link not found';
 			}
 		}
-		
-		if ($action == "published" or $action == "new" or $action == "discard"){
-			if(($link = $db->get_row("SELECT * FROM " . table_links . " WHERE link_id = $id"))) {
+
+		if ($action == "published" or $action == "new" or $action == "discard") {
+			if (($link = $db->get_row("SELECT * FROM " . table_links . " WHERE link_id = $id"))) {
 				$author = $db->get_row("Select * from " . table_users . " where user_id = $link->link_author");
-				
+
 				//misc smarty
-				$main_smarty->assign('link_id',$link->link_id);
-				$main_smarty->assign('link_title',$link->link_title);
-				$main_smarty->assign('link_url',$link->link_url);
-				$main_smarty->assign('link_content',$link->link_content);
-				$main_smarty->assign('link_status',$link->link_status);
-				$main_smarty->assign('user_login',$author->user_login);
-				$main_smarty->assign('action',$action);				
-				$main_smarty->assign('banned_domain_url',get_base_url($link->link_url));
-				$main_smarty->assign('admin_modify_url',getmyurl('admin_modify', $link->link_id));
-				$main_smarty->assign('admin_modify_do_url',getmyurl('admin_modify_do', $link->link_id, $action));
-				
+				$main_smarty->assign('link_id', $link->link_id);
+				$main_smarty->assign('link_title', $link->link_title);
+				$main_smarty->assign('link_url', $link->link_url);
+				$main_smarty->assign('link_content', $link->link_content);
+				$main_smarty->assign('link_status', $link->link_status);
+				$main_smarty->assign('user_login', $author->user_login);
+				$main_smarty->assign('action', $action);
+				$main_smarty->assign('banned_domain_url', get_base_url($link->link_url));
+				$main_smarty->assign('admin_modify_url', getmyurl('admin_modify', $link->link_id));
+				$main_smarty->assign('admin_modify_do_url', getmyurl('admin_modify_do', $link->link_id, $action));
+
 				// pagename
-				define('pagename', 'linkadmin'); 
-			  $main_smarty->assign('pagename', pagename);
-				
+				define('pagename', 'linkadmin');
+				$main_smarty->assign('pagename', pagename);
+
 				//show the template
 				$main_smarty->assign('tpl_center', '/admin/submission_status');
-/* Redwine: To properly display the template according to the Roles and Permissions */
-				if ($is_moderator == '1'){
+
+				/* To properly display the template according to the Roles and Permissions */
+				if ($is_moderator == '1') {
 					$main_smarty->display('/admin/moderator.tpl');
 				} else {
 					$main_smarty->display('/admin/admin.tpl');
 				}
-	
-			}
-			else
-			{
+			} else {
 				echo 'Error: link not found';
 			}
 		}
-	
-		if ($action == "dodiscard" or $action == "dopublished" or $action == "donew"){
-			if(($link = $db->get_row("SELECT * FROM " . table_links . " WHERE link_id = $id"))) {
-			$xaction = substr($action, 2, 100);
-			$link = new Link;
-			$link->id=$id;
-			$link->read();
-			$link->published_date = time();
-			$link->status = $xaction;
-			$link->store_basic();
-			$main_smarty->assign('action',$xaction);
-			$main_smarty->assign('story_url',getmyurl('story', $id));
-			$main_smarty->assign('admin_modify_url',getmyurl('admin_modify', $id));
-			$db->query("UPDATE " . table_links . " set link_status='".$xaction."' WHERE link_id=$id");
-			totals_regenerate();
 
-			// pagename
-			define('pagename', 'linkadmin'); 
-			$main_smarty->assign('pagename', pagename);
+		if ($action == "dodiscard" or $action == "dopublished" or $action == "donew") {
+			if (($link = $db->get_row("SELECT * FROM " . table_links . " WHERE link_id = $id"))) {
+				$xaction = substr($action, 2, 100);
 
-			// show the template
-			$main_smarty->assign('tpl_center', '/admin/submission_update');
-/* Redwine: To properly display the template according to the Roles and Permissions */
-			if ($is_moderator == '1'){
-				$main_smarty->display('/admin/moderator.tpl');
+				$link = new Link;
+				$link->id = $id;
+				$link->read();
+				$link->published_date = time();
+				$link->status = $xaction;
+				$link->store_basic();
+				$main_smarty->assign('action', $xaction);
+				$main_smarty->assign('story_url', getmyurl('story', $id));
+				$main_smarty->assign('admin_modify_url', getmyurl('admin_modify', $id));
+
+				$db->query("UPDATE " . table_links . " set link_status='" . $xaction . "' WHERE link_id=$id");
+
+				totals_regenerate();
+
+				// pagename
+				define('pagename', 'linkadmin');
+				$main_smarty->assign('pagename', pagename);
+
+				// show the template
+				$main_smarty->assign('tpl_center', '/admin/submission_update');
+
+				/* Redwine: To properly display the template according to the Roles and Permissions */
+				if ($is_moderator == '1') {
+					$main_smarty->display('/admin/moderator.tpl');
+				} else {
+					$main_smarty->display('/admin/admin.tpl');
+				}
 			} else {
-				$main_smarty->display('/admin/admin.tpl');
-			}
-			}else{
 				echo 'Error: link not found';
 			}
-		}			
-	}else{
-			//no request
+		}
+	} else {
+		//no request
 	}
-}
-else{
-//	echo "<br />We're sorry, but you do not have administrative privileges on this site.<br />If you wish to be promoted, please contact the site administrator.<br />";
+} else {
+	//	echo "<br />We're sorry, but you do not have administrative privileges on this site.<br />If you wish to be promoted, please contact the site administrator.<br />";
 	header("Location: " . getmyurl('admin_login', $_SERVER['REQUEST_URI']));
 }

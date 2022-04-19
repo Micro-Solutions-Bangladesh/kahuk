@@ -33,8 +33,10 @@ if($list_comments)
 		}
 			$main_smarty->assign('comment_url', $story_url."#c".$row->comment_id);
 			$main_smarty->assign('comment_text', ShortenText(save_text_to_html($row->comment_content)));
-			$main_smarty->assign('Avatar_ImgSmall', get_avatar('small', '', $row->user_login, $row->user_email));
-			$main_smarty->assign('Avatar_ImgLarge', get_avatar('large', '', $row->user_login, $row->user_email));
+			
+			$avatar_all = kahuk_gravatar( $row->user_email, ['note' => 'sidebar_comments_index.tpl file'] );
+			$main_smarty->assign('Avatar', $avatar_all);
+			
 			$main_smarty->assign('username', $row->user_login);
 			$main_smarty->assign('user_view_url', getmyurl('user', $row->user_login));
 			$body .= $main_smarty->fetch($my_base_url . './modules/sidebar_comments/templates/sidebar_comments.tpl');		

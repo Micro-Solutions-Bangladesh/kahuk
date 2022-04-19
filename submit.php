@@ -1,16 +1,16 @@
 <?php
-set_time_limit( 180 );
-ini_set( 'session.gc_maxlifetime', 3600 );
+set_time_limit(180);
+ini_set('session.gc_maxlifetime', 3600);
 
-include_once( 'internal/Smarty.class.php' );
+include_once('internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
-include( 'config.php' );
-include( KAHUK_LIBS_DIR . 'kahuk-manage-spam.php' );
-include( KAHUK_LIBS_DIR . 'class-kahuk-http-request.php' );
-include( KAHUK_LIBS_DIR.'smartyvariables.php' );
+include('config.php');
+include(KAHUK_LIBS_DIR . 'kahuk-manage-spam.php');
+include(KAHUK_LIBS_DIR . 'class-kahuk-http-request.php');
+include(KAHUK_LIBS_DIR . 'smartyvariables.php');
 
-include( KAHUK_LIBS_DIR . 'page-submit.php' );
+include(KAHUK_LIBS_DIR . 'page-submit.php');
 
 /**
  * to check anonymous mode activated
@@ -18,14 +18,14 @@ include( KAHUK_LIBS_DIR . 'page-submit.php' );
 global $current_user, $main_smarty, $the_template, $the_template_center, $submit_error_code, $actioncode;
 
 $submit_error_code = '';
-$phase = ( isset( $_POST["phase"] ) && is_numeric( $_POST["phase"] ) ) ? $_POST["phase"] : 0;
+$phase = (isset($_POST["phase"]) && is_numeric($_POST["phase"])) ? $_POST["phase"] : 0;
 
 /** */
-if ( true != $current_user->authenticated ) {
+if (true != $current_user->authenticated) {
 	$vars = '';
-	check_actions( 'anonymous_story_user_id', $vars );
+	check_actions('anonymous_story_user_id', $vars);
 
-	if ( true != $vars['anonymous_story'] ) {
+	if (true != $vars['anonymous_story']) {
 		force_authentication();
 	}
 }
@@ -33,15 +33,15 @@ if ( true != $current_user->authenticated ) {
 /**
  * html tags allowed during submit
  */
-if ( checklevel( 'admin' ) ) {
-    $Story_Content_Tags_To_Allow = Story_Content_Tags_To_Allow_God;
-} elseif ( checklevel( 'moderator' ) ){
-    $Story_Content_Tags_To_Allow = Story_Content_Tags_To_Allow_Admin;
+if (checklevel('admin')) {
+	$Story_Content_Tags_To_Allow = Story_Content_Tags_To_Allow_God;
+} elseif (checklevel('moderator')) {
+	$Story_Content_Tags_To_Allow = Story_Content_Tags_To_Allow_Admin;
 } else {
-    $Story_Content_Tags_To_Allow = Story_Content_Tags_To_Allow_Normal;
+	$Story_Content_Tags_To_Allow = Story_Content_Tags_To_Allow_Normal;
 }
 
-$main_smarty->assign( 'Story_Content_Tags_To_Allow', htmlspecialchars( $Story_Content_Tags_To_Allow ) );
+$main_smarty->assign('Story_Content_Tags_To_Allow', htmlspecialchars($Story_Content_Tags_To_Allow));
 
 /**
  * Check wheather the URL is submitted directly form a website or the submit form in our website
@@ -49,30 +49,30 @@ $main_smarty->assign( 'Story_Content_Tags_To_Allow', htmlspecialchars( $Story_Co
 $isDirectSubmit = false;
 $urlFound = '';
 
-if ( isset( $_GET['url'] ) && ! isset( $_POST['url'] ) ) {
+if (isset($_GET['url']) && !isset($_POST['url'])) {
 	$isDirectSubmit = true;
 	$phase = 1;
-	$urlFound = esc_url( $_GET['url'] );
+	$urlFound = esc_url($_GET['url']);
 }
 
-if ( isset( $_POST['url'] ) && isset( $_POST['phase'] ) ) {
+if (isset($_POST['url']) && isset($_POST['phase'])) {
 	$isDirectSubmit = false;
-	$urlFound = esc_url( $_POST['url'] );
+	$urlFound = esc_url($_POST['url']);
 }
 
-if ( ! empty( $urlFound ) ) {
+if (!empty($urlFound)) {
 	// kahuk_debug_log( "Phase: {$phase} and the URL: {$urlFound}\nreferrer: " . $_SERVER["HTTP_REFERER"], __LINE__, '', __FILE__ );
-	check_referrer( $urlFound );
+	check_referrer($urlFound);
 }
 
 /**
  * Check if the url contain action code to display any redirection message
  * If action-code is not empty then we will by force make the phase 0
  */
-$actioncode = _get( 'actioncode', '' );
+$actioncode = _get('actioncode', '');
 
-if ( ! empty( $actioncode ) ) {
-	$main_smarty->assign( 'actioncode', sanitize_text_field( $actioncode ) );
+if (!empty($actioncode)) {
+	$main_smarty->assign('actioncode', sanitize_text_field($actioncode));
 }
 
 /**
@@ -80,23 +80,23 @@ if ( ! empty( $actioncode ) ) {
  */
 $sessionMessages = kahuk_get_session_messages();
 
-if ( empty( $sessionMessages ) ) {
-	$main_smarty->assign( 'sessionMessages', '' );
+if (empty($sessionMessages)) {
+	$main_smarty->assign('sessionMessages', '');
 } else {
-	$main_smarty->assign( 'sessionMessages', $sessionMessages );
+	$main_smarty->assign('sessionMessages', $sessionMessages);
 }
 
 // breadcrumbs and page titles
-$navwhere['text1'] = $main_smarty->get_config_vars( 'KAHUK_Visual_Breadcrumb_Submit' );
-$navwhere['link1'] = getmyurl( 'submit', '' );
-$main_smarty->assign( 'navbar_where', $navwhere );
-$main_smarty->assign( 'posttitle', $main_smarty->get_config_vars( 'KAHUK_Visual_Breadcrumb_Submit' ) );
-$main_smarty = do_sidebar( $main_smarty );
+$navwhere['text1'] = $main_smarty->get_config_vars('KAHUK_Visual_Breadcrumb_Submit');
+$navwhere['link1'] = getmyurl('submit', '');
+$main_smarty->assign('navbar_where', $navwhere);
+$main_smarty->assign('posttitle', $main_smarty->get_config_vars('KAHUK_Visual_Breadcrumb_Submit'));
+$main_smarty = do_sidebar($main_smarty);
 
-define( 'pagename', 'submit' ); 
-$main_smarty->assign( 'pagename', pagename );
+define('pagename', 'submit');
+$main_smarty->assign('pagename', pagename);
 
-switch ( $phase ) {
+switch ($phase) {
 	case 1:
 		do_submit1();
 		break;
@@ -110,9 +110,9 @@ switch ( $phase ) {
 		break;
 }
 
-$main_smarty->assign( 'submit_error', $submit_error_code );
-$main_smarty->assign( 'tpl_center', $the_template_center );
-$main_smarty->display( $the_template . '/kahuk.tpl' );
+$main_smarty->assign('submit_error', $submit_error_code);
+$main_smarty->assign('tpl_center', $the_template_center);
+$main_smarty->display($the_template . '/kahuk.tpl');
 
 exit;
 
@@ -121,19 +121,20 @@ exit;
 /**
  * Save Link Detail
  */
-function do_submit2() {
+function do_submit2()
+{
 	global $current_user, $the_template, $the_template_center, $submit_error_code, $urlFound;
 
-	$randkey = _post( 'randkey' );
-	$hasRecord = kahuk_has_url_in_record( $randkey, $urlFound );
+	$randkey = _post('randkey');
+	$hasRecord = kahuk_has_url_in_record($randkey, $urlFound);
 
-	if ( ! $hasRecord ) {
+	if (!$hasRecord) {
 		kahuk_set_session_message(
-			sprintf( 'Session expired for the url: %s !', $urlFound ),
+			sprintf('Session expired for the url: %s !', $urlFound),
 			'warning'
 		);
 
-		kahuk_redirect( KAHUK_BASE_URL . '/submit.php' );
+		kahuk_redirect(KAHUK_BASE_URL . '/submit.php');
 		return;
 	}
 
@@ -141,50 +142,50 @@ function do_submit2() {
 	$vars = array('username' => $current_user->user_login);
 	check_actions('submit_step_3_after_first_store', $vars);
 
-	if ( isset($vars['error']) && $vars['error'] == true ) {
+	if (isset($vars['error']) && $vars['error'] == true) {
 		$the_template_center = $the_template . '/submit_errors_center';
 		$submit_error_code = 'register_captcha_error';
 		return;
 	}
 
 	// Check Summary For the Link
-	$desc = kahuk_kses( $_POST['summarytext'], $Story_Content_Tags_To_Allow );
+	$link_content = kahuk_kses($_POST['summarytext'], $Story_Content_Tags_To_Allow);
 
-	$link_content = kahuk_autop( $desc );
-	$link_summary = kahuk_link_summary( $desc );
+	$link_summary = kahuk_link_summary($link_content);
 
-	if ( empty( $link_content ) ) {
+	if (empty($link_content)) {
 		kahuk_set_session_message(
 			'Summary text required some more text!',
 			'error'
 		);
 
-		kahuk_redirect( KAHUK_BASE_URL . '/submit.php' );
+		kahuk_redirect(KAHUK_BASE_URL . '/submit.php');
 	}
 
 
 	// Check for the Link Title
-	$story_title = sanitize_text_field( $_POST['title'] );
-	$story_slug = sanitize_title( $story_title ); // START TODO
+	$story_title = sanitize_text_field($_POST['title']);
+	$story_slug = sanitize_title($story_title); // START TODO
 
-	if ( empty( $story_title ) || empty( $story_slug ) ) {
+	if (empty($story_title) || empty($story_slug)) {
 		kahuk_set_session_message(
 			'Please write a appropriate title!',
 			'error'
 		);
 
-		kahuk_redirect( KAHUK_BASE_URL . '/submit.php' );
+		kahuk_redirect(KAHUK_BASE_URL . '/submit.php');
 	}
 
 	//
-	$story_check = kahuk_check_unique_story( $urlFound, $story_slug );
+	$story_check = kahuk_check_unique_story($urlFound, $story_slug);
 
-	if ( false == $story_check['status'] ) {
+	if (false == $story_check['status']) {
 		kahuk_set_session_message(
-			$story_check['message'], 'error'
+			$story_check['message'],
+			'error'
 		);
 
-		kahuk_redirect( KAHUK_BASE_URL . '/submit.php' );
+		kahuk_redirect(KAHUK_BASE_URL . '/submit.php');
 	}
 
 	$story_slug_unique = $story_check['story_slug'];
@@ -194,7 +195,7 @@ function do_submit2() {
 	// $linksData['link_author'] = $current_user->user_id;
 	$linksData['link_status'] = 'new';
 	$linksData['link_randkey'] = ''; // TODO Delete
-	$linksData['link_category'] = sanitize_number( $_POST['category'] );
+	$linksData['link_category'] = sanitize_number($_POST['category']);
 	$linksData['link_url'] = $urlFound;
 	$linksData['link_url_title'] = $story_title;
 	$linksData['link_title'] = $story_title;
@@ -202,25 +203,25 @@ function do_submit2() {
 	$linksData['link_content'] = $link_content;
 	$linksData['link_summary'] = $link_summary;
 
-	$linksData['link_group_id'] = sanitize_number( _post( "link_group_id", '0' ) );
-	$linksData['link_tags'] = kahuk_slashes( sanitize_text_field( $_POST['link_tags'] ) );
+	$linksData['link_group_id'] = sanitize_number(_post("link_group_id", '0'));
+	$linksData['link_tags'] = kahuk_slashes(sanitize_text_field($_POST['link_tags']));
 
-	$linkId = kahuk_insert_story( $linksData ); //
+	$linkId = kahuk_insert_story($linksData); //
 	$newPost = [];
 
-	if ( 0 < $linkId ) {
-		$newPost = kahuk_get_story_by_id( $linkId );
+	if (0 < $linkId) {
+		$newPost = kahuk_get_story_by_id($linkId);
 	}
 
-	if ( ! $newPost ) {
-		kahuk_debug_log( "Unable to fetch newly created post using the slug {$story_slug_unique}", "", "", __FILE__ );
+	if (!$newPost) {
+		kahuk_debug_log("Unable to fetch newly created post using the slug {$story_slug_unique}", "", "", __FILE__);
 
 		kahuk_set_session_message(
-			sprintf( 'Got an unexpected error, we will fix it!', $urlFound ),
+			sprintf('Got an unexpected error, we will fix it!', $urlFound),
 			'error'
 		);
 
-		kahuk_redirect( KAHUK_BASE_URL );
+		kahuk_redirect(KAHUK_BASE_URL);
 	}
 
 	require_once KAHUK_LIBS_DIR . 'class-voting.php';
@@ -233,46 +234,48 @@ function do_submit2() {
 	];
 
 	$kahukVoting = new KahukVoting();
-	$kahukVoting->init( $args );
+	$kahukVoting->init($args);
 
 	//
-	kahuk_regenerate_total_by_status( 'new' );
+	kahuk_regenerate_total_by_status('new');
 
 	//
 	$categories = kahuk_categories_init();
-	$category = $categories->get_item( $linksData['link_category'] );
+	$category = $categories->get_item($linksData['link_category']);
 
-	$story_url = getmyurl( "storyURL", $category['category_safe_name'], urlencode( $newPost['link_title_url'] ) );
+	$story_url = getmyurl("storyURL", $category['category_safe_name'], urlencode($newPost['link_title_url']));
 
-	kahuk_redirect( $story_url );
+	kahuk_redirect($story_url);
 }
 
 
 
 // enter URL before submit process
-function do_submit0() {
+function do_submit0()
+{
 	global $main_smarty, $the_template, $the_template_center;
 
 	$the_template_center = $the_template . '/submit_step_1_center';
 
-	$main_smarty->assign( 'submit_rand', rand( 10000,10000000 ) );
+	$main_smarty->assign('submit_rand', rand(10000, 10000000));
 
 	$vars = '';
 
-	check_actions( 'do_submit0', $vars );
+	check_actions('do_submit0', $vars);
 }
 
 
 /**
  * 
  */
-function do_submit1() {
+function do_submit1()
+{
 	global $db, $current_user, $main_smarty, $the_template, $urlFound, $the_template_center, $submit_error_code;
 
-	include( KAHUK_LIBS_DIR . 'kahuk-link.php' );
-	$kahukLink = kahuk_link_init( $urlFound );
+	include(KAHUK_LIBS_DIR . 'kahuk-link.php');
+	$kahukLink = kahuk_link_init($urlFound);
 
-	if ( $kahukLink->errors->has_errors() ) {
+	if ($kahukLink->errors->has_errors()) {
 		do_submit0();
 
 		$the_template_center = $the_template . '/submit_errors_center';
@@ -281,59 +284,59 @@ function do_submit1() {
 		return;
 	}
 
-	$randkey = _post( 'randkey' );
+	$randkey = _post('randkey');
 
-	kahuk_create_url_records( $randkey, $kahukLink->url );
+	kahuk_create_url_records($randkey, $kahukLink->url);
 
-	$main_smarty->assign( 'randkey', $randkey );
-	$main_smarty->assign( 'submit_url', $kahukLink->url );
-	$data = parse_url( $kahukLink->url );
-	$main_smarty->assign( 'url', $kahukLink->url );
-	$main_smarty->assign( 'url_short', 'http://'.$data['host'] ); // TODO
+	$main_smarty->assign('randkey', $randkey);
+	$main_smarty->assign('submit_url', $kahukLink->url);
+	$data = parse_url($kahukLink->url);
+	$main_smarty->assign('url', $kahukLink->url);
+	$main_smarty->assign('url_short', 'http://' . $data['host']); // TODO
 
-	$main_smarty->assign( 'StorySummary_ContentTruncate', StorySummary_ContentTruncate );
-	$main_smarty->assign( 'submit_url_description', $kahukLink->url_description );
-	$main_smarty->assign( 'submit_trackback', $kahukLink->trackback );
-	
+	$main_smarty->assign('StorySummary_ContentTruncate', StorySummary_ContentTruncate);
+	$main_smarty->assign('submit_url_description', $kahukLink->url_description);
+	$main_smarty->assign('submit_trackback', $kahukLink->trackback);
+
 	//
-	$submit_url_title = str_replace( '"', "&#034;", $kahukLink->url_title );
-	$main_smarty->assign( 'submit_url_title', $submit_url_title );
+	$submit_url_title = str_replace('"', "&#034;", $kahukLink->url_title);
+	$main_smarty->assign('submit_url_title', $submit_url_title);
 
 	//
 	$categories = kahuk_categories_init();
-	$main_smarty->assign( 'submit_cat_array', $categories->get_items() );
+	$main_smarty->assign('submit_cat_array', $categories->get_items());
 
 	//
-	$featured_img = ( empty( $kahukLink->linkImages ) ) ? "" : $kahukLink->linkImages[0]['url']; // Get the first image
-	$main_smarty->assign( 'og_twitter_image', $featured_img );
+	$featured_img = (empty($kahukLink->linkImages)) ? "" : $kahukLink->linkImages[0]['url']; // Get the first image
+	$main_smarty->assign('og_twitter_image', $featured_img);
 
-	$main_smarty->assign( 'tpl_extra_fields', $the_template . '/submit_extra_fields' );
+	$main_smarty->assign('tpl_extra_fields', $the_template . '/submit_extra_fields');
 
 	$the_template_center = $the_template . '/submit_step_2_center';
 
 	// 
-	if ( "true" == enable_group ) {
-		$sql = "SELECT group_id,group_name FROM " . table_groups . " LEFT JOIN ".table_group_member." ON member_group_id=group_id
+	if ("true" == enable_group) {
+		$sql = "SELECT group_id,group_name FROM " . table_groups . " LEFT JOIN " . table_group_member . " ON member_group_id=group_id
 		WHERE member_user_id = $current_user->user_id AND group_status = 'Enable' AND member_status='active' 
 		AND (member_role != 'banned' && member_role != 'flagged') ORDER BY group_name ASC";
 
 		$output = '';
-		$group_membered = $db->get_results( $sql );
-		
-		if ( $group_membered ) {
+		$group_membered = $db->get_results($sql);
+
+		if ($group_membered) {
 			$output .= "<select id='link_group_id' name='link_group_id' tabindex='3' class='form-control submit_group_select'>";
 			$output .= "<option value = ''>" . $main_smarty->get_config_vars('PLIKLI_Visual_Group_Select_Group') . "</option>";
 
-			foreach($group_membered as $results) {
-				$output .= "<option value = ".$results->group_id. ($linkres->link_group_id ? ' selected' : '') . ">".$results->group_name."</option>";
+			foreach ($group_membered as $results) {
+				$output .= "<option value = " . $results->group_id . ($linkres->link_group_id ? ' selected' : '') . ">" . $results->group_name . "</option>";
 			}
 
 			$output .= "</select>";
 		}
 
-		$main_smarty->assign( 'output', $output );
+		$main_smarty->assign('output', $output);
 	}
-	
+
 	$vars = '';
 	check_actions('do_submit1', $vars);
 	$_SESSION['step'] = 1;

@@ -115,6 +115,7 @@
 			{checkActionsTpl location="tpl_kahuk_submit_preview_start"}
 				{* Redwine: temporary solution to eliminate the warnings "Undefined index: link_shakebox_index" *}
 			<div class="stories" id="xnews-{if !empty($link_shakebox_index)}{$link_shakebox_index}{/if}">
+
 				<div class="headline">
 					{if $Voting_Method eq 2}
 						<h4 id="ls_title-{if !empty($link_shakebox_index)}{$link_shakebox_index}{/if}">
@@ -172,10 +173,17 @@
 								// Assign smarty variables to use in the template.
 								$main_smarty->assign('link_submitter', $user->username);
 								$main_smarty->assign('submitter_profile_url', getmyurl('user2', $login, 'profile'));
-								$main_smarty->assign('Avatar_ImgSrc', get_avatar('small', $user->avatar_source, $user->username));
+
+								$user_email = kahuk_user_email_by_userlogin( $user->username );
+								$avatar_all = kahuk_gravatar( $user_email, ['note' => 'submit_step_2_center.php file'] );
+
+								$main_smarty->assign('Avatar', $avatar_all);
 							{/php}
-							{* Redwine: temporary solution to eliminate the warnings "Undefined index: link_shakebox_index" *}
-							{if $UseAvatars neq "0"}<span id="ls_avatar-{if !empty($link_shakebox_index)}{$link_shakebox_index}{/if}"><img src="{$Avatar_ImgSrc}" width="16px" height="16px" alt="" title="Avatar" /></span>{else}<i class="fa fa-user"></i>{/if}
+
+							<span id="ls_avatar-{if !empty($link_shakebox_index)}{$link_shakebox_index}{/if}">
+								<img src="{$Avatar.small}" width="16px" height="16px" alt="" title="Avatar">
+							</span>
+
 							<a href="{$submitter_profile_url}">{$link_submitter}</a> 
 							<i class="fa fa-time"></i>
 							Being Submitted Now

@@ -11,6 +11,33 @@ if ( !function_exists( 'gettext' ) ) {
 	function _( $s ) {return $s;}
 }
 
+
+/**
+ * Convert object of database return into array
+ * 
+ * @params $dbResult object required
+ * @params $columnsName array required
+ * 
+ * @since 5.0.4
+ */
+function kahuk_db_object_to_array( $dbResult, $columnsName ) {
+	$output = [];
+	$counter = 0;
+
+	foreach($dbResult as $row) {
+		foreach($columnsName as $column_name) {
+			if ($row->$column_name) {
+				$output[$counter][$column_name] = $row->$column_name;
+			}
+		}
+
+		$counter++;
+	}
+
+	return $output;
+}
+
+
 /**
  * Get messages from the session
  * 
@@ -250,10 +277,6 @@ function kahuk_debug_log($message, $line = '', $func = '', $file = '')
 {
 	$output = "";
 
-	if (defined('DEV_MODE_ON') && (true == DEV_MODE_ON)) {
-		$output .= "\n===";
-	}
-
 	if (!empty($file)) {
 		$output .= "\n" . "File: " . $file;
 	}
@@ -281,14 +304,14 @@ function kahuk_debug_log($message, $line = '', $func = '', $file = '')
 function _kahuk_debug_log( $message )
 {
 	if (defined('DEV_MODE_ON') && (true == DEV_MODE_ON)) {
-		error_log( "\n" . $message, 3, KAHUK_LOG_DIR . "debug.log");
+		error_log( "\n===\n" . $message, 3, KAHUK_LOG_DIR . "debug.log");
 	} else {
 		kahuk_error_log( $message );
 	}
 }
 
 /**
- * Log message to the error.log file
+ * Log message to the file comes from kahuk_error_log_file_path()
  * 
  * @since 5.0.0
  */
@@ -308,7 +331,9 @@ function kahuk_error_log($message, $file = '', $line = '')
 
 	$output .= "\n" . $message;
 
-	error_log($output, 3, KAHUK_LOG_DIR . "error.log");
+	$logFile = kahuk_error_log_file_path();
+
+	error_log($output, 3, $logFile);
 }
 
 
@@ -375,6 +400,106 @@ function kahuk_generate_password( $psaa_length = 8 ) {
     return implode($output); //turn the array into a string
 }
 
+
+
+/**
+ * Verifies that an email is valid.
+ *
+ * @since 5.0.5
+ *
+ * @param string $email      Email address to verify.
+ * 
+ * @return string|array Valid email address on success, array on failure.
+ */
+function is_email( $email ) {
+	// Test for the minimum length the email can be.
+	if ( strlen( $email ) < 6 ) {
+		return [
+			'status' => false,
+			'code' => 'email_too_short'
+		];
+	}
+
+	// Test for an @ character after the first position.
+	if ( strpos( $email, '@', 1 ) === false ) {
+		return [
+			'status' => false,
+			'code' => 'email_no_at'
+		];
+	}
+
+	// Split out the local and domain parts.
+	list( $local, $domain ) = explode( '@', $email, 2 );
+
+	// LOCAL PART
+	// Test for invalid characters.
+	if ( ! preg_match( '/^[a-zA-Z0-9!#$%&\'*+\/=?^_`{|}~\.-]+$/', $local ) ) {
+		return [
+			'status' => false,
+			'code' => 'local_invalid_chars'
+		];
+	}
+
+	// DOMAIN PART
+	// Test for sequences of periods.
+	if ( preg_match( '/\.{2,}/', $domain ) ) {
+		return [
+			'status' => false,
+			'code' => 'domain_period_sequence'
+		];
+	}
+
+	// Test for leading and trailing periods and whitespace.
+	if ( trim( $domain, " \t\n\r\0\x0B." ) !== $domain ) {
+		return [
+			'status' => false,
+			'code' => 'domain_period_limits'
+		];
+	}
+
+	// Split the domain into subs.
+	$subs = explode( '.', $domain );
+
+	// Assume the domain will have at least two subs.
+	if ( 2 > count( $subs ) ) {
+		return [
+			'status' => false,
+			'code' => 'domain_no_periods'
+		];
+	}
+
+	// Loop through each sub.
+	foreach ( $subs as $sub ) {
+		// Test for leading and trailing hyphens and whitespace.
+		if ( trim( $sub, " \t\n\r\0\x0B-" ) !== $sub ) {
+			return [
+				'status' => false,
+				'code' => 'sub_hyphen_limits'
+			];
+		}
+
+		// Test for invalid characters.
+		if ( ! preg_match( '/^[a-z0-9-]+$/i', $sub ) ) {
+			return [
+				'status' => false,
+				'code' => 'sub_invalid_chars'
+			];
+		}
+	}
+
+	// Congratulations, your email made it!
+	return $email;
+}
+
+/**
+ * Counts the number of words inside string.
+ * 
+ * @since 5.0.3
+ */
+function kahuk_word_count($str)
+{
+	return str_word_count($str);
+}
 
 /**
  * Returns either a GET value or the default

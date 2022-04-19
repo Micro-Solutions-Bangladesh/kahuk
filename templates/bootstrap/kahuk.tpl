@@ -1,7 +1,7 @@
 {if $maintenance_mode eq "true" && $user_level neq 'admin'}{include file=$the_template"/maintenance.tpl"}{else}<!DOCTYPE html>
 <html class="no-js" dir="{#KAHUK_Visual_Language_Direction#}" xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-	{checkActionsTpl location="tpl_kahuk_head_start"}
+	{checkActionsTpl location="tpl_kahuk_after_head_start"}
 	
 	<!-- START META -->
 		{include file=$the_template"/meta.tpl"}
@@ -34,14 +34,14 @@
 	
 	<link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="{$kahuk_base_url}/rss.php"/>
 	<link rel="icon" href="{$my_kahuk_base}/favicon.ico" type="image/x-icon"/>
-	{checkActionsTpl location="tpl_kahuk_head_end"}
+	{checkActionsTpl location="tpl_kahuk_before_head_end"}
 </head>
 <body dir="{#KAHUK_Visual_Language_Direction#}" {if isset($body_args)}{$body_args}{/if} {checkActionsTpl location="tpl_kahuk_body_onload"}>
 	{if $maintenance_mode eq "true" && $user_level eq 'admin'}
 		<div class="alert alert-danger" style="margin-bottom:0;"><button class="close" data-dismiss="alert">&times;</button>{#KAHUK_Maintenance_Admin_Warning#}</div>
 	{/if}
 	
-	{checkActionsTpl location="tpl_kahuk_body_start"}
+	{checkActionsTpl location="tpl_kahuk_after_body_start"}
 	
 	<!-- START HEADER -->
 		{include file=$tpl_header.".tpl"}
@@ -249,7 +249,7 @@
 		</script>
 	{/literal}
 
-	{checkActionsTpl location="tpl_kahuk_body_end"}
+	{checkActionsTpl location="tpl_kahuk_before_body_end"}
 </body>
 </html>
 {/if}{*END Maintenance Mode *}

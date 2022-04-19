@@ -4,11 +4,11 @@ include_once('internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('config.php');
-include(KAHUK_LIBS_DIR.'link.php');
-include(KAHUK_LIBS_DIR.'comment.php');
-include(KAHUK_LIBS_DIR.'smartyvariables.php');
+include(KAHUK_LIBS_DIR . 'link.php');
+include(KAHUK_LIBS_DIR . 'comment.php');
+include(KAHUK_LIBS_DIR . 'smartyvariables.php');
 
-if(!Enable_Live) {
+if (!Enable_Live) {
 	kahuk_redirect_404();
 }
 
@@ -40,13 +40,13 @@ $comments = $db->get_results("$select $from_where $order_by LIMIT $offset,$top_u
 //$comment = new Comment;
 //$user = new User;
 $link = new Link;
-if($comments) {
-	foreach($comments as $dbcomment) {
-//		$comment->id = $dbcomment->comment_id;
-//		$comment->read();
+if ($comments) {
+	foreach ($comments as $dbcomment) {
+		//		$comment->id = $dbcomment->comment_id;
+		//		$comment->read();
 		$live_item['comment_content'] = $dbcomment->comment_content;
-//		$user->id = $comment->author;
-//		$user->read();
+		//		$user->id = $comment->author;
+		//		$user->read();
 		$live_item['comment_author'] = $dbcomment->user_login;
 		$live_item['comment_date'] = txt_time_diff(strtotime($dbcomment->comment_date));
 		$link->id = $dbcomment->link_id;

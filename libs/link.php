@@ -818,11 +818,10 @@ class Link
 
 		$smarty->assign('link_group_id', $this->link_group_id);
 		$smarty->assign('instpath', my_base_url . my_kahuk_base . "/");
-		$smarty->assign('UseAvatars', do_we_use_avatars());
-		$smarty->assign('Avatar', $avatars = get_avatar('all', "", "", "", $this->userid));
-		$smarty->assign('Avatar_ImgSrc', $avatars['large']);
-		$smarty->assign('Avatar_ImgSrcs', $avatars['small']);
-		/* Redwine: Roles and permissions and Groups fixes */
+
+		$avatar_all = kahuk_gravatar( $this->userid, ['note' => 'libs - link.php file'] );
+		$smarty->assign('Avatar', $avatar_all);
+
 		// Get the Group creator/Admin/Moderator to use the assigned permissions, when $this->link_group_id is greater than 0 
 		$is_gr_Creator = 0;
 		$is_gr_Admin = 0;

@@ -237,11 +237,9 @@ function check_string($which) {
 }
 
 function get_current_page() {
-	if(($var=check_integer('page'))) {
-		return $var;
-	} else {
-		return 1;
-	}
+	$pagenum = intval(_request('page'));
+
+	return ((0<$pagenum) ? $pagenum : 1);
 }
 
 
@@ -275,8 +273,13 @@ function get_trackback($id) {
 	return getmyurl("trackback", $id);
 }
 
+/**
+ * depricated in favor of the kahuk_check_user_role() function
+ * 
+ */
 function checklevel($levl){
 	global $current_user;
+
 	if(isset($current_user->user_level)){
 		if ($current_user->user_level == $levl)
 		{

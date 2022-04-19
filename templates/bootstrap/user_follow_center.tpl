@@ -114,7 +114,8 @@
 							{if !empty($following)}
 								{foreach from=$following item=myfriend}
 									{php}
-										$this->_vars['friend_avatar'] = get_avatar('small', $this->_vars['myfriend']['user_avatar_source'], $this->_vars['myfriend']['user_login'], $this->_vars['myfriend']['user_email']);
+										$this->_vars['friend_avatar'] = $this->_vars['friend_avatar'] = kahuk_gravatar($this->_vars['myfriend']['user_email'], ['imgsize' => 'small']);
+										// get_avatar('small', $this->_vars['myfriend']['user_avatar_source'], $this->_vars['myfriend']['user_login'], $this->_vars['myfriend']['user_email']);
 										$this->_vars['profileURL'] = getmyurl('user2', $this->_vars['myfriend']['user_login'], 'profile');
 									    $this->_vars['user_url_remove'] = getmyurl('user_friends', $this->_vars['myfriend']['user_login'], 'removefriend');
 										$this->_vars['user_url_add'] = getmyurl('user_friends', $this->_vars['myfriend']['user_login'], 'addfriend');
@@ -176,7 +177,8 @@
 			<tbody>
 				{foreach from=$following item=myfriend}
 					{php}
-						$this->_vars['friend_avatar'] = get_avatar('small', $this->_vars['myfriend']['user_avatar_source'], $this->_vars['myfriend']['user_login'], $this->_vars['myfriend']['user_email']);
+						$this->_vars['friend_avatar'] = $this->_vars['friend_avatar'] = kahuk_gravatar($this->_vars['myfriend']['user_email'], ['imgsize' => 'small']);
+						// get_avatar('small', $this->_vars['myfriend']['user_avatar_source'], $this->_vars['myfriend']['user_login'], $this->_vars['myfriend']['user_email']);
 						$this->_vars['profileURL'] = getmyurl('user2', $this->_vars['myfriend']['user_login'], 'profile');
 					    $this->_vars['user_url_remove'] = getmyurl('user_friends', $this->_vars['myfriend']['user_login'], 'removefriend');
 						$this->_vars['user_url_add'] = getmyurl('user_friends', $this->_vars['myfriend']['user_login'], 'addfriend');
@@ -224,7 +226,8 @@
 			<tbody>
 				{foreach from=$follower item=myfriend}
 					{php}
-						$this->_vars['friend_avatar'] = get_avatar('small', $this->_vars['myfriend']['user_avatar_source'], $this->_vars['myfriend']['user_login'], $this->_vars['myfriend']['user_email']);
+						$this->_vars['friend_avatar'] = $this->_vars['friend_avatar'] = kahuk_gravatar($this->_vars['myfriend']['user_email'], ['imgsize' => 'small']);
+						// get_avatar('small', $this->_vars['myfriend']['user_avatar_source'], $this->_vars['myfriend']['user_login'], $this->_vars['myfriend']['user_email']);
 						$this->_vars['profileURL'] = getmyurl('user2', $this->_vars['myfriend']['user_login'], 'profile');
 						$this->_vars['addURL'] = getmyurl('user_friends', $this->_vars['myfriend']['user_login'], 'addfriend');
 					    $this->_vars['user_url_remove'] = getmyurl('user_friends', $this->_vars['myfriend']['user_login'], 'removefriend');

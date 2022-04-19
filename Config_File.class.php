@@ -8,5 +8,3 @@ class Config_File extends config{
     {
     }
 }
-
-?>

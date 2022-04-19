@@ -103,7 +103,7 @@ function kahuk_change_story_status( $story_id ) {
         // SQL Query
         $sql = "UPDATE `" . table_links . "` SET";
 
-        $sql .= " link_status = 'published', link_published_date=FROM_UNIXTIME(". time() .")";
+        $sql .= " link_status = 'published', link_published_date = NOW()";
         
         $sql .= " WHERE link_id = " . intval( $story_id );
 

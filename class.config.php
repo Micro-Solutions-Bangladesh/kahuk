@@ -189,4 +189,3 @@ if (!function_exists('detect_encoding'))
 	  return null;
 	}
 }
-?>

@@ -1,9 +1,10 @@
 <?php
-if ( ! defined( 'KAHUKPATH' ) ) {
+if (!defined('KAHUKPATH')) {
 	die();
 }
 
-class kahukconfig {
+class kahukconfig
+{
 	var $id = 0;
 	var $var_page = 0;
 	var $var_name = 0;
@@ -14,12 +15,12 @@ class kahukconfig {
 	var $var_desc = '';
 	var $EditInPlaceCode = '';
 
-	function showpage(){
-		global $db, $my_kahuk_base;
-		
-		?>
-			<div class="admin_config_content">
-		<?php
+	function showpage()
+	{
+		global $db;
+?>
+		<div class="admin_config_content">
+	<?php
 
 		$sql = "Select * from " . table_config . " where var_page = '$this->var_page'";
 		$configs = $db->get_results($sql);
@@ -28,19 +29,16 @@ class kahukconfig {
 			echo '<table class="table table-bordered table-striped">';
 			echo '<thead><tr>';
 			echo '<th>Title</th>';
-			echo '<th>'.$main_smarty->get_config_vars(KAHUK_Visual_Config_Description).'</th>';
-			echo '<th style="min-width:120px">'.$main_smarty->get_config_vars(KAHUK_Visual_Config_Value).'</th>';
-			echo '<th style="width:120px;">'.$main_smarty->get_config_vars(KAHUK_Visual_Config_Default_Value).'</th>';
-			echo '<th style="width:120px;">'.$main_smarty->get_config_vars(KAHUK_Visual_Config_Expected_Values).'</th>';
+			echo '<th>' . $main_smarty->get_config_vars(KAHUK_Visual_Config_Description) . '</th>';
+			echo '<th style="min-width:120px">' . $main_smarty->get_config_vars(KAHUK_Visual_Config_Value) . '</th>';
+			echo '<th style="width:120px;">' . $main_smarty->get_config_vars(KAHUK_Visual_Config_Default_Value) . '</th>';
+			echo '<th style="width:120px;">' . $main_smarty->get_config_vars(KAHUK_Visual_Config_Expected_Values) . '</th>';
 			echo '</tr></thead><tbody>';
-			
-			foreach($configs as $config) {
-//				$this->var_id=$config_id;
-//				$this->read();
-				foreach ($config as $k=>$v)
-				    $this->$k = $v;
+
+			foreach ($configs as $config) {
+				foreach ($config as $k => $v)
+					$this->$k = $v;
 				$this->print_summary();
-//				$EditInPlaceCode .= $this->EditInPlaceCode;
 			}
 			echo '</tbody></table>';
 		} else {
@@ -49,159 +47,119 @@ class kahukconfig {
 		echo '</div><div style="clear:both;"> </div>';
 	}
 
-	function read(){
+	function read()
+	{
 		global $db;
 		$config = $db->get_row("SELECT * FROM " . table_config . " WHERE var_id = $this->var_id");
 
-			$this->var_page=$config->var_page;
-			$this->var_name=$config->var_name;
-			$this->var_value=htmlentities($config->var_value);
-			$this->var_defaultvalue=$config->var_defaultvalue;
-			$this->var_optiontext=$config->var_optiontext;
-			$this->var_title=$config->var_title;
-			$this->var_desc=$config->var_desc;
+		$this->var_page = $config->var_page;
+		$this->var_name = $config->var_name;
+		$this->var_value = htmlentities($config->var_value);
+		$this->var_defaultvalue = $config->var_defaultvalue;
+		$this->var_optiontext = $config->var_optiontext;
+		$this->var_title = $config->var_title;
+		$this->var_desc = $config->var_desc;
 
 		return true;
 	}
-		
-	function store($loud = true){
+
+	function store($loud = true)
+	{
 		global $db;
-		if(strtolower(trim($this->var_value)) == 'true'){$this->var_value = 'true';}
-		if(strtolower(trim($this->var_value)) == 'false'){$this->var_value = 'false';}
-		$sql = "UPDATE " . table_config . " set var_value = '".$db->escape(trim($this->var_value))."' where var_id = ".$db->escape(sanitize($this->var_id,3));
+
+		if (strtolower(trim($this->var_value)) == 'true') {
+			$this->var_value = 'true';
+		}
+
+		if (strtolower(trim($this->var_value)) == 'false') {
+			$this->var_value = 'false';
+		}
+
+		$sql = "UPDATE " . table_config . " set var_value = '" . $db->escape(trim($this->var_value)) . "' where var_id = " . $db->escape(sanitize($this->var_id, 3));
 		$db->query($sql);
-		$this->create_file();
 
 		$content = trim($this->var_value);
-		if($loud == true){
+
+		if ($loud == true) {
 			print(htmlspecialchars($content));
 		}
 
 		return true;
 	}
-		
-	function print_summary(){
+
+	function print_summary()
+	{
 		global $db, $main_smarty;
 		/* Redwine: in some instances, the trailing space is left. we want to make sure to trim it.*/
 		$this->var_value = trim($this->var_value);
-		echo '<span id="var_'.$this->var_id.'_span"><form onsubmit="return false">';
+		echo '<span id="var_' . $this->var_id . '_span"><form onsubmit="return false">';
 		echo '<tr>';
-		echo "<td>".translate($this->var_title)."</td>";
-		echo "<td>".translate($this->var_desc)."</td><td>";
-		
+		echo "<td>" . translate($this->var_title) . "</td>";
+		echo "<td>" . translate($this->var_desc) . "</td><td>";
+
 		$gethttphost = $_SERVER["HTTP_HOST"];
-		$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http') . '://';	
+		$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http') . '://';
 		$port = strpos($gethttphost, ':');
-		if ($port !== false){ 
+		if ($port !== false) {
 			$httphost = substr($gethttphost, 0, $port);
-		}else{
+		} else {
 			$httphost = $gethttphost;
-		}	
-		$standardport = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 443 : 80); 
-		$waitTimeoutInSeconds = 1; 
-		if($fp = fsockopen($httphost,$standardport,$errCode,$errStr,$waitTimeoutInSeconds)){   
+		}
+		$standardport = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 443 : 80);
+		$waitTimeoutInSeconds = 1;
+		if ($fp = fsockopen($httphost, $standardport, $errCode, $errStr, $waitTimeoutInSeconds)) {
 			$expected_base_url = $protocol . $httphost;
 		}
 		fclose($fp);
-		if($this->var_name == '$my_base_url'){echo translate("It looks like this should be set to") . " <strong>" . $expected_base_url ."</strong> ";}
-		
-		if($this->var_name == '$my_kahuk_base'){
+		if ($this->var_name == '$my_base_url') {
+			echo translate("It looks like this should be set to") . " <strong>" . $expected_base_url . "</strong> ";
+		}
+
+		if ($this->var_name == '$my_kahuk_base') {
 			$pos = strrpos($_SERVER["SCRIPT_NAME"], "/admin/");
 			$path = substr($_SERVER["SCRIPT_NAME"], 0, $pos);
-			if ($path == "/" || $path == ""){$path = translate("Nothing - Leave it blank");}
-			echo translate("It looks like this should be set to")." <strong>".$path."</strong><br>";
+			if ($path == "/" || $path == "") {
+				$path = translate("Nothing - Leave it blank");
+			}
+			echo translate("It looks like this should be set to") . " <strong>" . $path . "</strong><br>";
 		}
-		
-		echo '<input class="form-control admin_config_input emptytext" id="editme' .$this->var_id. '" onclick="show_edit('.$this->var_id.')" value="'.htmlentities($this->var_value,ENT_QUOTES,'UTF-8').'">';
-		echo '<span class="emptytext" id="showme' .$this->var_id. '" style="display:none;">';
-		if (preg_match('/^\s*(.+),\s*(.+) or (.+)\s*$/',$this->var_optiontext,$m))
-		{
-		    echo "<select name=\"var_value\" class=\"form-control\">";
-		    for($ii=1; $ii<=3; $ii++)
-			echo "<option value='{$m[$ii]}' ".($m[$ii]==$this->var_value ? "selected" : "").">{$m[$ii]}</option>";
-		    echo "</select><br />";
-		}
-		elseif (preg_match('/^\s*(.+[^\/])\s*\/\s*([^\/].+)\s*$/',$this->var_optiontext,$m) ||
-		    preg_match('/^\s*(.+) or (.+)\s*$/',$this->var_optiontext,$m))
-		{
-		    if (preg_match('/^(\d+)\s*=\s*(.+)$/',$m[1],$m1) && 
-			preg_match('/^(\d+)\s*=\s*(.+)$/',$m[2],$m2))
-		    	echo "<select name=\"var_value\" class=\"form-control\"><option value='{$m1[1]}' ".($m1[1]==$this->var_value ? "selected" : "").">{$m1[2]}</option><option value='{$m2[1]}' ".($m2[1]==$this->var_value ? "selected" : "").">{$m2[2]}</option></select><br />";
-		    else
-		    	echo "<select name=\"var_value\" class=\"form-control\"><option value='{$m[1]}' ".($m[1]==$this->var_value ? "selected" : "").">{$m[1]}</option><option value='{$m[2]}' ".($m[2]==$this->var_value ? "selected" : "").">{$m[2]}</option></select><br />";
-		}
-		elseif (preg_match('/^\s*(\d+)\s*-\s*(\d+)\s*$/',$this->var_optiontext,$m))
-		{
-		    echo "<select name=\"var_value\" class=\"form-control\">";
-		    for ($ii=$m[1]; $ii<=$m[2]; $ii++)
-			echo "<option value='$ii' ".($ii==$this->var_value ? "selected" : "").">$ii</option>";
-		    echo "</select><br />";
-		}
-		else
-		{
-		    echo "<input type=\"text\" class='form-control admin_config_input edit_input' name=\"var_value\" value=\"".htmlentities($this->var_value,ENT_QUOTES,'UTF-8')."\" ";
-		    if (strpos($this->var_optiontext,'number')===0) {
-				$min = preg_match('/at least (\d+)/',$this->var_optiontext,$m) ? $m[1] : 0;
+
+		echo '<input class="form-control admin_config_input emptytext" id="editme' . $this->var_id . '" onclick="show_edit(' . $this->var_id . ')" value="' . htmlentities($this->var_value, ENT_QUOTES, 'UTF-8') . '">';
+		echo '<span class="emptytext" id="showme' . $this->var_id . '" style="display:none;">';
+		if (preg_match('/^\s*(.+),\s*(.+) or (.+)\s*$/', $this->var_optiontext, $m)) {
+			echo "<select name=\"var_value\" class=\"form-control\">";
+			for ($ii = 1; $ii <= 3; $ii++)
+				echo "<option value='{$m[$ii]}' " . ($m[$ii] == $this->var_value ? "selected" : "") . ">{$m[$ii]}</option>";
+			echo "</select><br />";
+		} elseif (
+			preg_match('/^\s*(.+[^\/])\s*\/\s*([^\/].+)\s*$/', $this->var_optiontext, $m) ||
+			preg_match('/^\s*(.+) or (.+)\s*$/', $this->var_optiontext, $m)
+		) {
+			if (
+				preg_match('/^(\d+)\s*=\s*(.+)$/', $m[1], $m1) &&
+				preg_match('/^(\d+)\s*=\s*(.+)$/', $m[2], $m2)
+			)
+				echo "<select name=\"var_value\" class=\"form-control\"><option value='{$m1[1]}' " . ($m1[1] == $this->var_value ? "selected" : "") . ">{$m1[2]}</option><option value='{$m2[1]}' " . ($m2[1] == $this->var_value ? "selected" : "") . ">{$m2[2]}</option></select><br />";
+			else
+				echo "<select name=\"var_value\" class=\"form-control\"><option value='{$m[1]}' " . ($m[1] == $this->var_value ? "selected" : "") . ">{$m[1]}</option><option value='{$m[2]}' " . ($m[2] == $this->var_value ? "selected" : "") . ">{$m[2]}</option></select><br />";
+		} elseif (preg_match('/^\s*(\d+)\s*-\s*(\d+)\s*$/', $this->var_optiontext, $m)) {
+			echo "<select name=\"var_value\" class=\"form-control\">";
+			for ($ii = $m[1]; $ii <= $m[2]; $ii++)
+				echo "<option value='$ii' " . ($ii == $this->var_value ? "selected" : "") . ">$ii</option>";
+			echo "</select><br />";
+		} else {
+			echo "<input type=\"text\" class='form-control admin_config_input edit_input' name=\"var_value\" value=\"" . htmlentities($this->var_value, ENT_QUOTES, 'UTF-8') . "\" ";
+			if (strpos($this->var_optiontext, 'number') === 0) {
+				$min = preg_match('/at least (\d+)/', $this->var_optiontext, $m) ? $m[1] : 0;
 				echo "size='5' onblur='check_number({$this->var_id},this,$min)'";
-	 	    }
-		    echo '>';
+			}
+			echo '>';
 		}
 		echo "<input style='margin:4px 4px 0 0;' type=\"submit\" class=\"btn btn-primary\" value=\"Save\" onclick=\"save_changes({$this->var_id},this.form)\">";
 		echo "<input style='margin-top:3px;' type=\"reset\" class=\"btn btn-default\" value=\"Cancel\" onclick=\"hide_edit({$this->var_id})\"></span></td>";
 		echo "<td>{$this->var_defaultvalue}</td>";
 		echo "<td>{$this->var_optiontext}</td>";
-		echo '<input type = "hidden" name = "var_id" value = "'.$this->var_id.'">';
+		echo '<input type = "hidden" name = "var_id" value = "' . $this->var_id . '">';
 		echo "</td></tr></form></span>";
-		
-	}
-
-
-	// TODO VVI
-	function create_file($filename = "../settings.php"){
-		global $db;
-
-		if($handle = fopen($filename, 'w')) {
-		
-			fwrite($handle, "<?php\n");
-			$usersql = $db->get_results('SELECT * FROM ' . TABLE_PREFIX . 'config');
-			foreach($usersql as $row) {
-				$value = $row->var_enclosein . trim($row->var_value). $row->var_enclosein;
-				
-				$write_vars = array( '$my_base_url', '$my_kahuk_base', '$dblang', '$language' );
-				
-				if( in_array( $row->var_name, $write_vars ) ) {
-				
-					if ($row->var_method == "normal"){
-						$line =  $row->var_name . " = " . $value . ";";
-					}
-					if ($row->var_method == "define"){
-						$line = "define('" . $row->var_name . "', ". $value . ");";
-					}
-				
-					if(fwrite($handle, $line . "\n")) {
-			
-					} else {
-						echo "<strong>Could not write to '$filename' file</strong>";
-					}
-				}				
-			}
-			fwrite($handle, "include_once KAHUK_LIBS_DIR.'settings_from_db.php';\n");
-			fwrite($handle, "?>");
-			fclose($handle);
-
-			if(caching == 1){
-				// this is to clear the cache and reload it for settings_from_db.php
-				$db->cache_dir = KAHUKPATH.'cache';
-				$db->use_disk_cache = true;
-				$db->cache_queries = true;
-				$db->cache_timeout = 0;
-				// if this query changes, update the query in /libs/settings_from_db.php LINE 16
-				$usersql = $db->get_results('SELECT var_name, var_value, var_method, var_enclosein FROM ' . TABLE_PREFIX . 'config');
-				$db->cache_queries = false;
-			}
-
-		} else {
-			echo "<strong>Could not open '$filename' file for writing</strong>";
-		}
 	}
 }

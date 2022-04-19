@@ -1097,5 +1097,3 @@ class Template_Lite_Compiler extends Template_Lite {
 		}
 	}
 }
-
-?>
