@@ -14,7 +14,7 @@
 		{literal}
 			<script type='text/javascript'>
 			$(function(){
-				$('#whitelist_add').keyup(function () {
+				$('#whitelist_add').on("change", function () {
 					if ($(this).val() == '') { //Check to see if there is any text entered
 						//If there is no text within the input, disable the button
 						$('.whitelistCheck').attr('disabled', 'disabled');
@@ -32,7 +32,7 @@
 						}
 					}
 				});
-				$('#blacklist_add').keyup(function () {
+				$('#blacklist_add').on("change", function () {
 					if ($(this).val() == '') { //Check to see if there is any text entered
 						//If there is no text within the input, disable the button
 						$('.blacklistCheck').attr('disabled', 'disabled');

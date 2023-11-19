@@ -1,5 +1,5 @@
 <legend>Error Log</legend>
-<p>Below you will find the contents of the /{php} echo LOG_FILE; {/php} file, where Kahuk CMS stores error messages. Not all of these error messages are significant, but you should carefully review each one to detect problems with your website. Once you have reviewed the errors below, dismiss them by clicking on the "Clear Log" button.</p>
+<p>Below you will find the contents of the "{$kahuk_viewable_log_file}" file, where Kahuk CMS stores error messages. Not all of these error messages are significant, but you should carefully review each one to detect problems with your website. Once you have reviewed the errors below, dismiss them by clicking on the "Clear Log" button.</p>
 
 <ul class="log-files">
 {foreach from=$logfiles item=logfile key=i}

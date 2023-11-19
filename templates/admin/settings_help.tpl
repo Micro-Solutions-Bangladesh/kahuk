@@ -42,39 +42,35 @@ input[type="radio"] {margin-right:10px;}
 <p><span style="background-color:#80e68d;padding:3px;border:1px solid #000;">This color means the setting is configured.</span>
 <br /><br /><span style="background-color:#ec9cab;padding:3px;border:1px solid #000;">This color means the setting is not configured.</span></p><br /><br />
 <legend class="centerText">MUST CONFIGURE</legend>
-{*site email*}
-	<fieldset>
-        <legend><a href="{$my_kahuk_base}/module.php?module=admin_language" target="_blank">Site's Email</a>:</legend>
-        <p>Your site's email is {if $siteEmail neq 'Not configured'}configured{else}Not configured{/if}. If you wish to change the email or configure it, click on the title to go to the Modify Language Module, then type "@" in the filter box and click on the filter button. The definition that needs to be configured is KAHUK_PassEmail_From. Click inside the box until you see two buttons appearing. "Save" and "cancel". Enter the email and click save.</p>
-		<select name="site_email" class="form-control {if $siteEmail neq 'Not configured'}configured{else}notconfigured{/if}">					
-            <option selected>{$siteEmail}</option>
-		</select>
-	</fieldset>
+
     
 {*SMTP email*}
 	<fieldset>
         <legend><a href="{$kahuk_base_url}/admin/admin_config.php?page=Location%20Installed" target="_blank">SMTP Email</a>:</legend>
         <p>If you want to use the SMTP settings of your server's email, you can follow the instructions to set it up or to change it.<br />SMTP settings will allow to send SMTP emails, as well as testing, on LOCALHOST, all the features that sends an email to your users. Testing on LOCALHOST has an additional option to configure, which prints out the email sent on the page, and only Admins can view it.<br />The relevant configurations are:<br /></p>
-        <label>Allow SMTP Testing?</label>
-		<select name="allow_smtp" class="form-control {if $allowSMTP eq 'true'}configured{else}notconfigured{/if}">					
-            <option selected>{$allowSMTP}</option>
-		</select><br />
+        <label>Debug email send?</label>
+        <input type="text" name="_email_debug" 
+            value="{$emailDebug}" disabled
+            class="form-control {if $emailDebug eq 'true'}configured{else}notconfigured{/if}"
+        />
+		<br />
         <label>SMTP Host</label>
-		<select name="host_smtp" class="form-control {if $hostSMTP neq ''}configured{else}notconfigured{/if}">					
-            <option selected>{$hostSMTP}</option>
-		</select><br />
+        <input type="text" name="_smtp_host" 
+            value="{$hostSMTP}" disabled
+            class="form-control {if $hostSMTP neq ''}configured{else}notconfigured{/if}"
+        />
+		<br />
         <label>SMTP Port</label>
-		<select name="port_smtp" class="form-control {if $portSMTP neq ''}configured{else}notconfigured{/if}">					
-            <option selected>{$portSMTP}</option>
-		</select><br />
+        <input type="text" name="_smtp_port" 
+            value="{$portSMTP}" disabled
+            class="form-control {if $portSMTP neq ''}configured{else}notconfigured{/if}"
+        />
+		<br />
         <label>SMTP Password</label>
-		<select name="pass_smtp" class="form-control {if $passSMTP neq ''}configured{else}notconfigured{/if}">					
-            <option selected>{$passSMTP}</option>
-		</select><br />
-        <label>Want to use a FAKE email?</label>
-		<select name="fake_smtp" class="form-control {if $fakeSMTP eq 'true'}configured{else}notconfigured{/if}">					
-            <option selected>{$fakeSMTP}</option>
-		</select>
+        <input type="text" name="_smtp_pass" 
+            value="{$passSMTP}" disabled
+            class="form-control {if $passSMTP neq ''}configured{else}notconfigured{/if}"
+        />
 	</fieldset>    
     
 {*Logo, openGraph and Twitter Card*}
@@ -115,27 +111,7 @@ input[type="radio"] {margin-right:10px;}
 <legend class="centerText">RECOMMENDED CONFIGURATION</legend>
 <fieldset>
     <p>The following are recommended configurations. To configure, click on the title of each.</p>
-</fieldset>   
-
-{*SEO settings*}
-	<fieldset>
-        <legend><a href="{$kahuk_base_url}/admin/admin_config.php?page=SEO" target="_blank">SEO Settings</a>:</legend>
-        <label>URL Method</label>
-        <p>Under SEO Settings. It is a best to use the SEO URL Method 2. To use it, on localhost or production server, you also need to have an <strong>.htaccess</strong> file, which you can get it ready by following the instructions under URL Method.</p>
-        <select name="Seo_method" class="form-control {if $SEOMethod eq 2}configured{else}notconfigured{/if}">					
-            <option selected>{$SEOMethod}</option>
-		</select>
-    </fieldset>
-
-{*AntiSpam settings*}
-	<fieldset>
-        <legend><a href="{$kahuk_base_url}/admin/admin_config.php?page=AntiSpam" target="_blank">AntiSpam Settings</a>:</legend>
-        <label>Enable Spam Checking</label>
-        <p>Under AntiSpam Settings. It is a best to set it to true. It helps Admins to whitelist/blacklist domains. When set to true, "Manage Domains" link will appear under Manage section in the dashboard.</p>
-        <select name="Anti_spam" class="form-control {if $Anti_spam eq true}configured{else}notconfigured{/if}">					
-            <option selected>{$Anti_spam}</option>
-		</select>
-    </fieldset>
+</fieldset>
 
 {*Submit settings*}
 	<fieldset>
@@ -226,20 +202,6 @@ input[type="radio"] {margin-right:10px;}
         </ul>
     </fieldset>
     
-    {*Live*}
-	<fieldset>
-        <legend><a href="{$kahuk_base_url}/admin/admin_config.php?page=Live" target="_blank">Live</a>:</legend>
-        <label>Enable Live</label>
-        <p>By default it is set to true. If you wish to disallow it (temporarily or indefinitely, set it to false.</p>
-        
-        <p>Under the Live section, you can also keep the default or change the following settings:</p>
-        
-        <ul>
-            <li>Number of items to show on the live page: default is 20</li>
-            <li>How many seconds between refreshes - not recommended to set it less than 5: default is 20</li>
-        </ul>
-    </fieldset>
-    
     {*Location Installed*}
 	<fieldset>
         <legend><a href="{$kahuk_base_url}/admin/admin_config.php?page=Location%20Installed" target="_blank">Location Installed</a>:</legend>
@@ -252,23 +214,6 @@ input[type="radio"] {margin-right:10px;}
         <label>Maintenance Mode</label>
         <p>Default is false.</p>
         <p>Set the mode to true when you want to notify the users of the unavailability of the site (upgrade, downtime, etc.) <strong>NOTE that only Admin can still access the site during maintenance mode!</strong></p>
-    </fieldset>
-    
-    {*Misc*}
-	<fieldset>
-        <legend><a href="{$kahuk_base_url}/admin/admin_config.php?page=Misc" target="_blank">Miscellaneous</a>:</legend>
-        <label>Enable Extra Fields</label>
-        <p>Default is false. If you wish to enable it, set it to true. <strong>When SET to TRUE, you have to edit the /libs/extra_fields.php file, using the NEW <a href="{$kahuk_base_url}/admin/admin_xtra_fields_editor.php" target="_blank">Extra Fields Editor</a> in the Dashboard!</strong></p>
-        
-        <ul>
-        <li>Allow friends: default is true. If you wish to disallow it (temporarily or indefinitely, set it to false.</li>
-        <li>How many stories to show on a page: default is 8. Set it to your needs.</li>
-        <li>How many users to display in top users: default is 25. Set it to your needs.</li>
-        <li>Timezone offset: set to Zero. Set it according to your timezone.</li>
-        <li>Site Language: default is English. You might want to set it to your language (require that you rename the appropriate language file in the /languages/ folder.</li>
-        <li>Allow users to change Kahuk language: default is 0 (no). When SET to 1, you have to rename the language file that you want to allow in /languages/ folder. Ex: RENAME lang_italian.conf.default to lang_italian.conf</li>
-        <li>Display What is Kahuk in the sidebar?: default is set to true. Set it to false if you do not want it to display. If you want it to display but with your own content, Keep it set to true and edit the language file where the entry is KAHUK_Visual_What_Is_Kahuk and KAHUK_Visual_What_Is_Kahuk_Text under the Sidebar section.<br /><a href="{$kahuk_base_url}/module.php?module=admin_language" target="_blank">Modify Language</a> in the Dashboard!</strong></li>
-        </ul>
     </fieldset>
 
     {*OutGoing*}

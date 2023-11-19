@@ -1,6 +1,6 @@
 <!--user_killspam.tpl -->
 <legend>{#KAHUK_Visual_Breadcrumb_User_Killspam#}</legend>
-<div class="alert alert-warning expires-warning">{#KAHUK_Visual_Page_Expires#}</div>
+
 <p>{#KAHUK_Visual_View_Killspam_Step1#}</p>
 <form name="token" method="post">
 <p>
