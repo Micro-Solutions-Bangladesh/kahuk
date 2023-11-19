@@ -1,4 +1,6 @@
 <?php
+define('IS_ADMIN', true);
+
 include_once('../internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
@@ -90,8 +92,9 @@ $main_smarty->assign('kahuk_logs', $kahuk_logs);
 
 
 // pagename
-define('pagename', 'admin_log');
-$main_smarty->assign('pagename', pagename);
+$pagename = 'admin_log';
+define('pagename', $pagename);
+$main_smarty->assign('pagename', $pagename);
 $main_smarty->assign('logfiles', $logFiles);
 
 // show the template

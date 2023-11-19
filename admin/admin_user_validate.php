@@ -1,4 +1,6 @@
 <?php
+define('IS_ADMIN', true);
+
 include_once('../internal/Smarty.class.php');
 $main_smarty = new Smarty;
 include('../config.php');
@@ -25,7 +27,7 @@ if (isset($_REQUEST['id'])) {
 		$user->id = $user_id;
 		$user->read();
 
-		$db->query(" UPDATE " . table_users . " SET `user_modification` = NOW() , `user_lastlogin` = NOW() WHERE `user_id` =" . $user_id . " LIMIT 1 ");
+		$db->query("UPDATE " . table_users . " SET `user_level` = 'normal', `verification_code` = 'verified', `user_modification` = NOW() , `user_lastlogin` = NOW() WHERE `user_id` = {$user_id} LIMIT 1");
 		echo '
 		<div class="modal fade in">
 			<div class="modal-header">

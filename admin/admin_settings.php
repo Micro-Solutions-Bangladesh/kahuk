@@ -1,4 +1,6 @@
 <?php
+define('IS_ADMIN', true);
+
 include_once('../internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
@@ -29,20 +31,17 @@ if (strpos($siteEmail, 'ENTER_THE_LOCALPART_HERE') !== false) {
 }
 
 //Check if the site's email is entered.
-$allowSMTP = $db->get_var("SELECT `var_value` FROM " . table_config ." WHERE `var_name` = 'allow_smtp_testing';");
-$main_smarty->assign('allowSMTP', $allowSMTP);
+$emailDebug = kahuk_get_config("_email_debug");
+$main_smarty->assign('emailDebug', $emailDebug);
 
-$hostSMTP = $db->get_var("SELECT `var_value` FROM " . table_config ." WHERE `var_name` = 'smtp_host';");
+$hostSMTP = kahuk_get_config("_smtp_host");
 $main_smarty->assign('hostSMTP', $hostSMTP);
 
-$portSMTP = $db->get_var("SELECT `var_value` FROM " . table_config ." WHERE `var_name` = 'smtp_port';");
+$portSMTP = kahuk_get_config("_smtp_port");
 $main_smarty->assign('portSMTP', $portSMTP);
 
-$passSMTP = $db->get_var("SELECT `var_value` FROM " . table_config ." WHERE `var_name` = 'smtp_pass';");
+$passSMTP = kahuk_get_config("_smtp_pass");
 $main_smarty->assign('passSMTP', $passSMTP);
-
-$fakeSMTP = $db->get_var("SELECT `var_value` FROM " . table_config ." WHERE `var_name` = 'smtp_fake_email';");
-$main_smarty->assign('fakeSMTP', $fakeSMTP);
 
 //Logo, openGraph and Twitter Card
 $useLogo = $db->get_var("SELECT `var_value` FROM " . table_config ." WHERE `var_name` = 'Default_Site_Logo';");
@@ -60,12 +59,6 @@ $main_smarty->assign('validateuserEmail', $validateuserEmail);
 
 $validateuserPass = $db->get_var("SELECT `var_value` FROM " . table_config ." WHERE `var_name` = 'validate_password';");
 $main_smarty->assign('validateuserPass', $validateuserPass);
-
-$SEOMethod = $db->get_var("SELECT `var_value` FROM " . table_config ." WHERE `var_name` = '\$URLMethod';");
-$main_smarty->assign('SEOMethod', $SEOMethod);
-
-$Anti_spam = $db->get_var("SELECT `var_value` FROM " . table_config ." WHERE `var_name` = 'CHECK_SPAM';");
-$main_smarty->assign('Anti_spam', $Anti_spam);
 
 $submitDraft = $db->get_var("SELECT `var_value` FROM " . table_config ." WHERE `var_name` = 'Allow_Draft';");
 $main_smarty->assign('submitDraft', $submitDraft);

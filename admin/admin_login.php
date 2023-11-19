@@ -1,10 +1,10 @@
 <?php
+define('IS_ADMIN', true);
 
 include_once('../internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('../config.php');
-include(KAHUK_LIBS_DIR . 'link.php');
 include(KAHUK_LIBS_DIR . 'smartyvariables.php');
 
 $canIhaveAccess = 0;
@@ -54,7 +54,7 @@ if ((isset($_POST["processlogin"]) && is_numeric($_POST["processlogin"])) || (is
 				$db->query("UPDATE " . table_login_attempts . " SET login_username='$dbusername', login_count=login_count+1, login_time=NOW() WHERE login_id=" . $login_id);
 				$user = $db->get_row("SELECT * FROM " . table_users . " WHERE user_login = '$username' or user_email= '$username'");
 				
-				if (kahuk_validate() && $user->user_lastlogin == NULL) {
+				if (&& $user->user_lastlogin == NULL) {
 					$errorMsg = $main_smarty->get_config_vars('KAHUK_Visual_Resend_Email') .
 						"<form method='post'>
 							<div class='input-append notvalidated'>
@@ -77,9 +77,6 @@ if ((isset($_POST["processlogin"]) && is_numeric($_POST["processlogin"])) || (is
 				}
 
 				define('logindetails', $username . ";" . $password . ";" . $return);
-
-				$vars = '';
-				check_actions('login_success_pre_redirect', $vars);
 
 				if (strpos($_SERVER['SERVER_SOFTWARE'], "IIS") && strpos(php_sapi_name(), "cgi") >= 0) {
 					echo '<SCRIPT LANGUAGE="JavaScript">window.location="' . $return . '";</script>';

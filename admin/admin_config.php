@@ -1,9 +1,10 @@
 <?php
+define('IS_ADMIN', true);
+
 include_once('../internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('../config.php');
-include(KAHUK_LIBS_DIR . 'link.php');
 include(KAHUK_LIBS_DIR . 'smartyvariables.php');
 include(KAHUK_LIBS_DIR . 'admin_config.php');
 
@@ -67,7 +68,7 @@ function dowork()
 			$config->read();
 
 			// Check if template exists
-			if ($config->var_name == '$thetemp' && $config->var_value != js_urldecode($_REQUEST['var_value'])) {
+			if ($config->var_name == 'template_folder' && $config->var_value != js_urldecode($_REQUEST['var_value'])) {
 				if (!file_exists('../templates/' . js_urldecode($_REQUEST['var_value']))) {
 					print "alert('" . $main_smarty->get_config_vars('KAHUK_Visual_AdminPanel_NoTemplate') . "')";
 					exit;
