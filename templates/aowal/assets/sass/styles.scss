@@ -1,0 +1,26 @@
+@import "variables";
+
+/* tailwind directives */
+@tailwind base;
+@import "base";
+
+@tailwind components;
+@tailwind utilities;
+
+
+
+
+@import "header";
+
+@import "buttons";
+
+@import "common-components";
+
+
+.space-y-4 > * + * {
+    margin-top: 1rem; /* 16px */
+}
+
+.space-y-6 > * + * {
+    margin-top: 1.5rem; /* 24px */
+}

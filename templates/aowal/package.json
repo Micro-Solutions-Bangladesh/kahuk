@@ -1,0 +1,23 @@
+{
+  "name": "aowal",
+  "version": "1.0.0",
+  "description": "Aowal template using Tailwind and tw-elements for vahuk.com / tutpub.com",
+  "scripts": {
+    "test": "echo \"Yes, build process is working!\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Shah Alom (https://twitter.com/shahalom_amin/)",
+  "devDependencies": {
+    "gulp": "^4.0.2",
+    "gulp-postcss": "^9.0.1",
+    "gulp-rename": "^2.0.0",
+    "gulp-sass": "^5.1.0",
+    "gulp-uglifycss": "^1.1.0",
+    "postcss": "^8.4.6",
+    "sass": "^1.49.7",
+    "tailwindcss": "^3.0.18"
+  },
+  "dependencies": {
+    "tw-elements": "^1.0.0-alpha10"
+  }
+}
