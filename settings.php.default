@@ -1,4 +1,0 @@
-<?php
-$dblang = 'en';
-
-include_once KAHUK_LIBS_DIR . 'settings_from_db.php';

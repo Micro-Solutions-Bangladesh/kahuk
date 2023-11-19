@@ -87,7 +87,6 @@
 							creating a database and write down your database name, username, password, and host
 							somewhere.</li>
 						<li>Rename the /favicon.ico.default to /favicon.ico</li>
-						<li>Rename the /settings.php.default to /settings.php</li>
 						<li>Rename the /languages/lang_english.conf.default file to lang_english.conf. Same instructions
 							apply to any other language file that you might use that are located in the /languages
 							directory.</li>
@@ -102,11 +101,6 @@
 								<li>/cache/</li>
 								<li>/languages/ (all files contained in this folder should be CHMOD 777)</li>
 								<li>/logs/ (all files contained should be CHMOD 777)</li>
-							</ul>
-						</li>
-						<li>CHMOD 666 the following files
-							<ul>
-								<li>/settings.php</li>
 							</ul>
 						</li>
 						<li>Open /install/index.php in your web browser. If you are reading this document after you
@@ -130,30 +124,6 @@
 					</ol>
 					<br />
 
-					<legend><a href="#backup" name="backup">Backup</a></legend>
-					<ol>
-						<li>Log into your site as admin</li>
-						<li>Click on admin panel link</li>
-						<li>Click on File and MySQL backup link</li>
-						<li>Backup your files, avatars, and MySQL database</li>
-						<li>Download the backup .zip files to your computer</li>
-						<li>Delete the files from the backup manager</li>
-					</ol>
-					<br />
-
-					<legend><a href="#version" name="version">Version</a></legend>
-					<p><strong>Kahuk CMS Version</strong></p>
-					<p>For easy access, the Kahuk Admin Panel's "Statistics" widget displays your Kahuk CMS Version.
-						Kahuk stores your version number in a MySQL database under the kahuk_misc_data table. If you
-						have access to a tool to view your MySQL database, like PhpMyAdmin, you will find that the data
-						is stored under the name "kahuk_version". </p>
-					<p>To upgrade to the latest version of Kahuk CMS, make sure that you run the file
-						/install/upgrade.php in your browser after uploading the latest version Kahuk files to your
-						server. If you forget to take this step your database may not be up to date with the latest
-						version, causing the version number displayed in the Admin Panel to be incorrect.</p>
-
-					<br />
-
 					<legend><a href="#upgrade" name="upgrade">Upgrading</a></legend>
 					<div class="well">
 						Please be sure to <strong>make a backup of your MySQL databases and files before
@@ -175,7 +145,6 @@
 							<ol>
 								<li>/avatars/ (entire directory)</li>
 								<li>/favicon.ico</li>
-								<li>/settings.php</li>
 							</ol>
 						</li>
 						<li>Upload all of the new files to your server. <br />
@@ -185,7 +154,6 @@
 						<li>Confirm that the CHMOD permissions for the following files or directories are all set to
 							777.</li>
 						<ul>
-							<li>/settings.php</li>
 							<li>/admin/backup/</li>
 							<li>/avatars/groups_uploaded/</li>
 							<li>/avatars/user_uploaded/</li>

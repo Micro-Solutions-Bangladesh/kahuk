@@ -65,14 +65,16 @@ class Template_Lite
 	// private internal variables
 	public $_vars		= array();	// stores all internal assigned variables
 	public $_confs		= array();	// stores all internal config variables
-	public $_plugins	= array(	   'modifier'	  => array(),
-								   'function'	  => array(),
-								   'block'		 => array(),
-								   'compiler'	  => array(),
-								   'resource'	  => array(),
-								   'prefilter'	 => array(),
-								   'postfilter'	=> array(),
-								   'outputfilter'  => array());
+	public $_plugins	= array(
+		'modifier'	  => array(),
+		'function'	  => array(),
+		'block'		 => array(),
+		'compiler'	  => array(),
+		'resource'	  => array(),
+		'prefilter'	 => array(),
+		'postfilter'	=> array(),
+		'outputfilter'  => array()
+	);
 	public $_linenum		= 0;		// the current line number in the file we are processing
 	public $_file			= "";		// the current file we are processing
 	public $_config_obj	= null;
@@ -106,7 +108,7 @@ class Template_Lite
 			case 'output':
 				include_once($this->_get_plugin_filepath('outputfilter', $name));
 				$this->_plugins['outputfilter'][$name] = "template_" . $type . "filter_" . $name;
-			   break;
+				break;
 			case 'pre':
 			case 'post':
 				if (!isset($this->_plugins[$type . 'filter'][$name])) {
@@ -153,13 +155,13 @@ class Template_Lite
 		}
 	}
 
-	function append($key, $value=null, $merge=false)
+	function append($key, $value = null, $merge = false)
 	{
 		if (is_array($key)) {
 			foreach ($key as $_key => $_value) {
 				if ($_key != '') {
 					if (!@is_array($this->_vars[$_key])) {
-						settype($this->_vars[$_key],'array');
+						settype($this->_vars[$_key], 'array');
 					}
 					if ($merge && is_array($_value)) {
 						foreach ($_value as $_mergekey => $_mergevalue) {
@@ -173,7 +175,7 @@ class Template_Lite
 		} else {
 			if ($key != '' && isset($value)) {
 				if (!@is_array($this->_vars[$key])) {
-					settype($this->_vars[$key],'array');
+					settype($this->_vars[$key], 'array');
 				}
 				if ($merge && is_array($value)) {
 					foreach ($value as $_mergekey => $_mergevalue) {
@@ -186,11 +188,11 @@ class Template_Lite
 		}
 	}
 
-	function append_by_ref($key, &$value, $merge=false)
+	function append_by_ref($key, &$value, $merge = false)
 	{
 		if ($key != '' && isset($value)) {
 			if (!@is_array($this->_vars[$key])) {
-				settype($this->_vars[$key],'array');
+				settype($this->_vars[$key], 'array');
 			}
 			if ($merge && is_array($value)) {
 				foreach ($value as $_key => $_val) {
@@ -387,8 +389,8 @@ class Template_Lite
 
 	function template_exists($file)
 	{
-		if (file_exists($this->_get_dir($this->template_dir).$file)) {
-			$this->_resource_time = filemtime($this->_get_dir($this->template_dir).$file);
+		if (file_exists($this->_get_dir($this->template_dir) . $file)) {
+			$this->_resource_time = filemtime($this->_get_dir($this->template_dir) . $file);
 			$this->_resource_type = 1;
 			return true;
 		} else {
@@ -438,29 +440,30 @@ class Template_Lite
 		$file = $this->_get_resource($file);
 
 		if ($this->debugging) {
-			$this->_templatelite_debug_info[] = array('type'	  => 'template',
-												'filename'  => $file,
-												'depth'	 => 0,
-												'exec_time' => array_sum(explode(' ', microtime())) );
+			$this->_templatelite_debug_info[] = array(
+				'type'	  => 'template',
+				'filename'  => $file,
+				'depth'	 => 0,
+				'exec_time' => array_sum(explode(' ', microtime()))
+			);
 			$included_tpls_idx = count($this->_templatelite_debug_info) - 1;
 		}
 
 		$this->_cache_id = $cache_id;
 		$this->template_dir = $this->_get_dir($this->template_dir);
 		$this->compile_dir = $this->_get_dir($this->compile_dir);
-		
+
 		if ($this->cache) {
 			$this->_cache_dir = $this->_build_dir($this->cache_dir, $this->_cache_id);
 		}
 
-		$name = ($this->encode_file_name) ? md5((($this->_resource_type == 1) ? $this->template_dir.$file : $this->_resource_type . "_" . $file)).'.php' : str_replace(".", "_", str_replace("/", "_", $this->_resource_type . "_" . $file)).'.php';
+		$name = ($this->encode_file_name) ? md5((($this->_resource_type == 1) ? $this->template_dir . $file : $this->_resource_type . "_" . $file)) . '.php' : str_replace(".", "_", str_replace("/", "_", $this->_resource_type . "_" . $file)) . '.php';
 
 		$this->_error_level = $this->debugging ? error_reporting() : error_reporting(error_reporting() & ~E_NOTICE);
-//		$this->_error_level = error_reporting(E_ALL);
 
 		if (!$this->force_compile && $this->cache && $this->_is_cached($file, $cache_id)) {
 			ob_start();
-			include($this->_cache_dir.$name);
+			include($this->_cache_dir . $name);
 			$output = ob_get_contents();
 			ob_end_clean();
 			$output = substr($output, strpos($output, "\n") + 1);
@@ -468,14 +471,14 @@ class Template_Lite
 			$output = $this->_fetch_compile($file, $cache_id);
 
 			if ($this->cache) {
-				$f = fopen($this->_cache_dir.$name, "w");
+				$f = fopen($this->_cache_dir . $name, "w");
 				fwrite($f, serialize($this->_cache_info) . "\n$output");
 				fclose($f);
 			}
 		}
 
 		if (strpos($output, $this->_sl_md5) !== false) {
-			preg_match_all('!' . $this->_sl_md5 . '{_run_insert (.*)}' . $this->_sl_md5 . '!U',$output,$_match);
+			preg_match_all('!' . $this->_sl_md5 . '{_run_insert (.*)}' . $this->_sl_md5 . '!U', $output, $_match);
 			foreach ($_match[1] as $value) {
 				$arguments = unserialize($value);
 				$output = str_replace($this->_sl_md5 . '{_run_insert ' . $value . '}' . $this->_sl_md5, call_user_func_array('insert_' . $arguments['name'], array((array)$arguments, $this)), $output);
@@ -514,7 +517,68 @@ class Template_Lite
 
 	function config_load($file, $section_name = null, $var_name = null)
 	{
-		require(TEMPLATE_LITE_DIR . "internal/template.config_loader.php");
+		$this->_config_module_loaded = true;
+
+		$this->template_dir = $this->_get_dir($this->template_dir);
+		// $this->config_dir = $this->_get_dir($this->config_dir);
+		$this->compile_dir = $this->_get_dir($this->compile_dir);
+
+		$name = ($this->encode_file_name) ? md5($this->template_dir . $file . $section_name . $var_name) . '.php' : str_replace(".", "_", str_replace("/", "_", $file . "_" . $section_name . "_" . $var_name)) . '.php';
+
+		if ($this->debugging) {
+			$debug_start_time = array_sum(explode(' ', microtime()));
+		}
+
+		if ($this->cache) {
+			array_push($this->_cache_info['config'], $file);
+		}
+
+		if (!$this->force_compile && file_exists($this->compile_dir . 'c_' . $name) && (filemtime($this->compile_dir . 'c_' . $name) > filemtime($this->config_dir . $file))) {
+			include($this->compile_dir . 'c_' . $name);
+
+			return true;
+		}
+
+		if (!is_object($this->_config_obj)) {
+			require_once(TEMPLATE_LITE_DIR . "internal/class.config.php");
+
+			$this->_config_obj = new $this->config_class;
+			$this->_config_obj->overwrite = $this->config_overwrite;
+			$this->_config_obj->booleanize = $this->config_booleanize;
+			$this->_config_obj->fix_new_lines = $this->config_fix_new_lines;
+			$this->_config_obj->read_hidden = $this->config_read_hidden;
+		}
+
+		if (!($_result = $this->_config_obj->config_load($file, $section_name, $var_name))) {
+			return false;
+		}
+
+		if (!empty($var_name) || !empty($section_name)) {
+			$output = "\$this->_confs = " . var_export($_result, true) . ";";
+		} else {
+			// must shift of the bottom level of the array to get rid of the section labels
+			$_temp = array();
+			foreach ($_result as $value) {
+				$_temp = array_merge($_temp, $value);
+			}
+			$output = "\$this->_confs = " . var_export($_temp, true) . ";";
+		}
+
+		$f = fopen($this->compile_dir . 'c_' . $name, "w");
+		fwrite($f, '<?php ' . $output . ' ?>');
+		fclose($f);
+		eval($output);
+
+		if ($this->debugging) {
+			$this->_templatelite_debug_info[] = array(
+				'type'	  => 'config',
+				'filename'  => $file . ' [' . $section_name . '] ' . $var_name,
+				'depth'	 => 0,
+				'exec_time' => array_sum(explode(' ', microtime())) - $debug_start_time
+			);
+		}
+
+		return true;
 	}
 
 	function _is_cached($file, $cache_id)
@@ -525,22 +589,22 @@ class Template_Lite
 
 		$file = $this->_get_resource($file);
 
-		$name = ($this->encode_file_name) ? md5((($this->_resource_type == 1) ? $this->template_dir.$file : $this->_resource_type . "_" . $file)).'.php' : str_replace(".", "_", str_replace("/", "_", $this->_resource_type . "_" . $file)).'.php';
+		$name = ($this->encode_file_name) ? md5((($this->_resource_type == 1) ? $this->template_dir . $file : $this->_resource_type . "_" . $file)) . '.php' : str_replace(".", "_", str_replace("/", "_", $this->_resource_type . "_" . $file)) . '.php';
 
-		if (file_exists($this->_cache_dir.$name) && (((time() - filemtime($this->_cache_dir.$name)) < $this->cache_lifetime) || $this->cache_lifetime == -1) && (filemtime($this->_cache_dir.$name) > $this->_resource_time)) {
-			$fh = fopen($this->_cache_dir.$name, "r");
-			if (!feof($fh) && ($line = fgets($fh, filesize($this->_cache_dir.$name)))) {
+		if (file_exists($this->_cache_dir . $name) && (((time() - filemtime($this->_cache_dir . $name)) < $this->cache_lifetime) || $this->cache_lifetime == -1) && (filemtime($this->_cache_dir . $name) > $this->_resource_time)) {
+			$fh = fopen($this->_cache_dir . $name, "r");
+			if (!feof($fh) && ($line = fgets($fh, filesize($this->_cache_dir . $name)))) {
 				$includes = unserialize($line);
 				if (isset($includes['template'])) {
 					foreach ($includes['template'] as $value) {
-						if (!(file_exists($this->template_dir.$value) && (filemtime($this->_cache_dir.$name) > filemtime($this->template_dir.$value)))) {
+						if (!(file_exists($this->template_dir . $value) && (filemtime($this->_cache_dir . $name) > filemtime($this->template_dir . $value)))) {
 							return false;
 						}
 					}
 				}
 				if (isset($includes['config'])) {
 					foreach ($includes['config'] as $value) {
-						if (!(file_exists($this->config_dir.$value) && (filemtime($this->_cache_dir.$name) > filemtime($this->config_dir.$value)))) {
+						if (!(file_exists($this->config_dir . $value) && (filemtime($this->_cache_dir . $name) > filemtime($this->config_dir . $value)))) {
 							return false;
 						}
 					}
@@ -561,9 +625,9 @@ class Template_Lite
 		return template_fetch_compile_include($_templatelite_include_file, $_templatelite_include_vars, $this);
 	}
 
-	function _generate_file_name($file) 
+	function _generate_file_name($file)
 	{
-		return ($this->encode_file_name) ? md5((($this->_resource_type == 1) ? $this->template_dir.$file : $this->_resource_type . "_" . $file)).'.php' : str_replace(".", "_", str_replace("/", "_", $this->_resource_type . "_" . $file)).'.php';
+		return ($this->encode_file_name) ? md5((($this->_resource_type == 1) ? $this->template_dir . $file : $this->_resource_type . "_" . $file)) . '.php' : str_replace(".", "_", str_replace("/", "_", $this->_resource_type . "_" . $file)) . '.php';
 	}
 
 	function _fetch_compile($file)
@@ -576,9 +640,11 @@ class Template_Lite
 			array_push($this->_cache_info['template'], $file);
 		}
 
-		if (!$this->force_compile && file_exists($compiled_file)
-		 && (filemtime($compiled_file) > $this->_resource_time)
-		 && (filemtime($compiled_file) > $this->_version_date)) {
+		if (
+			!$this->force_compile && file_exists($compiled_file)
+			&& (filemtime($compiled_file) > $this->_resource_time)
+			&& (filemtime($compiled_file) > $this->_version_date)
+		) {
 			ob_start();
 			include($compiled_file);
 			$output = ob_get_contents();
@@ -632,7 +698,7 @@ class Template_Lite
 
 		$output = $this->_compile_obj->_compile_file($file_contents);
 
-		if ( file_exists( $compiled_file ) ) {
+		if (file_exists($compiled_file)) {
 			$f = fopen($compiled_file, "w");
 			fwrite($f, $output);
 			fclose($f);
@@ -698,9 +764,10 @@ class Template_Lite
 				return $dir;
 			}
 			foreach ($_args as $value) {
-				$dir .= $value.DIRECTORY_SEPARATOR;
+				$dir .= $value . DIRECTORY_SEPARATOR;
 			}
 		}
+
 		return $dir;
 	}
 
@@ -720,6 +787,7 @@ class Template_Lite
 
 		$plugin_dir_path = "";
 		$_plugin_dir_list = is_array($this->plugins_dir) ? $this->plugins_dir : (array)$this->plugins_dir;
+
 		foreach ($_plugin_dir_list as $_plugin_dir) {
 			$_plugin_dir = $this->_get_dir($_plugin_dir);
 
@@ -734,16 +802,16 @@ class Template_Lite
 				if (!isset($_path_array)) {
 					$_ini_include_path = ini_get('include_path');
 
-					if (strstr($_ini_include_path,';')) {
+					if (strstr($_ini_include_path, ';')) {
 						// windows pathnames
-						$_path_array = explode(';',$_ini_include_path);
+						$_path_array = explode(';', $_ini_include_path);
 					} else {
-						$_path_array = explode(':',$_ini_include_path);
+						$_path_array = explode(':', $_ini_include_path);
 					}
 				}
 
-				if (!in_array($_plugin_dir,$_path_array)) {
-					array_push($_path_array,$_plugin_dir);
+				if (!in_array($_plugin_dir, $_path_array)) {
+					array_push($_path_array, $_plugin_dir);
 				}
 
 				foreach ($_path_array as $_include_path) {
@@ -754,24 +822,17 @@ class Template_Lite
 				}
 			}
 		}
+
 		return $plugin_dir_path;
 	}
 
-//	function _parse_resource_link($resource_link)
-//	{
-//		$stuffing = "file:/this/is/the/time_5-23.tpl";
-//		$stuffing_data = explode(":", $stuffing);
-//		preg_match_all('/(?:([0-9a-z._-]+))/i', $stuffing, $stuff);
-//		print_r($stuff);
-//		echo "<br>Path: " . str_replace($stuff[0][count($stuff[0]) - 1], "", $stuffing);
-//		echo "<br>Filename: " . $stuff[0][count($stuff[0]) - 1];
-//	}
 
 	function _build_dir($dir, $id)
 	{
 		if (!function_exists("template_build_dir")) {
 			require_once(TEMPLATE_LITE_DIR . "internal/template.build_dir.php");
 		}
+
 		return template_build_dir($dir, $id, $this);
 	}
 
@@ -780,113 +841,113 @@ class Template_Lite
 		if (!function_exists("template_destroy_dir")) {
 			require_once(TEMPLATE_LITE_DIR . "internal/template.destroy_dir.php");
 		}
+
 		return template_destroy_dir($file, $id, $dir, $this);
 	}
 
 	function trigger_error($error_msg, $error_type = E_USER_ERROR, $file = null, $line = null)
 	{
 		if (isset($file) && isset($line)) {
-			$info = ' ('.basename($file).", line $line)";
+			$info = ' (' . basename($file) . ", line $line)";
 		} else {
 			$info = null;
 		}
+
 		trigger_error('TPL: [in ' . $this->_file . ' line ' . $this->_linenum . "]: syntax error: $error_msg$info", $error_type);
 	}
 
-    function _get_compile_path($file)
-    {
+	function _get_compile_path($file)
+	{
 		$name = $this->_generate_file_name($file);
-        return $this->_get_dir($this->compile_dir) . 'c_'.$name;
-    }
+		return $this->_get_dir($this->compile_dir) . 'c_' . $name;
+	}
 
-   /**
-     * compile the given source
-     *
-     * @param string $resource_name
-     * @param string $source_content
-     * @param string $compiled_content
-     * @return boolean
-     */
-    function _compile_source($resource_name, &$source_content, &$compiled_content, $cache_include_path=null)
-    {
-        if (file_exists(SMARTY_DIR . $this->compiler_file)) {
-            require_once(SMARTY_DIR . $this->compiler_file);
-        } else {
-            // use include_path
-            require_once($this->compiler_file);
-        }
+	/**
+	 * compile the given source
+	 *
+	 * @param string $resource_name
+	 * @param string $source_content
+	 * @param string $compiled_content
+	 * @return boolean
+	 */
+	function _compile_source($resource_name, &$source_content, &$compiled_content, $cache_include_path = null)
+	{
+		if (file_exists(SMARTY_DIR . $this->compiler_file)) {
+			require_once(SMARTY_DIR . $this->compiler_file);
+		} else {
+			// use include_path
+			require_once($this->compiler_file);
+		}
 
 
-        $smarty_compiler = new $this->compiler_class;
+		$smarty_compiler = new $this->compiler_class;
 
-        $smarty_compiler->template_dir      = $this->template_dir;
-        $smarty_compiler->compile_dir       = $this->compile_dir;
-        $smarty_compiler->plugins_dir       = $this->plugins_dir;
-        $smarty_compiler->config_dir        = $this->config_dir;
-        $smarty_compiler->force_compile     = $this->force_compile;
-        if (isset($this->caching)) {
+		$smarty_compiler->template_dir      = $this->template_dir;
+		$smarty_compiler->compile_dir       = $this->compile_dir;
+		$smarty_compiler->plugins_dir       = $this->plugins_dir;
+		$smarty_compiler->config_dir        = $this->config_dir;
+		$smarty_compiler->force_compile     = $this->force_compile;
+		if (isset($this->caching)) {
 			$smarty_compiler->caching       = $this->caching;
 		}
-        if (isset($this->php_handling)) {
+		if (isset($this->php_handling)) {
 			$smarty_compiler->php_handling  = $this->php_handling;
 		}
-        $smarty_compiler->left_delimiter    = $this->left_delimiter;
-        $smarty_compiler->right_delimiter   = $this->right_delimiter;
-        $smarty_compiler->_version          = $this->_version;
-        if (isset($this->security)) {
+		$smarty_compiler->left_delimiter    = $this->left_delimiter;
+		$smarty_compiler->right_delimiter   = $this->right_delimiter;
+		$smarty_compiler->_version          = $this->_version;
+		if (isset($this->security)) {
 			$smarty_compiler->security      = $this->security;
 		}
-        if (isset($this->secure_dir)) {
+		if (isset($this->secure_dir)) {
 			$smarty_compiler->secure_dir    = $this->secure_dir;
 		}
-        if (isset($this->security_settings)) {
+		if (isset($this->security_settings)) {
 			$smarty_compiler->security_settings = $this->security_settings;
 		}
-        if (isset($this->trusted_dir)) {
+		if (isset($this->trusted_dir)) {
 			$smarty_compiler->trusted_dir   = $this->trusted_dir;
 		}
-        if (isset($this->use_sub_dirs)) {
+		if (isset($this->use_sub_dirs)) {
 			$smarty_compiler->use_sub_dirs  = $this->use_sub_dirs;
 		}
-        $smarty_compiler->_reg_objects      = &$this->_reg_objects;
-        $smarty_compiler->_plugins          = &$this->_plugins;
-        $smarty_compiler->_tpl_vars         = &$this->_tpl_vars;
-        $smarty_compiler->default_modifiers = $this->default_modifiers;
-        if (isset($this->_compile_id)) {
+		$smarty_compiler->_reg_objects      = &$this->_reg_objects;
+		$smarty_compiler->_plugins          = &$this->_plugins;
+		$smarty_compiler->_tpl_vars         = &$this->_tpl_vars;
+		$smarty_compiler->default_modifiers = $this->default_modifiers;
+		if (isset($this->_compile_id)) {
 			$smarty_compiler->compile_id    = $this->_compile_id;
 		}
-        if (isset($this->_config)) {
+		if (isset($this->_config)) {
 			$smarty_compiler->_config       = $this->_config;
 		}
-        if (isset($this->request_use_auto_globals)) {
+		if (isset($this->request_use_auto_globals)) {
 			$smarty_compiler->request_use_auto_globals  = $this->request_use_auto_globals;
 		}
 
-        if (isset($cache_include_path) && isset($this->_cache_serials[$cache_include_path])) {
-            $smarty_compiler->_cache_serial = $this->_cache_serials[$cache_include_path];
-        }
-        $smarty_compiler->_cache_include = $cache_include_path;
+		if (isset($cache_include_path) && isset($this->_cache_serials[$cache_include_path])) {
+			$smarty_compiler->_cache_serial = $this->_cache_serials[$cache_include_path];
+		}
+		$smarty_compiler->_cache_include = $cache_include_path;
 
 
-        $compiled_content = $smarty_compiler->_compile_file($source_content);
+		$compiled_content = $smarty_compiler->_compile_file($source_content);
 
-        if (isset($smarty_compiler->_cache_serial)) {
-            $this->_cache_include_info = array(
-                'cache_serial'=>$smarty_compiler->_cache_serial
-                ,'plugins_code'=>$smarty_compiler->_plugins_code
-                ,'include_file_path' => $cache_include_path);
+		if (isset($smarty_compiler->_cache_serial)) {
+			$this->_cache_include_info = array(
+				'cache_serial' => $smarty_compiler->_cache_serial, 'plugins_code' => $smarty_compiler->_plugins_code, 'include_file_path' => $cache_include_path
+			);
+		} else {
+			$this->_cache_include_info = null;
+		}
+	}
 
-        } else {
-            $this->_cache_include_info = null;
-        }
-    }
-
-    /**
-     * wrapper for eval() retaining $this
-     * @return mixed
-     */
-    function _eval($code, $params=null)
-    {
-        return eval($code);
-    }
+	/**
+	 * wrapper for eval() retaining $this
+	 * @return mixed
+	 */
+	function _eval($code, $params = null)
+	{
+		return eval($code);
+	}
 }
