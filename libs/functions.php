@@ -4,6 +4,15 @@ if (!defined('KAHUKPATH')) {
 }
 
 /**
+ * @since 5.0.6
+ */
+function kahuk_session_start() {
+	if(!isset($_SESSION)) {
+		session_start();
+	}
+}
+
+/**
  * 
  * @since 4.1.5
  */
@@ -11,32 +20,81 @@ if ( !function_exists( 'gettext' ) ) {
 	function _( $s ) {return $s;}
 }
 
-
 /**
- * Convert object of database return into array
+ * a value 0 or 1 will be returned from the script that checks whether the content is left-to-right or right-to-left language. This varibale will be passed to /templates/bootstrap/link_summary.tpl and used on line 214 to apply dir="rtl" when applicable.
+ * As per http://php.net/manual/en/regexp.reference.unicode.php and https://www.w3.org/International/questions/qa-scripts#which
  * 
- * @params $dbResult object required
- * @params $columnsName array required
+ * @since 5.0.6
  * 
- * @since 5.0.4
+ * @return boolean
  */
-function kahuk_db_object_to_array( $dbResult, $columnsName ) {
-	$output = [];
-	$counter = 0;
-
-	foreach($dbResult as $row) {
-		foreach($columnsName as $column_name) {
-			if ($row->$column_name) {
-				$output[$counter][$column_name] = $row->$column_name;
-			}
-		}
-
-		$counter++;
-	}
-
-	return $output;
+function kahuk_is_rtl( $str ) {
+	return (preg_match('/\p{Arabic}/u', $str) == 1 || preg_match('/\p{Hebrew}/u', $str) == 1 || preg_match('/\p{Nko}/u', $str) == 1 || preg_match('/\p{Syloti_Nagri}/u', $str) == 1 || preg_match('/\p{Thaana}/u', $str) == 1);
 }
 
+
+/**
+ * Format the date, in localized format.
+ * 
+ * @since 5.0.6
+ * 
+ * @param int $timestamp Optional. Unix timestamp. Defaults to current time.
+ * @param string $format PHP date format.
+ * 
+ * @return string|empty The date, translated if locale specifies it. False on invalid timestamp input.
+ */
+function kahuk_date($timestamp = '', $format = 'date') {
+	if ($format == 'date') {
+		$format = 'F j, Y';
+	} else if ($format == 'datetime') {
+		$format = 'F j, Y \a\t g:ia';
+	}
+
+	if ($timestamp == '') {
+		$timestamp = time();
+	}
+
+	if (!is_numeric($timestamp)) {
+		$timestamp = strtotime($timestamp);
+	}
+
+	return date($format, $timestamp);
+}
+
+
+
+/**
+ * Count the number of words seperated by spaces
+ * 
+ * @since 5.0.6
+ * 
+ * return int number of words determined by spaces
+ */
+function kahuk_word_count($str) {
+	// return str_word_count($str);
+
+	$rs = explode(" ", $str);
+
+	return count($rs);
+}
+
+/**
+ * Get messages from the session
+ * 
+ * @since 5.0.0
+ * 
+ * @return array
+ */
+function kahuk_shorten_the_url($url) {
+	if (!$url) {
+		return '';
+	}
+
+	$parsed = parse_url($url);
+	$scheme = ($parsed['scheme'] ?? "https");
+
+	return  $scheme . "://" . $parsed['host'];
+}
 
 /**
  * Get messages from the session
@@ -46,7 +104,7 @@ function kahuk_db_object_to_array( $dbResult, $columnsName ) {
  * @return array
  */
 function kahuk_get_session_messages() {
-	session_start();
+	kahuk_session_start();
 
 	$output = ( isset( $_SESSION['kahuk_session_message'] ) ? $_SESSION['kahuk_session_message'] : [] );
 	$_SESSION['kahuk_session_message'] = [];
@@ -57,10 +115,14 @@ function kahuk_get_session_messages() {
 /**
  * Save message into the session
  * 
+ * @param $msg Message
+ * @param msgType could be 'success', 'info', 'warning', 'error'
+ * 
  * @since 5.0.0
  */
 function kahuk_set_session_message( $msg, $msgtype = 'info', $msgcode = '' ) {
-	session_start();
+	kahuk_session_start();
+
 	$output = [];
 
 	if ( isset( $_SESSION['kahuk_session_message'] ) ) {
@@ -75,21 +137,6 @@ function kahuk_set_session_message( $msg, $msgtype = 'info', $msgcode = '' ) {
 
 	$_SESSION['kahuk_session_message'] = $output;
 }
-
-
-
-
-/**
- * Sanitize numeric value from text
- * 
- * @since 5.0.0
- */
-function sanitize_number( $text ) {
-	$output = strip_tags( trim( $text ) );
-
-	return (int) $output;
-}
-
 
 /**
  * Add or remove slash on the basis of $store variable
@@ -112,7 +159,6 @@ function kahuk_slashes( $text, $store = true ) {
  * @param string         $string            Text content to filter.
  * @param array[]|string $allowable_tags    An array of allowed HTML elements and attributes, or a
  *                                          context name such as 'post'.
- * @param string[]       $allowed_protocols Array of allowed URL protocols.
  * 
  * @return string Filtered content containing only the allowed HTML.
  */
@@ -125,6 +171,7 @@ function kahuk_kses( $string, $allowable_tags ) {
 		strip_tags($string, $allowable_tags)
 	) );
 }
+
 
 /**
  * Replaces double line breaks with paragraph elements.
@@ -171,7 +218,31 @@ function kahuk_autop( $text ) {
 
 
 /**
+ * Retrieves a modified URL query string.
+ *
+ * You can rebuild the URL and append query variables to the URL query by using this function.
+ * There are two ways to use this function; either a single key and value, or an associative array.
+ *
+ * Using a single key and value:
+ *
+ *     add_query_arg( 'key', 'value', 'http://example.com' );
+ *
+ * Using an associative array:
+ *
+ *     add_query_arg( array(
+ *         'key1' => 'value1',
+ *         'key2' => 'value2',
+ *     ), 'http://example.com' );
+ *
+ * Omitting the URL from either use results in the current URL being used
+ * (the value of `$_SERVER['REQUEST_URI']`).
+ *
+ * Values are expected to be encoded appropriately with urlencode() or rawurlencode().
  * 
+ * @param string|array $key   Either a query variable key, or an associative array of query variables.
+ * @param string       $value Optional. Either a query variable value, or a URL to act upon.
+ * @param string       $url   Optional. A URL to act upon.
+ * @return string New URL query string (unescaped).
  */
 function add_query_arg( ...$args ) {
 	if ( is_array( $args[0] ) ) {
@@ -257,57 +328,89 @@ function add_query_arg( ...$args ) {
  * 
  * @return void
  */
-function kahuk_redirect( $location, $status = 302 ) {
+function kahuk_redirect( $location = '', $status = 302 ) {
 	if ( $status < 300 || 399 < $status ) {
 		die( 'HTTP redirect status code must be a redirection code, 3xx.' );
+	}
+
+	if (empty($location)) {
+		$location = kahuk_root_url();
 	}
 
 	header( "Location: $location", true, $status );
 	exit;
 }
 
+
 /**
- * Log message to the debug.log file
- * Edit the constant DEV_MODE_ON while you are debugging the Kahuk CMS
- * DEV_MODE_ON should always false in a live/production site
+ * Log message of unexpected activities
  * 
- * @since 5.0.0
+ * @since 5.0.6
+ * 
+ * return void
  */
-function kahuk_debug_log($message, $line = '', $func = '', $file = '')
-{
+function kahuk_log_unexpected($message) {
+	if (!KAHUK_DEBUG_MANUAL) {
+		return;
+	}
+
+	static $permalink = false;
+	$current_time = kahuk_date('', 'datetime');
 	$output = "";
 
-	if (!empty($file)) {
-		$output .= "\n" . "File: " . $file;
+	if (!$permalink) {
+		$permalink = kahuk_get_permalink();
+		$output = "\n\n" . "*** ATTENTION *** [{$current_time}] {$permalink}\n";
 	}
 
-	if (!empty($func)) {
-		$output .= "\t" . "Function: " . $func;
-	}
+	$output .= $message . "\n";
+	$logFile = kahuk_error_log_file_path('attention');
 
-	if (!empty($line)) {
-		$output .= "\t" . "[Line: " . $line . "]";
-	}
-
-	if (!empty($message)) {
-		$output .= "\n" . $message;
-	}
-
-	_kahuk_debug_log($output);
+	error_log($output, 3, $logFile);
 }
 
 /**
- * Log message to the debug.log file
+ * Log query message
  * 
- * @since 5.0.0
+ * @since 5.0.7
+ * 
+ * return void
  */
-function _kahuk_debug_log( $message )
-{
-	if (defined('DEV_MODE_ON') && (true == DEV_MODE_ON)) {
-		error_log( "\n===\n" . $message, 3, KAHUK_LOG_DIR . "debug.log");
-	} else {
-		kahuk_error_log( $message );
+function kahuk_log_queries($message) {
+	if (!LOG_QUERY_ACTIVITY) {
+		return;
 	}
+
+	static $permalink = false;
+	$current_time = kahuk_date('', 'datetime');
+	$output = "";
+
+	if (!$permalink) {
+		$permalink = kahuk_get_permalink();
+		$output = "\n\n" . "*** QUERY LOGS *** [{$current_time}] {$permalink}\n";
+	}
+
+	$output .= $message . "\n";
+	$logFile = kahuk_error_log_file_path('attention');
+
+	error_log($output, 3, $logFile);
+}
+
+/**
+ * Log message of schedule activities
+ * 
+ * @since 5.0.7
+ * 
+ * return void
+ */
+function kahuk_log_schedule($message) {
+	$permalink = kahuk_get_permalink();
+	$current_time = kahuk_date('', 'datetime');
+
+	$output = "*** SCHEDULE *** [{$current_time}] {$permalink}\n{$message}\n\n";
+	$logFile = kahuk_error_log_file_path('attention');
+
+	error_log($output, 3, $logFile);
 }
 
 /**
@@ -358,7 +461,7 @@ function kahuk_check_url_format($url)
  */
 function kahuk_redirect_404()
 {
-	header("Location: " . my_kahuk_base . "/error_404.php");
+	header("Location: " . kahuk_create_url("error-404/"));
 	die();
 }
 
@@ -389,7 +492,9 @@ function kahuk_allowed_protocols() {
 function kahuk_generate_password( $psaa_length = 8 ) {
 	$output = [];
 
-	$alphabets = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890~!@#*';
+	// $alphabets = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890~!@#*';
+	$alphabets = 'abcdefghijklmnpqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ1234567890{}[]';
+
     $alphaLength = strlen($alphabets) - 1; //put the length -1 in cache
     
 	for ($i = 0; $i < $psaa_length; $i++) {
@@ -491,54 +596,4 @@ function is_email( $email ) {
 	return $email;
 }
 
-/**
- * Counts the number of words inside string.
- * 
- * @since 5.0.3
- */
-function kahuk_word_count($str)
-{
-	return str_word_count($str);
-}
 
-/**
- * Returns either a GET value or the default
- * 
- * @since 5.0.0
- * 
- * @return mixed The result.
- */
-function _get($varname, $default = '')
-{
-	$output = (isset($_GET[$varname])) ? $_GET[$varname] : $default;
-
-    return $output;
-}
-
-/**
- * Returns either a POST value or the default
- * 
- * @since 5.0.0
- * 
- * @return mixed The result.
- */
-function _post($varname, $default = '')
-{
-	$output = (isset($_POST[$varname])) ? $_POST[$varname] : $default;
-
-    return $output;
-}
-
-/**
- * Returns either a REQUEST value or the default
- * 
- * @since 5.0.0
- * 
- * @return mixed The result.
- */
-function _request($varname, $default = '')
-{
-	$output = (isset($_REQUEST[$varname])) ? $_REQUEST[$varname] : $default;
-
-    return $output;
-}

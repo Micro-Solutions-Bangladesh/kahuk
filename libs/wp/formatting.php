@@ -100,104 +100,6 @@ function esc_html( $text ) {
 	// return apply_filters( 'esc_html', $safe_text, $text );
 }
 
-
-/**
- * 
- */
-function sanitize_title( $title ) {
-	$title = strip_tags( $title );
-	// Preserve escaped octets.
-	$title = preg_replace( '|%([a-fA-F0-9][a-fA-F0-9])|', '---$1---', $title );
-	// Remove percent signs that are not part of an octet.
-	$title = str_replace( '%', '', $title );
-	// Restore octets.
-	$title = preg_replace( '|---([a-fA-F0-9][a-fA-F0-9])---|', '%$1', $title );
-
-	$title = strtolower( $title );
-
-	// Convert &nbsp, &ndash, and &mdash to hyphens.
-	$title = str_replace( array( '%c2%a0', '%e2%80%93', '%e2%80%94' ), '-', $title );
-	// Convert &nbsp, &ndash, and &mdash HTML entities to hyphens.
-	$title = str_replace( array( '&nbsp;', '&#160;', '&ndash;', '&#8211;', '&mdash;', '&#8212;' ), '-', $title );
-	// Convert forward slash to hyphen.
-	$title = str_replace( '/', '-', $title );
-
-	// $decoded_title = utf8_decode($title);
-	// echo "decoded_title: " . $decoded_title . "<br>";
-
-	// $encoded_title = utf8_encode($decoded_title);
-	// echo "decoded_title: " . $encoded_title . "<br>";
-
-
-	// Strip these characters entirely.
-	$title = str_replace(
-		array(
-			// Soft hyphens.
-			'%c2%ad',
-			// &iexcl and &iquest.
-			'%c2%a1',
-			'%c2%bf',
-			// Angle quotes.
-			'%c2%ab',
-			'%c2%bb',
-			'%e2%80%b9',
-			'%e2%80%ba',
-			// Curly quotes.
-			'%e2%80%98',
-			'%e2%80%99',
-			'%e2%80%9c',
-			'%e2%80%9d',
-			'%e2%80%9a',
-			'%e2%80%9b',
-			'%e2%80%9e',
-			'%e2%80%9f',
-			// Bullet.
-			'%e2%80%a2',
-			// &copy, &reg, &deg, &hellip, and &trade.
-			'%c2%a9',
-			'%c2%ae',
-			'%c2%b0',
-			'%e2%80%a6',
-			'%e2%84%a2',
-			// Acute accents.
-			'%c2%b4',
-			'%cb%8a',
-			'%cc%81',
-			'%cd%81',
-			// Grave accent, macron, caron.
-			'%cc%80',
-			'%cc%84',
-			'%cc%8c',
-			// Some Unicode
-			'&raquo;', // RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK
-			'&laquo;', // LEFT-POINTING DOUBLE ANGLE QUOTATION MARK
-			'&copy;', // COPYRIGHT SIGN
-			'&reg;', // REGISTERED SIGN
-			'&para;', // PILCROW SIGN
-			'&divide;', // DIVISION SIGN
-			'»',
-			'&amp;',
-			'&',
-		),
-		'',
-		$title
-	);
-
-	// Convert &times to 'x'.
-	$title = str_replace( '%c3%97', 'x', $title );
-
-	// Kill entities.
-	$title = preg_replace( '/&.+?;/', '', $title );
-	$title = str_replace( '.', '-', $title );
-	// $title = preg_replace( '/[^%a-z0-9 _-]/', '', $title );
-	$title = preg_replace( '/\s+/', '-', $title );
-	$title = preg_replace( '|-+|', '-', $title );
-	$title = trim( $title, '-' );
-
-	return $title;
-}
-
-
 /**
  * Sanitizes a string from user input or from the database.
  * Primarily copied from Wordpress v4.7.0
@@ -281,7 +183,43 @@ function _sanitize_text_fields( $str, $keep_newlines = false ) {
 	return $filtered;
 }
 
+/**
+ * Convert a csv string into array
+ *
+ * @since 5.0.8
+ * 
+ * @return array
+ */
+function kahuk_csv_to_array( $str, $allowEmpty = false ) {
+	$filtered = explode(",", trim($str));
+	$output = [];
 
+	foreach($filtered as $v) {
+		if (trim($v)) {
+			$output[] = trim($v);
+		} else if ($allowEmpty) {
+			$output[] = "";
+		}
+	}
+	
+	return $output;
+}
+
+/**
+ * Sanitizes a string into proper csv by deleten unwanted spaces and empty value
+ *
+ * @since 5.0.7
+ *
+ * @param string $str CSV String to sanitize.
+ * @param boolean $allowEmpty determine wheather empty value addable into the output
+ * 
+ * @return string
+ */
+function sanitize_csv( $str, $allowEmpty = false ) {
+	$output = kahuk_csv_to_array($str, $allowEmpty);
+
+	return implode(",", $output);
+}
 
 /**
  * Properly strip all HTML tags including script and style
@@ -407,14 +345,14 @@ function wp_check_invalid_utf8( $string, $strip = false ) {
  * @since 5.0.0
  *
  * @param string   $url       The URL to be cleaned.
+ * @param string   $_context  Private. Use esc_url_raw() for database usage.
  * @param string[] $protocols Optional. An array of acceptable protocols.
  *                            Defaults to return value of wp_allowed_protocols().
- * @param string   $_context  Private. Use esc_url_raw() for database usage.
  * @return string The cleaned URL after the {@see 'clean_url'} filter is applied.
  *                An empty string is returned if `$url` specifies a protocol other than
  *                those in `$protocols`, or if `$url` contains an empty string.
  */
-function esc_url( $url, $protocols = null, $_context = 'display' ) {
+function esc_url( $url, $_context = 'display', $protocols = null ) {
     // $original_url = $url;
  
     if ( '' === $url ) {
@@ -441,7 +379,7 @@ function esc_url( $url, $protocols = null, $_context = 'display' ) {
      */
     if ( strpos( $url, ':' ) === false && ! in_array( $url[0], array( '/', '#', '?' ), true ) &&
         ! preg_match( '/^[a-z0-9-]+?\.php/i', $url ) ) {
-        $url = 'http://' . $url;
+        $url = 'https://' . $url;
     }
  
     // Replace ampersands and single quotes only when displaying.

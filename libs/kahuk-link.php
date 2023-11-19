@@ -57,13 +57,6 @@ class KahukLink
     function initializeAssets() {
         $url = esc_url( $this->rawUrl );
 
-        // TODO
-		// if ( CHECK_SPAM && kahuk_check_spam( $url ) ) {
-		// 	$this->valid = false;
-
-		// 	return;
-		// }
-
         if ( empty( $url ) ) {
             $this->errors->add( 'emptyurl', 'Empty URL!' );
 

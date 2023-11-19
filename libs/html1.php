@@ -4,60 +4,54 @@ if (!defined('KAHUKPATH')) {
 }
 
 /**
+ * Get config from language
+ * 
+ * @since 5.0.6
+ * 
+ * @return string
+ */
+function kahuk_language_config($name) {
+	global $main_smarty;
+
+	return $main_smarty->get_config_vars($name);
+}
+
+/**
+ * find category id when given category name
+ * $the_cats is set in /libs/smartyvariables.php
  * 
  */
 function get_category_id($cat_name)
 {
-	// find category id when given category name
-	// $the_cats is set in /libs/smartyvariables.php
-	global $dblang, $the_cats;
+	global $the_cats;
 
 	foreach ($the_cats as $cat) {
-		if ($cat->category_name == $cat_name && $cat->category_lang == $dblang) {
+		if ($cat->category_name == $cat_name) {
 			return $cat->category_id;
 		}
 	}
 	return null;
 }
 
+/**
+ * find category name when given category id
+ * $the_cats is set in /libs/smartyvariables.php
+ */
 function get_category_name($cat_id)
 {
-	// find category name when given category id
-	// $the_cats is set in /libs/smartyvariables.php
 	global $dblang, $the_cats;
 
 	foreach ($the_cats as $cat) {
-		if ($cat->category_id == $cat_id && $cat->category_lang == $dblang) {
+		if ($cat->category_id == $cat_id) {
 			return $cat->category_name;
 		}
 	}
 	return null;
 }
 
-
-function who_voted($storyid, $avatar_size, $condition)
-{
-	// this returns who voted for a story
-	// eventually add support for filters (only show friends, etc)	
-	global $db;
-	if (!is_numeric($storyid)) {
-		die();
-	}
-
-	$sql = "SELECT user_login, user_email
-			FROM " . table_votes . " 
-			INNER JOIN " . table_users . " ON vote_user_id=user_id 
-			WHERE vote_value $condition AND vote_link_id=$storyid AND vote_type='links' AND user_level NOT IN('Spammer')";
-	$voters = $db->get_results($sql);
-	$voters = object_2_array($voters);
-
-	foreach ($voters as $key => $val) {
-		$voters[$key]['Avatar'] = kahuk_gravatar($val['user_email'], ['note' => 'libs - html1.php file']);
-	}
-
-	return $voters;
-}
-
+/**
+ * 
+ */
 function category_display()
 {
 	global $db;
@@ -66,8 +60,8 @@ function category_display()
 	$maincategory = object_2_array($maincategory);
 
 	foreach ($maincategory as $id => $rs) {
-		$maincategory[$id]['safename'] = $rs['category_safe_name'];
-		$maincategory[$id]['id'] = $rs['category_id'];
+		$maincategory[$id]['category_safe_name'] = $rs['category_safe_name'];
+		$maincategory[$id]['category_id'] = $rs['category_id'];
 		$maincategory[$id]['parent'] = $rs['category_parent'];
 		$maincategory[$id]['order'] = $rs['category_order'];
 
@@ -75,8 +69,8 @@ function category_display()
 		//echo "select * from ".table_categories." where category_parent =".$rs['category_id'];
 		$childcategory = object_2_array($childcategory);
 		foreach ($childcategory as $id => $rc) {
-			$childcategory[$id]['safename'] = $rc['category_safe_name'];
-			$childcategory[$id]['id'] = $rc['category_id'];
+			$childcategory[$id]['category_safe_name'] = $rc['category_safe_name'];
+			$childcategory[$id]['category_id'] = $rc['category_id'];
 			$childcategory[$id]['parent'] = $rc['category_parent'];
 		}
 	}
@@ -88,7 +82,7 @@ function cat_safe_name($cat_id)
 	global $dblang, $the_cats;
 
 	foreach ($the_cats as $cat) {
-		if ($cat->category_id == $cat_id && $cat->category_lang == $dblang) {
+		if ($cat->category_id == $cat_id) {
 			return $cat->category_safe_name;
 		}
 	}
@@ -292,79 +286,19 @@ function do_sidebar($var_smarty, $navwhere = '')
 			$thecat = $thecat->category_name;
 		}
 
-		$var_smarty->assign('UrlMethod', urlmethod);
 		if (!empty($catID)) {
 			foreach ($the_cats as $cat) {
-				if ($cat->category_id == $catID && $cat->category_lang == $dblang && $cat->category_parent == 0) {
+				if ($cat->category_id == $catID && $cat->category_parent == 0) {
 					$globals['category_id'] = $cat->category_id;
 					$globals['category_name'] = $cat->category_name;
 				}
 			}
 		}
+
 		$pos = strrpos($_SERVER["SCRIPT_NAME"], "/");
 		$script_name = substr($_SERVER["SCRIPT_NAME"], $pos + 1, 100);
 		$script_name = str_replace(".php", "", $script_name);
 
-		include_once('dbtree.php');
-		/* Redwine: added isset and initialized $sqlGeticategory to eliminate the Notice undefined mnm_user and sqlGeticategory in case the user is not logged in. */
-		$login_user = $db->escape(sanitize(isset($_COOKIE['mnm_user']), 3));
-		$sqlGeticategory = "";
-		if ($login_user) {
-			/////// for user set category----sorojit.
-			$sqlGeticategory = $db->get_var("SELECT user_categories from " . table_users . " where user_login = '$login_user';");
-			if (!empty($sqlGeticategory)) {
-				$sqlGeticategory = " AND category__auto_id NOT IN ($sqlGeticategory) ";
-			}
-		}
-		$right = array();
-		$array1 = "SELECT * from " . table_categories . " where category__auto_id>0 $sqlGeticategory ORDER BY lft";
-		/* Redwine: mysql_ extension is deprecated. */
-		$result1 = $db->get_results($array1);
-		//while ($row = mysql_fetch_object($result1)) {
-		foreach ($result1 as $row) {
-			$a[] = $row;
-		}
-		$result = $a;
-		$i = 0;
-		$lastspacer = 0;
-		$array = array();
-
-		foreach ($result as $row) {
-			if (count($right) > 0) {
-				// check if we should remove a node from the stack
-				while ($right && end($right) < $row->rgt) {
-					if (array_pop($right) == NULL) {
-						break;  // We've reached the top of the category chain
-					}
-				}
-			}
-
-			$array[$i]['principlecat'] = $row->rgt - $row->lft - 1;
-			$array[$i]['spacercount'] = count($right);
-			$array[$i]['lastspacercount'] = $lastspacer;
-			$array[$i]['spacerdiff'] = abs($lastspacer - count($right));
-			$array[$i]['auto_id'] = $row->category__auto_id;
-			$array[$i]['name'] = $row->category_name;
-			$array[$i]['description'] = $row->category_desc;
-			$array[$i]['safename'] = $row->category_safe_name;
-			if (isset($row->category_color)) {
-				$array[$i]['color'] = $row->category_color;
-			}
-			if (isset($row->category_parent)) {
-				$array[$i]['parent'] = $row->category_parent;
-				$array[$i]['parent_name'] = GetCatName($row->category_parent);
-				$array[$i]['parent_subcat_count'] = GetSubCatCount($row->category_parent);
-			}
-			$array[$i]['subcat_count'] = GetSubCatCount($row->category__auto_id);
-
-			$lastspacer = count($right);
-			$i = $i + 1;
-			$right[] = $row->rgt;
-		}
-		///////end of for user set category
-		$var_smarty->assign('start', 0);
-		$var_smarty->assign('lastspacer', 0);
-		$var_smarty->assign('cat_array', $array);
 
 		// use the 'totals' table now 
 		$published_count = get_story_count('published');
@@ -375,42 +309,20 @@ function do_sidebar($var_smarty, $navwhere = '')
 
 	$var_smarty->cache = $_caching; // set cache back to original value
 
-	$vars = '';
-	check_actions('do_sidebar', $vars);
-
 	return $var_smarty;
 }
 
-/**
- * Force the user to login before viewing the page
- */
-function force_authentication()
-{
-	global $current_user;
 
-	if (!$current_user->authenticated) {
-		if (strpos($_SERVER["REQUEST_URI"], '/admin/') !== false) {
-			// Admin panel login
-			header("Location: " . getmyurl('admin_login', $_SERVER['REQUEST_URI']));
-			die;
-		} else {
-			// Normal login
-			header("Location: " . getmyurl('login', $_SERVER['REQUEST_URI']));
-			die;
-		}
-	}
 
-	return true;
-}
 
 
 /**
- * 
+ * Depricated in favour of the kahuk_pagination_test()
  */
 function do_pages($total, $page_size, $thepage, $fetch = false)
 {
 	// "previous" and "next" page buttons
-	global $db, $URLMethod, $main_smarty;
+	global $main_smarty;
 
 	$index_limit = 10;
 
@@ -422,192 +334,102 @@ function do_pages($total, $page_size, $thepage, $fetch = false)
 	$output = '';
 
 	if ($total_pages != '1') { // If there is only 1 page, don't display any pagination at all
-		if ($URLMethod == 1) {
-			$query = preg_replace('/page=[0-9]+/', '', sanitize($_SERVER['QUERY_STRING'], 3));
-			$query = preg_replace('/^&*(.*)&*$/', "$1", $query);
-			if (!empty($query)) {
-				$query = "&amp;$query";
-			}
+		$query = preg_replace('(login=)', '/', str_replace('amp;', '&', sanitize($_SERVER['QUERY_STRING'], 3)));	//remove login= from query string //
+		$query = preg_replace('(view=)', '/', $query);	                    //remove view= from query string //
+		$query = preg_replace('(part=)', '', $query);
+		$query = preg_replace('(order)', '', $query);
+		$query = preg_replace('/page[=\/][0-9]+/', '', $query);  			//remove page arguments to because its hardcoded in html   //
+		$query = preg_replace('/title=([^&]*)/', '/$1', $query); 	 		//main line to recompose arg to place in url //	
+		$query = preg_replace('/([^&]+)=([^&]*)/', '/$1/$2/', $query); 	 		//main line to recompose arg to place in url //	
+		$query = preg_replace('/&/', '', $query);							//whack any ampersands	//	
 
-			$output .= '<div class="pagination_wrapper"><ul class="pagination">';
+		$query = preg_replace('/search\/(.*)/', '$1' . '/', $query);
+		/* Redwine: added quotes to group_story because it was assumed as a constant and generating Notice:  Use of undefined constant group_story. */
+		if ($thepage != "group_story")
+			$query = preg_replace('/(?<!s)category\/(.*)/', '$1' . '/', $query);
+		$query = preg_replace('/\/+/', '/', $query);
+		$query = preg_replace('/^\//', '', $query);
+		$query = preg_replace('/\/$/', '', $query);
 
-			if ($current == 1) {
-				// There are no previous pages, so don't show the "previous" link.
-				//$output .= '<li class="disabled"><span>&#171; '.$main_smarty->get_config_vars("KAHUK_Visual_Page_Previous"). '</span></li>';
+		$output .= '<div class="pagination-wrapper mt-6"><ul class="pagination">';
+
+		if ($current == 1) {
+			// There are no previous pages, so don't show the "previous" link.
+			//$output .= '<li class="disabled"><span>&#171; '.$main_smarty->get_config_vars("KAHUK_Visual_Page_Previous"). '</span></li>';
+		} else {
+			$i = $current - 1;
+			if (pagename == "admin_users") {
+				$output .= '<li><a href="' . my_kahuk_base . '/admin/' . pagename . '.php?page=' . $i . '">&#171; ' . $main_smarty->get_config_vars("KAHUK_Visual_Page_Previous") . '</a></li>';
+			} elseif (pagename == "admin_links") {
+				$output .= '<li><a href="' . my_kahuk_base . '/admin/' . pagename . '.php?page=' . $i . '">&#171; ' . $main_smarty->get_config_vars("KAHUK_Visual_Page_Previous") . '</a></li>';
+			} elseif (pagename == "index" || pagename == "published") {
+				$output .= '<li><a href="' . my_kahuk_base . '/' . $query . ($i > 1 ? '/page/' . $i : '') . '">&#171; ' . $main_smarty->get_config_vars("KAHUK_Visual_Page_Previous") . '</a></li>';
 			} else {
-				$i = $current - 1;
-				if ((pagename == "index" || pagename == "published")  && $i == 1) {
-					$output .= '<li><a href="' . ($query ? '?' : './') . $query . '">&#171; ' . $main_smarty->get_config_vars("KAHUK_Visual_Page_Previous") . '</a></li>';
-				} else {
-					$output .= '<li><a href="?page=' . $i . $query . '">&#171; ' . $main_smarty->get_config_vars("KAHUK_Visual_Page_Previous") . '</a></li>';
-				}
+				$output .= '<li><a href="' . my_kahuk_base . '/' . pagename . '/' . $query . '/page/' . $i . '">&#171; ' . $main_smarty->get_config_vars("KAHUK_Visual_Page_Previous") . '</a></li>';
 			}
-
-			if ($start > 1) {
-				$i = 1;
-				if ((pagename == "index" || pagename == "published")  && $i == 1) {
-					$output .= '<li><a href="' . ($query ? '?' : './') . $query . '">' . $i . '</a></li>';
-				} else {
-					$output .= '<li><a href="?page=' . $i . $query . '">' . $i . '</a></li>';
-					$output .= '<li class="active"><a href="#">...</a></li>';
-				}
-			}
-
-			for ($i = $start; $i <= $end && $i <= $total_pages; $i++) {
-				if ($i == $current) {
-					$output .= '<li class="active"><a href="#">' . $i . '</a></li>';
-				} elseif ((pagename == "index" || pagename == "published")  && $i == 1) {
-					$output .= '<li><a href="' . ($query ? '?' : './') . $query . '" class="pages">' . $i . '</a></li>';
-				} else {
-					$output .= '<li><a href="?page=' . $i . $query . '" class="pages">' . $i . '</a></li>';
-				}
-			}
-
-			if ($total_pages > $end) {
-				$i = $total_pages;
-				$output .= '<li class="disabled"><span>...</span></li>';
-				$output .= '<li><a href="?page=' . $i . $query . '">' . $i . '</a></li>';
-			}
-
-			if ($current < $total_pages) {
-				$i = $current + 1;
-				$output .= '<li><a href="?page=' . $i . $query . '"> ' . $main_smarty->get_config_vars("KAHUK_Visual_Page_Next") . ' &#187;' . '</a></li>';
-			} else {
-				// There are no pages left, so don't add a "next" link.
-				//$output .= '<li><a href="?page='.$i.$query.'">'.$main_smarty->get_config_vars("KAHUK_Visual_Page_Next"). ' &#187;' . '</a></li>';
-			}
-			$output .= "</ul></div>\n";
 		}
 
-		if ($URLMethod == 2) {
-			$query = preg_replace('(login=)', '/', str_replace('amp;', '&', sanitize($_SERVER['QUERY_STRING'], 3)));	//remove login= from query string //
-			$query = preg_replace('(view=)', '/', $query);	                    //remove view= from query string //
-			$query = preg_replace('(part=)', '', $query);
-			$query = preg_replace('(order)', '', $query);
-			$query = preg_replace('/page[=\/][0-9]+/', '', $query);  			//remove page arguments to because its hardcoded in html   //
-			$query = preg_replace('/title=([^&]*)/', '/$1', $query); 	 		//main line to recompose arg to place in url //	
-			$query = preg_replace('/([^&]+)=([^&]*)/', '/$1/$2/', $query); 	 		//main line to recompose arg to place in url //	
-			$query = preg_replace('/&/', '', $query);							//whack any ampersands	//	
-			$query = preg_replace('/module\/pagestatistics/', '', $query);
-			$query = preg_replace('/search\/(.*)/', '$1' . '/', $query);
-			/* Redwine: added quotes to group_story because it was assumed as a constant and generating Notice:  Use of undefined constant group_story. */
-			if ($thepage != "group_story")
-				$query = preg_replace('/(?<!s)category\/(.*)/', '$1' . '/', $query);
-			$query = preg_replace('/\/+/', '/', $query);
-			$query = preg_replace('/^\//', '', $query);
-			$query = preg_replace('/\/$/', '', $query);
-
-			$output .= '<div class="pagination_wrapper"><ul class="pagination">';
-
-			if ($current == 1) {
-				// There are no previous pages, so don't show the "previous" link.
-				//$output .= '<li class="disabled"><span>&#171; '.$main_smarty->get_config_vars("KAHUK_Visual_Page_Previous"). '</span></li>';
+		if ($start > 1) {
+			$i = 1;
+			if (pagename == "admin_users") {
+				$output .= '<li><a href="' . my_kahuk_base . '/admin/' . pagename . '.php?page=' . $i . '">' . $i . '</a></li>';
+			} elseif (pagename == "admin_links") {
+				$output .= '<li><a href="' . my_kahuk_base . '/admin/' . pagename . '.php?page=' . $i . '">' . $i . '</a></li>';
+			} elseif (pagename == "index" || pagename == "published") {
+				$output .= '<li><a href="' . my_kahuk_base . '/' . $query . '">' . $i . '</a></li>';
 			} else {
-				$i = $current - 1;
-				if (pagename == "admin_users") {
-					$output .= '<li><a href="' . my_kahuk_base . '/admin/' . pagename . '.php?page=' . $i . '">&#171; ' . $main_smarty->get_config_vars("KAHUK_Visual_Page_Previous") . '</a></li>';
-				} elseif (pagename == "admin_links") {
-					$output .= '<li><a href="' . my_kahuk_base . '/admin/' . pagename . '.php?page=' . $i . '">&#171; ' . $main_smarty->get_config_vars("KAHUK_Visual_Page_Previous") . '</a></li>';
-				} elseif (pagename == "index" || pagename == "published") {
-					$output .= '<li><a href="' . my_kahuk_base . '/' . $query . ($i > 1 ? '/page/' . $i : '') . '">&#171; ' . $main_smarty->get_config_vars("KAHUK_Visual_Page_Previous") . '</a></li>';
-				} elseif (pagename == "live_published") {
-					$output .= '<li><a href="' . my_kahuk_base . '/live/published/' . $query . '/page/' . $i . '">&#171; ' . $main_smarty->get_config_vars("KAHUK_Visual_Page_Previous") . '</a></li>';
-				} elseif (pagename == "live_unpublished") {
-					$output .= '<li><a href="' . my_kahuk_base . '/live/new/' . $query . '/page/' . $i . '">&#171; ' . $main_smarty->get_config_vars("KAHUK_Visual_Page_Previous") . '</a></li>';
-				} elseif (pagename == "live_comments") {
-					$output .= '<li><a href="' . my_kahuk_base . '/live/comments/' . $query . '/page/' . $i . '">&#171; ' . $main_smarty->get_config_vars("KAHUK_Visual_Page_Previous") . '</a></li>';
-				} else {
-					$output .= '<li><a href="' . my_kahuk_base . '/' . pagename . '/' . $query . '/page/' . $i . '">&#171; ' . $main_smarty->get_config_vars("KAHUK_Visual_Page_Previous") . '</a></li>';
-				}
+				$output .= '<li><a href="' . my_kahuk_base . '/' . pagename . '/' . $query . '/page/' . $i . '">' . $i . '</a></li>';
 			}
-
-			if ($start > 1) {
-				$i = 1;
+			$output .= '<li class="dots disabled"><a href="#" aria-disabled="true">...</a></li>';
+		}
+		for ($i = $start; $i <= $end && $i <= $total_pages; $i++) {
+			if ($i == $current) {
+				$output .= '<li class="active"><a href="#">' . $i . '</a></li>';
+			} else {
 				if (pagename == "admin_users") {
 					$output .= '<li><a href="' . my_kahuk_base . '/admin/' . pagename . '.php?page=' . $i . '">' . $i . '</a></li>';
 				} elseif (pagename == "admin_links") {
 					$output .= '<li><a href="' . my_kahuk_base . '/admin/' . pagename . '.php?page=' . $i . '">' . $i . '</a></li>';
 				} elseif (pagename == "index" || pagename == "published") {
-					$output .= '<li><a href="' . my_kahuk_base . '/' . $query . '">' . $i . '</a></li>';
-				} elseif (pagename == "live_published") {
-					$output .= '<li><a href="' . my_kahuk_base . '/live/published/' . $query . '/page/' . $i . '">' . $i . '</a></li>';
-				} elseif (pagename == "live_unpublished") {
-					$output .= '<li><a href="' . my_kahuk_base . '/live/new/' . $query . '/page/' . $i . '">' . $i . '</a></li>';
-				} elseif (pagename == "live_comments") {
-					$output .= '<li><a href="' . my_kahuk_base . '/live/comments/' . $query . '/page/' . $i . '">' . $i . '</a></li>';
-				} else {
-					$output .= '<li><a href="' . my_kahuk_base . '/' . pagename . '/' . $query . '/page/' . $i . '">' . $i . '</a></li>';
-				}
-				$output .= '<li class="dots disabled"><a href="#" aria-disabled="true">...</a></li>';
-			}
-			for ($i = $start; $i <= $end && $i <= $total_pages; $i++) {
-				if ($i == $current) {
-					$output .= '<li class="active"><a href="#">' . $i . '</a></li>';
-				} else {
-					if (pagename == "admin_users") {
-						$output .= '<li><a href="' . my_kahuk_base . '/admin/' . pagename . '.php?page=' . $i . '">' . $i . '</a></li>';
-					} elseif (pagename == "admin_links") {
-						$output .= '<li><a href="' . my_kahuk_base . '/admin/' . pagename . '.php?page=' . $i . '">' . $i . '</a></li>';
-					} elseif (pagename == "index" || pagename == "published") {
-						$output .= '<li><a href="' . my_kahuk_base . '/' . $query . ($i > 1 ? '/page/' . $i : '') . '">' . $i . '</a></li>';
-					} elseif (pagename == "live_published") {
-						$output .= '<li><a href="' . my_kahuk_base . '/live/published/' . $query . '/page/' . $i . '">' . $i . '</a></li>';
-					} elseif (pagename == "live_unpublished") {
-						$output .= '<li><a href="' . my_kahuk_base . '/live/new/' . $query . '/page/' . $i . '">' . $i . '</a></li>';
-					} elseif (pagename == "live_comments") {
-						$output .= '<li><a href="' . my_kahuk_base . '/live/comments/' . $query . '/page/' . $i . '">' . $i . '</a></li>';
-					} else {
-						$output .= '<li><a href="' . my_kahuk_base . '/' . pagename . '/' . $query . '/page/' . $i . '">' . $i . '</a></li>';
-					}
-				}
-			}
-
-			if ($total_pages > $end) {
-				$i = $total_pages;
-				$output .= '<li class="dots disabled"><a href="#" aria-disabled="true">...</a></li>';
-				if ($pagename == "admin_users") {
-					$output .= '<li><a href="' . my_kahuk_base . '/admin/' . pagename . '.php?page=' . $i . '">' . $i . '</a></li>';
-				} elseif (pagename == "admin_links") {
-					$output .= '<li><a href="' . my_kahuk_base . '/admin/' . pagename . '.php?page=' . $i . '">' . $i . '</a></li>';
-				} elseif (pagename == "index" || pagename == "published") {
-					$output .= '<li><a href="' . my_kahuk_base . '/' . $query . '/page/' . $i . '">' . $i . '</a></li>';
-				} elseif (pagename == "live_published") {
-					$output .= '<li><a href="' . my_kahuk_base . '/live/published/' . $query . '/page/' . $i . '">' . $i . '</a></li>';
-				} elseif (pagename == "live_unpublished") {
-					$output .= '<li><a href="' . my_kahuk_base . '/live/new/' . $query . '/page/' . $i . '">' . $i . '</a></li>';
-				} elseif (pagename == "live_comments") {
-					$output .= '<li><a href="' . my_kahuk_base . '/live/comments/' . $query . '/page/' . $i . '">' . $i . '</a></li>';
+					$output .= '<li><a href="' . my_kahuk_base . '/' . $query . ($i > 1 ? '/page/' . $i : '') . '">' . $i . '</a></li>';
 				} else {
 					$output .= '<li><a href="' . my_kahuk_base . '/' . pagename . '/' . $query . '/page/' . $i . '">' . $i . '</a></li>';
 				}
 			}
-
-			if ($current < $total_pages) {
-				$i = $current + 1;
-				if (pagename == "admin_users") {
-					$output .= '<li><a href="' . my_kahuk_base . '/admin/' . pagename . '.php?page=' . $i . '"> ' . $main_smarty->get_config_vars("KAHUK_Visual_Page_Next") . ' &#187;' . '</a></li>';
-				} elseif (pagename == "admin_links") {
-					$output .= '<li><a href="' . my_kahuk_base . '/admin/' . pagename . '.php?page=' . $i . '"> ' . $main_smarty->get_config_vars("KAHUK_Visual_Page_Next") . ' &#187;' . '</a></li>';
-				} elseif (pagename == "live_published") {
-					$output .= '<li><a href="' . my_kahuk_base . '/live/published/' . $query . '/page/' . $i . '"> ' . $main_smarty->get_config_vars("KAHUK_Visual_Page_Next") . ' &#187;' . '</a></li>';
-				} elseif (pagename == "live_unpublished") {
-					$output .= '<li><a href="' . my_kahuk_base . '/live/new/' . $query . '/page/' . $i . '"> ' . $main_smarty->get_config_vars("KAHUK_Visual_Page_Next") . ' &#187;' . '</a></li>';
-				} elseif (pagename == "live_comments") {
-					$output .= '<li><a href="' . my_kahuk_base . '/live/comments/' . $query . '/page/' . $i . '"> ' . $main_smarty->get_config_vars("KAHUK_Visual_Page_Next") . ' &#187;' . '</a></li>';
-				} elseif (pagename == "index" || pagename == "published") {
-					$output .= '<li><a href="' . my_kahuk_base . '/' . $query . '/page/' . $i . '"> ' . $main_smarty->get_config_vars("KAHUK_Visual_Page_Next") . ' &#187;' . '</a></li>';
-				} else {
-					$output .= '<li><a href="' . my_kahuk_base . '/' . pagename . '/' . $query . '/page/' . $i . '"> ' . $main_smarty->get_config_vars("KAHUK_Visual_Page_Next") . ' &#187;' . '</a></li>';
-				}
-			} else {
-				$output .= '<li class="disabled"><a href="#" aria-disabled="true">' . $main_smarty->get_config_vars("KAHUK_Visual_Page_Next") . ' &#187;' . '</a></li>';
-			}
-
-			$output .= "</ul></div>";
-			$output = str_replace("/group_story/", "/groups/", $output);
-			$output = str_replace("//", "/", $output);
 		}
+
+		if ($total_pages > $end) {
+			$i = $total_pages;
+			$output .= '<li class="dots disabled"><a href="#" aria-disabled="true">...</a></li>';
+			if ($pagename == "admin_users") {
+				$output .= '<li><a href="' . my_kahuk_base . '/admin/' . pagename . '.php?page=' . $i . '">' . $i . '</a></li>';
+			} elseif (pagename == "admin_links") {
+				$output .= '<li><a href="' . my_kahuk_base . '/admin/' . pagename . '.php?page=' . $i . '">' . $i . '</a></li>';
+			} elseif (pagename == "index" || pagename == "published") {
+				$output .= '<li><a href="' . my_kahuk_base . '/' . $query . '/page/' . $i . '">' . $i . '</a></li>';
+			} else {
+				$output .= '<li><a href="' . my_kahuk_base . '/' . pagename . '/' . $query . '/page/' . $i . '">' . $i . '</a></li>';
+			}
+		}
+
+		if ($current < $total_pages) {
+			$i = $current + 1;
+			if (pagename == "admin_users") {
+				$output .= '<li><a href="' . my_kahuk_base . '/admin/' . pagename . '.php?page=' . $i . '"> ' . $main_smarty->get_config_vars("KAHUK_Visual_Page_Next") . ' &#187;' . '</a></li>';
+			} elseif (pagename == "admin_links") {
+				$output .= '<li><a href="' . my_kahuk_base . '/admin/' . pagename . '.php?page=' . $i . '"> ' . $main_smarty->get_config_vars("KAHUK_Visual_Page_Next") . ' &#187;' . '</a></li>';
+			} else {
+				$output .= '<li><a href="' . my_kahuk_base . '/' . pagename . '/' . $query . '/page/' . $i . '"> ' . $main_smarty->get_config_vars("KAHUK_Visual_Page_Next") . ' &#187;' . '</a></li>';
+			}
+		} else {
+			$output .= '<li class="disabled"><a href="#" aria-disabled="true">' . $main_smarty->get_config_vars("KAHUK_Visual_Page_Next") . ' &#187;' . '</a></li>';
+		}
+
+		$output .= "</ul></div>";
+		$output = str_replace("/group_story/", "/groups/", $output);
+		$output = str_replace("//", "/", $output);
 	}
+
 	if ($fetch == false) {
 		echo $output;
 	} else {
@@ -832,8 +654,6 @@ function getmyFullurl($x, $var1 = "", $var2 = "", $var3 = "")
 
 function getmyurl($x, $var1 = "", $var2 = "", $var3 = "")
 {
-	global $URLMethod;
-
 	$var1 = sanitize($var1, 1);
 	$var2 = sanitize($var2, 1);
 	$var3 = sanitize($var3, 1);
@@ -851,255 +671,137 @@ function getmyurl($x, $var1 = "", $var2 = "", $var3 = "")
 		}
 	}
 
-	if ($URLMethod == 1) {
-		if ($x == "index") $ret = "/index.php";
-		elseif ($x == "maincategory") $ret = "/index.php?category=" . $var1;
-		elseif ($x == "newcategory") $ret = "/new.php?category=" . $var1;
-		elseif ($x == "discardedcategory") $ret = "/discarded.php?category=" . $var1;
-		elseif ($x == "editlink") $ret = "/editlink.php?id=" . $var1;
-		elseif ($x == "edit") $ret = "/edit.php?id=" . $var1 . "&amp;commentid=" . $var2;
-		elseif ($x == "user") $ret = "/user.php?login=" . $var1 . ($var2 ? '&amp;view=' . $var2 : '');
-		elseif ($x == "user_inbox") $ret = "/user.php?view=" . $var1;
-		elseif ($x == "user_add_remove") $ret = "/user.php?login=" . $var2 . "&amp;view=" . $var1;
-		elseif ($x == "user_friends") $ret = "/user.php?login=" . $var1 . "&amp;view=" . $var2;
-		elseif ($x == "index_sort") $ret = "/index.php?part=" . $var1 . ($var2 ? "&amp;category=" . $var2 : '');
-		elseif ($x == "new_sort") $ret = "/new.php?part=" . $var1 . ($var2 ? "&amp;category=" . $var2 : '');
-		elseif ($x == "userblank") $ret = "/user.php?login=";
-		elseif ($x == "user2") $ret = "/user.php?login=" . $var1 . ($var2 ? "&amp;view=" . $var2 : '');
-		elseif ($x == "search") $ret = "/search.php?search=" . $var1;
-		elseif ($x == "advancedsearch") $ret = "/advancedsearch.php";
-		elseif ($x == "search_url") $ret = "/search.php?search=" . $var1;
-		elseif ($x == "admin_login") $ret = "/admin/admin_login.php?return=" . $var1;
-		elseif ($x == "login") $ret = "/login.php?return=" . $var1;
-		elseif ($x == "logout") $ret = "/login.php?op=logout&return=" . my_kahuk_base; //return=" . $var1; /*Redwine: making both URL method 1 and 2 consistent by setting the return to the root.*/
-		elseif ($x == "user_edit") $ret = "/profile.php?login=$var1";
-		elseif ($x == "register") $ret = "/register.php";
-		elseif ($x == "category") $ret = "/index.php?category=" . $var1;
-		elseif ($x == "submit") $ret = "/submit.php";
-		elseif ($x == "story") $ret = "/story.php?id=" . $var1;
-		elseif ($x == "storytitle") $ret = "/story.php?title=" . $var1;
-		elseif ($x == "storycattitle") $ret = "/story.php?title=" . $var2;
-		elseif ($x == "out") $ret = "/out.php?id=" . $var1;
-		elseif ($x == "outtitle") $ret = "/out.php?title=" . $var1;
-		elseif ($x == "outurl") $ret = "/out.php?url=" . rawurlencode($var1);
-		elseif ($x == "root") $ret = "/index.php";
-		elseif ($x == "new") $ret = "/new.php";
-		elseif ($x == "discarded") $ret = "/discarded.php";
-		elseif ($x == "topusers") $ret = "/topusers.php";
-		elseif ($x == "profile") $ret = "/profile.php";
-		elseif ($x == "userNoVar") $ret = "/user.php";
-		elseif ($x == "loginNoVar") $ret = "/login.php";
-		elseif ($x == "rssTime") $ret = "/rss.php?time=" . $var1;
-		elseif ($x == "about") $ret = "/faq-" . $var1 . ".php";
-		elseif ($x == "bugreport") $ret = "/bugreport.php";
-		elseif ($x == "rsspage") $ret = "/rss.php?category=$var1&amp;status=$var2&amp;group=$var3";
-		elseif ($x == "rss") $ret = "/rss.php";
-		elseif ($x == "rssnew") $ret = "/rss.php?status=new";
-		elseif ($x == "rssall") $ret = "/rss.php?status=all";
-		elseif ($x == "rsscategory") $ret = "/rss.php?category=" . $var1;
-		elseif ($x == "rsscategorynew") $ret = "/rss.php?status=new&amp;category=" . $var1;
-		elseif ($x == "rsssearch") $ret = "/rss.php?search=" . $var1;
-		elseif ($x == "rssuser") $ret = "/userrss.php?user=" . $var1 . "&amp;status=" . $var2;
-		elseif ($x == "storyrss") $ret = "/storyrss.php?title=" . $var1;
-		elseif ($x == "trackback") $ret = "/trackback.php?id=" . $var1;
-		elseif ($x == "page") $ret = "/page.php?page=" . $var1;
-		elseif ($x == "new_cat") $ret = "/?category=";
-		elseif ($x == "discarded_cat") $ret = "/?category=";
-		elseif ($x == "admin") $ret = "/admin/index.php";
-		elseif ($x == "admin_modify") $ret = "/admin/linkadmin.php?id=" . $var1 . "&amp;action=main";
-		elseif ($x == "admin_modify_do") $ret = "/admin/linkadmin.php?id=" . $var1 . "&amp;action=do" . $var2;
-		elseif ($x == "admin_modify_edo") $ret = "/admin/linkadmin.php?id=" . $var1 . "&amp;action=edo" . $var2;
-		elseif ($x == "admin_discard") $ret = "/admin/linkadmin.php?id=" . $var1 . "&amp;action=discard";
-		elseif ($x == "admin_new") $ret = "/admin/linkadmin.php?id=" . $var1 . "&amp;action=new";
-		elseif ($x == "admin_published") $ret = "/admin/linkadmin.php?id=" . $var1 . "&amp;action=published";
-		elseif ($x == "editcomment") $ret = "/edit.php?id=" . $var2 . "&amp;commentid=" . $var1;
-		elseif ($x == "live_comments") $ret = "/live_comments.php";
-		elseif ($x == "live_published") $ret = "/live_published.php";
-		elseif ($x == "live_unpublished") $ret = "/live_unpublished.php";
-		elseif ($x == "live") $ret = "/live.php";
-		elseif ($x == "template") $ret = "/settemplate.php";
-		elseif ($x == "settemplate") $ret = "/settemplate.php?template=" . $var1;
+	if ($x == "maincategory") $ret = "/" . $var1;
+	elseif ($x == "newcategory") $ret = "/new/" . $var1;
+	elseif ($x == "discardedcategory") $ret = "/discarded/" . $var1 . "/";
 
-		//group links
-		elseif ($x == "groups") $ret = "/groups.php";
-		elseif ($x == "submit_groups") $ret = "/submit_groups.php";
-		elseif ($x == "group_story") $ret = "/group_story.php?id=" . $var1;
-		elseif ($x == "group_story_title") $ret = "/group_story.php?title=" . $var1;
-		elseif ($x == "group_story2") $ret = "/group_story.php?title=" . $var1 . "&amp;view=" . $var2 . ($var3 ? "&amp;$var3=" : '');
-		elseif ($x == "join_group") $ret = "/join_group.php?id=" . $var1 . "&amp;privacy=" . $var2 . "&amp;join=true";
-		elseif ($x == "unjoin_group") $ret = "/join_group.php?id=" . $var1 . "&amp;privacy=" . $var2 . "&amp;join=false";
-		elseif ($x == "join_group_withdraw") $ret = "/join_group.php?group_id=" . $var1 . "&amp;user_id=" . $var2 . "&amp;activate=withdraw";
-		elseif ($x == "group_admin") $ret = "/groupadmin.php?id=" . $var1 . "&amp;role=admin&amp;userid=" . $var3;
-		elseif ($x == "group_normal") $ret = "/groupadmin.php?id=" . $var1 . "&amp;role=normal&amp;userid=" . $var3;
-		elseif ($x == "group_moderator") $ret = "/groupadmin.php?id=" . $var1 . "&amp;role=moderator&amp;userid=" . $var3;
-		elseif ($x == "group_flagged") $ret = "/groupadmin.php?id=" . $var1 . "&amp;role=flagged&amp;userid=" . $var3;
-		elseif ($x == "group_banned") $ret = "/groupadmin.php?id=" . $var1 . "&amp;role=banned&amp;userid=" . $var3;
-		elseif ($x == "group_avatar") $ret = "/group_avatar.php?id=" . $var1;
-		elseif ($x == "group_sort") $ret = "/groups.php?sortby=" . $var1 . $var2;
-		/* Redwine: Roles and permissions and Groups fixes */
-		elseif ($x == "group_story_links_publish") $ret = "/join_group.php?action=published&amp;link=" . $var1;
-		elseif ($x == "group_story_links_new") $ret = "/join_group.php?action=new&amp;link=" . $var1;
-		elseif ($x == "group_story_links_discard") $ret = "/join_group.php?action=discard&amp;link=" . $var1;
-		elseif ($x == "admin_categories_tasks") $ret = "/admin_categories_tasks.php?action=" . $var1;
-		elseif ($x == "editgroup") $ret = "/editgroup.php?id=" . $var1;
-		elseif ($x == "deletegroup") $ret = "/deletegroup.php?id=" . $var1;
-	}
-	if ($URLMethod == 2) {
-		if ($x == "maincategory") $ret = "/" . $var1;
-		elseif ($x == "newcategory") $ret = "/new/" . $var1;
-		elseif ($x == "discardedcategory") $ret = "/discarded/" . $var1 . "/";
+	elseif ($x == "editlink") $ret = "/story/" . $var1 . "/edit/";
+	elseif ($x == "edit") $ret = "/story/" . $var1 . "/editcomment/" . $var2 . "/";
+	elseif ($x == "user") $ret = "/user/" . $var1 . ($var1 ? '/' : '');
+	elseif ($x == "user_friends") $ret = "/user/" . $var1 . "/" . $var2 . "/";
+	elseif ($x == "user_add_remove") $ret = "/user/" . $var2 . "/" . $var1 . "/";
+	elseif ($x == "user_add_links") $ret = "/user/add/link/" . $var1 . "/";
+	elseif ($x == "user_remove_links") $ret = "/user/remove/link/" . $var1 . "/";
+	elseif ($x == "user_inbox") $ret = "/inbox/";
+	elseif ($x == "userblank") $ret = "/user/";
+	elseif ($x == "user2") $ret = "/user/" . $var1 . "/" . $var2 . "/";
+	elseif ($x == "index") $ret = "/";
+	elseif ($x == "index_sort") $ret = "/" . $var1 . ($var2 ? '/' . $var2 : '') . "/";
+	elseif ($x == "new_sort") $ret = "/new/" . $var1 . ($var2 ? '/' . $var2 : '') . "/";
+	elseif ($x == "search") $ret = "/search" . ($var1 ? '/' . $var1 : '') . "/";
+	// elseif ($x == "advancedsearch") $ret = "/advanced-search/";
+	elseif ($x == "search_url") $ret = "/search/" . urlencode(str_replace('/', '|', $var1)) . "/";
+	elseif ($x == "admin_login") $ret = "/admin/admin_login.php?return=" . urlencode($var1);
+	elseif ($x == "login") $ret = "/login.php?return=" . urlencode($var1);
+	elseif ($x == "logout") $ret = "/login.php?op=logout&return=" . my_kahuk_base;
+	elseif ($x == "register") $ret = "/register/";
+	elseif ($x == "submit") $ret = "/submit/";
+	elseif ($x == "story") $ret = "/story/" . $var1 . "/";
+	elseif ($x == "storytitle") $ret = "/story/" . $var1 . "/";
+	elseif ($x == "storycattitle") $ret = "/" . $var1 . "/" . $var2 . "/";
 
-		elseif ($x == "editlink") $ret = "/story/" . $var1 . "/edit/";
-		elseif ($x == "edit") $ret = "/story/" . $var1 . "/editcomment/" . $var2 . "/";
-		elseif ($x == "user") $ret = "/user/" . $var1 . ($var1 ? '/' : '');
-		elseif ($x == "user_friends") $ret = "/user/" . $var1 . "/" . $var2 . "/";
-		elseif ($x == "user_add_remove") $ret = "/user/" . $var2 . "/" . $var1 . "/";
-		elseif ($x == "user_add_links") $ret = "/user/add/link/" . $var1 . "/";
-		elseif ($x == "user_remove_links") $ret = "/user/remove/link/" . $var1 . "/";
-		elseif ($x == "user_inbox") $ret = "/inbox/";
-		elseif ($x == "userblank") $ret = "/user/";
-		elseif ($x == "user2") $ret = "/user/" . $var1 . "/" . $var2 . "/";
-		elseif ($x == "index") $ret = "/";
-		elseif ($x == "index_sort") $ret = "/" . $var1 . ($var2 ? '/' . $var2 : '') . "/";
-		elseif ($x == "new_sort") $ret = "/new/" . $var1 . ($var2 ? '/' . $var2 : '') . "/";
-		elseif ($x == "search") $ret = "/search" . ($var1 ? '/' . $var1 : '') . "/";
-		elseif ($x == "advancedsearch") $ret = "/advanced-search/";
-		elseif ($x == "search_url") $ret = "/search/" . urlencode(str_replace('/', '|', $var1)) . "/";
-		elseif ($x == "admin_login") $ret = "/admin/admin_login.php?return=" . urlencode($var1);
-		elseif ($x == "login") $ret = "/login.php?return=" . urlencode($var1);
-		elseif ($x == "logout") $ret = "/login.php?op=logout&return=" . my_kahuk_base;
-		elseif ($x == "register") $ret = "/register/";
-		elseif ($x == "submit") $ret = "/submit/";
-		elseif ($x == "story") $ret = "/story/" . $var1 . "/";
-		elseif ($x == "storytitle") $ret = "/story/" . $var1 . "/";
-		elseif ($x == "storycattitle") $ret = "/" . $var1 . "/" . $var2 . "/";
+	elseif ($x == "out") $ret = "/out/" . $var1 . "/";
+	elseif ($x == "outtitle") $ret = "/out/" . $var1 . "/";
+	elseif ($x == "outurl") $ret = "/out/" . $var1 . "/";
+	elseif ($x == "root") $ret = "/";
+	elseif ($x == "new") $ret = "/new/";
+	elseif ($x == "topusers") $ret = "/topusers/";
+	elseif ($x == "user_edit") $ret = "/user/$var1/edit/";
+	elseif ($x == "userNoVar") $ret = "/user/";
+	elseif ($x == "loginNoVar") $ret = "/login/";
+	elseif ($x == "rssTime") $ret = "/rss.php?time=" . $var1;
+	elseif ($x == "about") $ret = "/about/" . $var1 . "/";
+	elseif ($x == "rss") $ret = "/rss/";
+	elseif ($x == "rssuser") $ret = "/user/$var1/rss/";
+	elseif ($x == "rssnew") $ret = "/new/rss/";
+	elseif ($x == "rssall") $ret = "/rss/" . $var1 . "/";
+	elseif ($x == "rsscategory") $ret = "/rss/category/" . $var1;
+	elseif ($x == "rsscategorynew") $ret = "/rss/category/new/" . $var1;
+	elseif ($x == "rsssearch") $ret = "/search/" . $var1 . "/rss/";
+	elseif ($x == "rsspage") $ret = ($var2 ? "/$var2" : '') . ($var1 ? "/$var1" : '') . ($var3 ? "/group/$var3" : '') . "/rss/";
+	elseif ($x == "rssgroup") $ret = "/group/$var1" . ($var2 ? "/$var2" : '') . "/rss/";
 
-		elseif ($x == "out") $ret = "/out/" . $var1 . "/";
-		elseif ($x == "outtitle") $ret = "/out/" . $var1 . "/";
-		elseif ($x == "outurl") $ret = "/out/" . $var1 . "/";
-		elseif ($x == "root") $ret = "/";
-		elseif ($x == "new") $ret = "/new/";
-		elseif ($x == "topusers") $ret = "/topusers/";
-		elseif ($x == "user_edit") $ret = "/user/$var1/edit/";
-		elseif ($x == "userNoVar") $ret = "/user/";
-		elseif ($x == "loginNoVar") $ret = "/login/";
-		elseif ($x == "rssTime") $ret = "/rss.php?time=" . $var1;
-		elseif ($x == "about") $ret = "/about/" . $var1 . "/";
-		elseif ($x == "rss") $ret = "/rss/";
-		elseif ($x == "rssuser") $ret = "/user/$var1/rss/";
-		elseif ($x == "rssnew") $ret = "/new/rss/";
-		elseif ($x == "rssall") $ret = "/rss/" . $var1 . "/";
-		elseif ($x == "rsscategory") $ret = "/rss/category/" . $var1;
-		elseif ($x == "rsscategorynew") $ret = "/rss/category/new/" . $var1;
-		elseif ($x == "rsssearch") $ret = "/search/" . $var1 . "/rss/";
-		elseif ($x == "rsspage") $ret = ($var2 ? "/$var2" : '') . ($var1 ? "/$var1" : '') . ($var3 ? "/group/$var3" : '') . "/rss/";
-		elseif ($x == "rssgroup") $ret = "/group/$var1" . ($var2 ? "/$var2" : '') . "/rss/";
+	elseif ($x == "storyrss") $ret = "/$var2/$var1/rss/";
+	elseif ($x == "page") $ret = "/static/" . $var1 . "/";
+	elseif ($x == "editcomment") $ret = "/story/" . $var2 . "/editcomment/" . $var1 . "/";
 
-		elseif ($x == "storyrss") $ret = "/$var2/$var1/rss/";
-		elseif ($x == "page") $ret = "/static/" . $var1 . "/";
-		elseif ($x == "editcomment") $ret = "/story/" . $var2 . "/editcomment/" . $var1 . "/";
-		elseif ($x == "live_comments") $ret = "/live/comments/";
-		elseif ($x == "live_published") $ret = "/live/published/";
-		elseif ($x == "live_unpublished") $ret = "/live/new/";
-		elseif ($x == "live") $ret = "/live/";
-		elseif ($x == "template") $ret = "/settemplate/";
-		elseif ($x == "settemplate") $ret = "/settemplate/" . $var1 . "/";
-		elseif ($x == "admin") $ret = "/admin/";
-		elseif ($x == "admin_modify") $ret = "/story/" . $var1 . "/modify/main/";
-		elseif ($x == "admin_modify_do") $ret = "/story/" . $var1 . "/modify/do" . $var2 . "/";
-		elseif ($x == "admin_modify_edo") $ret = "/story/" . $var1 . "/modify/edo" . $var2 . "/";
-		elseif ($x == "admin_discard") $ret = "/story/" . $var1 . "/modify/discard/";
-		elseif ($x == "admin_new") $ret = "/story/" . $var1 . "/modify/new/";
-		elseif ($x == "admin_published") $ret = "/story/" . $var1 . "/modify/published/";
+	elseif ($x == "admin") $ret = "/admin/";
+	elseif ($x == "admin_modify") $ret = "/story/" . $var1 . "/modify/main/";
+	elseif ($x == "admin_modify_do") $ret = "/story/" . $var1 . "/modify/do" . $var2 . "/";
+	elseif ($x == "admin_modify_edo") $ret = "/story/" . $var1 . "/modify/edo" . $var2 . "/";
+	elseif ($x == "admin_discard") $ret = "/story/" . $var1 . "/modify/discard/";
+	elseif ($x == "admin_new") $ret = "/story/" . $var1 . "/modify/new/";
+	elseif ($x == "admin_published") $ret = "/story/" . $var1 . "/modify/published/";
 
-		elseif ($x == "groups") $ret = "/groups/";
-		elseif ($x == "submit_groups") $ret = "/groups/submit/";
-		elseif ($x == "group_story") $ret = "/groups/id/" . $var1 . "/";
-		elseif ($x == "group_story_title") $ret = "/groups/" . $var1 . "/";
-		elseif ($x == "group_story2") $ret = "/groups/" . $var1 . "/" . $var2 . ($var3 ? "/$var3/" : '');
-		elseif ($x == "join_group") $ret = "/groups/join/" . $var1 . "/privacy/" . $var2 . "/";
-		elseif ($x == "unjoin_group") $ret = "/groups/unjoin/" . $var1 . "/privacy/" . $var2 . "/";
-		elseif ($x == "join_group_withdraw") $ret = "/groups/withdraw/" . $var1 . "/user_id/" . $var2 . "/";
-		elseif ($x == "group_admin") $ret = "/groups/member/admin/id/" . $var1 . "/role/admin/userid/" . $var3 . "/";
-		elseif ($x == "group_normal") $ret = "/groups/member/normal/id/" . $var1 . "/role/normal/userid/" . $var3 . "/";
-		elseif ($x == "group_moderator") $ret = "/groups/member/moderator/" . $var1 . "/role/moderator/userid/" . $var3 . "/";
-		elseif ($x == "group_flagged") $ret = "/groups/member/flagged/" . $var1 . "/role/flagged/userid/" . $var3 . "/";
-		elseif ($x == "group_banned") $ret = "/groups/member/banned/id/" . $var1 . "/role/banned/userid/" . $var3 . "/";
-		elseif ($x == "group_avatar") $ret = "/group_avatar/" . $var1 . "/";
-		elseif ($x == "group_sort") $ret = "/groups/" . $var1 . ($var2 ? "/$var2" : '') . "/";
-		elseif ($x == "editgroup") $ret = "/groups/edit/" . $var1 . "/";
-		elseif ($x == "deletegroup") $ret = "/groups/delete/" . $var1 . "/";
-		elseif ($x == "group_story_links_publish") $ret = "/join_group/action/published/link/" . $var1 . "/";
-		elseif ($x == "group_story_links_new") $ret = "/join_group/action/new/link/" . $var1 . "/";
-		elseif ($x == "group_story_links_discard") $ret = "/join_group/action/discard/link/" . $var1 . "/";
-		elseif ($x == "admin_categories_tasks") $ret = "/admin_categories_tasks/action/" . $var1 . "/";
-	}
+	elseif ($x == "groups") $ret = "/groups/";
+	elseif ($x == "submit_groups") $ret = "/groups/submit/";
+	elseif ($x == "group_story") $ret = "/groups/id/" . $var1 . "/";
+	elseif ($x == "group_story_title") $ret = "/groups/" . $var1 . "/";
+	elseif ($x == "group_story2") $ret = "/groups/" . $var1 . "/" . $var2 . ($var3 ? "/$var3/" : '');
+	elseif ($x == "join_group") $ret = "/groups/join/" . $var1 . "/privacy/" . $var2 . "/";
+	elseif ($x == "unjoin_group") $ret = "/groups/unjoin/" . $var1 . "/privacy/" . $var2 . "/";
+	elseif ($x == "join_group_withdraw") $ret = "/groups/withdraw/" . $var1 . "/user_id/" . $var2 . "/";
+	elseif ($x == "group_admin") $ret = "/groups/member/admin/id/" . $var1 . "/role/admin/userid/" . $var3 . "/";
+	elseif ($x == "group_normal") $ret = "/groups/member/normal/id/" . $var1 . "/role/normal/userid/" . $var3 . "/";
+	elseif ($x == "group_moderator") $ret = "/groups/member/moderator/" . $var1 . "/role/moderator/userid/" . $var3 . "/";
+	elseif ($x == "group_flagged") $ret = "/groups/member/flagged/" . $var1 . "/role/flagged/userid/" . $var3 . "/";
+	elseif ($x == "group_banned") $ret = "/groups/member/banned/id/" . $var1 . "/role/banned/userid/" . $var3 . "/";
+	elseif ($x == "group_avatar") $ret = "/group_avatar/" . $var1 . "/";
+	elseif ($x == "group_sort") $ret = "/groups/" . $var1 . ($var2 ? "/$var2" : '') . "/";
+	elseif ($x == "editgroup") $ret = "/groups/edit/" . $var1 . "/";
+	elseif ($x == "deletegroup") $ret = "/groups/delete/" . $var1 . "/";
+	elseif ($x == "group_story_links_publish") $ret = "/join_group/action/published/link/" . $var1 . "/";
+	elseif ($x == "group_story_links_new") $ret = "/join_group/action/new/link/" . $var1 . "/";
+	elseif ($x == "group_story_links_discard") $ret = "/join_group/action/discard/link/" . $var1 . "/";
+	elseif ($x == "admin_categories_tasks") $ret = "/admin_categories_tasks/action/" . $var1 . "/";
 
 	return my_kahuk_base . preg_replace('/\/+/', '/', $ret);
 }
 
-function SetSmartyURLs($main_smarty)
-{
-	global $dblang, $URLMethod;
-	if (strpos($_SERVER['PHP_SELF'], "login.php") === false) {
-		$main_smarty->assign('URL_login', htmlentities(getmyurl("login", $_SERVER['REQUEST_URI'])));
-	} else {
-		$main_smarty->assign('URL_login', getmyurl("loginNoVar"));
-	}
-	$main_smarty->assign('URL_logout', htmlentities(getmyurl("logout", $_SERVER['REQUEST_URI'])));
 
-	$main_smarty->assign('URL_home', getmyurl("kahuk_index"));
-	$main_smarty->assign('URL_register', getmyurl("register"));
-	$main_smarty->assign('URL_root', getmyurl("root"));
-	$main_smarty->assign('URL_index', getmyurl("index"));
+
+/**
+ * 
+ */
+function SetSmartyURLs($main_smarty) {
 	$main_smarty->assign('URL_search', getmyurl("search"));
 	$main_smarty->assign('URL_advancedsearch', getmyurl("advancedsearch"));
 	$main_smarty->assign('URL_maincategory', getmyurl("maincategory"));
 	$main_smarty->assign('URL_newcategory', getmyurl("newcategory"));
 	$main_smarty->assign('URL_category', getmyurl("category"));
+
 	$main_smarty->assign('URL_user', getmyurl("user"));
-	$main_smarty->assign('URL_userNoVar', getmyurl("userNoVar"));
+	// $main_smarty->assign('URL_userNoVar', getmyurl("userNoVar"));
 	$main_smarty->assign('URL_user_inbox', getmyurl("user_inbox", "inbox"));
 	$main_smarty->assign('URL_user_add_remove', getmyurl("user_add_remove"));
-	$main_smarty->assign('URL_profile', getmyurl("user_edit"));
+	// $main_smarty->assign('URL_profile', getmyurl("user_edit"));
 	$main_smarty->assign('URL_story', getmyurl("story"));
 	$main_smarty->assign('URL_storytitle', getmyurl("storytitle"));
-	$main_smarty->assign('URL_topusers', getmyurl("topusers"));
-	if (isset($_GET['category']) && sanitize($_GET['category'], 1) != '' && strpos($_SERVER['PHP_SELF'], "new.php") === false  && strpos($_SERVER['PHP_SELF'], "story.php") === false) {
-		$main_smarty->assign('URL_new', getmyurl("newcategory") . sanitize(sanitize($_GET['category'], 1), 2));
-	} else {
-		$main_smarty->assign('URL_new', getmyurl("new"));
-	}
+
 	if (isset($_GET['category']) && sanitize($_GET['category'], 1) != '' && strpos($_SERVER['PHP_SELF'], "index.php") === false && strpos($_SERVER['PHP_SELF'], "story.php") === false) {
 		$main_smarty->assign('URL_base', getmyurl("maincategory", sanitize(sanitize($_GET['category'], 1), 2)));
 	} else {
 		$main_smarty->assign('URL_base', getmyurl("index"));
 	}
 
-	$main_smarty->assign('URL_submit', getmyurl("submit"));
 	$main_smarty->assign('URL_rss', getmyurl("rss"));
 	$main_smarty->assign('URL_rsscategory', getmyurl("rsscategory"));
 	$main_smarty->assign('URL_rsscategorynew', getmyurl("rsscategorynew"));
 	$main_smarty->assign('URL_rssnew', getmyurl("rssnew", "new"));
 	$main_smarty->assign('URL_rssall', getmyurl("rssall", "all"));
 	$main_smarty->assign('URL_rsssearch', getmyurl("rsssearch"));
-	$main_smarty->assign('URL_admin', getmyurl("admin"));
+
 	$main_smarty->assign('URL_admin_users', getmyurl("admin_users"));
 	$main_smarty->assign('URL_admin_language', getmyurl("admin_language"));
 	$main_smarty->assign('URL_admin_categories', getmyurl("admin_categories"));
 	$main_smarty->assign('URL_admin_backup', getmyurl("admin_backup"));
-	$main_smarty->assign('URL_admin_modules', getmyurl("admin_modules"));
+
 	$main_smarty->assign('URL_admin_config', getmyurl("admin_config"));
 	$main_smarty->assign('URL_admin_rss', getmyurl("admin_rss"));
-	$main_smarty->assign('URL_live', getmyurl("live"));
-	$main_smarty->assign('URL_unpublished', getmyurl("live_unpublished"));
-	$main_smarty->assign('URL_published', getmyurl("live_published"));
-	$main_smarty->assign('URL_comments', getmyurl("live_comments"));
-	$main_smarty->assign('URL_template', getmyurl("template"));
-	$main_smarty->assign('URL_settemplate', getmyurl("settemplate"));
 
-	$main_smarty->assign('URL_groups', getmyurl("groups"));
-	$main_smarty->assign('URL_submit_groups', getmyurl("submit_groups"));
+	$main_smarty->assign('URL_template', getmyurl("template"));
+
+
 	$main_smarty->assign('URL_join_group', getmyurl("join_group"));
 	$main_smarty->assign('unjoin_group', getmyurl("unjoin_group"));
 	return $main_smarty;
@@ -1142,7 +844,7 @@ function totals_regenerate()
 	$cached_totals[$name] = $count;
 
 	if (caching == 1) {
-		// this is to clear the cache and reload it for settings_from_db.php
+		// this is to clear the cache and reload it for settings-from-db.php
 		$db->cache_dir = KAHUKPATH . 'cache';
 		$db->use_disk_cache = true;
 		$db->cache_queries = true;
@@ -1162,7 +864,7 @@ function totals_adjust_count($name, $adjust)
 	$cached_totals[$name] = $db->get_var('SELECT total FROM ' . table_totals . ' WHERE name="' . $name . '"');
 
 	if (caching == 1) {
-		// this is to clear the cache and reload it for settings_from_db.php
+		// this is to clear the cache and reload it for settings-from-db.php
 		$db->cache_dir = KAHUKPATH . 'cache';
 		$db->use_disk_cache = true;
 		$db->cache_queries = true;
@@ -1245,8 +947,10 @@ function check_referrer($post_url = false)
 			$_SERVER['HTTP_REFERER'] = sanitize($_SERVER['HTTP_REFERER'], 3);
 
 			// update checks if HTTP_REFERER and posted url are the same!
-			if (strpos($_SERVER['HTTP_REFERER'], $post_url) !== false) {
-				return true;
+			if ($post_url) {
+				if (strpos($_SERVER['HTTP_REFERER'], $post_url) !== false) {
+					return true;
+				}
 			}
 
 			if (strpos(preg_replace('/^.+:\/\/(www\.)?/', '', $_SERVER['HTTP_REFERER']) . '/', preg_replace('/^.+:\/\/(www\.)?/', '', my_base_url)) !== 0) {
@@ -1255,6 +959,13 @@ function check_referrer($post_url = false)
 			}
 		} elseif ($xsfr_first_page) {
 			unset($_SESSION['xsfr']);
+
+			kahuk_set_session_message(
+				"Security code expired!",
+				'notice'
+			);
+
+			kahuk_redirect(kahuk_root_url());
 			die('Wrong security code');
 		}
 	}
@@ -1495,34 +1206,3 @@ function recursive_remove_directory($directory, $empty = TRUE)
 
 
 
-function allowToAuthorCat($cat)
-{
-	global $current_user, $db;
-
-	$user = new User($current_user->user_id);
-	if ($user->level == "admin") {
-		return true;
-	} elseif ($user->level == "moderator" && ((is_array($cat) && $cat['authorlevel'] != "admin") || $cat->category_author_level != "admin")) {
-		return true;
-	} elseif ((is_array($cat) && $cat['authorlevel'] == "normal") || $cat->category_author_level == "normal") {
-		// DB 11/12/08
-
-		$group = is_array($cat) ? $cat['authorgroup'] : $cat->category_author_group;
-		if (!$group) {
-			return true;
-		} else {
-			$group = "'" . preg_replace("/\s*(,\s*)+/", "','", $group) . "'";
-			$groups = $db->get_row($sql = "SELECT a.* FROM " . table_groups . " a, " . table_group_member . " b 
-                                WHERE   a.group_id=b.member_group_id AND 
-                                    b.member_user_id=$user->id   AND 
-                                    a.group_status='Enable' AND 
-                                    b.member_status='active' AND
-                                    a.group_name IN ($group)");
-			if ($groups->group_id) {
-				return true;
-			}
-		}
-	}
-	/////
-	return false;
-}

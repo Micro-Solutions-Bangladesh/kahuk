@@ -77,16 +77,18 @@ class Trackback {
 
 // Send a Trackback
 	function send() {
-		global $trackbackURL;
-        if (empty($this->url))
-                return;
+		$trackback_url = kahuk_get_config('trackback_url');
+
+        if (empty($this->url)) {
+			return;
+		}
 
         $title = urlencode($this->title);
         $excerpt = urlencode($this->content);
-        $blog_name = urlencode($trackbackURL);
+        $trackback_url = urlencode($trackback_url);
         $tb_url = $this->url;
         $url = urlencode(get_permalink($this->link));
-        $query_string = "charset=UTF-8&title=$title&url=$url&blog_name=$blog_name&excerpt=$excerpt";
+        $query_string = "charset=UTF-8&title=$title&url=$url&blog_name=$trackback_url&excerpt=$excerpt";
         $trackback_url = parse_url($this->url);
         $http_request  = 'POST ' . $trackback_url['path'] . ($trackback_url['query'] ? '?'.$trackback_url['query'] : '') . " HTTP/1.0\r\n";
         $http_request .= 'Host: '.$trackback_url['host']."\r\n";
@@ -106,7 +108,7 @@ class Trackback {
 		}
 		$this->status='error';	
 		$this->store();
-        return $false;
+
+        return false;
 	}
 }
-?>

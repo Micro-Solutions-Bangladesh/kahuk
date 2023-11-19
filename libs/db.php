@@ -287,30 +287,9 @@ class ezSQL_mysql extends ezSQLcore {
 		$this->overrideLogFiles();
 	}
 
-
-	/**
-	 * 
-	 */
 	function overrideLogFiles() {
-		$this->log_to_file   = LOG_DB_QUERY;
-		$this->logfile       = LOG_DB_QUERY_FILE;
-		$this->logpath       = LOG_DB_QUERY_FILE;
-		$this->log_qry_error = LOG_DB_QUERY_ERROR;
+		$this->log_file = LOG_DB_QUERY_FILE;
 	}
-
-
-	/**
-	 *  Short hand way to connect to mySQL database server
-	 *  and select a mySQL database at the same time
-	 */
-
-	// function quick_connect($dbuser='', $dbpassword='', $dbname='', $dbhost='localhost') {
-	// 	$return_val = false;
-	// 	if ( ! $this->connect($dbuser, $dbpassword, $dbhost,true) ) ;
-	// 	else if ( ! $this->select($dbname) ) ;
-	// 	else $return_val = true;
-	// 	return $return_val;
-	// }
 
 	/**
 	 *  Try to connect to mySQL database server
@@ -330,19 +309,15 @@ class ezSQL_mysql extends ezSQLcore {
 			$this->register_error($ezsql_mysql_str[2].' in '.__FILE__.' on line '.__LINE__);
 			$this->show_errors ? trigger_error($ezsql_mysql_str[2],E_USER_WARNING) : null;
 		} else {
-			if ( $this->log_to_file ) {
-				$fh=fopen( $this->logfile, "a" );
-				fwrite( $fh,"Connect - " . date("Y-m-d H:i:s", time()) . " - " . $_SERVER['REQUEST_URI'] ."\n" );
-				fclose( $fh );
-			}
+			$this->logMe("\n\nConnect - " . date("Y-m-d H:i:s", time()) . " - " . $_SERVER['REQUEST_URI'] ."\n");
 
 			mysqli_query ( $this->dbh, "SET time_zone = '".date("P")."'" );
-			mysqli_query ( $this->dbh, 'set names utf8' );
-			mysqli_query ( $this->dbh, "set character_set_client='utf8'" );
-			mysqli_query ( $this->dbh, "set character_set_results='utf8'" );
-			mysqli_query ( $this->dbh, "set collation_connection='utf8mb4_unicode_ci'" );
-			mysqli_query ( $this->dbh, "set GLOBAL sql_mode ='';" );
-			mysqli_query ( $this->dbh, "set SESSION sql_mode ='';" );
+			mysqli_query ( $this->dbh, 'SET names utf8' );
+			mysqli_query ( $this->dbh, "SET character_set_client='utf8'" );
+			mysqli_query ( $this->dbh, "SET character_set_results='utf8'" );
+			mysqli_query ( $this->dbh, "SET collation_connection='utf8mb4_unicode_ci'" );
+			// mysqli_query ( $this->dbh, "SET GLOBAL sql_mode ='';" );
+			// mysqli_query ( $this->dbh, "SET SESSION sql_mode ='';" );
 			$this->dbuser = $dbuser;
 			$this->dbpassword = $dbpassword;
 			$this->dbhost = $dbhost;
@@ -350,6 +325,12 @@ class ezSQL_mysql extends ezSQLcore {
 		}
 
 		return $return_val;
+	}
+
+	function logMe($str) {
+		if (LOG_DB_QUERY) {
+			error_log("*** DB LOG ***\n" . $str, 3, $this->log_file);
+		}
 	}
 
 	/**********************************************************************
@@ -444,7 +425,7 @@ class ezSQL_mysql extends ezSQLcore {
 			$this->select( $this->dbname );
 		}
 
-		if ( $this->log_to_file ) {
+		if (LOG_DB_QUERY) {
 			$mtime     = microtime();
 			$mtime     = explode( ' ', $mtime );
 			$mtime     = $mtime[1] + $mtime[0];
@@ -454,29 +435,25 @@ class ezSQL_mysql extends ezSQLcore {
 		// Perform the query via std mysql_query function..
 		$this->result = @mysqli_query($this->dbh, $query);
 
-		if ( $this->log_to_file ) {
+		if (LOG_DB_QUERY) {
 			$mtime     = microtime();
 			$mtime     = explode( " ", $mtime );
 			$mtime     = $mtime[1] + $mtime[0];
 			$endtime   = $mtime;
-			$totaltime = ( $endtime - $starttime );
+			$totaltime = ($endtime - $starttime);
 
 			$display = date('Y-m-d h:i:s',time());
-			$file_handle = fopen( $this->logpath, "a" );
 
-			fwrite( $file_handle, $display . ' - ' . $totaltime . ' - ' . $query . "\n" );
-			fclose( $file_handle );
+			$this->logMe($display . ' - ' . $totaltime . ' - ' . $query . "\n");
 		}
 		
 		// If there is an error then take note of it..
-		if ( $str = @mysqli_error( $this->dbh ) ) {
+		if ($str = @mysqli_error($this->dbh)) {
 			$is_insert = true;
 			$this->register_error( $str );
 			$this->show_errors ? trigger_error($str,E_USER_WARNING) : null;
-			
-			$file_handle = fopen( $this->log_qry_error, "a" );
-			fwrite( $file_handle,$totaltime . ' - ' . $query . "\n" );
-			fclose( $file_handle );
+
+			$this->logMe($str);
 
 			return false;
 		}
@@ -529,7 +506,62 @@ class ezSQL_mysql extends ezSQLcore {
 		$this->trace || $this->debug_all ? $this->debug() : null ;
 
 		return $return_val;
+	}
 
+	/**
+	 * 
+	 */
+	function query_insert( $query ) {
+		// Flush cached values..
+		$this->flush();
+
+		// For reg expressions
+		$query = trim( $query );
+
+		// Log how the function was called
+		$this->func_call = "\$db->query( \"$query\" )";
+
+		// Keep track of the last query for debug..
+		$this->last_query = $query;
+
+		// Count how many queries there have been
+		$this->num_queries++;
+
+		// Use core file cache function
+		if ( $cache = $this->get_cache( $query ) ) {
+			return $cache;
+		}
+
+		// If there is no existing database connection then try to connect
+		if ( ! isset($this->dbh) || ! $this->dbh ) {
+			$this->connect( $this->dbuser, $this->dbpassword, $this->dbhost );
+			$this->select( $this->dbname );
+		}
+	
+
+		$starttime = microtime(true);
+
+		// Perform the query via std mysql_query function..
+		$this->result = @mysqli_query($this->dbh, $query);
+
+		$endtime = microtime(true);
+		$totaltime = ( $endtime - $starttime );
+
+		
+		// If there is an error then take note of it..
+		if ( $str = @mysqli_error( $this->dbh ) ) {
+			kahuk_log_unexpected("DB Error: {$str}\nSQL: {$query}");
+			$this->register_error( $str );
+			$this->show_errors ? trigger_error($str, E_USER_WARNING) : null;
+
+			$this->logMe($totaltime . ' - ' . $query . "\n");
+
+			return false;
+		}
+
+		$this->insert_id = @mysqli_insert_id( $this->dbh );
+
+		return $this->insert_id;
 	}
 
 	/**

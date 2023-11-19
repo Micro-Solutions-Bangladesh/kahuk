@@ -3,8 +3,8 @@
  * 
  */
 function kahuk_link_summary( $content ) {
-    if (utf8_strlen($content) > StorySummary_ContentTruncate) {
-        $content = truncate_strings_html( $content, StorySummary_ContentTruncate );
+    if (utf8_strlen($content) > MAX_NUMBER_OF_WORD_STORY_DESC) {
+        $content = truncate_strings_html( $content, MAX_NUMBER_OF_WORD_STORY_DESC );
     }
 
     return $content;
@@ -45,11 +45,14 @@ function kahuk_has_url_in_record( $randkey, $url ) {
 }
 
 /**
- * Check for the uniqueness of story title and url
+ * Check for the uniqueness of story title, slug and url
+ * 
+ * @updated 5.0.6
+ * @since 5.0.1
  * 
  * @return array
  */
-function kahuk_check_unique_story( $story_url, $story_slug ) {
+function kahuk_check_unique_story( $story_url, $story_slug, $skipId = [] ) {
     $output = [
         'status' => false
     ];
@@ -65,7 +68,7 @@ function kahuk_check_unique_story( $story_url, $story_slug ) {
     }
 
     //
-    $storyCountBySlug = kahuk_count_story_by_slug( $story_slug );
+    $storyCountBySlug = kahuk_count_story_by_slug( $story_slug, ['not_id' => $skipId] );
 
     if ( MAX_NUMBER_OF_DUPLICATE_STORY_TITLE <= $storyCountBySlug ) {
         $output['code'] = "duplicate_title_reject";
@@ -81,7 +84,7 @@ function kahuk_check_unique_story( $story_url, $story_slug ) {
         $output['code'] = "story_slug_fail";
         $output['message'] = sprintf( 'Sorry, We are unable to create an unique slug from your title!', $story_url ); // TODO dynamic
 
-        kahuk_debug_log( "Unable to create unique slug from: {$story_slug} :: {$story_url}", __LINE__, __FILE__, __FILE__ );
+        kahuk_log_unexpected("Unable to create unique slug from: [story_slug: {$story_slug}, story_url: {$story_url}]");
     } else {
         $output['status'] = true;
         $output['story_slug'] = $stroy_slug_new;
@@ -123,7 +126,7 @@ function kahuk_unique_title_slug( $title_slug ) {
             $slugNameCheck = false;
             $uniqueSlug = '';
 
-            kahuk_debug_log( "Fail to create new slug for {$title_slug}", __LINE__, __FILE__, __FILE__ );
+            kahuk_log_unexpected( "Fail to create new slug for {$title_slug}");
         }
     } while ( $slugNameCheck );
 

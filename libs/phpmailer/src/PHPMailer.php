@@ -89,14 +89,14 @@ class PHPMailer
      *
      * @var string
      */
-    public $From = 'root@localhost';
+    public $From = 'kahuk@localhost';
 
     /**
      * The From name of the message.
      *
      * @var string
      */
-    public $FromName = 'Root User';
+    public $FromName = 'Kahuk';
 
     /**
      * The envelope sender of the message.

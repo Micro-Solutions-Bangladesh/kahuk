@@ -3,10 +3,11 @@
  * 
  */
 function kahuk_check_spam( $url ) {
-    global $MAIN_SPAM_RULESET, $USER_SPAM_RULESET;
+    $domain_blacklist = kahuk_log_domain_blacklist();
 
     $regex_url   = "/(http:\/\/|https:\/\/|ftp:\/\/|www\.)([^\/\"<\s]*)/im";
     $mk_regex_array = array();
+    $text = '';
 
     preg_match_all($regex_url, $text, $mk_regex_array);
 
@@ -22,10 +23,11 @@ function kahuk_check_spam( $url ) {
         }
     }
 
-    $retVal = kahuk_check_spam_rules($MAIN_SPAM_RULESET, strtoupper($text));
+    $file_antispam = kahuk_log_file_antispam();
+    $retVal = kahuk_check_spam_rules($file_antispam, strtoupper($text));
 
     if (!$retVal) {
-        $retVal = kahuk_check_spam_rules($USER_SPAM_RULESET, strtoupper($text));
+        $retVal = kahuk_check_spam_rules($domain_blacklist, strtoupper($text));
     }
 
     return $retVal;
