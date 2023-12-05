@@ -48,7 +48,7 @@ function kahuk_replace_old_cms_instances() {
     _kahuk_replace_old_cms_instances( $sql, table_config );
 
     //
-    $sql = "UPDATE `" . table_config . "` SET `var_desc` = 'Allow users to change Kahuk language<br /><strong>When SET to 1, you have to rename the language file that you want to allow in /languages/ folder.</strong> Ex: <span style=\"font-style:italic;color:#004dff\">RENAME lang_italian.conf.default</span> to <span style=\"font-style:italic;color:#004dff\">lang_italian.conf</span>' WHERE `var_name` = 'user_language';";
+    $sql = "UPDATE `" . table_config . "` SET `var_desc` = 'Allow users to change Kahuk language<br /><strong>When SET to 1, you have to rename the language file that you want to allow in /languages/ folder.</strong> Ex: <span style=\"font-style:italic;color:#004dff\">RENAME lang_italian.conf.sample</span> to <span style=\"font-style:italic;color:#004dff\">lang_italian.conf</span>' WHERE `var_name` = 'user_language';";
     _kahuk_replace_old_cms_instances( $sql, table_config );
 
     //

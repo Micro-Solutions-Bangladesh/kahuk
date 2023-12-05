@@ -123,12 +123,23 @@ function kahuk_get_smtp_pass() {
 /**
  * 
  */
-function kahuk_get_from_email() {
-    global $hooks, $main_smarty;
+function kahuk_contact_email_auto() {
+    global $hooks;
 
-    $output = $main_smarty->get_config_vars('KAHUK_LANG_EMAIL_NOREPLY');
+    $output = kahuk_get_config("_site_email_auto");
 
-    return $hooks->apply_filters("from_email", $output);
+    return $hooks->apply_filters("email_auto", $output);
+}
+
+/**
+ * 
+ */
+function kahuk_contact_email_noreply() {
+    global $hooks;
+
+    $output = kahuk_get_config("_site_email_noreply");
+
+    return $hooks->apply_filters("email_noreply", $output);
 }
 
 /**
@@ -150,8 +161,8 @@ function kahuk_send_email($customArgs = []) {
 
     $default = [
         "smtp_host" => kahuk_get_smtp_host(),
-        "from_email" => kahuk_get_from_email(),
-        "reply_to_email" => kahuk_get_from_email(),
+        "from_email" => kahuk_contact_email_auto(),
+        "reply_to_email" => kahuk_contact_email_auto(),
         "from_email_name" => kahuk_get_from_email_name(),
         "to_email" => "",
         "subject" => "",

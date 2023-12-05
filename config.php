@@ -120,7 +120,7 @@ ob_start();
  *************************************/
 if (!file_exists(dirname(__FILE__) . '/languages/lang_' . KAHUK_LANG . '.conf')) {
 	$output .= '<div id="wrapper" style="width:800px;padding:10px;background-color:#FFC6C6;border:1px solid #000;color:#000;display:block;margin-left:auto;margin-right:auto;">';
-	$output .= 'The language file /languages/lang_' . KAHUK_LANG . '.conf does not exist. Either this file is missing or the server does not have permission to read it. Make sure that you renamed the file /languages/lang_' . $language . '.conf.default to /languages/lang_' . $language . '.conf.</div>';
+	$output .= 'The language file /languages/lang_' . KAHUK_LANG . '.conf does not exist. Either this file is missing or the server does not have permission to read it. Make sure that you renamed the file /languages/lang_' . KAHUK_LANG . '.conf.default to /languages/lang_' . KAHUK_LANG . '.conf.</div>';
 
 	die($output);
 }

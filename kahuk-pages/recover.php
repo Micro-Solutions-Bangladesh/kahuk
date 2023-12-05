@@ -44,7 +44,7 @@ if ($user) {
             $actionStatus['msgcode'] = 'generated-password-fail';
             $actionStatus['msg'] = sprintf(
                 $main_smarty->get_config_vars("KAHUK_Lang_Recover_password_Generate_Fail"),
-                $main_smarty->get_config_vars("KAHUK_LANG_EMAIL_CONTACT")
+                kahuk_get_config("_site_email_contact")
             );
         }
     } else {
@@ -63,7 +63,7 @@ if ($user) {
 
 
 // misc smarty 
-$main_smarty->assign('errorMsg', $errorMsg);
+$main_smarty->assign('errorMsg', ($errorMsg ? $errorMsg : ""));
 
 $main_smarty->assign('actionStatus', $actionStatus);
 $main_smarty->assign('id', $id);

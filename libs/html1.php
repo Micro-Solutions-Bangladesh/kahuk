@@ -664,11 +664,13 @@ function getmyurl($x, $var1 = "", $var2 = "", $var3 = "")
 		// var 1 = category_safe_name
 		// var 2 = title_url
 		// var 3 = story id
-		if (enable_friendly_urls == true) {
-			return getmyurl("storycattitle", $var1, $var2);
-		} else {
-			return getmyurl("story", $var3);
-		}
+		return getmyurl("storycattitle", $var1, $var2);
+
+		// if (enable_friendly_urls == true) {
+		// 	return getmyurl("storycattitle", $var1, $var2);
+		// } else {
+		// 	return getmyurl("story", $var3);
+		// }
 	}
 
 	if ($x == "maincategory") $ret = "/" . $var1;
@@ -975,9 +977,9 @@ $english_language = array();
 
 function translate($str)
 {
-	global $language, $main_smarty, $english_language;
+	global $main_smarty, $english_language;
 
-	if ($language == 'english') {
+	if (KAHUK_LANG == 'english') {
 		return $str;
 	}
 	if (sizeof($english_language) == 0) {

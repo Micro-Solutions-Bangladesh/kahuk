@@ -1,4 +1,4 @@
-# vahuk-com
+# kahuk-com
 Kahuk offers to bookmark endless articles, conversations, images, and videos using web URLs. The community can comment on posts that provide discussion and often humor.
 
 ***

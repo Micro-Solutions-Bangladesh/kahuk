@@ -1,12 +1,12 @@
 AddDefaultCharset UTF-8
 
 ## 404 Error Page
-ErrorDocument 404 /__my_kahuk_base__error_404
+ErrorDocument 404 __my_kahuk_base__error_404
 
 ##
 Options +FollowSymlinks -MultiViews
 RewriteEngine on
-RewriteBase /__my_kahuk_base__
+RewriteBase __my_kahuk_base__
 
 ## FORCE HTTPS ONLY
 # RewriteCond %{HTTPS} !=on

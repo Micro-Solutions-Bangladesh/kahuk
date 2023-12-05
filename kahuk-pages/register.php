@@ -144,7 +144,7 @@ if (is_ip_banned($userip)) {
             $str = sprintf(
                 $main_smarty->get_config_vars('KAHUK_PassEmail_verification_message'), 
                 $username, 
-                $main_smarty->get_config_vars('KAHUK_PassEmail_From')
+                kahuk_get_config("_site_email_contact")
             );
             eval('$str = "'.str_replace('"','\"',$str).'";');
             $message = "$str";
@@ -153,12 +153,6 @@ if (is_ip_banned($userip)) {
                 'to_email' => $email,
                 'subject' => $subject,
                 'message' => $message,
-                // 'from_email' => $main_smarty->get_config_vars('KAHUK_LANG_EMAIL_NOREPLY'),
-                // 'reply_to_email' => $main_smarty->get_config_vars('KAHUK_LANG_EMAIL_NOREPLY'),
-
-                // 'send_type' => 'smtp',
-                // 'debug' => 0,
-                // 'from_email_pass' => kahuk_get_config("_smtp_pass"),
             ];
             
             // $isMailSent = $globalMailerObj->sendMe($data);

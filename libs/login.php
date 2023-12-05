@@ -29,15 +29,19 @@ class UserAuth {
 				&& $db->escape($_COOKIE['mnm_user']) === $userInfo[0]) {
 				$dbusername = $db->escape($_COOKIE['mnm_user']);
 
-				$dbuser = $db->get_row("SELECT * FROM " . table_users . " WHERE user_login = '$dbusername'");
-				$cached_users[$dbuser->user_id] = $dbuser;
+				$sql = "SELECT * FROM " . table_users . " WHERE user_login = '$dbusername'";
+				$dbuser = $db->get_row($sql);
 
-				if($dbuser->user_id > 0 && md5($dbuser->user_pass)==$userInfo[2] && ($dbuser->user_status=='enable')) {
-					$this->user_id = $dbuser->user_id;
-					$this->user_level = $dbuser->user_level;
-					$this->user_login  = $userInfo[0];
-					$this->md5_pass = $userInfo[2];
-					$this->authenticated = true;
+				if ($dbuser) {
+					$cached_users[$dbuser->user_id] = $dbuser;
+
+					if($dbuser->user_id > 0 && md5($dbuser->user_pass)==$userInfo[2] && ($dbuser->user_status=='enable')) {
+						$this->user_id = $dbuser->user_id;
+						$this->user_level = $dbuser->user_level;
+						$this->user_login  = $userInfo[0];
+						$this->md5_pass = $userInfo[2];
+						$this->authenticated = true;
+					}
 				}
 			}
 		}

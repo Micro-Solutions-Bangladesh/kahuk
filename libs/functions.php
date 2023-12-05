@@ -97,17 +97,62 @@ function kahuk_shorten_the_url($url) {
 }
 
 /**
+ * Create markup of notification message
+ * 
+ * @since 6.0.0
+ * 
+ * @return string markup
+ */
+function kahuk_create_markup_message($msg, $msgtype = "info") {
+	$markup = "<div class=\"alert alert-%s mb-4\"><p class=\"m-0\">%s</p></div>";
+
+	return sprintf(
+		$markup, $msgtype, $msg
+	);
+}
+
+/**
+ * Create markup of messages
+ * 
+ * @since 6.0.0
+ * 
+ * @return string markup
+ */
+function kahuk_markup_messages($messages, $wrapper="") {
+	$output = "";
+	$markup = "<div class=\"alert alert-%s mb-4\"><p class=\"m-0\">%s</p></div>";
+
+	foreach($messages as $message) {
+		$output .= sprintf(
+			$markup, $message["msgtype"], $message["msg"]
+		);
+	}
+
+	if ($wrapper) {
+		return sprintf(
+			$wrapper, $output
+		);
+	}
+
+	return $output;
+}
+
+/**
  * Get messages from the session
  * 
  * @since 5.0.0
  * 
  * @return array
  */
-function kahuk_get_session_messages() {
+function kahuk_get_session_messages($isMarkup = false, $wrapper="") {
 	kahuk_session_start();
 
 	$output = ( isset( $_SESSION['kahuk_session_message'] ) ? $_SESSION['kahuk_session_message'] : [] );
 	$_SESSION['kahuk_session_message'] = [];
+
+	if ($isMarkup) {
+		$output = kahuk_markup_messages($output, $wrapper);
+	}
 
 	return $output;
 }

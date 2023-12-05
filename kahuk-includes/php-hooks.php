@@ -1140,3 +1140,7 @@ class Hooks
 
 global $hooks;
 $hooks = Hooks::getInstance();
+
+
+// Few global implementations
+$hooks->add_filter("story_slug", "kahuk_create_slug");

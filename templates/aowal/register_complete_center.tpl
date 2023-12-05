@@ -6,9 +6,8 @@
         {#KAHUK_Visual_Register_Noemail#}
     </p>
 
-    {assign var="email" value=#KAHUK_LANG_EMAIL_CONTACT#}
     <ul class="list-disc pl-base mt-4">
-        {#KAHUK_Visual_Register_ToDo#|sprintf:$email}
+        {#KAHUK_Visual_Register_ToDo#|sprintf:$site_email_contact}
     </ul>
     {php}$hooks->do_action("snippet_action_tpl", "tpl_kahuk_register_complete_end");{/php}
 </div>

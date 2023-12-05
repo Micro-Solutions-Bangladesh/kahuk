@@ -22,7 +22,7 @@ if($canIhaveAccess == 0){
 }
 
 //Check if the site's email is entered.
-$siteEmail = $main_smarty->get_config_vars('KAHUK_PassEmail_From');
+$siteEmail = kahuk_get_config("_site_email_contact");
 
 if (strpos($siteEmail, 'ENTER_THE_LOCALPART_HERE') !== false) {
     $main_smarty->assign('siteEmail', 'Not configured');

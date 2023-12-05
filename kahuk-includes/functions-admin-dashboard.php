@@ -445,12 +445,30 @@ function kahuk_admin_menu_sub_manage_settings_callback($items) {
     ];
 
     $items[] = [
+        "menu_slug" => "settings-primary-settings",
+        "page_title" => "Primary Settings",
+        "menu_title" => "Primary Settings",
+        "capability" => "admin",
+        "url" => kahuk_create_url('admin/admin_config.php?page=Primary Settings'),
+        "position" => "10.10",
+    ];
+
+    $items[] = [
+        "menu_slug" => "settings-email-settings",
+        "page_title" => "Email Settings",
+        "menu_title" => "Email Settings",
+        "capability" => "admin",
+        "url" => kahuk_create_url('admin/admin_config.php?page=Email Settings'),
+        "position" => "10.11",
+    ];
+
+    $items[] = [
         "menu_slug" => "settings-logos",
         "page_title" => "Settings Logos",
         "menu_title" => "Logos",
         "capability" => "admin",
         "url" => kahuk_create_url('admin/admin_config.php?page=Logo'),
-        "position" => "10.10",
+        "position" => "10.12",
     ];
 
     $items[] = [
@@ -559,7 +577,7 @@ function kahuk_admin_menu_sub_manage_settings_callback($items) {
         "capability" => "admin",
         "url" => kahuk_create_url("admin/admin_config.php?page=Voting"),
         "position" => "10.22",
-    ];    
+    ];
 
     $items[] = [
         "menu_slug" => "manage-domains",

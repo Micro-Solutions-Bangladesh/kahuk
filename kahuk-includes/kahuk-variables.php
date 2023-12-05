@@ -1,9 +1,13 @@
 <?php
-
 /**
  * 
  */
 $dblang = 'en';
+$site_name = kahuk_site_name();
+$main_smarty->assign('site_name', $site_name);
+
+$site_email_contact = kahuk_get_config("_site_email_contact");
+$main_smarty->assign('site_email_contact', $site_email_contact);
 
 $main_smarty->assign('my_base_url', my_base_url);
 $main_smarty->assign('my_kahuk_base', my_kahuk_base);

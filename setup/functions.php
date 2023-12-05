@@ -1,24 +1,50 @@
 <?php
 /**
- * Generate Password
+ * Check if the "kahuk-configs.php" file is readable
  * 
- * @since 5.0.3
+ * @since 5.0.8
  * 
- * @return string
+ * @return boolean
  */
-function kahuk_generate_password( $psaa_length = 10 ) {
-	$output = [];
+function kahuk_has_configs_file() {
+    $file = KAHUKPATH . 'kahuk-configs.php';
 
-	$alphabets = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890~!@#*';
-    $alphaLength = strlen($alphabets) - 1; //put the length -1 in cache
+    return is_readable($file);
+}
+
+/**
+ * @since 5.0.0
+ */
+function kahuk_template_action_messages() {
+	global $messagesArray;
+	// print_r( $messagesArray );
     
-	for ($i = 0; $i < $psaa_length; $i++) {
-        $n = rand(0, $alphaLength);
-        $output[] = $alphabets[$n];
+    foreach( $messagesArray as $row ) {
+		foreach( $row as $i => $msg ) {
+			echo kahuk_create_markup_message( $msg, $i );
+		}
     }
 
-    return implode($output); //turn the array into a string
+	//
+	$builtInMessages = [
+		"invaliddbuser" => "Please provide a valid user for Database!",
+		"invaliddbpass" => "Database password is required!",
+		"invaliddbname" => "Database name is required!",
+		"invaliddbhost" => "Database host is required!",
+	];
+
+	if ( isset( $_REQUEST["errors"] ) ) {
+		$errors = explode( ",", $_REQUEST["errors"] );
+
+		foreach( $errors as $i => $code ) {
+			if ( isset( $builtInMessages[$code] ) ) {
+				kahuk_create_markup_message( $builtInMessages[$code], "warning" );
+			}
+		}
+	}
 }
+
+
 
 /**
  * Check if table exist
@@ -50,19 +76,20 @@ function kahuk_table_exist( $table_name ) {
  * @return boolean true|false
  */
 function kahuk_check_db_connection() {
-	$output = false;
+	$output = [
+		"status" => false,
+	];
 
-	if ( $conn = @mysqli_connect( DB_HOST, DB_USER, DB_PASSWORD ) ) {
+	if ($conn = @mysqli_connect(DB_HOST, DB_USER, DB_PASSWORD)) {
 		$db_selected = mysqli_select_db( $conn, DB_NAME );
 
-		if ( !$db_selected ) {
-			die ('Error [' . DB_NAME . '] : ' . mysqli_error( $conn ) );
+		if ($db_selected) {
+			$output["status"] = true;
+		} else {
+			$output["message"] = "Error [" . DB_NAME . "]: " . mysqli_error($conn);
 		}
-
-		$output = true;
-
 	} else {
-		die ( 'Error: database connection failed!' );
+		$output["message"] = "Error: database connection failed!";
 	}
 
 	return $output;
@@ -72,121 +99,63 @@ function kahuk_check_db_connection() {
  * Check databse settings
  * 
  * @since 5.0.2
+ * 
+ * @return string|empty
  */
 function kahuk_check_db_settings() {
 	$errors = [];
 	$isError = false;
 
-	$dbuser = $_POST['dbuser'];
-	$dbpass = $_POST['dbpass'];
-	$dbname = $_POST['dbname'];
-	$dbhost = $_POST['dbhost'];
+	// print_r($_POST);
+	// exit;
 
-	if ( empty( $dbuser ) ) {
+	$dbuser = $_POST["dbuser"];
+	$dbpass = $_POST["dbpass"];
+	$dbname = $_POST["dbname"];
+	$dbhost = $_POST["dbhost"];
+
+	if (empty($dbuser)) {
 		$errors[] = "invaliddbuser";
 		$isError = true;
 	}
 
-	if ( empty( $dbpass ) ) {
+	if (empty($dbpass)) {
 		$errors[] = "invaliddbpass";
 		$isError = true;
 	}
 
-	if ( empty( $dbname ) ) {
+	if (empty($dbname)) {
 		$errors[] = "invaliddbname";
 		$isError = true;
 	}
 
-	if ( empty( $dbhost ) ) {
+	if (empty($dbhost)) {
 		$errors[] = "invaliddbhost";
 		$isError = true;
 	}
 
-	if ( $isError ) {
+	if ($isError) {
 		return implode(",", $errors);
 	}
 
-	$tblprefix = ( ! empty( trim( $_POST['tblprefix'] ) ) ) ? $_POST['tblprefix'] : 'kahuk_life_';
-	$seourl    = ( isset( $_POST['seourl'] ) && ( 2 && intval( $_POST['seourl'] ) ) ) ? "true" : "false";
+	$tblprefix = (!empty(trim($_POST["tblprefix"]))) ? $_POST["tblprefix"] : "kahuk_";
 
-	define( 'DB_USER', $dbuser );
-	define( 'DB_PASSWORD', $dbpass );
-	define( 'DB_NAME', $dbname );
-	define( 'DB_HOST', $dbhost );
-	define( 'TABLE_PREFIX', $tblprefix );
-	define( 'SEO_FRIENDLY_URL', $seourl );
+	define("DB_USER", $dbuser);
+	define("DB_PASSWORD", $dbpass);
+	define("DB_NAME", $dbname);
+	define("DB_HOST", $dbhost);
+	define("TABLE_PREFIX", $tblprefix);
 
-	return '';
+	return "";
 }
 
 
-
-/**
- * @since 5.0.0
- */
-function kahuk_template_action_messages() {
-	global $messagesArray;
-	// print_r( $messagesArray );
-    
-    foreach( $messagesArray as $row ) {
-		foreach( $row as $i => $msg ) {
-			_kahuk_messages_markup( $msg, $i );
-		}
-    }
-
-	//
-	$builtInMessages = [
-		'invaliddbuser' => "Please provide a valid user for Database!",
-		'invaliddbpass' => "Database password is required!",
-		'invaliddbname' => "Database name is required!",
-		'invaliddbhost' => "Database host is required!",
-	];
-
-	if ( isset( $_REQUEST['errors'] ) ) {
-		$errors = explode( ",", $_REQUEST['errors'] );
-
-		foreach( $errors as $i => $code ) {
-			if ( isset( $builtInMessages[$code] ) ) {
-				_kahuk_messages_markup( $builtInMessages[$code], 'warning' );
-			}
-		}
-	}
-}
-
-
-
-/**
- * 
- */
-// function kahuk_template_step4() {
-// 	global $messagesArray;
-// 	$hasError = false;
-
-//     foreach( $messagesArray as $row ) {
-// 		foreach( $row as $i => $msg ) {
-// 			_kahuk_messages_markup( $msg, $i );
-
-// 			if ( 'danger' == $i ) {
-// 				$hasError = true;
-// 			}
-// 		}
-//     }
-
-// 	if ( $hasError ) {
-// 		_kahuk_messages_markup( '<strong>Installation Unsuccessfull!</strong>', 'danger' );
-// 	} else {
-// 		_kahuk_messages_markup( '<strong>Cheers! Installation Successfull!</strong>', 'danger' );
-// 	}
-// }
 
 
 /**
  * 
  */
 function kahuk_template_step0() {
-	// global $step;
-
-	// kahuk_template_action_messages();
 ?>
 <p>
 	Before getting started, we need some information on the database. You will need to know the following items before proceeding.
@@ -198,16 +167,10 @@ function kahuk_template_step0() {
 	<li>Database host</li>
 	<li>Table prefix (just as a good practice)</li>
 </ol>
-<p>
-	These information will require to create the <code>kahuk-configs.php</code> file.
-</p>
 
 <div class="row">
-	<div class="col tac">
-		<a href="index.php?step=1" class="link-btn lets-go">Install New Site &raquo;</a>
-	</div>
-	<div class="col tac">
-		<a href="index.php?step=11" class="link-btn lets-go">Upgrade Plikli 4.1.5 to Kahuk 5.0.x &raquo;</a>
+	<div class="col">
+		<a href="index.php?step=install-1" class="link-btn lets-go">Install New Site &raquo;</a>
 	</div>
 </div>
 <?php
@@ -273,39 +236,35 @@ function kahuk_template_footer() {
  * @since 5.0.0
  */
 function get_kahuk_file_uri( $file_path ) {
-    $file = ltrim( $file_path, '/' );
-	$output = '';
+    $file = ltrim($file_path, "/");
+	$output = "";
 
-	if ( defined( 'KAHUK_BASE_URL' ) ) {
+	if (defined("KAHUK_BASE_URL")) {
 		$output = KAHUK_BASE_URL;
 	} else {
-		$output = ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] === 'on' ? "https" : "http" ) . "://$_SERVER[HTTP_HOST]";
+		$output = (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] === "on" ? "https" : "http") . "://$_SERVER[HTTP_HOST]";
 	}
 
 	return $output . "/" . $file_path;
 }
 
 
-
-
-
-
 /**
- * 
+ * Depricated, use kahuk_create_markup_message() function
  * 
  * @return void|string
  */
-function kahuk_messages_markup( $msg, $type = 'primary' ) {
+function kahuk_messages_markup( $msg, $type = "primary" ) {
     $output = [];
 
 	$alertClass = $type;
 
-	if ( 'error' == $type ) {
-		$alertClass = 'danger';
+	if ("error" == $type) {
+		$alertClass = "danger";
 	}
 
 
-    $output[] = '<div class="alert alert-' .$alertClass . '">';
+    $output[] = "<div class=\"alert alert-{$alertClass}\">";
 
 	if( is_array( $msg ) ) {
 		foreach( $msg as $v ) {
@@ -315,7 +274,7 @@ function kahuk_messages_markup( $msg, $type = 'primary' ) {
 		$output[] = sprintf("<p>%s</p>", $msg);
 	}
     
-    $output[] = '</div>';
+    $output[] = "</div>";
 
     return implode( "", $output );
 }
@@ -325,33 +284,9 @@ function kahuk_messages_markup( $msg, $type = 'primary' ) {
  * 
  * @return void
  */
-function _kahuk_messages_markup( $msgArray, $type = 'info' ) {
+function _kahuk_messages_markup( $msgArray, $type = "info" ) {
     echo kahuk_messages_markup( $msgArray, $type );
 }
-
-/**
- * Create /settings.php file
- * 
- * @since 5.0.0
- */
-function create_settings_file() {
-	$default_content = file_get_contents( KAHUKPATH . 'settings.php.default' );
-
-	$new_content = str_replace( "table_prefix_here", TABLE_PREFIX, $default_content );
-
-	$path_to_file = KAHUKPATH . 'settings.php';
-
-	if ( $handle = fopen( $path_to_file, 'w' ) ) {
-		if ( fwrite( $handle, $new_content ) ) {
-			fclose( $handle );
-
-			_kahuk_messages_markup( '<code>/settings.php</code> file has been created!', 'success' );
-		}
-
-		chmod( $path_to_file, 0644 );
-	}
-}
-
 
 /**
  * Create site base path
@@ -359,13 +294,13 @@ function create_settings_file() {
  * @since 5.0.0
  */
 function kahuk_base_path() {
-	$pos = strrpos( $_SERVER['SCRIPT_NAME'], '/' );
+	$pos = strrpos( $_SERVER["SCRIPT_NAME"], "/" );
 
-	if ( defined( 'KAHUK_INSTALLING' ) && KAHUK_INSTALLING ) {
-		$pos = strrpos($_SERVER['SCRIPT_NAME'], "/setup");
+	if ( defined( "KAHUK_INSTALLING" ) && KAHUK_INSTALLING ) {
+		$pos = strrpos($_SERVER["SCRIPT_NAME"], "/setup");
 	}
 
-	$path = substr( $_SERVER['SCRIPT_NAME'], 0, $pos );
+	$path = substr( $_SERVER["SCRIPT_NAME"], 0, $pos );
 
 	if ( $path == "/" ) {
 		$path = "";
@@ -380,37 +315,46 @@ function kahuk_base_path() {
  * @since 5.0.0
  */
 function create_kahuk_configs_file() {
+	global $messagesArray;
+
 	$path = kahuk_base_path();
 
-	$root_url = ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] === 'on' ? "https" : "http" ) . "://$_SERVER[HTTP_HOST]";
+	$root_url = (isset( $_SERVER["HTTPS"]) && $_SERVER["HTTPS"] === "on" ? "https" : "http") . "://$_SERVER[HTTP_HOST]";
 
+	$sample_content = file_get_contents(KAHUKPATH . "kahuk-configs.php.sample");
 
-	// $default_file_path = KAHUKPATH . 'kahuk-configs.php.default';
-	$default_content = file_get_contents( KAHUKPATH . 'kahuk-configs.php.default' );
+	$new_content = str_replace("database_name_here", DB_NAME, $sample_content);
+	$new_content = str_replace("database_username_here", DB_USER, $new_content);
+	$new_content = str_replace("database_login_password_here", DB_PASSWORD, $new_content);
+	$new_content = str_replace("database_host_here", DB_HOST, $new_content);
+	$new_content = str_replace("database_tables_prefix_here", TABLE_PREFIX, $new_content);
 
-	$new_content = str_replace( "database_name_here", DB_NAME, $default_content );
-	$new_content = str_replace( "database_username_here", DB_USER, $new_content );
-	$new_content = str_replace( "database_login_password_here", DB_PASSWORD, $new_content );
-	$new_content = str_replace( "database_host_here", DB_HOST, $new_content );
-	$new_content = str_replace( "database_tables_prefix_here", TABLE_PREFIX, $new_content );
+	$new_content = str_replace("kahuk_base_url_here", $root_url . $path, $new_content);
+	$new_content = str_replace("my_base_url_here", $root_url, $new_content);
+	$new_content = str_replace("my_kahuk_base_here", $path, $new_content);
 
-	$new_content = str_replace( "kahuk_base_url_here", $root_url . $path, $new_content );
-	$new_content = str_replace( "my_base_url_here", $root_url, $new_content );
-	$new_content = str_replace( "my_kahuk_base_here", $path, $new_content );
-
-	$new_content = str_replace( "seo_friendly_url_here", SEO_FRIENDLY_URL, $new_content );
+	// $new_content = str_replace("seo_friendly_url_here", SEO_FRIENDLY_URL, $new_content);
 
 	//
-	$path_to_kahuk_configs = KAHUKPATH . 'kahuk-configs.php';
+	$path_to_kahuk_configs = KAHUKPATH . "kahuk-configs.php";
 
-	if ( $handle = fopen( $path_to_kahuk_configs, 'w' ) ) {
-		if ( fwrite( $handle, $new_content ) ) {
-			fclose( $handle );
+	if ($handle = fopen($path_to_kahuk_configs, "w")) {
+		if (fwrite($handle, $new_content)) {
+			fclose($handle);
 
-			_kahuk_messages_markup( '<code>/kahuk-configs.php</code> file has been created!', 'success' );
+			// echo kahuk_create_markup_message("<code>/kahuk-configs.php</code> file has been created!", "success");
+			$messagesArray[] = [
+				"status" => "success",
+				"message" => "<code>/kahuk-configs.php</code> file has been created.",
+			];
 		}
 
-		chmod( $path_to_kahuk_configs, 0644 );
+		chmod($path_to_kahuk_configs, 0644);
+	} else {
+		$messagesArray[] = [
+			"status" => "warning",
+			"message" => "Fail to create <code>/kahuk-configs.php</code>.",
+		];
 	}
 }
 
@@ -421,26 +365,35 @@ function create_kahuk_configs_file() {
  * @since 5.0.2
  */
 function create_kahuk_htaccess_file() {
+	$messagesArray = [];
 
-	if ( defined( "SEO_FRIENDLY_URL" ) && SEO_FRIENDLY_URL ) {
-		$path = defined( 'my_kahuk_base' ) ? my_kahuk_base : kahuk_base_path();
-		$site_base = $path . '/';
+	$path = defined("my_kahuk_base") ? my_kahuk_base : kahuk_base_path();
+	$site_base = $path . "/";
 
-		$default_content = file_get_contents( KAHUKPATH . 'htaccess.default' );
+	$sample_content = file_get_contents(KAHUKPATH . "htaccess.sample");
 
-		$new_content = str_replace( "__my_kahuk_base__", $site_base, $default_content );
+	$new_content = str_replace("__my_kahuk_base__", $site_base, $sample_content);
 
-		//
-		$path_to_file = KAHUKPATH . '.htaccess';
+	//
+	$path_to_file = KAHUKPATH . ".htaccess";
 
-		if ( $handle = fopen( $path_to_file, 'w' ) ) {
-			if ( fwrite( $handle, $new_content ) ) {
-				fclose( $handle );
+	if ($handle = fopen($path_to_file, "w")) {
+		if (fwrite($handle, $new_content)) {
+			fclose($handle);
 
-				_kahuk_messages_markup( '<code>/.htaccess</code> file has been created!', 'success' );
-			}
-
-			chmod( $path_to_file, 0644 );
+			$messagesArray = [
+				"status" => "success",
+				"message" => "<code>{$path_to_file}</code> file has been created!",
+			];
 		}
+
+		chmod($path_to_file, 0644);
+	} else {
+		$messagesArray = [
+			"status" => "warning",
+			"message" => "Fail to create <code>{$path_to_file}</code>.",
+		];
 	}
+
+	return $messagesArray;
 }

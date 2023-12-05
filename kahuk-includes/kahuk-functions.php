@@ -1,4 +1,28 @@
 <?php
+/**
+ * Kahuk CMS Version
+ * 
+ * @return string
+ */
+function kahuk_version($isNumber = false) {
+	return ($isNumber ? "600" : "6.0.0");
+}
+
+/**
+ * Get Website Name
+ * TODO delete KAHUK_LANG_SITE_NAME 
+ * 
+ * @since 6.0.0
+ * 
+ * @return string website name
+ */
+function kahuk_site_name() {
+    global $hooks;
+
+    $site_name = kahuk_get_config("_site_name");
+
+    return $hooks->apply_filters("site_name", $site_name);
+}
 
 /**
  * Check Admin section by IS_ADMIN constant and return true or false
@@ -186,7 +210,7 @@ function kahuk_create_slug($str) {
     return $output;
 }
 
-$hooks->add_filter("story_slug", "kahuk_create_slug");
+
 
 /**
  * Create slug from story title (based on WP sanitize_title function)

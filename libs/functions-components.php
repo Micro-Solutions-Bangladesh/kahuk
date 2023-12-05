@@ -112,7 +112,7 @@ function kahuk_current_page_title() {
  * @return string 
  */
 function kahuk_build_page_title($pn = "", $display = true) {
-    global $main_smarty, $hooks;
+    global $hooks;
 
     $defaultArgs = [
         'divider' => "|",
@@ -122,7 +122,7 @@ function kahuk_build_page_title($pn = "", $display = true) {
     $title_array = $hooks->apply_filters("kahuk_title_parts", $defaultArgs);
 
     $page_title = ($pn ? kahuk_page_title($pn) : kahuk_current_page_title());
-    $site_name = $main_smarty->get_config_vars("KAHUK_LANG_SITE_NAME");
+    $site_name = kahuk_site_name();
 
     $output = $page_title . " " . $title_array["divider"] . " " . $site_name;
 

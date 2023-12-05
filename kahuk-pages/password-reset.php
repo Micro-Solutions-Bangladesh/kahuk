@@ -48,12 +48,6 @@ if ($action === 'reset') {
             'to_email' => $user['user_email'],
             'subject' => $subject,
             'message' => $message,
-            // 'from_email' => $main_smarty->get_config_vars('KAHUK_LANG_EMAIL_NOREPLY'),
-            // 'reply_to_email' => $main_smarty->get_config_vars('KAHUK_LANG_EMAIL_NOREPLY'),
-        
-            // 'send_type' => 'smtp',
-            // 'debug' => 0,
-            // 'from_email_pass' => kahuk_get_config("_smtp_pass"),
         ];
 
         // $isMailSent = $globalMailerObj->sendMe($data);

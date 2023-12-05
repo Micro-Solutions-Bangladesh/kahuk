@@ -25,10 +25,6 @@ function check_if_table_exists($table) {
 	}
 }
 
-function kahuk_version(){
-	return "5.0.7";
-}
-
 function kahuk_hash(){
 	// returns the hash from the misc_table 
 	return "1841866885781771311081921994968184148531621276880100124891721419559174194141113134148";

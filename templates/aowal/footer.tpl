@@ -46,17 +46,17 @@
                 <h2 class="text-lg font-bold mb-base-half">Connect With Us</h2>
                 <ul>
                     <li>
-                        <a href="https://www.facebook.com/VahukOfficial" title="{#KAHUK_Visual_Name#} on Facebook">
+                        <a href="https://www.facebook.com/KahukCMS" title="{#KAHUK_Visual_Name#} on Facebook">
                             <i class="icon icon-facebook"></i> Facebook
                         </a>
                     </li>
                     <li>
-                        <a href="https://twitter.com/VahukOfficial" title="{#KAHUK_Visual_Name#} on Twitter">
+                        <a href="https://twitter.com/" title="{#KAHUK_Visual_Name#} on Twitter">
                             <i class="icon icon-twitter"></i> Twitter
                         </a>
                     </li>
                     <li>
-                        <a href="mailto:{#KAHUK_LANG_EMAIL_CONTACT#}" title="Contact {#KAHUK_Visual_Name#}">
+                        <a href="mailto:{$site_email_contact}" title="Contact {#KAHUK_Visual_Name#}">
                             <i class="icon icon-link-1"></i> Contact Us
                         </a>
                     </li>
@@ -80,8 +80,7 @@
 
     <div class="container">
         <div class="copy-right w-full text-center pt-base-half pb-base">
-            Copyright &copy; {php}echo date("Y");{/php} Vahuk.com and / or <a href="https://microsolutionsbd.com/"
-                title="Micro Solutions Bangladesh" target="_blank">MSBD</a>.
+            Copyright &copy; {php}echo date("Y");{/php} {$site_name}.
             <br>
             Made With <a href="https://kahuk.com/" rel="external" target="_blank">Kahuk CMS</a>
         </div><!-- /.footer-credits -->

@@ -1,7 +1,7 @@
 {
   "name": "aowal",
   "version": "1.0.0",
-  "description": "Aowal template using Tailwind and tw-elements for vahuk.com / tutpub.com",
+  "description": "Aowal template using Tailwind and tw-elements for kahuk cms",
   "scripts": {
     "test": "echo \"Yes, build process is working!\" && exit 1"
   },
