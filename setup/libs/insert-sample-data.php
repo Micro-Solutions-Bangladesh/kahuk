@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * 
  */
@@ -10,25 +9,17 @@ function _kahuk_insert_sample_data( $sql, $tablename ) {
     mysqli_query( $kahukDB, $sql );
 
     $msg = sprintf( "INSERT default/sample data in %s, %d rows affected.", $tablename, $kahukDB->affected_rows );
-    
-    // _kahuk_messages_markup( [ $msg, $sql ] );
+
     _kahuk_messages_markup( [ $msg ] );
-
-    // flush();
-    // ob_flush();
-    // time_nanosleep(0, 500000000);
 }
-
 
 /**
  * 
  */
 function kahuk_insert_sample_data() {
     global $kahukDB;
-    $dblang = "en";
 
     $ipAddress = mysqli_real_escape_string( $kahukDB, $_SERVER['REMOTE_ADDR'] );
-
 
     //
 	$saltedpass = generatePassHash($_POST['upassword']);
@@ -66,8 +57,6 @@ function kahuk_insert_sample_data() {
 	
     _kahuk_insert_sample_data( $sql, table_users );
 
-
-
     // Configs
     $stmt = file_get_contents(KAHUKPATH . "setup/libs/sql/sample-data-configs.sql");
 	$stmt = str_replace("---table_config---", table_config, $stmt);
@@ -83,30 +72,11 @@ function kahuk_insert_sample_data() {
 
 	_kahuk_insert_sample_data($sql, table_categories);
 
-
-    // $sql = "INSERT INTO `" . table_categories . "` (`category__auto_id`, `category_lang`, `category_id`, `category_parent`, `category_name`, `category_safe_name`, `rgt`, `lft`, `category_enabled`, `category_order`, `category_desc`, `category_keywords`, `category_author_level`, `category_author_group`, `category_votes`) VALUES (0, '" . $dblang . "', 0, 0, 'all', 'all', 3, 0, 2, 0, '', '', 'normal', '', '');";
-	// _kahuk_insert_sample_data( $sql, table_categories );
-
-    // $sql = "UPDATE `" . table_categories . "` SET `category__auto_id` = '0' WHERE `category_name` = 'all' LIMIT 1;";
-	// mysqli_query( $kahukDB, $sql );
-
-    // $stmt = file_get_contents( KAHUKPATH . 'setup/libs/sql/sample-data-categories.sql');
-	// $sql = str_replace( "`PREFIX_categories`", "`" . table_categories. "`", $stmt );
-
-	// _kahuk_insert_sample_data( $sql, table_categories );
-
-
-    // //
-    // $sql = 'INSERT INTO `' . table_formulas . '` (`id`, `type`, `enabled`, `title`, `formula`) VALUES (1, \'report\', 1, \'Simple Story Reporting\', \'$reports > $votes * 3\');';
-    // _kahuk_insert_sample_data( $sql, table_formulas );
-
-
     //
     $stmt = file_get_contents( KAHUKPATH . 'setup/libs/sql/sample-data-links.sql');
 	$sql = str_replace( "---table_links---", table_links, $stmt );
 
 	_kahuk_insert_sample_data( $sql, table_links );
-
 
     //
     $sql = "
@@ -140,16 +110,11 @@ function kahuk_insert_sample_data() {
 
     _kahuk_insert_sample_data( $sql, table_misc_data );
 
-
-
-
     //
     $stmt = file_get_contents(KAHUKPATH . "setup/libs/sql/sample-data-totals.sql");
 	$sql = str_replace("---table_totals---", table_totals, $stmt);
 
 	_kahuk_insert_sample_data( $sql, table_totals );
-
-
 
     //
     $stmt = file_get_contents( KAHUKPATH . "setup/libs/sql/sample-data-votes.sql");

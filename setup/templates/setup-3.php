@@ -3,10 +3,6 @@ $uname = _post("uname");
 $uemail = _post("uemail");
 $upassword = _post("upassword");
 
-
-// echo "<pre>[uname: {$uname}, uemail: {$uemail}, upassword: {$upassword}]</pre>";
-// exit;
-
 if (
     $uname && 
     $uemail && 
@@ -60,32 +56,24 @@ if (
     }
 }
 
-
 include_once KAHUKPATH . 'kahuk-configs.php';
 include_once KAHUKPATH . 'libs/define_tables.php';
 
-// include_once KAHUKPATH . 'libs/db.php';
 include_once KAHUKPATH . 'setup/libs/db.php';
-
 
 include_once KAHUKPATH . 'libs/html1.php';
 
 include_once KAHUKPATH . 'setup/libs/create-tables.php';
 include_once KAHUKPATH . 'setup/libs/insert-sample-data.php';
 
-
-
 include_once(KAHUKPATH . "setup/templates/header.php");
 
 
 echo kahuk_get_session_messages(true);
 
-
-
 kahuk_create_primary_tables();
 
 kahuk_insert_sample_data();
-
 ?>
 <div class="complete-setup">
     <form action="index.php?step=setup-4" method="post">

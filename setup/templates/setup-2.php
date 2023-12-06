@@ -7,13 +7,10 @@ if (kahuk_has_configs_file()) {
         "info"
     );
 } else {
-    // print_r($_POST);
     $settings_check = kahuk_check_db_settings();
 
     if ($settings_check) {
         kahuk_redirect("./index.php?step=install-1&errors={$settings_check}"); // Redirect to first page
-    } else {
-        // kahuk_redirect("./index.php?step=install-2&config-status=yes");
     }
 
     $connection_check = kahuk_check_db_connection();
@@ -23,13 +20,7 @@ if (kahuk_has_configs_file()) {
             $connection_check["message"],
             "warning"
         );
-
-        // foreach($messagesArray as $msg) {
-        //     kahuk_set_session_message(
-        //         $msg["message"],
-        //         $msg["status"]
-        //     );
-        // }
+        
         kahuk_redirect($redirectTo . "-1");
 
     } else {
@@ -49,9 +40,7 @@ if (kahuk_has_configs_file()) {
     }
 }
 
-    echo kahuk_get_session_messages(true);
-
-    // include( KAHUKPATH . "setup/templates/admin-detail-form.php" );
+echo kahuk_get_session_messages(true);
 ?>
 <h2>Admin User Detail</h2>
 
@@ -75,7 +64,6 @@ if (kahuk_has_configs_file()) {
     </div>
 
     <div class="form-row">
-        <!-- <input type="hidden" name="step" value="setup-3"> -->
         <input type="hidden" name="config_status" value="yes">
         <input type="hidden" name="htaccess_status" value="no">
         <input type="submit" class="btn btn-primary" name="Submit" value="Submit">

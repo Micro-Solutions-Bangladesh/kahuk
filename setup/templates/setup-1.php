@@ -44,13 +44,6 @@ echo kahuk_get_session_messages(true);
         <div class="form-text"></div>
     </div>
 
-    <!-- <div class="form-row form-check">
-        <input name="seourl" class="form-check-input" type="checkbox" value="1" id="flexCheckDefault" checked="true">
-        <label class="form-check-label" for="flexCheckDefault">
-            Default checkbox
-        </label>        
-    </div> -->
-
     <div class="form-row">
         <input type="hidden" name="step" value="setup-2">
         <input type="submit" class="btn btn-primary" name="Submit" value="<?php echo $lang['StartInstall']; ?>" />
