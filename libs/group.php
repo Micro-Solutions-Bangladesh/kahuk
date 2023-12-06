@@ -101,10 +101,15 @@ function group_display($group_or_id) {
 		$main_smarty->assign('group_date', $group_date);
 
 		//get group avatar path
-		$imgsrc = KAHUK_URL_GROUP_AVATAR_MEDIUM;
+		$imgsrc = kahuk_get_config("_avatar_group_medium");
+		$group_avatar_medium_width = kahuk_get_config("_group_avatar_medium_width");
 
-		if ($group_avatar == "uploaded" && allow_groups_avatar == 'true' && file_exists(KAHUKPATH . "avatars/groups_uploaded/" . $group_id . "_" . group_avatar_size_width . ".jpg")) {
-			$imgsrc = KAHUK_BASE_URL . "/avatars/groups_uploaded/" . $group_id . "_" . group_avatar_size_width . ".jpg";
+		if (
+			allow_groups_avatar == 'true' && 
+			$group_avatar == "uploaded" && 
+			is_readable(KAHUKPATH . "avatars/groups_uploaded/" . $group_id . "_" . $group_avatar_medium_width . ".jpg")
+		) {
+			$imgsrc = KAHUK_BASE_URL . "/avatars/groups_uploaded/" . $group_id . "_" . $group_avatar_medium_width . ".jpg";
 		}
 
 		$main_smarty->assign('imgsrc', $imgsrc);

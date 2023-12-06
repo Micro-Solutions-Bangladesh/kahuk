@@ -7,12 +7,13 @@
  * @return string group avatar image url
  */
 function kahuk_group_avatar_url($group_id, $img_size = '', $relative_path = false) {
-    $img_size = (empty($img_size) ? group_avatar_size_width : $img_size);
-    $output = KAHUK_URL_GROUP_AVATAR_MEDIUM;
+    $group_avatar_medium_width = kahuk_get_config("_group_avatar_medium_width");
+    $img_size = (empty($img_size) ? $group_avatar_medium_width : $img_size);
+    $output = kahuk_get_config("_avatar_group_medium");
 
     $file_path = KAHUK_GROUPS_AVATAR_DIR . $group_id . "_{$img_size}.jpg";
 
-    if (file_exists($file_path)) {
+    if (is_readable($file_path)) {
         $output = KAHUK_FOLDER_GROUPS_AVATAR . "/" . $group_id . "_{$img_size}.jpg";
 
         $output = kahuk_create_url($output, [], $relative_path);

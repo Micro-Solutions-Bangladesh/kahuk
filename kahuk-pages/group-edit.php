@@ -81,7 +81,8 @@ if (isset($_POST["action"])) {
             }
 
             $original_image = KAHUK_GROUPS_AVATAR_DIR . "{$group_id}_original.jpg";
-            $thumb_image = KAHUK_GROUPS_AVATAR_DIR . "{$group_id}_" . group_avatar_size_width . ".jpg";
+            $group_avatar_medium_width = kahuk_get_config("_group_avatar_medium_width");
+            $thumb_image = KAHUK_GROUPS_AVATAR_DIR . "{$group_id}_" . $group_avatar_medium_width . ".jpg";
 
             $result = @move_uploaded_file($_FILES['image_file']['tmp_name'], $original_image);
             
@@ -102,11 +103,14 @@ if (isset($_POST["action"])) {
                     'success'
                 );
 
+                $group_avatar_medium_width = kahuk_get_config("_group_avatar_medium_width");
+                $group_avatar_medium_height = kahuk_get_config("_group_avatar_medium_height");
+
                 // create large avatar
                 include KAHUK_LIBS_DIR . "class.pThumb.php";
 
                 $img = new pThumb();
-                $img->pSetSize(group_avatar_size_width, group_avatar_size_height);
+                $img->pSetSize($group_avatar_medium_width, $group_avatar_medium_height);
                 $img->pSetQuality(100);
                 $img->pCreate($original_image);
                 $img->pSave($thumb_image);

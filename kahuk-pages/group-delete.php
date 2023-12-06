@@ -42,7 +42,8 @@ if ($action == 'groupdelete') {
             }
 
             // Delete group avatar image - thumb
-            $thumb_image = KAHUK_GROUPS_AVATAR_DIR . "{$group_id}_" . group_avatar_size_width . ".jpg";
+            $group_avatar_medium_width = kahuk_get_config("_group_avatar_medium_width");
+            $thumb_image = KAHUK_GROUPS_AVATAR_DIR . "{$group_id}_" . $group_avatar_medium_width . ".jpg";
 
             if (file_exists($thumb_image)) {
                 unlink($thumb_image);

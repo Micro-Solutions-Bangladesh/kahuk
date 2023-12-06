@@ -14,7 +14,7 @@ function get_group_meta($group_or_id, $args = []) {
     global $globalGroupsObj, $globalUsersObj;
 
     $output = [
-        'avatar_size_with' => group_avatar_size_width,
+        'avatar_size_with' => kahuk_get_config("_group_avatar_medium_width"),
     ];
 
     $group_id = 0;
