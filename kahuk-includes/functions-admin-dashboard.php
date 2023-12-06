@@ -370,19 +370,6 @@ function kahuk_intial_admin_menu_items() {
     kahuk_add_admin_menu($menuItem);
 
     /**
-     * Item Settings
-     */
-    $menuItem = [
-        "menu_slug" => "manage-settings",
-        "menu_title" => "Settings",
-        "capability" => "admin",
-        "icon_url" => "<i class=\"fa fa-wrench\"></i>",
-        "position" => 20,
-    ];
-
-    kahuk_add_admin_menu($menuItem);
-
-    /**
      * Item Plugins
      */
     $menuItem = [
@@ -390,7 +377,8 @@ function kahuk_intial_admin_menu_items() {
         "menu_title" => "Plugins",
         "capability" => "admin",
         "icon_url" => "<i class=\"fa fa-puzzle-piece\"></i>",
-        "position" => 25,
+        "url" => kahuk_create_url('admin/admin_plugins.php'),
+        "position" => 20,
     ];
     
     kahuk_add_admin_menu($menuItem);
@@ -403,6 +391,19 @@ function kahuk_intial_admin_menu_items() {
         "menu_title" => "Templates",
         "capability" => "admin",
         "icon_url" => "<i class=\"fa fa-file-o\"></i>",
+        "position" => 25,
+    ];
+
+    kahuk_add_admin_menu($menuItem);
+
+    /**
+     * Item Settings
+     */
+    $menuItem = [
+        "menu_slug" => "manage-settings",
+        "menu_title" => "Settings",
+        "capability" => "admin",
+        "icon_url" => "<i class=\"fa fa-wrench\"></i>",
         "position" => 30,
     ];
 
