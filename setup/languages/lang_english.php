@@ -28,9 +28,8 @@ $lang['StartUpgrade'] = 'Start Upgrade';
 	$lang['Installation'] = 'Installation (Please Read Carefully)';
 	$lang['OnceFamiliar'] = '<p>If this is your first time installing Kahuk you should continue on this page after carefully following the directions below. If you need to <a href="./upgrade.php">upgrade your site</a> from a previous version, please run the upgrade script by clicking on the Upgrade link above. WARNING: running the installation process on an existing Kahuk site database will overwrite all the data, so please make sure that you want to perform an installation if you choose to continue below.</p><br />
 	<ol>
-		<li>Rename settings.php.default to settings.php</li>
-		<li>Rename /languages/lang_english.conf.default to lang_english.conf</li>
-		<li>Rename the directory /logs.default to /logs</li>
+		<li>Rename /languages/lang_english.conf.sample to lang_english.conf</li>
+		<li>Rename the directory /logs.sample to /logs</li>
 		<li>CHMOD 0777 the following folders:
 			<ol>
 				<li>/admin/backup/</li>
@@ -42,7 +41,7 @@ $lang['StartUpgrade'] = 'Start Upgrade';
 		</li>
 		<li>CHMOD 0666 the following files:
 			<ol>
-				<li>settings.php</li>
+
 			</ol>
 		</li>
 	</ol>
@@ -58,7 +57,7 @@ $lang['StartUpgrade'] = 'Start Upgrade';
 	$lang['PrefixExample'] = '(ie: "kahuk_" makes the tables for users become kahuk_users)';
 	// $lang['CheckSettings'] = 'Check Settings';
 	$lang['Errors'] = '<br /><br />Please fix the above error(s), then <a class="btn btn-default btn-xs" onClick="document.location.reload(true)">Refresh the Page</a>';
-	$lang['LangNotFound'] = 'was not found. Please remove the \'.default\' extension from all language files and try again.';
+	$lang['LangNotFound'] = 'was not found. Please remove the \'.sample\' extension from all language files and try again.';
 
 // step 3
 	$lang['ConnectionEstab'] = 'Database connection established...';
@@ -116,6 +115,6 @@ $lang['StartUpgrade'] = 'Start Upgrade';
 // Errors
 	$lang['NotFound'] = 'was not found!';
 	$lang['CacheNotFound'] = 'was not found! Create a directory called /cache in your root directory and set it to CHMOD 777.';
-	$lang['SettingsNotFound'] = 'was not found! Try renaming settings.php.default to settings.php';
+	
 	$lang['ZeroBytes'] = 'is 0 bytes.';
 	$lang['NotEditable'] = 'is not writable. Please CHMOD it to 777';

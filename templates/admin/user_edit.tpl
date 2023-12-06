@@ -52,7 +52,7 @@ function checkBreachedPassword() {
 </script>
 {/literal}
 	<legend>{#KAHUK_Visual_Breadcrumb_Edit_User#}: <a href="{$kahuk_base_url}/user.php?login={$userdata[nr].user_login}">{$userdata[nr].user_login}</a></legend>
-	<div class="alert alert-warning expires-warning">{#KAHUK_Visual_Page_Expires#}</div>
+	
 	<form id="form1" name="form1" method="post" action="" {if $validate_password eq '1'}onsubmit="return checkBreachedPassword();"{/if}>
     
     <input type="hidden" name="token" value="{$uri_token_admin_users_edit}" />
@@ -113,7 +113,7 @@ function checkBreachedPassword() {
 				<td><label>{#KAHUK_Visual_Profile_VerifyNewPass#}:</label></td>
 				<td><input id="password2" name="password2" class="form-control" type="password"></td>
 			</tr>
-			{checkActionsTpl location="tpl_admin_user_edit_center_fields"}
+			
 			<tr>
 				<td>
 					<a class="btn btn-default" href="{$kahuk_base_url}/profile.php?login={$userdata[nr].user_login}">{#KAHUK_Visual_Submit3_Modify#} {#KAHUK_Visual_Breadcrumb_Profile#} {#KAHUK_Visual_Profile#}</a>

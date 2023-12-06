@@ -1,0 +1,49 @@
+@layer base {
+    html {
+        @apply font-body text-deep-100;
+    }
+
+    strong {
+        @apply font-bold;
+    }
+
+    p {
+        @apply block w-full max-w-full mb-4;
+    }
+
+    li {
+        @apply mb-3;
+    }
+    ul {
+        @apply mb-4;
+    }
+
+    table {
+        @apply w-full;
+
+        th, td {
+            @apply p-4;
+        }
+
+        tbody {
+            tr:nth-child(even) {
+                background-color: lighten($light-color, 12%);
+            }
+    
+            tr {
+                &:hover {
+                    @apply bg-light-90;
+                }
+            }
+        }
+    }
+
+    hr {
+        border: 0;
+        width: 100%;
+        height: 1px;
+        position: relative;
+    }
+}
+
+

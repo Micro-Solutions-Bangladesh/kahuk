@@ -1,11 +1,11 @@
 <!-- user_view.tpl -->
 {section name=nr loop=$userdata}
 	<legend>View User</legend>
-	{checkActionsTpl location="tpl_kahuk_admin_user_view_start"}
+	
 	<br />
 	<table class="table table-bordered table-striped" cellpadding="0" cellspacing="0">
 		<tbody>
-			{checkActionsTpl location="tpl_kahuk_admin_user_view_tr_start"}
+			
 			<tr>
 				<td width="160px"><strong>Username</strong></td>
 				<td><a href="{$kahuk_base_url}/user.php?login={$userdata[nr].user_login}">{$userdata[nr].user_login}</a></td>
@@ -50,7 +50,7 @@
 			<tr>
 				<td><strong>{#KAHUK_Visual_View_User_Groups_Created#}: </strong></td><td> {$userdata[nr].created}</td>
 			</tr>
-			{checkActionsTpl location="tpl_admin_user_show_center_fields"}
+			
 			<tr>
 				<td><a href="admin_links.php?user={$userdata[nr].user_login}">{#KAHUK_Visual_View_User_Sub_Links#}</a></td> <td> {$linkcount} Total</td>
 			</tr>
@@ -58,14 +58,14 @@
 				<td><a href="admin_comments.php?user={$userdata[nr].user_login}">{#KAHUK_Visual_View_User_Sub_Comments#}</a></td>
 				<td>{$commentcount} Total</td>
 			</tr>
-			{checkActionsTpl location="tpl_kahuk_admin_user_view_tr_end"}
+			
 		</tbody>
 	</table>
 {* Redwine: Roles and permissions and Groups fixes *}	
 	{if $amIadmin eq '1'}		
 		<a class="btn btn-primary" href="?mode=edit&user_id={$userdata[nr].user_id}">{#KAHUK_Visual_View_User_Edit_Data#}</a>
 		{if $user_logged_in neq $userdata[nr].user_login && $userdata[nr].user_id neq '1'}
-			{if $userdata[nr].user_enabled}
+			{if $userdata[nr].user_status eq 'enable'}
 				<a class="btn btn-warning" href="?mode=disable&user={$userdata[nr].user_login}">{#KAHUK_Visual_View_User_Disable#}</a>
 			{else}
 				<a class="btn btn-success" href="?mode=enable&user={$userdata[nr].user_login}">{#KAHUK_Visual_View_User_Enable#}</a>
@@ -74,7 +74,7 @@
 		{/if}
 {* Redwine: Roles and permissions and Groups fixes *}
 	{elseif $isModerator eq '1'}
-		{if $userdata[nr].user_enabled eq '0'}
+		{if $userdata[nr].user_status eq 'disable'}
 			<a class="btn btn-success" href="?mode=enable&user={$userdata[nr].user_login}">{#KAHUK_Visual_View_User_Enable#}</a>
 		{/if}
 	{/if}
@@ -82,4 +82,3 @@
 	{include file="/templates/admin/user_doesnt_exist_center.tpl"}
 {/section}
 <!--/user_view.tpl -->
-{checkActionsTpl location="tpl_kahuk_admin_user_view_end"}

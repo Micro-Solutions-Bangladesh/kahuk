@@ -8,7 +8,8 @@ class UserAuth {
 	var $user_id       = 0;
 	var $user_login    = "";
 	var $md5_pass      = "";
-	var $authenticated = FALSE;
+	var $authenticated = false;
+	var $user_level = "";
 
 	// Additional parameters for cookie security
 	protected $ip, $user_agent;
@@ -17,7 +18,7 @@ class UserAuth {
 	private $token, $validator;
 
 	function __construct() {
-		global $db, $cached_users, $language;
+		global $db, $cached_users;
 		$this->ip = check_ip_behind_proxy();
 		$this->user_agent = $_SERVER['HTTP_USER_AGENT'];
 
@@ -28,17 +29,19 @@ class UserAuth {
 				&& $db->escape($_COOKIE['mnm_user']) === $userInfo[0]) {
 				$dbusername = $db->escape($_COOKIE['mnm_user']);
 
-				$dbuser = $db->get_row("SELECT * FROM " . table_users . " WHERE user_login = '$dbusername'");
-				$cached_users[$dbuser->user_id] = $dbuser;
+				$sql = "SELECT * FROM " . table_users . " WHERE user_login = '$dbusername'";
+				$dbuser = $db->get_row($sql);
 
-				if($dbuser->user_id > 0 && md5($dbuser->user_pass)==$userInfo[2] && $dbuser->user_enabled) {
-					$this->user_id = $dbuser->user_id;
-					$this->user_level = $dbuser->user_level;
-					$this->user_login  = $userInfo[0];
-					$this->md5_pass = $userInfo[2];
-					$this->authenticated = TRUE;
-					if ($dbuser->user_language)
-						$language = $dbuser->user_language;
+				if ($dbuser) {
+					$cached_users[$dbuser->user_id] = $dbuser;
+
+					if($dbuser->user_id > 0 && md5($dbuser->user_pass)==$userInfo[2] && ($dbuser->user_status=='enable')) {
+						$this->user_id = $dbuser->user_id;
+						$this->user_level = $dbuser->user_level;
+						$this->user_login  = $userInfo[0];
+						$this->md5_pass = $userInfo[2];
+						$this->authenticated = true;
+					}
 				}
 			}
 		}
@@ -94,17 +97,18 @@ class UserAuth {
 	function Authenticate( $username, $pass, $remember = false ) {
 		global $db;
 		$dbusername = sanitize( $db->escape( $username ), 4 );
-		
-		check_actions( 'login_start', $vars );
 
 		$user = $db->get_row( "SELECT * FROM " . table_users . " WHERE user_login = '$dbusername' or user_email= '$dbusername'" );
 		
-		
-
 		/***
 		Redwine: the code below is to check for the hashed password of the user logging in. If it contains the string 'bcrypt:' it means that the new password hashing has been applied to it, otherwise, it rehash the password based on the new password hashing!
 		***/
-		if ( $user->user_id > 0 && $user->user_lastlogin != NULL  && $user->user_enabled ) {
+		if (
+			$user &&
+			$user->user_id > 0 && 
+			$user->user_lastlogin != NULL  && 
+			($user->user_status == 'enable')
+		) {
 			if ( substr($user->user_pass, 0, 7) !== 'bcrypt:' ) {
 				$salt = substr( $user->user_pass, 0, SALT_LENGTH );
 				$sha_hash = substr( $user->user_pass, SALT_LENGTH );
@@ -119,19 +123,19 @@ class UserAuth {
 				$db->query( "UPDATE ".table_users." SET user_pass = '$new_pass' WHERE user_id ='$user->user_id' LIMIT 1" );
 			}
 		}
+
 		/* Redwine: End checking/applying the new password hashing */
-		if ( $user->user_id > 0 && verifyPassHash($pass, $user->user_pass) && $user->user_lastlogin != NULL  && $user->user_enabled) {
+		if (
+			$user &&
+			$user->user_id > 0 && 
+			verifyPassHash($pass, $user->user_pass) && 
+			$user->user_lastlogin != NULL  && 
+			($user->user_status == 'enable')
+		) {
 			$this->user_login = $user->user_login;  
 			$this->user_id = $user->user_id;
 
-			$vars = array( 'user' => serialize($this), 'can_login' => true );
-			check_actions( 'login_pass_match', $vars );
-
-			if ( $vars['can_login'] != true ) {
-				return false;
-			}
-
-			$this->authenticated = TRUE;
+			$this->authenticated = true;
 			$this->md5_pass = md5($user->user_pass);
 			$this->SetIDCookie(1, $remember);
 
@@ -150,12 +154,10 @@ class UserAuth {
 		global $main_smarty;
 		
 		$this->user_login = "";
-		$this->authenticated = FALSE;
+		$this->authenticated = false;
 		$this->SetIDCookie (0, '');
 
 		define('wheretoreturn', $url);
-		$vars = '';
-		check_actions('logout_success', $vars);
 
 		if (preg_match('/user\.php\?login=(.+)$/', $url, $m)) {
 			$user=new User();
@@ -163,7 +165,6 @@ class UserAuth {
 			if(!$user->all_stats() || $user->total_links+$user->total_comments==0) 
 				$url = my_kahuk_base.'/';
 		}
-			
 
 		header("Cache-Control: no-cache, must-revalidate");
 		if(!strpos($_SERVER['SERVER_SOFTWARE'], "IIS") && !strpos(php_sapi_name(), "cgi") >= 0){
@@ -186,3 +187,4 @@ class UserAuth {
 }
 
 $current_user = new UserAuth();
+

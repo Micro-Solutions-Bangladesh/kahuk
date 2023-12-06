@@ -271,7 +271,7 @@ function simple_messaging_showpage(){
 			$email_from =  $db->get_var("SELECT user_login FROM `" . table_users . "` WHERE `user_id` = '$current_user->user_id';");
 			$email_subject = "You've got a message in your " . $main_smarty->get_config_vars("KAHUK_Visual_Name") . " inbox";
 			$email_message = "Hi " . $user_to->username . ",\r\n\r\nYou've been sent a private message from " . $email_from . ". \r\n\r\nTo see the message, go to your " . $main_smarty->get_config_vars("KAHUK_Visual_Name") . " inbox here: " .  my_base_url . URL_simple_messaging_inbox . "\r\n\r\nThank you, \r\n" . $main_smarty->get_config_vars("KAHUK_Visual_Name") . " Admin";
-			$email_headers = "From: " . $main_smarty->get_config_vars("KAHUK_PassEmail_From") . "\r\nReply-To: " . $main_smarty->get_config_vars("KAHUK_PassEmail_From") . "\r\n";
+			$email_headers = "From: " . kahuk_get_config("_site_email_contact") . "\r\nReply-To: " . kahuk_get_config("_site_email_contact") . "\r\n";
                         @mail($email_to, $email_subject, $email_message, $email_headers);
 			
 			// show 'message sent', click to continue or wait 5..4..3..2..1.. then redirect

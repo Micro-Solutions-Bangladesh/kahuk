@@ -1,0 +1,54 @@
+
+// Break Points
+$bpXs: '475px';
+$bpSm: '640px';
+$bpMd: '768px';
+$bpLg: '1024px';
+$bpXl: '1280px';
+$bpXxl: '1536px';
+
+// Gutter Spacing
+$grid-gutter-width: 3rem;
+
+
+// Colors
+$deep-color:       #21303b;
+
+$deep-color-50p:       lighten($deep-color, 50%);
+$deep-color-60p:       lighten($deep-color, 40%);
+$deep-color-70p:       lighten($deep-color, 30%);
+$deep-color-80p:       lighten($deep-color, 20%);
+$deep-color-85p:       lighten($deep-color, 15%);
+$deep-color-90p:       lighten($deep-color, 10%);
+$deep-color-95p:       lighten($deep-color, 5%);
+
+$deep-color-105p:       darken($deep-color, 5%);
+$deep-color-110p:       darken($deep-color, 10%);
+$deep-color-120p:       darken($deep-color, 20%);
+$deep-color-130p:       darken($deep-color, 30%);
+$deep-color-140p:       darken($deep-color, 40%);
+$deep-color-150p:       darken($deep-color, 50%);
+$deep-color-160p:       darken($deep-color, 60%);
+$deep-color-170p:       darken($deep-color, 70%);
+$deep-color-180p:       darken($deep-color, 80%);
+
+$light-color:     #bae6fd;
+
+$light-color-50p:       lighten($light-color, 50%);
+$light-color-60p:       lighten($light-color, 40%);
+$light-color-70p:       lighten($light-color, 30%);
+$light-color-80p:       lighten($light-color, 20%);
+$light-color-85p:       lighten($light-color, 15%);
+$light-color-90p:       lighten($light-color, 10%);
+$light-color-95p:       lighten($light-color, 5%);
+
+$light-color-105p:       darken($light-color, 5%);
+$light-color-110p:       darken($light-color, 10%);
+$light-color-120p:       darken($light-color, 20%);
+$light-color-130p:       darken($light-color, 30%);
+$light-color-140p:       darken($light-color, 40%);
+$light-color-150p:       darken($light-color, 50%);
+$light-color-160p:       darken($light-color, 60%);
+$light-color-170p:       darken($light-color, 70%);
+$light-color-180p:       darken($light-color, 80%);
+

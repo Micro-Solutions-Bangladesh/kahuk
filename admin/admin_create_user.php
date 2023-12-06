@@ -1,10 +1,11 @@
 <?php
+define('IS_ADMIN', true);
+
 include_once('../internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('../config.php');
-include(KAHUK_LIBS_DIR . 'link.php');
-include(KAHUK_LIBS_DIR . 'class-votes.php');
+
 include(KAHUK_LIBS_DIR . 'smartyvariables.php');
 include(KAHUK_LIBS_DIR . 'csrf.php');
 include(KAHUK_LIBS_DIR . 'document_class.php');

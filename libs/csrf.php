@@ -230,4 +230,3 @@ function check_valid($token, $name) {
 		echo '<div style="text-align: center;background-color:#5cb85c;border-color:#4cae4c;width: 650px;padding: 20px;border: 1px solid #000000;margin: auto;"><span style="display:inline-block;background-color:#FFC6C6;border:1px solid #000000;color:#C80700;padding:20px;">Do not be alarmed. It could be a blocked invalid token (hack attempt) or just a timeout.<br />YOU ARE SAFE!<br />Go <a href = "javascript:history.go(-' . $steps_back . ')">back</a>, REFRESH that page, and try again.</span></div>';
 	}
 }
-?>

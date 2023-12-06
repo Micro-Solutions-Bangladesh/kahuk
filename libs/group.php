@@ -3,182 +3,6 @@
 /**
  * 
  */
-function joinGroup($group_id, $privacy)
-{
-	global $db, $current_user, $main_smarty, $the_template, $my_base_url, $my_kahuk_base;
-	if (!is_numeric($group_id)) {
-		die();
-	}
-
-	if (!$current_user->user_id) {
-		die();
-	}
-
-	// Enforce "Max Joinable Groups" config option
-	if (reached_max_joinable_groups($db, $current_user))
-		return;
-
-	$privacy = $db->get_var("SELECT group_privacy FROM " . table_groups . " WHERE group_id = $group_id");
-
-	if ($privacy == 'public') {
-		$member_status = 'active';
-	} else {
-		$member_status = 'inactive';
-	}
-
-	if (isMember($group_id)) {
-		return;
-	}
-
-	$sql = "INSERT IGNORE INTO " . table_group_member . " ( `member_user_id` , `member_group_id`, `member_role`,`member_status` ) VALUES ('" . $current_user->user_id . "', '" . $group_id . "','normal','" . $member_status . "' ) ";
-	$db->query($sql);
-
-	//member count update increase
-	if (isMemberActive($group_id) == 'active') {
-		$member_count = get_group_members($group_id);
-		$member_update = "update " . table_groups . " set group_members = '" . $member_count . "' where group_id = '" . $group_id . "'";
-		$db->query($member_update);
-	}
-
-	if ($privacy != 'public') {
-		$creator_id = get_group_creator($group_id);
-		$AddAddress = get_group_user_email($creator_id);
-
-		$subject = $main_smarty->get_config_vars('KAHUK_Visual_Group_Email_Subject');
-		$message = sprintf(
-			$main_smarty->get_config_vars('KAHUK_Visual_Group_Email_Body'),
-			my_base_url . getmyurl("user", $current_user->user_login),
-			$current_user->user_login,
-			my_base_url . my_kahuk_base . "/join_group.php?activate=true&group_id=" . $group_id . "&user_id=" . $current_user->user_id,
-			my_base_url . my_kahuk_base . "/join_group.php?activate=false&group_id=" . $group_id . "&user_id=" . $current_user->user_id
-		);
-		$headers = 'From: ' . $main_smarty->get_config_vars("KAHUK_PassEmail_From") . "\r\n";
-		$headers .= "Content-type: text/html; charset=utf-8\r\n";
-
-		/***************************
-		Redwine: if we are testing the smtp email send, WITH A FAKE EMAIL ADDRESS, the SESSION variable will allow us to print the email message when the register_complete.php is loaded, so that the account that is created can be validated and activated.
-		 ***************************/
-		if (allow_smtp_testing == 1 && smtp_fake_email == 1) {
-			$_SESSION['validationEmail'] = $message;
-		}
-
-		//Redwine: require the file for email sending.
-		require_once('phpmailer/sendEmail.php');
-
-		if (!$mail->Send()) {
-			$errorSending = $main_smarty->get_config_vars('KAHUK_Visual_Login_Delivery_Failed');
-		} else {
-			$errorSending = $main_smarty->get_config_vars("KAHUK_PassEmail_SendSuccess");
-
-			if (allow_smtp_testing == 1 && smtp_fake_email == 1) {
-				$errorSending .= "<br /><hr /><br />$message";
-			}
-		}
-
-		$_SESSION['errorSending'] = $errorSending;
-	}
-}
-
-/**
- * 
- */
-function unjoinGroup($group_id, $privacy)
-{
-	global $db, $current_user;
-
-	if (!is_numeric($group_id)) {
-		die();
-	}
-
-	//$isMember = isMember($story_id);if($privacy == 'public')
-	$sql2 = "delete from " . table_group_member . " where member_user_id = '" . $current_user->user_id . "' and member_group_id = '" . $group_id . "' ";
-	$db->query($sql2);
-
-	//member count update decrease
-	$member_count = get_group_members($group_id);
-	$member_update = "update " . table_groups . " set group_members = '" . $member_count . "' where group_id = '" . $group_id . "' ";
-
-	$db->query($member_update);
-}
-
-/**
- * 
- */
-function isMember($group_id)
-{
-	global $db, $current_user;
-	if (!is_numeric($group_id)) die();
-
-	return $db->get_var("SELECT count(*) FROM " . table_group_member . " WHERE member_group_id = $group_id AND member_user_id = '" . $current_user->user_id . "' ");
-}
-
-/**
- * 
- */
-function isMemberActive($group_id)
-{
-	global $db, $current_user;
-	if (!is_numeric($group_id)) die();
-
-	return $db->get_var("SELECT member_status FROM " . table_group_member . " WHERE member_group_id = $group_id AND member_user_id = '" . $current_user->user_id . "' ");
-}
-
-/**
- * 
- */
-function get_group_members($group_id)
-{
-	global $db;
-
-	if (!is_numeric($group_id)) {
-		die();
-	}
-
-	$gid = $group_id;
-
-	return $db->get_var("SELECT COUNT(*) FROM " . table_group_member . " WHERE member_group_id = $gid AND member_status = 'active'");
-}
-
-/**
- * returns creator id from group id
- */
-function get_group_creator($group_id)
-{
-	global $db;
-	if (!is_numeric($group_id)) die();
-
-	$gid = $group_id;
-	$creator = $db->get_row("SELECT group_creator FROM " . table_groups . " WHERE group_id = $gid");
-	return $creator->group_creator;
-}
-
-/**
- * 
- */
-/* Redwine: Roles and permissions and Groups fixes. 
-returns if current user is group Admin or Group Moderator */
-function get_group_roles($group_id)
-{
-	global $db, $current_user;
-
-	if (!is_numeric($group_id)) {
-		die();
-	}
-
-	$gid = $group_id;
-	$role = $db->get_row("SELECT member_role FROM " . table_group_member . " WHERE member_group_id =" . $gid . " AND member_user_id =" . $current_user->user_id . " AND member_status ='active'");
-
-	/* Redwine: added the below conditional statment because it was generating a notice. */
-	if (!empty($role)) {
-		return $role->member_role;
-	} else {
-		return '';
-	}
-}
-
-/**
- * 
- */
 //to return name from userid
 function get_group_user_email($uid)
 {
@@ -231,60 +55,34 @@ function get_groupdetail_user()
 }
 
 /**
- * 
+ * Set single group in main_smarty
+ * TODO Delete $requestID parameter or delete the function itself
  */
-//returns votes to publish count
-function group_check_to_publish($group_id)
-{
-	global $db;
-	if (!is_numeric($group_id)) die();
+function group_display($group_or_id) {
+	global $db, $main_smarty;
 
-	$gid = $group_id;
-	$group_vote_to_publish = $db->get_row("SELECT group_vote_to_publish FROM " . table_groups . " WHERE group_id = $gid");
-	return $group_vote_to_publish->group_vote_to_publish;
-}
+	$group = $group_or_id;
 
-/** 
- * Find out if the user has already joined the maximum allowable number of groups.
- * To enforce "Max Joinable Groups" config option.
- */
-function reached_max_joinable_groups($db, $current_user)
-{
-	$user_id = $current_user->user_id;
-
-	if (!is_numeric($user_id)) {
-		die();
+	if (is_numeric($group_or_id)) {
+		$group = $db->get_row("SELECT * FROM " . table_groups . " WHERE group_id = {$group_or_id}", ARRAY_A);		
 	}
 
-	$current_memberships = $db->get_var('SELECT COUNT(*) FROM ' . table_group_member . " WHERE member_user_id = '$user_id'");
+	// print_r($group);
 
-	return $current_memberships >= max_groups_to_join;
-}
-
-/**
- * 
- */
-//displaying group as story
-function group_display($requestID)
-{
-	global $db, $main_smarty, $the_template;
-	if (!is_numeric($requestID)) die();
-
-	$group = $db->get_row("SELECT * FROM " . table_groups . " WHERE group_id = $requestID");
 	if ($group) {
-		$group_id = $group->group_id;
-		$group_name = $group->group_name;
-		$group_safename = $group->group_safename;
-		$group_description = $group->group_description;
-		$group_creator = $group->group_creator;
-		$group_status = $group->group_status;
-		$group_members = $group->group_members;
-		$group_date = $group->group_date;
-		$group_privacy = $group->group_privacy;
-		$group_avatar = $group->group_avatar;
-		$group_vote_to_publish = $group->group_vote_to_publish;
-		$group_notify_email = $group->group_notify_email;
-		$date = $db->get_var(" SELECT DATE_FORMAT(group_date, '%b, %e %Y') from " . table_groups . " WHERE group_id = $group->group_id");
+		// die("***");
+		$group_id = $group['group_id'];
+		$group_name = $group['group_name'];
+		$group_safename = $group['group_safename'];
+		$group_description = $group['group_description'];
+		$group_creator = $group['group_creator'];
+		$group_status = $group['group_status'];
+		$group_members = $group['group_members'];
+		$group_date = $group['group_date'];
+		$group_privacy = $group['group_privacy'];
+		$group_avatar = $group['group_avatar'];
+		
+		$date = $db->get_var("SELECT DATE_FORMAT(group_date, '%b, %e %Y') FROM " . table_groups . " WHERE group_id = {$group->group_id}");
 		//echo $date;
 		$group_date = $date;
 		//$group_date = date('M j, Y', $group->group_date);
@@ -301,18 +99,23 @@ function group_display($requestID)
 		$main_smarty->assign('group_privacy', $group_privacy);
 		$main_smarty->assign('group_avatar', $group_avatar);
 		$main_smarty->assign('group_date', $group_date);
-		$main_smarty->assign('group_notify_email', $group_notify_email);
-		$main_smarty->assign('group_vote_to_publish', $group_vote_to_publish);
 
 		//get group avatar path
-		if ($group_avatar == "uploaded" && allow_groups_avatar == 'true' && file_exists(KAHUKPATH . "avatars/groups_uploaded/" . $group_id . "_" . group_avatar_size_width . ".jpg"))
-			$imgsrc = my_base_url . my_kahuk_base . "/avatars/groups_uploaded/" . $group_id . "_" . group_avatar_size_width . ".jpg";
-		else
-			$imgsrc = my_base_url . my_kahuk_base . "/templates/" . $the_template . "/img/group_large.gif";
+		$imgsrc = kahuk_get_config("_avatar_group_medium");
+		$group_avatar_medium_width = kahuk_get_config("_group_avatar_medium_width");
+
+		if (
+			allow_groups_avatar == 'true' && 
+			$group_avatar == "uploaded" && 
+			is_readable(KAHUKPATH . "avatars/groups_uploaded/" . $group_id . "_" . $group_avatar_medium_width . ".jpg")
+		) {
+			$imgsrc = KAHUK_BASE_URL . "/avatars/groups_uploaded/" . $group_id . "_" . $group_avatar_medium_width . ".jpg";
+		}
+
 		$main_smarty->assign('imgsrc', $imgsrc);
 
 		//get group creator and his urls
-		$g_name = get_group_submitter_username($group_creator);
+		$g_name = kahuk_user_login_by_id($group_creator);
 		$main_smarty->assign('group_submitter', $g_name);
 		$main_smarty->assign('submitter_profile_url', getmyurl('user', $g_name));
 		$main_smarty->assign('group_avatar_url', getmyurl('group_avatar', $group_id));
@@ -326,7 +129,7 @@ function group_display($requestID)
 			$main_smarty->assign('is_group_admin', 1);
 		}
 		// Get the Group Admin/Moderator to use the assigned permissions
-		$gr_roles = get_group_roles($requestID);
+		$gr_roles = kahuk_user_role_for_group($group_id);
 		$is_gr_Admin = 0;
 		$is_gr_Moderator = 0;
 		if ($gr_roles == "admin") {
@@ -372,434 +175,7 @@ function group_display($requestID)
 		$main_smarty->assign('form_action', $group_story_url);
 		$main_smarty->assign('edit_form_action', getmyurl("editgroup", $group_id));
 		$group_array = array($group_name, $group_description, $group_privacy);
+		
 		return $group_array;
 	}
-}
-//displaying member of a group
-function member_display($requestID)
-{
-	global $db, $main_smarty, $current_user;
-
-	if (!is_numeric($requestID)) {
-		die();
-	}
-
-	$member_display = '';
-	$index = 0;
-	/* Redwine: Roles and permissions and Groups fixes */
-	$isAdmin = $main_smarty->get_template_vars('isAdmin');
-	$isModerator = $main_smarty->get_template_vars('isModerator');
-	$main_smarty->assign('isAdmin', $isAdmin);
-	$main_smarty->assign('isModerator', $isModerator);
-	$gr_roles = get_group_roles($requestID);
-	$is_gr_Admin = 0;
-	$is_gr_Moderator = 0;
-
-	if ($gr_roles == "admin") {
-		$is_gr_Admin = 1;
-	} elseif ($gr_roles == "moderator") {
-		$is_gr_Moderator = 1;
-	}
-
-	$change_role = $main_smarty->get_config_vars("KAHUK_Visual_Group_Change_Role");
-	$role_normal = $main_smarty->get_config_vars("KAHUK_Visual_Group_Role_Normal");
-	$role_admin = $main_smarty->get_config_vars("KAHUK_Visual_Group_Role_Admin");
-	$role_moderator = $main_smarty->get_config_vars("KAHUK_Visual_Group_Role_Moderator");
-	$role_flagged = $main_smarty->get_config_vars("KAHUK_Visual_Group_Role_Flagged");
-	$role_banned = $main_smarty->get_config_vars("KAHUK_Visual_Group_Role_Banned");
-
-	$gcreator = get_group_creator($requestID);
-
-	$args = [];
-
-	if ($gcreator == $current_user->user_id || $isAdmin == '1' || $is_gr_Admin == '1' || $is_gr_Moderator == '1') {
-		$args["member_status"] = 'active';
-	}
-
-	// $args["debug"] = true;
-	$args["output_type"] = 'array';
-	$members_from_group = kahuk_get_members_by_group([$requestID], $args);
-
-	$main_smarty->assign('members_from_group', $members_from_group);
-
-	// $args["debug"] = false;
-	$args["output_type"] = '';
-	$members_from_group = kahuk_get_members_by_group([$requestID], $args);
-
-	if ($members_from_group) {
-		foreach ($members_from_group as $memberid) {
-			$member_user_id = $memberid->member_user_id;
-			$member_role = $memberid->member_role;
-
-			//role change urls
-			$member_adminchange_url = getmyurl('group_admin', $requestID, 'admin', $member_user_id);
-			$member_normalchange_url = getmyurl('group_normal', $requestID, 'normal', $member_user_id);
-			$member_moderatorchange_url = getmyurl('group_moderator', $requestID, 'moderator', $member_user_id);
-			$member_flaggedchange_url = getmyurl('group_flagged', $requestID, 'flagged', $member_user_id);
-			$member_bannedchange_url = getmyurl('group_banned', $requestID, 'banned', $member_user_id);
-
-			//get group creator and his url,avatar
-			$member_name = get_group_submitter_username($member_user_id);
-			$group_member_url = getmyurl('user', $member_name);
-			$group_member_avatar = kahuk_gravatar($member_user_id, ['imgsize' => 'small']);
-
-			$member_display .= '<tr><td><a href="' . $group_member_url . '" class="group_member"><img src="' . $group_member_avatar . '" alt="' . $member_name . '" align="absmiddle" /></a></td><td><a href="' . $group_member_url . '" class="group_member">' . $member_name . '</a></td>';
-
-			if ($gcreator == $current_user->user_id || $isAdmin == '1' || $is_gr_Admin == '1' || $is_gr_Moderator == '1') {
-				if ($memberid->member_status == 'active') {
-					if ($gcreator == $current_user->user_id || $is_gr_Admin == '1') {
-						if ($member_user_id == $current_user->user_id) {
-							$main_smarty->assign('is_group_admin', 'true');
-							$member_display .= '<td>' . $member_role . '</td><td></td><td></td>';
-						} else {
-							$member_display .= '<td>' . $member_role . '</td><td><a class="btn btn-default" href="#groupadminlinks-' . $index . '" data-toggle="modal"><i class="fa fa-edit" title="' . $change_role . '"></i> Edit</a></td><td><a class="btn btn-danger" href="' . my_base_url . my_kahuk_base . '/join_group.php?activate=false&group_id=' . $requestID . '&user_id=' . $member_user_id . '">Deactivate</a></td>';
-						}
-
-						$member_display .= '
-						<div class="modal fade" id="groupadminlinks-' . $index . '">
-							<div class="modal-dialog">
-								<div class="modal-content">
-									<div class="modal-header">
-										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-										<h4 class="modal-title">Group User Management</h4>
-									</div>
-									<div class="modal-body">
-										<a class="btn btn-default" href="' . $member_adminchange_url . '">' . $role_admin . '</a> 
-										<a class="btn btn-default" href="' . $member_normalchange_url . '">' . $role_normal . '</a> 
-										<a class="btn btn-default" href="' . $member_moderatorchange_url . '">' . $role_moderator . '</a> 
-										<hr />
-										<a class="btn btn-warning" href="' . $member_flaggedchange_url . '">' . $role_flagged . '</a> 
-										<a class="btn btn-danger" href="' . $member_bannedchange_url . '">' . $role_banned . '</a>
-									</div>
-									<div class="modal-footer">
-										<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-									</div>
-								</div><!-- /.modal-content -->
-							</div><!-- /.modal-dialog -->
-						</div><!-- /.modal -->
-						';
-					} else {
-						$member_display .= '<td>' . $member_role . '</td><td>&nbsp;</td><td>&nbsp;</td>';
-					}
-				} else {
-					if ($gcreator == $current_user->user_id || $is_gr_Admin == '1' || $is_gr_Moderator == '1') {
-						$member_display .= '<td>&nbsp;</td><td>&nbsp;</td><td><a class="btn btn-success" href="' . my_base_url . my_kahuk_base . '/join_group.php?activate=true&group_id=' . $requestID . '&user_id=' . $member_user_id . '">Activate</a></td>';
-					} else {
-						$member_display .= '<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>';
-					}
-				}
-			} else {
-				$member_display .= '<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>';
-			}
-
-			$index = $index + 1;
-			$member_display .= '</tr>';
-		}
-	}
-
-	$main_smarty->assign('member_display', $member_display);
-}
-
-/**
- * 
- */
-//get the new story for groups
-function group_stories($requestID, $catId, $view, $flag = 0)
-{
-	global $db, $main_smarty, $the_template, $page_size, $cached_links;
-
-	if (!is_numeric($requestID)) {
-		die();
-	}
-
-	$link = new Link;
-	$group_new_display = "";
-	$group_published_display = "";
-	/* Redwine: initialized a new variable $from_where to eliminate the Notice:  Undefined variable: from_where on line 457, 460. */
-	$from_where = '';
-	
-	if ($catId) {
-		$child_cats = '';
-		$child_cat_sql = '';
-		// do we also search the subcategories? 
-		/* Redwine: Fix applied to fix the "Show subcategories" feature in Admin Panel -> Settings -> Miscellenaous -> Show subcategories. See https://github.com/Pligg/pligg-cms/commit/2fcf3bac73246ca27de9e9f23f865153632fe4aa */
-		if (Independent_Subcategories == true) {
-			$child_array = '';
-
-			// get a list of all children and put them in $child_array.
-			children_id_to_array($child_array, table_categories, $catId);
-			if ($child_array != '') {
-				// build the sql
-				foreach ($child_array as $child_cat_id) {
-					$child_cat_sql .= ' OR `link_category` = ' . $child_cat_id . ' ';
-					if (Multiple_Categories)
-						$child_cat_sql .= ' OR ac_cat_id = ' . $child_cat_id . ' ';
-				}
-			}
-		}
-
-		if (Multiple_Categories) {
-			$child_cat_sql .= " OR ac_cat_id = $catId ";
-		}
-
-		$from_where .= " AND (link_category=$catId " . $child_cat_sql . ")";
-	}
-
-	$group_vote = group_check_to_publish($requestID);
-
-	if ($view == 'new') {
-		/* Redwine: Roles and permissions and Groups fixes */
-		$from_where .= " AND link_votes<$group_vote AND link_group_status='new'";
-	} else {
-		/* Redwine: Roles and permissions and Groups fixes */
-		$from_where .= " AND ((link_votes >= $group_vote AND link_group_status = 'new') OR link_group_status = 'published')";
-	}
-
-	$offset = (get_current_page() - 1) * $page_size;
-
-	if ($flag == 1) {
-		$sql = "SELECT SQL_CALC_FOUND_ROWS * FROM " . table_links . " WHERE link_group_id = $requestID AND link_group_status!='discard' $from_where GROUP BY link_id ORDER BY link_published_date DESC, link_date DESC ";
-	} else {
-		$sql = "SELECT SQL_CALC_FOUND_ROWS * FROM " . table_links . " WHERE link_group_id = $requestID AND link_group_status!='discard' $from_where GROUP BY link_id ORDER BY link_published_date DESC, link_date DESC LIMIT $offset, $page_size";
-	}
-
-	// Search on additional categories
-	if ($catId && Multiple_Categories) {
-		$sql = str_replace("WHERE", " LEFT JOIN " . table_additional_categories . " ON ac_link_id=link_id WHERE", $sql);
-	}
-
-	$links = $db->get_results($sql);
-	$rows = $db->get_var("SELECT FOUND_ROWS()");
-
-	if ($flag == 1) {
-		return $rows;
-	}
-
-	if ($links) {
-		foreach ($links as $dblink) {
-			$link->id = $dblink->link_id;
-			$cached_links[$dblink->link_id] = $dblink;
-			$link->read();
-			$group_display .= $link->print_summary('summary', true);
-		}
-		$main_smarty->assign('group_display', $group_display);
-	}
-
-	//for auto scrolling
-	if (Auto_scroll == 2 || Auto_scroll == 3) {
-		$main_smarty->assign("scrollpageSize", $page_size);
-		$main_smarty->assign('total_row', $rows);
-		$main_smarty->assign("group_vote", $group_vote);
-		if ($catId)
-			$main_smarty->assign('catID', $catId);
-	} else {
-		$main_smarty->assign('group_story_pagination', do_pages($rows, $page_size, 'group_story', true));
-	}
-}
-
-/**
- * 
- */
-//get the shared story for groups
-function group_shared($requestID, $catId, $flag = 0)
-{
-	global $db, $main_smarty, $the_template, $page_size, $cached_links;
-	/* Redwine: initialized a new variable $from_where to eliminate the Notice:  Undefined variable: from_where on line 531. */
-	$from_where = '';
-
-	if (!is_numeric($requestID)) {
-		die();
-	}
-
-	$link = new Link;
-	$group_shared_display = "";
-
-	if ($catId) {
-		$child_cats = '';
-		$child_cat_sql = '';
-
-		// do we also search the subcategories? 
-		/* Redwine: Fix applied to fix the "Show subcategories" feature in Admin Panel -> Settings -> Miscellenaous -> Show subcategories. See https://github.com/Pligg/pligg-cms/commit/2fcf3bac73246ca27de9e9f23f865153632fe4aa */
-		if (Independent_Subcategories == true) {
-			$child_array = '';
-
-			// get a list of all children and put them in $child_array.
-			children_id_to_array($child_array, table_categories, $catId);
-			if ($child_array != '') {
-				// build the sql
-				foreach ($child_array as $child_cat_id) {
-					$child_cat_sql .= ' OR `link_category` = ' . $child_cat_id . ' ';
-					if (Multiple_Categories)
-						$child_cat_sql .= ' OR ac_cat_id = ' . $child_cat_id . ' ';
-				}
-			}
-		}
-
-		if (Multiple_Categories) {
-			$child_cat_sql .= " OR ac_cat_id = $catId ";
-		}
-
-		$from_where .= " AND (link_category=$catId " . $child_cat_sql . ")";
-	}
-
-	$offset = (get_current_page() - 1) * $page_size;
-
-	if ($flag == 1) {
-		$sql = "SELECT SQL_CALC_FOUND_ROWS b.* FROM " . table_group_shared . " a
-				    LEFT JOIN " . table_links . " b ON link_id=share_link_id
-				    WHERE share_group_id = $requestID AND !ISNULL(link_id) $from_where 
-				    GROUP BY link_id
-				    ORDER BY link_published_date DESC, link_date DESC ";
-	} else {
-		$sql = "SELECT SQL_CALC_FOUND_ROWS b.* FROM " . table_group_shared . " a
-				    LEFT JOIN " . table_links . " b ON link_id=share_link_id
-				    WHERE share_group_id = $requestID AND !ISNULL(link_id) $from_where 
-				    GROUP BY link_id
-				    ORDER BY link_published_date DESC, link_date DESC  LIMIT $offset, $page_size";
-	}
-	// Search on additional categories
-	if ($catId && Multiple_Categories) {
-		$sql = str_replace("WHERE", " LEFT JOIN " . table_additional_categories . " ON ac_link_id=link_id WHERE", $sql);
-	}
-
-	$links = $db->get_results($sql);
-	$rows  = $db->get_var("SELECT FOUND_ROWS()");
-
-	if ($flag == 1) {
-		return $rows;
-	}
-
-	if ($links) {
-		foreach ($links as $dblink) {
-			$link->id = $dblink->link_id;
-			$cached_links[$dblink->link_id] = $dblink;
-			$link->read();
-			$group_shared_display .= $link->print_summary('summary', true);
-		}
-	}
-
-	$main_smarty->assign('group_shared_display', $group_shared_display);
-
-	//for auto scrolling
-	if (Auto_scroll == 2 || Auto_scroll == 3) {
-		$main_smarty->assign("scrollpageSize", $page_size);
-		$main_smarty->assign('total_row', $rows);
-
-		if ($catId) {
-			$main_smarty->assign('catID', $catId);
-		}
-
-		$main_smarty->assign('total_row', $rows);
-	} else {
-		$main_smarty->assign('group_story_pagination', do_pages($rows, $page_size, 'group_story', true));
-	}
-}
-
-/**
- * Depricated in favor of create_markup_group_summery() function
- */
-//displaying group as story
-function group_print_summary($requestID)
-{
-	global $db, $main_smarty, $the_template;
-
-	if (!is_numeric($requestID)) {
-		die();
-	}
-
-	$index = 0;
-	$group = $db->get_row("SELECT group_id,group_creator, group_status, group_members, group_date, group_name, group_safename, group_description, group_privacy, group_avatar FROM " . table_groups . " WHERE group_id = $requestID");
-
-	if ($group) {
-		$group_id = $group->group_id;
-		$group_name = $group->group_name;
-		$group_safename = $group->group_safename;
-		$group_description = $group->group_description;
-		$group_creator = $group->group_creator;
-		$group_status = $group->group_status;
-		$group_members = $group->group_members;
-		$group_date = $group->group_date;
-		$group_privacy = $group->group_privacy;
-		$group_avatar = $group->group_avatar;
-		//$group_date = date('M j, Y', $group->group_date);
-		$date = $db->get_var(" SELECT DATE_FORMAT(group_date, '%b, %e %Y') from " . table_groups . " WHERE group_id = $group->group_id");
-		//echo $date;
-		$group_date = $date;
-
-		//smarty variables	
-		$main_smarty->assign('group_id', $group_id);
-		$main_smarty->assign('group_name', $group_name);
-		$main_smarty->assign('group_safename', $group_safename);
-		$main_smarty->assign('group_description', $group_description);
-		$main_smarty->assign('group_creator', $group_creator);
-		$main_smarty->assign('group_status', $group_status);
-		$main_smarty->assign('group_members', $group_members);
-		$main_smarty->assign('group_privacy', $group_privacy);
-		$main_smarty->assign('group_avatar', $group_avatar);
-		$main_smarty->assign('group_date', $group_date);
-
-		//get group avatar path
-		if ($group_avatar == "uploaded" && file_exists(KAHUKPATH . "avatars/groups_uploaded/" . $group_id . "_" . group_avatar_size_width . ".jpg")) {
-			$imgsrc = my_base_url . my_kahuk_base . "/avatars/groups_uploaded/" . $group_id . "_" . group_avatar_size_width . ".jpg";
-		} else {
-			$imgsrc = my_base_url . my_kahuk_base . "/templates/" . $the_template . "/img/group_large.gif";
-		}
-
-		$main_smarty->assign('imgsrc', $imgsrc);
-
-		//get group creator and his url
-		$g_name = get_group_submitter_username($group_creator);
-		$main_smarty->assign('group_submitter', $g_name);
-		$submitter_profile_url = getmyurl('user', $g_name);
-		$main_smarty->assign('submitter_profile_url', $submitter_profile_url);
-
-		$main_smarty->assign('group_avatar_url', getmyurl('group_avatar', $group_id));
-
-		//check group admin
-		global $current_user;
-
-		if ($current_user->user_id == $group_creator) {
-			$main_smarty->assign('is_group_admin', 1);
-		}
-
-		//language
-		$lang_Created_By = $main_smarty->get_config_vars("KAHUK_Visual_Group_Created_By");
-		$lang_Created_On = $main_smarty->get_config_vars("KAHUK_Visual_Group_Created_On");
-		$lang_Member = $main_smarty->get_config_vars("KAHUK_Visual_Group_Member");
-
-		//check member
-		//include_once(KAHUK_LIBS_DIR.'group.php');
-		$main_smarty->assign('is_group_member', isMember($group_id));
-
-		// Joining and unjoining member links
-		// Set the url to an empty string if the user has already joined the maximum
-		// allowable number of groups
-		if (reached_max_joinable_groups($db, $current_user)) {
-			$join_url = '';
-		} else {
-			$join_url = getmyurl("join_group", $group_id);
-		}
-
-		$main_smarty->assign('join_group_url', $join_url);
-		$main_smarty->assign('unjoin_group_url', getmyurl("unjoin_group", $group_id));
-
-		//check logged or not
-		$main_smarty->assign('user_logged_in', $current_user->user_login);
-
-		//sidebar
-		//$main_smarty->assign('form_action', $_SERVER["PHP_SELF"]);
-		$group_story_url = getmyurl("group_story_title", $group_safename);
-		$main_smarty->assign('group_story_url', $group_story_url);
-
-		$group_edit_url = getmyurl("editgroup", $group_id);
-		$group_delete_url = getmyurl("deletegroup", $group_id);
-		
-		/* Redwine: initializing $group_output to eliminate the Notice:  Undefined variable: group_output. */
-		$group_output = "";
-		$group_output .= $main_smarty->fetch(The_Template . '/group_summary.tpl');
-
-		$index++;
-	}
-
-	return $group_output;
 }

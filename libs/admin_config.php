@@ -29,10 +29,10 @@ class kahukconfig
 			echo '<table class="table table-bordered table-striped">';
 			echo '<thead><tr>';
 			echo '<th>Title</th>';
-			echo '<th>' . $main_smarty->get_config_vars(KAHUK_Visual_Config_Description) . '</th>';
-			echo '<th style="min-width:120px">' . $main_smarty->get_config_vars(KAHUK_Visual_Config_Value) . '</th>';
-			echo '<th style="width:120px;">' . $main_smarty->get_config_vars(KAHUK_Visual_Config_Default_Value) . '</th>';
-			echo '<th style="width:120px;">' . $main_smarty->get_config_vars(KAHUK_Visual_Config_Expected_Values) . '</th>';
+			echo '<th>Description</th>';
+			echo '<th style="min-width:120px">Value</th>';
+			echo '<th style="width:120px;">Default Value</th>';
+			echo '<th style="width:120px;">Expected Values</th>';
 			echo '</tr></thead><tbody>';
 
 			foreach ($configs as $config) {
@@ -111,18 +111,6 @@ class kahukconfig
 			$expected_base_url = $protocol . $httphost;
 		}
 		fclose($fp);
-		if ($this->var_name == '$my_base_url') {
-			echo translate("It looks like this should be set to") . " <strong>" . $expected_base_url . "</strong> ";
-		}
-
-		if ($this->var_name == '$my_kahuk_base') {
-			$pos = strrpos($_SERVER["SCRIPT_NAME"], "/admin/");
-			$path = substr($_SERVER["SCRIPT_NAME"], 0, $pos);
-			if ($path == "/" || $path == "") {
-				$path = translate("Nothing - Leave it blank");
-			}
-			echo translate("It looks like this should be set to") . " <strong>" . $path . "</strong><br>";
-		}
 
 		echo '<input class="form-control admin_config_input emptytext" id="editme' . $this->var_id . '" onclick="show_edit(' . $this->var_id . ')" value="' . htmlentities($this->var_value, ENT_QUOTES, 'UTF-8') . '">';
 		echo '<span class="emptytext" id="showme' . $this->var_id . '" style="display:none;">';

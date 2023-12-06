@@ -1,14 +1,11 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html dir="{#KAHUK_Visual_Language_Direction#}" xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-	{checkActionsTpl location="tpl_kahuk_admin_head_start"}
-
 	<link rel="stylesheet" type="text/css" href="{$kahuk_base_url}/templates/admin/css/bootstrap.no-icons.min.css">
 	<link rel="stylesheet" type="text/css" href="{$kahuk_base_url}/templates/admin/css/font-awesome.min.css">
 	<link rel="stylesheet" type="text/css" href="{$kahuk_base_url}/templates/admin/css/jquery.pnotify.css" media="screen" />
 	<link rel="stylesheet" type="text/css" href="{$kahuk_base_url}/templates/admin/css/bootstrap-fileupload.min.css" media="screen">
 	<link rel="stylesheet" type="text/css" href="{$kahuk_base_url}/templates/admin/css/style.css" media="screen">
-	{checkForCss}
 
 	<meta name="Language" content="en-us">
 	<meta name="Robots" content="none">
@@ -95,13 +92,10 @@
 		</script>
 		{/literal}
 	{/if}
-	{checkActionsTpl location="tpl_kahuk_admin_head_end"}
+
 </head>
 <body dir="{#KAHUK_Visual_Language_Direction#}">
 {if $pagename neq "admin_login"}
-	
-	{checkActionsTpl location="tpl_kahuk_admin_body_start"}
-	
 	<header role="banner" class="navbar navbar-inverse">
 		<div class="container">
 			<div class="navbar-header">
@@ -119,8 +113,8 @@
 				<ul class="nav navbar-nav">
 					<li{if $pagename eq "admin_index"} class="active"{/if}><a href="{$kahuk_base_url}/admin/admin_index.php">{#KAHUK_Visual_AdminPanel#} Panel</a></li>
 					<li><a href="{$kahuk_base_url}/">{#KAHUK_Visual_Home#}</a></li>
-					{checkActionsTpl location="tpl_header_admin_links"}
-					<li><a href="{$URL_logout}">{#KAHUK_Visual_Logout#}</a></li>
+					
+					<li><a href="{$page_logout_url}">{#KAHUK_Visual_Logout#}</a></li>
 				</ul><!--/.nav -->
 			</nav>
 		</div>
@@ -149,8 +143,10 @@
 										<li{if $pagename eq "admin_comments"} class="active"{/if} id="manage_comments"><a href="{$kahuk_base_url}/admin/admin_comments.php">Comments {if $moderated_comments_count != '0'}<span class="pull-right badge badge-gray">{$moderated_comments_count}</span>{/if}</a></li>
 										<li{if $pagename eq "admin_users" || $pagename eq "admin_user_validate"} class="active"{/if} id="manage_users"><a href="{$kahuk_base_url}/admin/admin_users.php">Users {if $moderated_users_count != '0'}<span class="pull-right badge badge-gray">{$moderated_users_count}</span>{/if}</a></li>
 										<li{if $pagename eq "admin_group"} class="active"{/if} id="manage_groups"><a href="{$kahuk_base_url}/admin/admin_group.php">Groups {if $moderated_groups_count != '0'}<span class="pull-right badge badge-gray">{$moderated_groups_count}</span>{/if}</a></li>
-										{if $CHECK_SPAM}<li{if $pagename eq "domain_management"} class="active"{/if} id="domain_management"><a href="{$kahuk_base_url}/admin/domain_management.php">Manage Domains</a></li>{/if}
-										{checkActionsTpl location="tpl_kahuk_admin_manage_sidebarnav_end"}
+
+										<li{if $pagename eq "domain_management"} class="active"{/if} id="domain_management"><a href="{$kahuk_base_url}/admin/domain_management.php">Manage Domains</a></li>
+
+										
                                     </ul>
 								</div>
 							</div>
@@ -161,30 +157,27 @@
 			<div class="col-md-9">
 				<div class="row">
 					<div id="main_content">
-						{checkActionsTpl location="tpl_kahuk_admin_legend_before"}
+
 						{include file=$tpl_center.".tpl"}
 						{* Start Pagination *}
 						{if ($pagename eq "admin_users" && $templatelite.get.mode=='') || $pagename eq "admin_comments" || $pagename eq "admin_links" || $pagename eq "admin_user_validate"}	
 							{php} 
-							Global $db, $main_smarty, $rows, $offset, $URLMethod;
-							$oldURLMethod=$URLMethod;
-							$URLMethod=1;
-							$pagesize=get_misc_data('pagesize');
+							Global $db, $main_smarty, $rows, $offset,$page_size;
+
 							do_pages($rows, $pagesize ? $pagesize : 30, $the_page); 
-							$URLMethod=$oldURLMethod;
 							{/php}
 						{/if} 
 						{* End Pagination *}
-						{checkActionsTpl location="tpl_kahuk_admin_legend_after"}
+						
 					</div>
-					{checkActionsTpl location="tpl_kahuk_admin_body_end"}
+					
 				</div><!-- /row -->
 			</div><!-- /col-md-9 -->
 		</div><!-- /row -->
 		<hr />
 		<footer>
 			<p>Powered by <a href="https://kahuk.com/">Kahuk CMS</a></p>
-			{checkActionsTpl location="tpl_kahuk_admin_footer_end"}
+			
 		</footer>
 	</div><!-- /container -->
 	{* JavaScript to prevent the carousel function from automatically changing content *}

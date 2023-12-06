@@ -52,7 +52,6 @@ class KahukGroups
         global $db, $page_size;
 
         $defaults = [
-            'columns_all'   => false,
             'columns'       => [
                 'group_id',
                 'group_creator', 'group_status', 
@@ -60,26 +59,20 @@ class KahukGroups
                 'group_name', 'group_safename', 
                 'group_description', 'group_privacy', 
                 'group_avatar', 
-                'group_vote_to_publish', 
                 'group_field1', 'group_field2',
                 'group_field3', 'group_field4', 
                 'group_field5', 'group_field6', 
-                'group_notify_email',
             ],
-            'columns_minimum'       => [
-                'group_id',
-                'group_creator', 'group_status', 
-                'group_members', 'group_date', 
-                'group_name', 'group_safename', 
-                'group_description', 'group_privacy', 
-                'group_avatar',
+
+            'group_status'        => [
+                'enable'
             ],
-            'status'        => [
-                'Enable'
-            ],
-            'order_by'      => 'group_members DESC, group_date DESC',
+            'order_by'      => 'group_status ASC, group_members DESC, group_date DESC',
             'output_type'    => 'array', // or object
-            'debug'         => false,
+
+            'where_clause' => '',
+
+            'page_size' => 0,
         ];
 
         $args = array_merge($defaults, $argsCustom);
@@ -87,43 +80,33 @@ class KahukGroups
         $pagesize = ((0 < $args['page_size']) ? $args['page_size'] : $page_size);
         $offset = (get_current_page() - 1) * $pagesize;
 
-        // $orederby = ((empty($args['order_by']) ? '' : 'OREDE BY ' . $args['order_by']));
+        //
+        $where = "group_status IN ('" . implode("','", $args['group_status']) . "')";
 
-        $where = "group_status IN ('" . implode("','", $args['status']) . "')";
+        if (!empty($args['where_clause'])) {
+            $where .= $args['where_clause'];
+        }
 
         if (!empty($args['order_by'])) {
             $where .= ' ORDER BY ' . $args['order_by'];
         }
 
-        
-        $sql = "SELECT " . implode(',', $args['columns']);
+        $sql = "SELECT *";
 
-        if ($args['columns_all']) {
-            $sql = "SELECT *";
+        if (!empty($args['columns'])) {
+            $sql = "SELECT " . implode(',', $args['columns']);
         }
 
         $sql .= " FROM " . table_groups . " WHERE " . $where . " LIMIT {$offset}, {$pagesize}";
 
-        $output = $db->get_results($sql);
+        $output = $db->get_results($sql, ARRAY_A);
 
-        if ('array' == $args['output_type']) {
-            $outputColumns = $args['columns_minimum'];
-
-            if ($args['columns_all']) {
-                $outputColumns = $args['columns'];
-            }
-
-            $output = kahuk_db_object_to_array($output, $outputColumns);
+        if (!$output) {
+            kahuk_log_queries("globalGroupsObj->get_groups [OUTPUT: NULL]\nSQL: {$sql}");
+            $output = [];
+        } else {
+            $this->caching_items( $output );
         }
-
-        if ($args['debug']) {
-            echo "<pre>SQL: {$sql}<br>";
-            print_r($args);
-            print_r($output);
-            echo "</pre>";
-        }
-
-        $this->caching_items( $output );
 
         return $output;
     }
@@ -138,15 +121,18 @@ class KahukGroups
 
         $defaults = [
             'group_id'         => '',
-
-            "debug" => false,
+            'group_safename' => '',
         ];
 
         $args = array_merge($defaults, $argsCustom);
         $where = '';
 
+        // echo "<pre>get_group() 1</pre>";
+
         if ( !empty( $args['group_id'] ) ) {
             $where = "WHERE group_id = '" . $db->escape( $args['group_id'] ) . "'";
+        } else if ( !empty( $args['group_safename'] ) ) {
+            $where = "WHERE group_safename = '" . $db->escape( $args['group_safename'] ) . "'";
         }
 
         if ( empty($where) ) {
@@ -155,13 +141,11 @@ class KahukGroups
 
         $sql = "SELECT * FROM " . table_groups . " " . $where;
 
-        $output = $db->get_row( $sql, ARRAY_A );
+        $output = $db->get_row($sql, ARRAY_A);
 
-        if ($args['debug']) {
-            echo "<pre class=\"debug\">SQL: {$sql}<br>";
-            print_r($args);
-            print_r($output);
-            echo "</pre>";
+        if (!$output) {
+            kahuk_log_queries("globalGroupsObj->get_group [OUTPUT: NULL]\nSQL: {$sql}");
+            $output = [];
         }
 
         return $output;
@@ -185,18 +169,12 @@ class KahukGroups
     public function get_item( $id, $argsCustom = [] ) {
         $output = [];
 
-        $defaults = [
-            "debug" => false,
-        ];
+        $defaults = [];
 
         $args = array_merge($defaults, $argsCustom);
 
         if ( isset( $this->cachedItems[$id] ) ) {
             $output = $this->cachedItems[$id];
-
-            if ($args['debug']) {
-                echo "<p class=\"debug\">Group returned from cache</p>";
-            }
         } else {
             $args["group_id"] = $id;
 
@@ -204,10 +182,6 @@ class KahukGroups
 
             if ($output) {
                 $this->cachedItems[$id] = $output;
-            }
-
-            if ($args['debug']) {
-                echo "<p class=\"debug\">Group returned from database</p>";
             }
         }
 
@@ -226,27 +200,36 @@ class KahukGroups
         global $db;
 
         $defaults = [
-            'status'       => [
-                'Enable'
+            'group_status'       => [
+                'enable'
             ],
-            'debug'        => false,
+
+            'where_clause' => '',
         ];
 
         $args = array_merge($defaults, $customArgs);
 
         $where = "";
 
-        if (!empty($args['status'])) {
-            $where = "group_status IN ('" . implode("','", $args['status']) . "')";
+        if (!empty($args['group_status'])) {
+            $where = "group_status IN ('" . implode("','", $args['group_status']) . "')";
         }
 
-        return $db->count_rows(table_groups, 'group_id', $where, $args['debug']);
+        if (!empty($args['where_clause'])) {
+            $where .= $args['where_clause'];
+        }
+
+        $rs = $db->count_rows(table_groups, 'group_id', $where);
+
+        return $rs;
     }
 
     /**
      * 
      */
     public function check_group_name($group_name) {
+        global $db;
+
         $group_name = sanitize_text_field($group_name);
 
         if (kahuk_word_count($group_name) < MIN_NUMBER_OF_WORD_GROUP_NAME) {
@@ -261,6 +244,15 @@ class KahukGroups
             return $this->errors;
         }
 
+        //
+        $rs = $db->count_rows(table_groups, 'group_id', "group_name = '{group_name}'");
+
+        if ($rs > 0) {
+            $this->errors->add( 'max-word-name', kahuk_language_config('KAHUK_Visual_Group_Title_Exists'));
+            
+            return $this->errors;
+        }
+
         return $group_name;
     }
 
@@ -270,7 +262,13 @@ class KahukGroups
     public function check_group_safename($group_safename, $group_id = 0) {
         global $db;
 
-        $group_safename = sanitize_title($group_safename);
+        $group_safename = kahuk_create_slug_story($group_safename);
+
+        if (empty($group_safename)) {
+            $this->errors->add( 'group-slug-invalid', "Group slug require word(s)." );
+            
+            return $this->errors;
+        }
 
         $sql = "select COUNT(*) from " . table_groups . " WHERE group_safename='{$group_safename}'";
 
@@ -313,10 +311,81 @@ class KahukGroups
     /**
      * 
      */
-    public function update($data, $group_id, $debug = false) {
+    function insert($initialData) {
         global $db;
 
-        $sql = "update " . table_groups . " set";
+        $defaultData = [
+            'group_creator' => 0,
+            'group_status' => 'disable',
+            'group_members' => 1,
+            'group_date' => 'NOW()',
+            'group_safename' => '',
+            'group_name' => '',
+            'group_description' => '',
+            'group_privacy' => 'restricted',
+        ];
+    
+        $data = array_merge( $defaultData, $initialData );
+        $columns = '';
+        $values = '';
+
+        foreach($data as $column => $value) {
+            $isError = false;
+
+            $requiredFields = [
+                'group_status', 'group_date', 'group_safename',
+                'group_name', 'group_description', 'group_privacy',
+            ];
+            if (in_array($column, $requiredFields) && empty($value)) {
+                $isError = true;
+            }
+
+            //
+            $requiredFieldsNumber = [
+                'group_creator', 'group_members',
+            ];
+            if (in_array($column, $requiredFieldsNumber) && ($value < 1)) {
+                $isError = true;
+            }
+
+            if ($isError) {
+                kahuk_log_queries("KahukGroups->insert [{$column} = {$value}] " . print_r($data, true));
+                return false;
+            }
+
+            $columns .= $column . ",";
+
+            //
+            if (in_array($column, ['group_date'])) {
+                $values .= $db->escape($value) . ",";
+            } else {
+                $values .= "'" . $db->escape($value) . "',";
+            }
+            
+        }
+
+        $columns = trim($columns, ",");
+        $values = trim($values, ",");
+
+
+        $sql = "INSERT IGNORE INTO " . table_groups . " ({$columns}) VALUES ({$values})";
+
+        $output = $db->query( $sql );
+
+        if ($output) {
+            return $db->insert_id;
+        }
+
+        return false;
+    }
+
+    /**
+     * 
+     */
+    public function update($data, $group_id) {
+        global $db;
+
+        $sql = "UPDATE " . table_groups . " set";
 
         foreach($data as $column => $value) {
             $sql .= " " . $column . " = '" . $db->escape($value) . "',";
@@ -327,16 +396,66 @@ class KahukGroups
         if ($group_id>0) {
             $sql .= " WHERE group_id = '" . $db->escape($group_id) . "'";
 
-            if ($debug) {
-                echo "<pre class=\"debug\">SQL: $sql</pre>";
-            }
-
             return $db->query($sql);
         } else {
             return false;
         }
     }
+
+    /**
+     * Retrieve the group for group_story or, editgroup page
+     * 
+     * @return array
+     */
+    public function get_global_group($forceId = 0) {
+        $output = [];
+        $pagename = kahuk_get_pagename();
+        $gId = sanitize_number(_request("gId", '0'));
+
+        $pages = [
+            'group',
+            'group-edit', 'group-join', 'group-unjoin', 'group-share', 
+            'group-withdraw', 'group-delete', 'group-update',
+        ];
+
+        if ($forceId > 0) {
+            $args = ['group_id' => $forceId];
+            $output = $this->get_group($args);
+        } else if ($gId > 0) {
+            $args = ['group_id' => $gId];
+            $output = $this->get_group($args);
+        } else if (in_array($pagename, $pages)) {
+            $slug = kahuk_create_slug_story(_get('slug'));
+            $id = sanitize_number(_get('id'));
+
+            $args = [];
+
+            if ($id) {
+                $args['group_id'] = $id;
+            } else if ($slug) {
+                $args['group_safename'] = $slug;
+            }
+
+            $output = $this->get_group($args);
+        }
+
+        return $output;
+    }
 }
 
+global $globalGroupsObj, $globalGroup, $globalGroupPrivacies, $globalGroupStatuses, $globalGroupTasks;
+
 // Set the global variables to access groups class
-$globalGroups = kahuk_groups_init();
+$globalGroupsObj = kahuk_groups_init();
+
+// Create global group variable
+$globalGroup = $globalGroupsObj->get_global_group();
+
+// Allowed Group privacies
+$globalGroupPrivacies = ['public', 'private', 'restricted'];
+
+// Allowed Group privacies
+$globalGroupStatuses = ['pending','enable','disable'];
+
+// Only the following actions are allowed through url for group
+$globalGroupTasks = ['edit', 'join', 'unjoin', 'withdraw', 'delete', 'approve'];

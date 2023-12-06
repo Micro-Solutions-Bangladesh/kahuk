@@ -49,88 +49,13 @@ class User
 
 	function Create()
 	{
-		global $db, $main_smarty, $my_base_url, $my_kahuk_base, $allow_smtp_testing;
-		
-		if ($this->username == ''){
-			return false;
-		}
-		if ($this->pass == ''){
-			return false;
-		}
-		if ($this->email == ''){
-			return false;
-		}
-		
-		if (!user_exists($this->username)) {
-			$userip     = check_ip_behind_proxy();
-			$saltedpass = generatePassHash($this->pass);
-
-			// the code below, kahuk_validate() determines if the misc_validate settings is true or false.
-			if (kahuk_validate()) {
-				if ($db->query("INSERT IGNORE INTO " . table_users . " (user_login, user_email, user_pass, user_date, user_ip,user_categories) VALUES ('".$this->username."', '".$this->email."', '".$saltedpass."', NOW(), '".$userip."', '')")) {
-				
-					$result = $db->get_row("SELECT user_email, user_pass, user_karma, user_lastlogin FROM " . table_users . " WHERE user_login = '".$this->username."'");
-					$encode = md5($this->email . $result->user_karma .  $this->username. kahuk_hash().$main_smarty->get_config_vars('KAHUK_Visual_Name'));
-
-					$username = $this->username;
-					$password = $this->pass;
-					
-					$my_base_url=$my_base_url;
-					$my_kahuk_base=$my_kahuk_base;
-					$allow_smtp_testing = $allow_smtp_testing;
-					
-					$domain = $main_smarty->get_config_vars('KAHUK_Visual_Name');			
-					$validation = my_base_url . my_kahuk_base . "/validation.php?code=$encode&uid=".$this->username;
-                    
-                    $AddAddress = $this->email;
-                    $subject = $main_smarty->get_config_vars('KAHUK_PassEmail_Subject_verification');
-                    $str = sprintf($main_smarty->get_config_vars('KAHUK_PassEmail_verification_message'), $this->username, $main_smarty->get_config_vars('KAHUK_PassEmail_From'));
-					eval('$str = "'.str_replace('"','\"',$str).'";');
-					$message = "$str";
-
-					//Redwine: require the file for email sending.
-                    require('libs/phpmailer/sendEmail.php');
-
-					$isMailSent = $mail->Send();
-					
-					if ($isMailSent || DEV_MODE_ON) {
-						/**
-						 * Save The Email message in log file for developer
-						 */
-						if (DEV_MODE_ON) {
-							kahuk_debug_log($message);
-						}
-
-						/**
-						 * 
-						 */
-						$errorMsg = $main_smarty->get_config_vars("KAHUK_PassEmail_SendSuccess");
-                        return true;
-					} else {
-						$errorMsg = $main_smarty->get_config_vars('KAHUK_Visual_Login_Delivery_Failed');
-						$main_smarty->assign('errorMsg', $errorMsg);
-						return false;
-						exit;
-					}
-					
-				} else {
-					return false;
-				}
-			} else {
-				if ($db->query("INSERT IGNORE INTO " . table_users . " (user_login, user_email, user_pass, user_date, user_ip, user_lastlogin,user_categories) VALUES ('".$this->username."', '".$this->email."', '".$saltedpass."', NOW(), '".$userip."', NOW(),'')")) {
-					return true;
-				} else {
-					return false;
-				}
-			}
-		} else {
-			die('User already exists');
-		}
+		kahuk_log_unexpected('User->Create function deleted! Lets debug it...');
+		die('User->Create function deleted, this should be called from anywhere! Lets debug it...');
 	}
 
 	function store() 
 	{
-		global $db, $current_user, $cached_users;
+		global $db, $cached_users;
 
 		if (!$this->date) {
 			$this->date=time();
@@ -147,7 +72,6 @@ class User
 		$user_public_email = $db->escape($this->public_email);
 		$user_location = $db->escape($this->location);
 		$user_occupation = $db->escape($this->occupation);
-		$user_language = $db->escape($this->language);
 		$user_facebook = $db->escape($this->facebook);
 		$user_twitter = $db->escape($this->twitter);
 		$user_linkedin = $db->escape($this->linkedin);
@@ -175,7 +99,7 @@ class User
 				}
 			}
 			
-			$sql .= " , user_login='$user_login', user_occupation='$user_occupation', user_language='$user_language', user_location='$user_location', public_email='$user_public_email', user_level='$user_level', user_karma=$user_karma, user_date=FROM_UNIXTIME($user_date), user_pass='$saltedpass', user_email='$user_email', user_names='$user_names', user_url='$user_url', user_facebook='$user_facebook', user_twitter='$user_twitter', user_linkedin='$user_linkedin', user_googleplus='$user_googleplus', user_skype='$user_skype', user_pinterest='$user_pinterest' WHERE user_id=$this->id";
+			$sql .= " , user_login='$user_login', user_occupation='$user_occupation', user_location='$user_location', public_email='$user_public_email', user_level='$user_level', user_karma=$user_karma, user_date=FROM_UNIXTIME($user_date), user_pass='$saltedpass', user_email='$user_email', user_names='$user_names', user_url='$user_url', user_facebook='$user_facebook', user_twitter='$user_twitter', user_linkedin='$user_linkedin', user_googleplus='$user_googleplus', user_skype='$user_skype', user_pinterest='$user_pinterest' WHERE user_id=$this->id";
 			//die($sql);
 			$db->query($sql);
 			
@@ -248,7 +172,6 @@ class User
 			$this->public_email = $user->public_email;
 			$this->location = $user->user_location;
 			$this->occupation = $user->user_occupation;
-			$this->language = $user->user_language;
 			$this->url = $user->user_url;
 			$this->facebook = $user->user_facebook;
 			$this->twitter = $user->user_twitter;
@@ -304,13 +227,9 @@ class User
 	{
 		global $db;
 		
-		$vars = '';
-		check_actions('profile_show', $vars);
-		
 		$main_smarty->assign('user_publicemail', $this->public_email);
 		$main_smarty->assign('user_location', $this->location);
 		$main_smarty->assign('user_occupation', $this->occupation);
-		$main_smarty->assign('user_language', $this->language);
 		$main_smarty->assign('user_facebook', $this->facebook);
 		$main_smarty->assign('user_twitter', $this->twitter);
 		$main_smarty->assign('user_linkedin', $this->linkedin);
@@ -323,7 +242,7 @@ class User
 		$main_smarty->assign('user_names', $this->names);
 		$main_smarty->assign('user_username', $this->username);
 		
-		$users = $db->get_results("SELECT user_karma, COUNT(*) FROM ".table_users." WHERE user_level NOT IN ('Spammer') AND user_karma>0 AND (user_login!='anonymous' OR user_lastip) GROUP BY user_karma ORDER BY user_karma DESC",ARRAY_N);
+		$users = $db->get_results("SELECT user_karma, COUNT(*) FROM ".table_users." WHERE user_level NOT IN ('spammer') AND user_karma>0 AND (user_login!='anonymous' OR user_lastip) GROUP BY user_karma ORDER BY user_karma DESC",ARRAY_N);
 		
 		$ranklist = array();
 		$rank = 1;
@@ -347,8 +266,8 @@ class User
 			
 		if ($stats == 1) {		
 			$this->all_stats();
-			$main_smarty->assign('user_total_links', $this->total_links);
-			$main_smarty->assign('user_published_links', $this->published_links);
+			$main_smarty->assign('user_stories_total', $this->total_links);
+			$main_smarty->assign('user_stories_published_total', $this->published_links);
 			$main_smarty->assign('user_total_comments', $this->total_comments);
 			$main_smarty->assign('user_total_votes', $this->total_votes);
 			$main_smarty->assign('user_published_votes', $this->published_votes);
@@ -362,7 +281,7 @@ class User
 	    return $db->get_var($sql="SELECT COUNT(*) 
 					FROM ".table_friends." 
 					LEFT JOIN ".table_users." ON friend_from=user_id 
-					WHERE friend_to=$this->id AND friend_from!=$this->id AND user_enabled=1");
+					WHERE friend_to=$this->id AND friend_from!=$this->id AND user_status='enable'");
 	}
 
 	function getFollowingCount()
@@ -371,7 +290,7 @@ class User
 	    return $db->get_var("SELECT COUNT(*) 
 					FROM ".table_friends." 
 					LEFT JOIN ".table_users." ON friend_to=user_id 
-					WHERE friend_from=$this->id AND friend_to!=$this->id AND user_enabled=1");
+					WHERE friend_from=$this->id AND friend_to!=$this->id AND user_status='enable'");
 	}
 }
 
@@ -389,7 +308,7 @@ function user_group_read($user_id,$order_by='')
 					LEFT JOIN " . table_groups . " ON group_id=member_group_id
 					WHERE member_user_id = $user_id 
 						AND member_status = 'active'
-						AND group_status = 'Enable'
+						AND group_status = 'enable'
 						ORDER BY $order_by");
 	if ($groups) {
 		$group_display = '';
@@ -400,117 +319,75 @@ function user_group_read($user_id,$order_by='')
 	}	
 	return true;
 }
-/* Redwine: The killspam function was not working properly as some blocks of code were skipped. The best solution was to move the skipped code to a separate function that is called from killspam() and returns the value. This resulted in accurately recalculating the comments for every link the spammer commented on and also adjusting the votes count */
-function adjustVotesCount($id) 
-{
-	global $db;
-	require_once(KAHUK_LIBS_DIR.'link.php');
-	require_once(KAHUK_LIBS_DIR.'class-votes.php');
-	/* Redwine: used union query to make sure that all the comments of the spammer are also included, because it is very possible that he commented on more links than he voted */
-	$results = $db->get_results("SELECT `vote_link_id`, `vote_user_id` FROM " . table_votes . " WHERE `vote_user_id` = $id UNION SELECT `comment_link_id`, `comment_user_id` FROM " . table_comments . " WHERE `comment_user_id` = $id");
-	if ($results) {
-		$db->query("DELETE FROM `" . table_votes . "` WHERE `vote_user_id` = $id");
-		$db->query("DELETE FROM `" . table_comments . "` WHERE `comment_user_id` =$id");
-		foreach ($results as $result) {
-			$link = new Link;
-			$link->id=$result->vote_link_id;
-			$link->read();
 
-			$vote = new Vote;
-			$vote->type='links';
-			$vote->link=$result->vote_link_id;
-
-			if (Voting_Method == 1) {
-				$link->votes=$vote->count();
-				$link->reports = $link->count_all_votes("<0");
-			} elseif (Voting_Method == 2) {
-				$link->votes=$vote->rating();
-				$link->votecount=$vote->count();
-				$link->reports = $link->count_all_votes("<0");
-			}
-			elseif (Voting_Method == 3) {
-				$link->votes=$vote->count();
-				$link->karma = $vote->karma();
-				$link->reports = $link->count_all_votes("<0");
-			}
-			$link->recalc_comments();
-			$link->store_basic();
-			$link->check_should_publish();
-		}
-	}
-	return;
-}
 
 function killspam($id)
 {
 	global $db;
 
-	require_once(KAHUK_LIBS_DIR.'link.php');
-	require_once(KAHUK_LIBS_DIR.'class-votes.php');
-
 	$user= $db->get_row('SELECT * FROM ' . table_users ." where user_id=$id");
+	
 	if (!$user->user_id) {
 		return;
 	}
 	
 	canIChangeUser($user->user_level);
-	adjustVotesCount($id);
-	$db->query('UPDATE `' . table_users . "` SET user_enabled=0, `user_pass` = '63205e60098a9758101eeff9df0912ccaaca6fca3e50cdce3', user_level = 'Spammer' WHERE `user_id` = $id");
+
+	
+	$db->query('UPDATE `' . table_users . "` SET user_status='enable', `user_pass` = '63205e60098a9758101eeff9df0912ccaaca6fca3e50cdce3', user_level = 'spammer' WHERE `user_id` = $id");
 
 	ban_ip($user->user_ip,$user->user_lastip);
 	
-	/******* 
-	* Redwine: LINE 396 checks if the user is a group(s) creator **** obsolete query
-	*$results = $db->get_results("SELECT * FROM `" . table_groups . "` WHERE group_creator = '$id'");
-	*******/
-	/**** OBSOLETE ****/
-	/*******
-	* Redwine: Deletes the user from the table group_member **** as is, it only deletes the user from group_member where * the user is the group creator and keeps them as members in other groups if they joined multiple groups.
-	*Redwine: we have to remove the query above and the iteration through its result in order and change the delete query *to ensure that the spam user is removed from all groups that he created or just a member in
-	*******/
+	// Delete all comments
+	$db->query("DELETE FROM `" . table_comments . "` WHERE `comment_user_id` =$id");
 	
+	// Delete all vote
+	$db->query("DELETE FROM `" . table_votes . "` WHERE `vote_user_id` = $id");
+
+	//
 	$db->query('DELETE FROM `' . table_group_member . '` WHERE member_user_id = '.$id);
 	$db->query('DELETE FROM `' . table_group_shared . '` WHERE share_user_id = '.$id);
 
 	$db->query("DELETE FROM `" . table_groups . "` WHERE group_creator = '$id'");
 
 	$results = $db->get_results("SELECT link_id, link_url FROM `" . table_links . "` WHERE `link_author` = $id");
-	global $USER_SPAM_RULESET, $FRIENDLY_DOMAINS;
-	$filename = KAHUKPATH.$USER_SPAM_RULESET;
-	$lines = file($filename,FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-	$approved = file(KAHUKPATH.$FRIENDLY_DOMAINS,FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
+	$domain_blacklist = kahuk_log_domain_blacklist();
+	$domain_whitelist = kahuk_log_domain_whitelist();
+	
+	$lines = file($domain_blacklist, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+	$approved = file($domain_whitelist, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+	
 	if ($results) {
 	    foreach ($results as $result) {
 			if (preg_match('/:\/\/(www\.)?([^\/]+)(\/|$)/',$result->link_url,$m)) {
 				$domain = strtoupper($m[2]) . "\n";
-				if (!in_array($domain,$lines) && !in_array($domain,$approved)) {
+				if (!in_array($domain,$lines) && !in_array($domain, $approved)) {
 					$lines[] = $domain;
 					$changed = 1;
 				}
 			}
-			$vars = array('link_id' => $result->link_id);
-			check_actions('story_spam', $vars);
 	    }
 	}
 	
 	if ($changed) {
-		if (is_writable($filename)) {
-		   if ($handle = fopen($filename, 'w')) {
-		   	fwrite($handle,join("\n",$lines)); 
-			fclose($handle);
-		   } 
+		if (is_writable($domain_blacklist)) {
+			if ($handle = fopen($domain_blacklist, 'w')) {
+				fwrite($handle,join("\n",$lines)); 
+				fclose($handle);
+		   	} 
 		}
 	}
 	
-	/* Redwine: the query was not working because of $db->query($sql='UPDATE. the $sql= inside the the query construction was breaking it */
+	/* the query was not working because of $db->query($sql='UPDATE. the $sql= inside the the query construction was breaking it */
 	$db->query('UPDATE `' . table_links . '` SET `link_status` = "spam" WHERE `link_author` = "'.$id.'"');
 	$db->query('DELETE FROM `' . table_saved_links . '` WHERE `saved_user_id` = "'.$id.'"');
 	$db->query('DELETE FROM `' . table_trackbacks . '` WHERE `trackback_user_id` = "'.$id.'"');
 	
-	/* Redwine: the query was wrong and referencing the friend_id instead of friend_from and friend_to */
+	/* the query was wrong and referencing the friend_id instead of friend_from and friend_to */
 	$db->query('DELETE FROM `' . table_friends . "` WHERE `friend_from` = $id OR `friend_to` = $id");
 	$db->query('DELETE FROM `' . table_messages . "` WHERE `sender`=$id OR `receiver`=$id");
-}		
+}
 
 function canIChangeUser($user_level)
 {

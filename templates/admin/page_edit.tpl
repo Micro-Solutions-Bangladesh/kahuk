@@ -1,6 +1,6 @@
 <!-- page_edit.tpl -->
 <legend>{#KAHUK_Visual_AdminPanel_Page_Edit#}</legend>
-<a class="btn btn-default" href="{$kahuk_base_url}/page.php?page={$page_url}" target="_blank" rel="noopener noreferrer">Visit {$page_title} Page</a>
+<a class="btn btn-default" href="{$page_dynamic_page_url}" target="_blank" rel="noopener noreferrer">Visit {$page_title} Page</a>
 <br /><br />
 <form action="" class="form-horizontal" method="POST" id="thisform">
 	<div class="control-group">

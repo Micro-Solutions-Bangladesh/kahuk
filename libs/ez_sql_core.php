@@ -16,11 +16,11 @@
 		die();
 	}
 
-	define( 'EZSQL_VERSION', '2.03' );
-	define( 'OBJECT','OBJECT', true );
-	define( 'ARRAY_A','ARRAY_A', true );
-	define( 'ARRAY_N','ARRAY_N', true );
-	define( 'EZSQL_CORE_ERROR', 'ezSQLcore can not be used by itself (it is designed for use by database specific modules).' );
+	define('EZSQL_VERSION', '2.03');
+	define('OBJECT','OBJECT');
+	define('ARRAY_A','ARRAY_A');
+	define('ARRAY_N','ARRAY_N');
+	define('EZSQL_CORE_ERROR', 'ezSQLcore can not be used by itself (it is designed for use by database specific modules).');
 
 
 	/**********************************************************************
@@ -44,10 +44,9 @@
 		var $cache_inserts   = false;
 		var $use_disk_cache  = false;
 		var $cache_timeout   = 24;                      // hours
-		var $log_to_file     = false;                   // create a file in your root kahuk folder 
-		var $logfile         = 'logs/query.log';
-		var $logpath         = 'logs/query.log';        // named query.log and chmod 755
-		var $log_qry_error   = 'logs/query_error.log';
+
+		var $log_file = "";
+
 		// == TJH == default now needed for echo of debug function
 		var $debug_echo_is_on = true;
 
@@ -189,6 +188,7 @@
 
 				// If invalid output type was specified..
 			} else {
+				kahuk_log_unexpected("db->get_row() SQL: {$query}");
 				$this->register_error( " \$db->get_row(string query, output type, int offset) -- Output type must be one of: OBJECT, ARRAY_A, ARRAY_N");
 			}
 		}
@@ -292,6 +292,7 @@
 			// disk caching of queries
 			if ( $this->use_disk_cache && ( $this->cache_queries && ! $is_insert ) || ( $this->cache_inserts && $is_insert )) {
 				if ( ! is_dir($this->cache_dir) ) {
+					kahuk_log_unexpected("db->store_cache() SQL: {$query}");
 					$this->register_error("Could not open cache dir: $this->cache_dir");
 					$this->show_errors ? trigger_error("Could not open cache dir: $this->cache_dir",E_USER_WARNING) : null;
 				} else {

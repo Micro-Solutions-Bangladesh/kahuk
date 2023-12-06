@@ -1,20 +1,11 @@
 <?php
-date_default_timezone_set('UTC');
+date_default_timezone_set('UTC'); // TODO
 
 if ( ! defined( 'KAHUKPATH' ) ) {
 	die();
 }
 
-function mailer_start(){
-	// Usually a module will define Kahuk_Mailer
-	// If defined, then include call the function thats starts (includes) it
 
-	if(defined('Kahuk_Mailer') && function_exists(Kahuk_Mailer . '_mailer_start')){
-		call_user_func(Kahuk_Mailer . '_mailer_start');
-	} else {
-		include_once(KAHUK_LIBS_DIR.'mailer.php');
-	}
-}
 
 function check_if_table_exists($table) {
 	/* Redwine: creating a mysqli connection */
@@ -34,26 +25,11 @@ function check_if_table_exists($table) {
 	}
 }
 
-function kahuk_version(){
-	// returns the version of Kahuk that's installed 
-	$ver = get_misc_data('kahuk_version');
-	return $ver;
-}
-
 function kahuk_hash(){
 	// returns the hash from the misc_table 
-	$hash = get_misc_data('hash');
-	return $hash;
+	return "1841866885781771311081921994968184148531621276880100124891721419559174194141113134148";
 }
 
-
-function kahuk_validate(){
-	// returns the value for register validation 
-	$vars = array('validate' => misc_validate);
-	check_actions('kahuk_validate', $vars);
-
-	return $vars['validate'];
-}
 
 
 function get_misc_data($name){
@@ -79,13 +55,7 @@ function misc_data_update($name, $data){
 }
 
 function safeAddSlashes($string) {
-	// if function get_magic_quotes_gpc exists, returns a string with backslashes before characters that need to be quoted in database queries etc
-//	if (get_magic_quotes_gpc()) {
-//		return $string;
-//	} 
-//	else {
-		return addslashes($string);
-//	}
+	return addslashes($string);
 }
 
 function unixtimestamp($timestamp){
@@ -157,41 +127,62 @@ function check_email_address($email) {
   return true;
 }
 
+
+/**
+ * 
+ */
 function txt_time_diff($from, $now=0){
 	global $main_smarty;
 
-	if (empty($from))
-        	return "No date provided"; 
-	
+	if (empty($from)) {
+		return "";
+	}
+
 	$txt = '';
-	if($now==0) $now = time();
+
+	if($now==0) {
+		$now = time();
+	}
 
 	$diff=$now-$from;
-	if ($diff < 0)
-	{
+
+	if ($diff < 0) {
 		$diff = -$diff;
 		$txt  = '-';
 	}
+
 	$days=intval($diff/86400);
 	$diff=$diff%86400;
 	$hours=intval($diff/3600);
 	$diff=$diff%3600;
 	$minutes=intval($diff/60);
 
-	if($days>1) $txt  .= " $days ".$main_smarty->get_config_vars('KAHUK_Visual_Story_Times_Days');
-	else if ($days==1) $txt  .= " $days ".$main_smarty->get_config_vars('KAHUK_Visual_Story_Times_Day');
+	if($days>1) {
+		$txt  .= " $days ".$main_smarty->get_config_vars('KAHUK_Visual_Story_Times_Days');
+	} else if ($days==1) {
+		$txt  .= " $days ".$main_smarty->get_config_vars('KAHUK_Visual_Story_Times_Day');
+	}
 
 	if($days < 2){
-		if($hours>1) $txt .= " $hours ".$main_smarty->get_config_vars('KAHUK_Visual_Story_Times_Hours');
-		else if ($hours==1) $txt  .= " $hours ".$main_smarty->get_config_vars('KAHUK_Visual_Story_Times_Hour');
+		if ($hours>1) {
+			$txt .= " $hours ".$main_smarty->get_config_vars('KAHUK_Visual_Story_Times_Hours');
+		} else if ($hours==1) {
+			$txt .= " $hours ".$main_smarty->get_config_vars('KAHUK_Visual_Story_Times_Hour');
+		}
 	
-		if($hours < 3){
-			if($minutes>1) $txt .= " $minutes ".$main_smarty->get_config_vars('KAHUK_Visual_Story_Times_Minutes');
-			else if ($minutes==1) $txt  .= " $minutes ".$main_smarty->get_config_vars('KAHUK_Visual_Story_Times_Minute');
+		if ($hours < 3) {
+			if($minutes>1) {
+				$txt .= " $minutes ".$main_smarty->get_config_vars('KAHUK_Visual_Story_Times_Minutes');
+			} else if ($minutes==1) {
+				$txt .= " $minutes ".$main_smarty->get_config_vars('KAHUK_Visual_Story_Times_Minute');
+			}
 		}
 	}
 	
-	if($txt=='') $txt = ' '. $main_smarty->get_config_vars('KAHUK_Visual_Story_Times_FewSeconds') . ' ';
+	if ($txt=='') {
+		$txt = ' '. $main_smarty->get_config_vars('KAHUK_Visual_Story_Times_FewSeconds') . ' ';
+	}
+
 	return $txt;
 }
 
@@ -236,33 +227,9 @@ function check_string($which) {
 	}
 }
 
-function get_current_page() {
-	$pagenum = intval(_request('page'));
-
-	return ((0<$pagenum) ? $pagenum : 1);
-}
 
 
-function get_date($epoch) {
-	// get date in the format year-month-day
-    return date("Y-m-d", $epoch);
-}
 
-function get_base_url($url){
-	// get base of URL. For example, get_base_url will return kahuk.com if the URL was kahuk.com/support/
-   $req = $url;
-  
-   $pos = strpos($req, '://');
-   $protocol = strtolower(substr($req, 0, $pos));
-  
-   $req = substr($req, $pos+3);
-   $pos = strpos($req, '/');
-   if($pos === false)
-	   $pos = strlen($req);
-   $host = substr($req, 0, $pos);
-	
-	return $host;
-}
 
 
 function get_permalink($id) {

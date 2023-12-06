@@ -1,6 +1,12 @@
 <?php
+/**
+ * Depricated in favor of KahukFriends class
+ * 
+ */
+
 
 if(!defined('KAHUK_LIBS_DIR')){die();}
+
 
 class Friend {
 	var $friend = "";
@@ -40,7 +46,11 @@ class Friend {
 		}
 	}
 	
-	function get_friend_list($user_id)
+	/**
+	 * Depricated in favor of $globalFriendsObj->get_list_following
+	 * 
+	 */
+	function get_list_following($user_id)
 	{	
 		// returns an array of people you've added as a friend
 		global $db, $current_user;
@@ -48,7 +58,7 @@ class Friend {
 		$friends = $db->get_results("SELECT " . table_users . ".user_login, " . table_users . ".user_avatar_source, " . table_users . ".user_email, " . table_users . ".user_id 
 						FROM " . table_friends . " 
 						INNER JOIN " . table_users . " ON " . table_friends . ".friend_to = " . table_users . ".user_id 
-						WHERE " . table_friends . ".friend_from=$user_id AND " . table_users . ".user_id != $user_id AND user_enabled=1",
+						WHERE " . table_friends . ".friend_from=$user_id AND " . table_users . ".user_id != $user_id AND user_status='enable'",
 					     ARRAY_A);
 		if (!empty($friends)) {
 			foreach ($friends as &$friend) 
@@ -62,14 +72,18 @@ class Friend {
 
 	}
 
-	function get_friend_list_2($user_id)
+	/**
+	 * Depricated in favor of $globalFriendsObj->get_list_follower
+	 * 
+	 */
+	function get_list_follower($user_id)
 	{
 		// returns an array of people who have added you as a friend
 		global $db, $current_user;
 		$friends = $db->get_results("SELECT " . table_users . ".user_login, " . table_users . ".user_avatar_source, " . table_users . ".user_email, " . table_users . ".user_id 
 						FROM " . table_friends . " 
 						INNER JOIN " . table_users . " ON " . table_friends . ".friend_from = " . table_users . ".user_id 
-						WHERE " . table_friends . ".friend_to=$user_id AND " . table_users . ".user_id != $user_id  AND user_enabled=1",
+						WHERE " . table_friends . ".friend_to=$user_id AND " . table_users . ".user_id != $user_id  AND user_status='enable'",
 					     ARRAY_A);
 		if (!empty($friends)) {				 
 		foreach ($friends as &$friend) 
@@ -82,6 +96,10 @@ class Friend {
 		}
 	}
 
+	/**
+	 * Depricated in favor of $globalFriendsObj->get_friend_status
+	 * 
+	 */
 	function get_friend_status($friend)
 	{
 		global $db, $current_user;
@@ -114,4 +132,3 @@ class Friend {
 	}
 }
 
-?>

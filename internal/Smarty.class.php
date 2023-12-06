@@ -1,8 +1,8 @@
 <?php
-
 if (!defined('TEMPLATE_LITE_DIR')) {
 	define('TEMPLATE_LITE_DIR', dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR);
 }
+
 if (!defined('SMARTY_DIR')) {
 	define('SMARTY_DIR', dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR);
 }
@@ -10,9 +10,5 @@ if (!defined('SMARTY_DIR')) {
 require_once(TEMPLATE_LITE_DIR . "class.template.php");
 
 class Smarty extends Template_Lite{
-
-    function __construct()
-    {
-	}
+    function __construct(){}
 }
-?>

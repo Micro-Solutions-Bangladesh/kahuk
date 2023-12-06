@@ -1,0 +1,1 @@
+{* Done in the sidebar.tpl directly *}

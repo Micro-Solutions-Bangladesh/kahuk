@@ -1,0 +1,211 @@
+<?php
+if (!defined('KAHUKPATH')) {
+	define('KAHUKPATH', dirname(__FILE__) . '/');
+}
+
+/**
+ * Create names of folders
+ */
+if (!defined('KAHUK_FOLDER_TPL')) {
+	define('KAHUK_FOLDER_TPL', 'templates');
+}
+
+if (!defined('KAHUK_FOLDER_INC')) {
+	define('KAHUK_FOLDER_INC', 'kahuk-includes');
+}
+
+if (!defined('KAHUK_FOLDER_UPLOADED')) {
+	define('KAHUK_FOLDER_UPLOADED', 'resources');
+}
+
+if (!defined('KAHUK_FOLDER_PAGES')) {
+	define('KAHUK_FOLDER_PAGES', 'kahuk-pages');
+}
+
+if (!defined('KAHUK_FOLDER_PLUGINS')) {
+	define('KAHUK_FOLDER_PLUGINS', 'kahuk-plugins');
+}
+
+/** */
+define('KAHUK_TPL_DIR', KAHUKPATH . KAHUK_FOLDER_TPL . '/');
+
+/** */
+define('KAHUK_PAGES_DIR', KAHUKPATH . KAHUK_FOLDER_PAGES . '/');
+
+/** */
+define('KAHUK_INC_DIR', KAHUKPATH . KAHUK_FOLDER_INC . '/');
+
+/** */
+define('KAHUK_PLUGINS_DIR', KAHUKPATH . KAHUK_FOLDER_PLUGINS . '/');
+
+/** */
+define('KAHUK_LANG_DIR', KAHUKPATH . 'languages/');
+
+/** */
+define('KAHUK_LIBS_DIR', KAHUKPATH . 'libs/');
+
+/** */
+define('KAHUK_SMARTY_DIR', KAHUKPATH . 'internal/');
+
+/** */
+define('KAHUK_UPLOADED_DIR', KAHUKPATH . KAHUK_FOLDER_UPLOADED . '/');
+
+define('KAHUK_FOLDER_GROUPS_AVATAR', 'resources/groups-avatar');
+define('KAHUK_GROUPS_AVATAR_DIR', KAHUKPATH . KAHUK_FOLDER_GROUPS_AVATAR . '/');
+
+
+// ** MySQL settings - You can get this info from your web host ** //
+
+/** MySQL database name */
+define('DB_NAME', 'database_name_here');
+
+/** MySQL database username */
+define('DB_USER', 'database_username_here');
+
+/** MySQL database password */
+define('DB_PASSWORD', 'database_login_password_here');
+
+/** MySQL database hostname */
+define('DB_HOST', 'database_host_here'); // ex: localhost
+
+/** DB TABLES PREFIX */
+define('TABLE_PREFIX', 'database_tables_prefix_here'); // ex: kahuk_life_
+
+/** Database Charset to use in creating database tables. */
+if (!defined('DB_CHARSET')) {
+	define('DB_CHARSET', 'utf8');
+}
+
+/** The Database Collate type. Don't change this if in doubt. */
+if (!defined('DB_COLLATE')) {
+	define('DB_COLLATE', 'utf8_general_ci');
+}
+
+/**
+ * Wheather the error should display on screen or not.
+ */
+if (!defined('KAHUK_DEBUG_DISPLAY')) {
+	define('KAHUK_DEBUG_DISPLAY', true);
+}
+
+/**
+ * Should we report all errors?
+ */
+if (!defined('KAHUK_DEBUG')) {
+	define('KAHUK_DEBUG', true);
+}
+
+/**
+ * Which level of errors we want to log?
+ * Could be: E_CORE_ERROR | E_CORE_WARNING | E_COMPILE_ERROR | E_ERROR | E_WARNING | E_PARSE | E_USER_ERROR | E_USER_WARNING | E_RECOVERABLE_ERROR etc.
+ */
+if (!defined('KAHUK_DEBUG_LEVEL')) {
+	define('KAHUK_DEBUG_LEVEL', 'E_CORE_ERROR | E_CORE_WARNING | E_COMPILE_ERROR | E_ERROR | E_WARNING | E_PARSE | E_USER_ERROR | E_USER_WARNING | E_RECOVERABLE_ERROR');
+}
+
+/** */
+define('KAHUK_LANG', 'english');
+
+/** 
+ * Used by the Admin Panel error log file viewer 
+ */
+define('KAHUK_LOG_DIR', KAHUKPATH . 'logs/');
+define('LOG_FILE', 'logs/error.log');
+
+/**
+ * Will log the activity in attention log file
+ * used in the kahuk_log_unexpected() function
+ */
+define('KAHUK_DEBUG_MANUAL', true);
+
+/**
+ * Will log the activity in attention log file
+ * used in the kahuk_log_queries() function
+ */
+define('LOG_QUERY_ACTIVITY', true);
+
+/**
+ * Will log the activity in error log file
+ */
+define('LOG_DB_QUERY', false);
+define('LOG_DB_QUERY_FILE', LOG_FILE);
+
+/**
+ * Determine the Karma Values
+ */
+// Karma Value for USER when somebody Follow the USER
+define('FOLLOW_KARMA_FOR_USER', 50);
+
+// Karma Value initially for new STORY
+define('NEW_STORY_KARMA_INITIALY', 10);
+
+// Karma Value for USER When user submit a new STORY
+define('NEW_STORY_KARMA_FOR_USER', 5);
+
+// Karma Value to upgrade status of a story into PUBLISHED from NEW
+define('NEW_TO_PUBLISHED_KARMA', 20);
+
+// Karma Value for LINK When A Link is fork by user
+define('FORK_KARMA_FOR_STORY', 2);
+
+// Karma Value for User when he/she save a STORY
+define('FORK_KARMA_FOR_USER', 1);
+
+// Karma Value for LINK When A Link Get/Loss Vote
+define('REACTION_KARMA_FOR_STORY', 2);
+
+// Karma Value for USER When user vote
+define('REACTION_KARMA_FOR_USER', 1);
+
+// Karma Value for USER When user comment
+define('COMMENT_KARMA_FOR_USER', 1);
+
+// Karma Value for STORY When user comment
+define('COMMENT_KARMA_FOR_STORY', 2);
+
+/**
+ * 
+ */
+//
+define('SEO_FRIENDLY_URL', true);
+
+// Minimum number of word for story title
+define( 'MIN_NUMBER_OF_WORD_STORY_TITLE', 3 );
+
+// Maximum number of story with same url
+define('MAX_NUMBER_OF_DUPLICATE_STORY', 5);
+
+// Maximum number of story with same title
+define('MAX_NUMBER_OF_DUPLICATE_STORY_TITLE', 1);
+
+// Minimum number of word for group name
+define( 'MIN_NUMBER_OF_WORD_GROUP_NAME', 2 );
+
+// Maximum number of word for group name
+define( 'MAX_NUMBER_OF_WORD_GROUP_NAME', 20 );
+
+// Minimum number of word for group description
+define( 'MIN_NUMBER_OF_WORD_GROUP_DESC', 30 );
+
+// Maximum number of word for group description
+define( 'MAX_NUMBER_OF_WORD_GROUP_DESC', 200 );
+
+//
+define('KAHUK_BASE_URL', 'kahuk_base_url_here'); // ex: http[s]://example.com
+
+define('my_base_url', 'my_base_url_here'); // ex: http[s]://example.com
+define('my_kahuk_base', 'my_kahuk_base_here'); // /folder-name [ if installed in a folder ]
+
+
+/** PLEASE STOP EDITING BELOW THE LINE */
+
+//
+define('SALT_LENGTH', 9);
+
+ini_set('include_path', '.');
+
+// Template Caching
+// 0 = off
+// 1 = on
+define('caching', 1);
+define('summarize_mysql', 1);

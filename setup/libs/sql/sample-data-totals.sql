@@ -1,4 +1,4 @@
-INSERT INTO `PREFIX_totals` (`name`, `total`) VALUES
+INSERT INTO `---table_totals---` (`name`, `total`) VALUES
 ('published', 1),
 ('new', 3),
 ('discard', 0),

@@ -1,6 +1,6 @@
 <!-- user_disable.tpl -->
 <legend>{#KAHUK_Visual_View_User_Disable#}</legend>
-<div class="alert alert-warning expires-warning">{#KAHUK_Visual_Page_Expires#}</div>
+
 <p>Are you sure you want to "disable" this user and prevent them from logging in?</p>
 <p>
 	<a class="btn btn-danger" href="{$kahuk_base_url}/admin/admin_users.php?mode=yesdisable&user={$user}{$uri_token_admin_users_disable}">Yes, disable this user.</a>

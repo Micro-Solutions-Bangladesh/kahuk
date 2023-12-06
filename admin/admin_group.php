@@ -1,9 +1,10 @@
 <?php
+define('IS_ADMIN', true);
+
 include_once('../internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('../config.php');
-include(KAHUK_LIBS_DIR . 'link.php');
 include(KAHUK_LIBS_DIR . 'smartyvariables.php');
 
 check_referrer();
@@ -62,7 +63,7 @@ if (isset($_REQUEST['mode'])) {
 		header("Location: " . my_kahuk_base . "/admin/admin_group.php");
 		die();
 	} elseif ($mode == 'approve' && is_numeric($group_id)) {
-		$db->query("UPDATE " . table_groups . " SET group_status='Enable' WHERE group_id=$group_id");
+		$db->query("UPDATE " . table_groups . " SET group_status='enable' WHERE group_id=$group_id");
 
 		header("Location: " . my_kahuk_base . "/admin/admin_group.php");
 		die();

@@ -1,6 +1,4 @@
-<!-- users.tpl -->
 {literal}
-
 <script type="text/javascript">
 	$(function () {
 		$("[rel='tooltip']").tooltip();
@@ -8,8 +6,7 @@
 </script>
 
 <script type="text/javascript" language="javascript">
-function submit_list_form(){
-	
+function submit_list_form(){	
 	if($(".enabled_disable:checked").length==0) {
 		alert("Please select users");
 		return false;
@@ -30,10 +27,6 @@ function submit_list_form(){
 	}
 	
 	document.getElementById("user_list_form").submit();
-	
-	//for(x in document.getElementById("user_list_form"))
-	//alert(x);
-	//alert(document.getElementById("user_list_form"));
 }
 
 $(function(){
@@ -57,19 +50,29 @@ function set_admin_action(acc){
 		$("#selected_action").addClass("fa fa-check-square-o");
 		$("#selected_action").removeClass("fa fa-ban");
 		$("#selected_action").removeClass("fa fa-fa-square-o");
+		$("#selected_action").removeClass("fa fa-trash-o");
 		$("#admin_action").val(1);
 	}
 	if(acc==2){
 		$("#selected_action").addClass("fa fa-fa-square-o");
 		$("#selected_action").removeClass("fa fa-check-square-o");
 		$("#selected_action").removeClass("fa fa-ban");
+		$("#selected_action").removeClass("fa fa-trash-o");
 		$("#admin_action").val(2);
 	}
 	if(acc==3){
 		$("#selected_action").addClass("fa fa-ban");
 		$("#selected_action").removeClass("fa fa-fa-square-o");
 		$("#selected_action").removeClass("fa fa-check-square-o");
+		$("#selected_action").removeClass("fa fa-trash-o");
 		$("#admin_action").val(3);
+	}
+	if(acc==4){
+		$("#selected_action").addClass("fa fa-trash-o");
+		$("#selected_action").removeClass("fa fa-fa-square-o");
+		$("#selected_action").removeClass("fa fa-check-square-o");
+		$("#selected_action").removeClass("fa fa-ban");
+		$("#admin_action").val(4);
 	}
 	submit_list_form(); 
 }
@@ -83,7 +86,9 @@ function validate_all_user_action(){
 </script>
 {/literal}
 <legend>{#KAHUK_Visual_AdminPanel_User_Manage#}</legend>
-<div class="alert alert-warning expires-warning">{#KAHUK_Visual_Page_Expires#}</div>
+
+{include file=$the_template"/template-parts/session-messages.tpl"}
+
 {if $moderated_users_count > 0}
 	<div class="alert alert-warning">
 		There {if $moderated_users_count eq "1"}is{else}are{/if} <strong>{$moderated_users_count} {if $moderated_users_count eq "1"}user{else}users{/if}</strong> awaiting moderation.<br />
@@ -119,6 +124,12 @@ function validate_all_user_action(){
 						<a onclick="set_admin_action('3')" href="#">
 							<i class="fa fa-ban"></i>
 							{#KAHUK_Visual_KillSpam#}
+						</a>
+					</li>
+					<li>
+						<a onclick="set_admin_action('4')" href="#">
+							<i class="fa fa-trash-o"></i>
+							{#KAHUK_LANG_DELETE#}
 						</a>
 					</li>
 {* Redwine: Roles and permissions and Groups fixes *}
@@ -171,74 +182,71 @@ function validate_all_user_action(){
 		<thead>
 			<tr>
 				<th style="text-align:center;vertical-align:middle;"><input type='checkbox' id="selectall_user_ed" name="all1"></th>
-				{checkActionsTpl location="tpl_kahuk_admin_users_th_start"}
+				
 				<th style="min-width:50px;text-align:center;">ID</th>
 				<th style="min-width:95px;">{#KAHUK_Visual_Login_Username#}</th>
 				<th style="min-width:75px;text-align:center;">{#KAHUK_Visual_View_User_Level#}</th>
 				<th>{#KAHUK_Visual_View_User_Email#}</th>
 				<th style="min-width:85px">{#KAHUK_Visual_User_Profile_Joined#}</th>
 				<th style="min-width:50px;text-align:center;">Status</th>
-				{checkActionsTpl location="tpl_kahuk_admin_users_th_end"}
+				
 			</tr>
 		</thead>
 		<tbody>
 			{section name=nr loop=$userlist}
-				<tr class="{if $userlist[nr].user_enabled eq '0'}tr_moderated {/if}">
+				<tr class="{if $userlist[nr].user_status eq 'disable'}tr_moderated {/if}">
 					<td style="text-align:center;vertical-align:middle;">
 						{if $userlist[nr].user_level neq 'admin'}      
 							<input type="checkbox" name="enabled[{$userlist[nr].user_id}]" class="enabled_disable"  value="1" usernameval="{$userlist[nr].user_login}"/>
 						{/if} 
 					</td>
-					{checkActionsTpl location="tpl_kahuk_admin_users_td_start"}
+					
 					<td style="text-align:center;vertical-align:middle;">{$userlist[nr].user_id}</td>
 
-					<td style="vertical-align:middle;">
-						<img src="{$userlist[nr].Avatar.small}" style="height:18px;width:18px;" />
-
-
-						
-
-						<a href = "?mode=view&user={$userlist[nr].user_id}">
-							{$userlist[nr].user_login}
-						</a> {checkActionsTpl location="tpl_kahuk_admin_users_extra"} 
+					<td class="flex gap-2">
+						<img src="{$userlist[nr].Avatar.small}" style="height:40px;width:40px;" />
+						<a href="?mode=view&user={$userlist[nr].user_id}">
+							{$userlist[nr].user_login}<br>{$userlist[nr].user_karma}
+						</a>
 					</td>
 
 					<td style="text-align:center;vertical-align:middle;">{$userlist[nr].user_level}</td>
 					<td style="vertical-align:middle;">
-						{* Redwine: Roles and permissions and Groups fixes. Only display email field to Site Admins*}
+						{* Display email field only to Site Admins *}
 						{if $amIadmin eq '1'}
-						{if $userlist[nr].user_lastlogin neq NULL}
-							<i class="fa fa-check confirmed-email" title="{#KAHUK_Visual_AdminPanel_Confirmed_Email#}" alt="{#KAHUK_Visual_AdminPanel_Confirmed_Email#}"></i>
-						{else}
-							<a data-toggle="modal" href="{$kahuk_base_url}/admin/admin_user_validate.php?id={$userlist[nr].user_id}" title="{#KAHUK_Visual_AdminPanel_Unconfirmed_Email#}"><i class="fa fa-warning unconfirmed-email" rel="tooltip" data-placement="left" data-toggle="tooltip" data-original-title="{#KAHUK_Visual_AdminPanel_Unconfirmed_Email#}"></i></a>
-						{/if}
-						<a href="mailto:{$userlist[nr].user_email}" target="_blank" rel="noopener noreferrer">{$userlist[nr].user_email|truncate:25:"...":true}</a>
-{* Redwine: Roles and permissions and Groups fixes *}
+							{if $userlist[nr].user_level eq 'unverified'}
+								<a data-toggle="modal" href="{$kahuk_base_url}/admin/admin_user_validate.php?id={$userlist[nr].user_id}" title="{#KAHUK_Visual_AdminPanel_Unconfirmed_Email#}">
+									<i class="fa fa-warning unconfirmed-email" rel="tooltip" data-placement="left" data-toggle="tooltip" data-original-title="{#KAHUK_Visual_AdminPanel_Unconfirmed_Email#}"></i>
+								</a>
+							{else}
+								<i class="fa fa-check confirmed-email" title="{#KAHUK_Visual_AdminPanel_Confirmed_Email#}" alt="{#KAHUK_Visual_AdminPanel_Confirmed_Email#}"></i>							
+							{/if}
+							<a href="mailto:{$userlist[nr].user_email}" target="_blank" rel="noopener noreferrer">{$userlist[nr].user_email|truncate:25:"...":true}</a>
 						{/if}
 					</td>
 					<td>{$userlist[nr].user_date}</td>
 					<td style="text-align:center;vertical-align:middle;">
-						{if $userlist[nr].user_level eq 'Spammer'}
+						{if $userlist[nr].user_level eq 'spammer'}
 							<i class="fa fa-ban" title="{#KAHUK_Visual_AdminPanel_Spam#}"></i> {#KAHUK_Visual_AdminPanel_Spam#}
-						{elseif $userlist[nr].user_enabled eq 1}
+						{elseif $userlist[nr].user_status eq 'enable'}
 							<i class="fa fa-check-square-o" title="{#KAHUK_Visual_User_Profile_Enabled#}"></i> {#KAHUK_Visual_User_Profile_Enabled#}
 						{else}
 							<i class="fa fa-square-o" title="{#KAHUK_Visual_User_Profile_Disabled#}"></i> {#KAHUK_Visual_User_Profile_Disabled#}
 						{/if}
 					</td>
-					{checkActionsTpl location="tpl_kahuk_admin_users_td_end"}
+					
 				</tr>
 			{/section}
 		</tbody>
 	</table>
 </form>
-{*Redwine: Roles and permissions and Groups fixes. Only Site Admins can create users accounts*}
+{* Roles and permissions and Groups fixes. Only Site Admins can create users accounts *}
 {if $isAdmin eq '1'}
 {include file="/admin/user_create.tpl"}
 <div style="float:right;margin:8px 2px 0 0;">
 	<a class="btn btn-success"  href="#createUserForm-modal" data-toggle="modal" title="{#KAHUK_Visual_AdminPanel_New_User#}">{#KAHUK_Visual_AdminPanel_New_User#}</a>
 </div>
-{*Redwine: Roles and permissions and Groups fixes. Only Site Admins can create users accounts*}
+{* Roles and permissions and Groups fixes. Only Site Admins can create users accounts *}
 {/if}
 <div style="clear:both;"></div>
 
@@ -251,4 +259,4 @@ function check_all(elem) {
 }
 {/literal}
 </SCRIPT>
-<!--/users.tpl -->
+{* End: users.tpl *}

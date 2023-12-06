@@ -1,9 +1,10 @@
 <?php
+define('IS_ADMIN', true);
+
 include_once('../internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('../config.php');
-include(KAHUK_LIBS_DIR . 'link.php');
 include(KAHUK_LIBS_DIR . 'smartyvariables.php');
 
 check_referrer();
@@ -42,9 +43,7 @@ if (isset($_REQUEST['mode'])) {
 		if ($mode == 'delete' && is_numeric($link_id)) {
 			$db->query(" delete from " . table_links . " where link_id=" . $link_id);
 
-			// module system hook
-			$vars = array('link_id' => $link_id);
-			check_actions('admin_story_delete', $vars);
+
 
 			header("Location: " . my_kahuk_base . "/admin/admin_page.php");
 			die();

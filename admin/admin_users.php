@@ -1,10 +1,11 @@
 <?php
+define('IS_ADMIN', true);
+
 include_once('../internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('../config.php');
-include(KAHUK_LIBS_DIR . 'link.php');
-include(KAHUK_LIBS_DIR . 'class-votes.php');
+
 include(KAHUK_LIBS_DIR . 'smartyvariables.php');
 include(KAHUK_LIBS_DIR . 'csrf.php');
 include(KAHUK_LIBS_DIR . 'document_class.php');
@@ -44,34 +45,44 @@ if ($canIhaveAccess == 1) {
 	// sessions used to prevent CSRF
 	$CSRF = new csrf();
 
-	if (isset($_POST['frmsubmit'])) {
+	if (isset($_POST["frmsubmit"])) {
 		if ($_POST["enabled"]) {
 			// if TOKEN is empty, no need to continue, just display the invalid token error.
-			if (empty($_POST['token'])) {
+			if (empty($_POST["token"])) {
 				$CSRF->show_invalid_error(1);
 				exit;
 			}
 
 			// if valid TOKEN, proceed. A valid integer must be equal to 2.
-			if ($CSRF->check_valid(sanitize($_POST['token'], 3), 'admin_users_list') == 2) {
-				$value = $db->escape($_POST['admin_acction']);
+			if ($CSRF->check_valid(sanitize($_POST["token"], 3), 'admin_users_list') == 2) {
+				$value = $db->escape($_POST["admin_acction"]);
 
 				foreach ($_POST["enabled"] as $id => $valuea) {
-					$_GET['id'] = $id = $db->escape($id);
+					$_GET["id"] = $id = $db->escape($id);
 					$user = $db->get_row('SELECT * FROM ' . table_users . " where user_id=$id");
 
-					if ($value == 3) {
-						if ($user->user_level != "Spammer")
+					if ($value == 4) {
+						$rs = kahuk_delete_user_completely($id);
+
+						if ($rs["status"] == "error") {
+							die($rs["message"]);
+						}
+
+						kahuk_set_session_message($rs["message"]);
+						
+					} elseif ($value == 3) {
+						if ($user->user_level != "spammer") {
 							killspam($id);
+						}
 					} elseif ($value == 2) {
-						if ($user->user_enabled != 0) {
+						if ($user->user_status != "disable") {
 							canIChangeUser($user->user_level);
-							$db->query("UPDATE " . table_users . " SET user_enabled='0', user_level=IF(user_level='Spammer','normal',user_level) WHERE user_id='" . $db->escape($id) . "'");
+							$db->query("UPDATE " . table_users . " SET user_status='disable', user_level=IF(user_level='spammer','normal',user_level) WHERE user_id='" . $db->escape($id) . "'");
 						}
 					} elseif ($value == 1) {
-						if ($user->user_enabled != 1) {
+						if ($user->user_status != "enable") {
 							canIChangeUser($user->user_level);
-							$db->query("UPDATE " . table_users . " SET user_enabled='1', user_level=IF(user_level='Spammer','normal',user_level) WHERE user_id='" . $db->escape($id) . "'");
+							$db->query("UPDATE " . table_users . " SET user_status='enable', user_level=IF(user_level='spammer','normal',user_level) WHERE user_id='" . $db->escape($id) . "'");
 						}
 					}
 				}
@@ -81,14 +92,15 @@ if ($canIhaveAccess == 1) {
 			}
 		}
 
-		if ($_POST['delete']) {
-			foreach ($_POST['delete'] as $id) {
-				$_GET['id'] = $id = $db->escape($id);
-				killspam($id);
-			}
-		}
+		// if ($_POST['delete']) {
+		// 	foreach ($_POST['delete'] as $id) {
+		// 		$_GET['id'] = $id = $db->escape($id);
+		// 		killspam($id);
+		// 	}
+		// }
 
-		header("Location:" . $_SERVER['HTTP_REFERER']);
+		kahuk_redirect($permalink);
+		// header("Location:" . $_SERVER['HTTP_REFERER']);
 		exit;
 	}
 
@@ -176,7 +188,7 @@ if ($canIhaveAccess == 1) {
 			foreach ($userdata as $key => $val) {
 				$userdata[$key]['Avatar'] = kahuk_gravatar($val['user_email'], ['note' => 'admin_users.php file 1']);
 
-				$created = $db->get_results('SELECT * FROM ' . table_groups . ' where group_status="Enable" AND group_creator=' . $userdata[$key]['user_id'], ARRAY_A);
+				$created = $db->get_results('SELECT * FROM ' . table_groups . ' where group_status="enable" AND group_creator=' . $userdata[$key]['user_id'], ARRAY_A);
 
 				if (!empty($created)) {
 					$arr = [];
@@ -228,10 +240,6 @@ if ($canIhaveAccess == 1) {
 					$main_smarty->display('/admin/admin.tpl');
 				}
 			}
-
-			// module system hook
-			$vars = '';
-			check_actions('admin_users_view', $vars);
 
 			// show the template
 			$main_smarty->assign('tpl_center', '/admin/user_view');
@@ -310,10 +318,6 @@ if ($canIhaveAccess == 1) {
 						}
 					}
 
-					// module system hook
-					$vars = '';
-					check_actions('admin_users_save', $vars);
-
 					$user->username = $username;
 					$user->level = trim(sanitize($_POST["level"], 3));
 					$user->email = $email;
@@ -349,7 +353,7 @@ if ($canIhaveAccess == 1) {
 			$CSRF->create('admin_users_edit', true, true);
 
 			$main_smarty->assign('userdata', $userdata);
-			$main_smarty->assign('levels', array('normal', 'admin', 'moderator', 'Spammer'));
+			$main_smarty->assign('levels', array('normal', 'admin', 'moderator', 'spammer'));
 
 			// breadcrumbs and page title
 			$navwhere['text1'] = $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel');
@@ -364,10 +368,6 @@ if ($canIhaveAccess == 1) {
 			define('pagename', 'admin_users');
 			$main_smarty->assign('pagename', pagename);
 
-
-			// module system hook
-			$vars = '';
-			check_actions('admin_users_edit', $vars);
 
 			// show the template
 			$main_smarty->assign('tpl_center', '/admin/user_edit');
@@ -398,7 +398,9 @@ if ($canIhaveAccess == 1) {
 
 					$password = substr(md5(uniqid(rand(), true)), 0, 9);
 					$saltedPass = generatePassHash($password);
-					$db->query('UPDATE `' . table_users . "` SET `user_pass` = '$saltedPass' WHERE `user_login` = '" . sanitize($_GET["user"], 3) . "'");
+
+					$sql = 'UPDATE `' . table_users . "` SET `user_pass` = '$saltedPass' WHERE `user_login` = '" . sanitize($_GET["user"], 3) . "'";
+					$db->query($sql);
 
 					$message = sprintf(
 						$main_smarty->get_config_vars("KAHUK_PassEmail_PassBody"),
@@ -408,16 +410,24 @@ if ($canIhaveAccess == 1) {
 						$password
 					);
 
-					$headers = 'From: ' . $main_smarty->get_config_vars("KAHUK_PassEmail_From") . "\r\n";
-					$headers .= "Content-type: text/html; charset=utf-8\r\n";
+					$data = [
+						'to_email' => $user->user_email,
+						'subject' => $subject,
+						'message' => $message,
+					];
+			
+					// $isMailSent = $globalMailerObj->sendMe($data);
+					$isMailSent = kahuk_send_email($data);
 
-					// require the file for email sending.
-					require(KAHUK_LIBS_DIR . 'phpmailer/sendEmail.php');
+					if ($isMailSent) {
+						if (KAHUK_DEBUG) {
+							kahuk_log_unexpected("Email send success. [admin/admin_user.php]\n" . $message);
+						}
 
-					if (!$mail->Send()) {
-						$main_smarty->assign('adminResetPassword', $main_smarty->get_config_vars('KAHUK_Visual_Login_Delivery_Failed') . " To: $AddAddress<br />");
-					} else {
 						$main_smarty->assign('adminResetPassword', $main_smarty->get_config_vars("KAHUK_Visual_Group_Email_Invitation") . " To: $AddAddress<br /><hr />$message");
+					} else {
+						kahuk_log_unexpected("Email send fail. [admin/admin_user.php]\n" . $message);
+						$main_smarty->assign('adminResetPassword', $main_smarty->get_config_vars('KAHUK_Visual_Login_Delivery_Failed') . " To: $AddAddress<br />");
 					}
 
 					// breadcrumbs and page title
@@ -503,7 +513,7 @@ if ($canIhaveAccess == 1) {
 				}
 
 				if ($user) {
-					$db->query('UPDATE `' . table_users . '` SET `user_enabled` = 0 WHERE `user_login` = "' . sanitize($_GET["user"], 3) . '"');
+					$db->query("UPDATE `" . table_users . "` SET `user_status` = 'disable' WHERE `user_login` = '" . sanitize($_GET["user"], 3) . "'");
 
 					// breadcrumbs and page titles
 					$navwhere['text1'] = $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel');
@@ -579,7 +589,7 @@ if ($canIhaveAccess == 1) {
 				canIChangeUser($user->user_level);
 
 				if ($user) {
-					$db->query('UPDATE `' . table_users . '` SET `user_enabled` = 1 WHERE `user_login` = "' . sanitize($_GET["user"], 3) . '"');
+					$db->query('UPDATE `' . table_users . '` SET `user_status` = "enable" WHERE `user_login` = "' . sanitize($_GET["user"], 3) . '"');
 
 					// breadcrumbs and page titles
 					$navwhere['text1'] = $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel');
@@ -672,12 +682,7 @@ if ($canIhaveAccess == 1) {
 			$CSRF->create('admin_users_list', true, true);
 			global $offset, $page_size;
 
-			// Items per page drop-down
-			if (isset($_GET["pagesize"]) && is_numeric($_GET["pagesize"])) {
-				misc_data_update('pagesize', $_GET["pagesize"]);
-			}
-
-			$pagesize = get_misc_data('pagesize');
+			$pagesize = $page_size;
 
 			if ($pagesize <= 0) {
 				$pagesize = 30;
@@ -688,7 +693,7 @@ if ($canIhaveAccess == 1) {
 			if (isset($_GET["filter"]) && !empty($_GET["filter"])) {
 				$filter_sql = " user_level='" . sanitize($_GET["filter"], 3) . "' ";
 			} else {
-				$filter_sql = " user_level!='Spammer' ";
+				$filter_sql = " user_level!='spammer' ";
 			}
 
 			$search_sql = '';
@@ -741,14 +746,9 @@ if ($canIhaveAccess == 1) {
 	} else { // No options are selected, so show the list of users.			
 		$CSRF->create('admin_users_list', true, true);
 		$CSRF->create('admin_users_create', true, true);
-		global $offset, $top_users_size;
+		global $offset;
 
-		// Items per page drop-down
-		if (isset($_GET["pagesize"]) && is_numeric($_GET["pagesize"])) {
-			misc_data_update('pagesize', $_GET["pagesize"]);
-		}
-
-		$pagesize = get_misc_data('pagesize');
+		$pagesize = $page_size;
 
 		if ($pagesize <= 0) {
 			$pagesize = 30;
@@ -768,17 +768,17 @@ if ($canIhaveAccess == 1) {
 					$filter_sql = " WHERE user_level='normal' ";
 					break;
 				case 'spammer':
-					$filter_sql = " WHERE user_level='Spammer' ";
+					$filter_sql = " WHERE user_level='spammer' ";
 					break;
 				case 'disabled':
-					$filter_sql = " WHERE user_level!='Spammer' AND user_enabled='0' ";
+					$filter_sql = " WHERE user_level!='spammer' AND user_status='disable' ";
 					break;
 				default:
-					$filter_sql = " WHERE user_level!='Spammer' ";
+					$filter_sql = " WHERE user_level!='spammer' ";
 					break;
 			}
 		} else {
-			$filter_sql = "WHERE user_level!='Spammer'";
+			$filter_sql = " WHERE user_level!='spammer'";
 		}
 
 		// figure out what "page" of the results we're on

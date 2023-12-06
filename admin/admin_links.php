@@ -1,240 +1,194 @@
 <?php
+define('IS_ADMIN', true);
 
 include_once('../internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('../config.php');
-include(KAHUK_LIBS_DIR . 'link.php');
-include(KAHUK_LIBS_DIR . 'smartyvariables.php');
-include(KAHUK_LIBS_DIR . 'csrf.php');
+
+include(KAHUK_LIBS_DIR.'smartyvariables.php');
+include(KAHUK_LIBS_DIR.'csrf.php');
 
 check_referrer();
 
-// require user to log in
 force_authentication();
 
-// restrict access to admins
-$amIadmin = 0;
-$amIadmin = $amIadmin + checklevel('admin');
-$main_smarty->assign('amIadmin', $amIadmin);
-
-$canIhaveAccess = 0;
-$canIhaveAccess = $canIhaveAccess + checklevel('admin');
-$canIhaveAccess = $canIhaveAccess + checklevel('moderator');
-
-// Moderators have a value of '1' for the variable $is_moderator
-$is_moderator = checklevel('moderator');
-
-if ($canIhaveAccess == 0) {
-	header("Location: " . getmyurl('admin_login', $_SERVER['REQUEST_URI']));
-	die();
+if (!in_array($session_user_level, ['admin','moderator'])) {
+    die(".");
 }
 
-if ($canIhaveAccess == 1) {
-	global $offset;
-	$CSRF = new csrf();
+$CSRF = new csrf();
 
-	// Items per page drop-down
-	if (isset($_GET["pagesize"]) && is_numeric($_GET["pagesize"])) {
-		misc_data_update('pagesize', $_GET["pagesize"]);
+// pagename
+// define('pagename', 'admin_links');
+
+$paginationArgs = [];
+
+// $process = sanitize_text_field(_post('process'));
+$tool_keyword = sanitize_text_field(_request("tool_keyword"));
+$tool_status = sanitize_text_field(_request("tool_status"));
+$tool_process = sanitize_text_field(_post("tool_process"));
+$pagesize = sanitize_number(_get("pagesize", 50));
+
+//
+$story_statuses = kahuk_story_statuses(false);
+$story_status_default = kahuk_story_status_default();
+$stories_status = ($tool_status ? [$tool_status] : $story_statuses);
+
+//
+$page_url = kahuk_create_url("admin/admin_links.php");
+
+
+//
+if ($tool_process) {
+	$token = _post("token");
+
+	if ($tool_keyword) {
+		$page_url = add_query_arg("tool_keyword", $tool_keyword, $page_url);
+	}
+	
+	if ($tool_status) {
+		$page_url = add_query_arg("tool_status", $tool_status, $page_url);
 	}
 
-	$pagesize = get_misc_data('pagesize');
+	// if valid TOKEN, proceed. A valid integer must be equal to 2.
+	if (!empty($token) && $CSRF->check_valid(sanitize($_POST["token"], 3), 'stories_edit') == 2) {
+		
+		$selectedBoxes = _post('cbid_', []);
 
-	if ($pagesize <= 0) {
-		$pagesize = 30;
-	}
+		if(in_array($tool_process, $story_statuses)) {
+			$selectedIds = [];
 
-	$main_smarty->assign('pagesize', $pagesize);
-
-	// figure out what "page" of the results we're on
-	$offset = (get_current_page() - 1) * $pagesize;
-	$user_sql = '';
-	$search_sql = '';
-
-	// if user is searching
-	$temp = '';
-	if (isset($_GET['keyword']) && $_GET['keyword'] != $main_smarty->get_config_vars('KAHUK_Visual_Search_SearchDefaultText')) {
-		$kahuk_keyword = sanitize($_GET["keyword"], 3);
-		$search_sql = " AND (link_author LIKE '%" . $kahuk_keyword . "%' OR link_title LIKE '%" . $kahuk_keyword . "%' OR link_content LIKE '%" . $kahuk_keyword . "%' OR link_tags LIKE '%" . $kahuk_keyword . "%') ";
-	}
-
-	if (!empty($_GET['user'])) {
-		$user = $db->get_var("SELECT user_id FROM " . table_users . " where user_login='" . sanitize($_GET['user'], 3) . "'");
-		$user_sql = " AND link_author='" . $user . "'";
-	}
-
-	// if admin uses the filter
-	if (isset($_GET["filter"])) {
-		switch (sanitize($_GET["filter"], 3)) {
-			case 'new':
-				$filter_sql = " link_status = 'new' ";
-				break;
-			case 'draft':
-				$filter_sql = " link_status = 'draft' ";
-				break;
-			case 'scheduled':
-				$filter_sql = " link_status = 'scheduled' ";
-				break;
-			case 'all':
-				$filter_sql = " link_status <> 'page' AND link_status <> 'discard' AND link_status <> 'spam' ";
-				break;
-			case 'today':
-				$filter_sql = " link_date > DATE_SUB(NOW(),INTERVAL 1 DAY) ";
-				break;
-			case 'yesterday':
-				$filter_sql = " link_date BETWEEN DATE_SUB(NOW(),INTERVAL 2 DAY) AND DATE_SUB(NOW(),INTERVAL 1 DAY) ";
-				break;
-			case 'week':
-				$filter_sql = " link_date > DATE_SUB(NOW(),INTERVAL 7 DAY) ";
-				break;
-			case 'discard':
-				$filter_sql = " link_status = 'discard' ";
-				break;
-			case 'spam':
-				$filter_sql = " link_status = 'spam' ";
-				break;
-			case 'moderated':
-				$filter_sql = " link_status = 'moderated' ";
-				break;
-			case 'page':
-				$filter_sql = " link_status = 'page' ";
-				break;
-			case 'other':
-				$filter_sql = " link_status != 'new' AND link_status != 'published' AND link_status != 'discard' AND link_status != 'spam' AND link_status != 'page'";
-				break;
-			default:
-				$filter_sql = " link_status = '" . $db->escape($_GET["filter"]) . "'";
-				break;
-		}
-	} else {
-		$filter_sql = " link_status <> 'page' AND link_status <> 'discard' AND link_status <> 'spam' ";
-	}
-
-	$filtered = $db->get_results("SELECT SQL_CALC_FOUND_ROWS * FROM " . table_links . " WHERE $filter_sql $search_sql $user_sql ORDER BY link_date DESC LIMIT $offset,$pagesize");
-	$rows = $db->get_var("SELECT FOUND_ROWS()");
-
-	// read links from database 
-	$user = new User;
-	$link = new Link;
-
-	if ($filtered) {
-		$template_stories = [];
-
-		foreach ($filtered as $dbfiltered) {
-			$link->id = $dbfiltered->link_id;
-			$cached_links[$dbfiltered->link_id] = $dbfiltered;
-			$link->read();
-			$user->id = $link->author;
-			$user->read();
-
-			/* to restrict changing the story status where authors are admins, only to admins*/
-			if ($amIadmin) {
-				$template_stories[] = array(
-					'link_title_url' => $link->title_url,
-					'link_id' => $link->id,
-					'link_title' => $link->title,
-					'link_status' => $link->status,
-					'link_author' => $user->username,
-					'link_date' => date("d-m-Y", $link->date),
-				);
-				/* moderators are restricted to changing the story status to normal level and moderators authors only*/
-			} elseif ($is_moderator && $user->level != 'admin') {
-				$template_stories[] = array(
-					'link_title_url' => $link->title_url,
-					'link_id' => $link->id,
-					'link_title' => $link->title,
-					'link_status' => $link->status,
-					'link_author' => $user->username,
-					'link_date' => date("d-m-Y", $link->date),
-				);
-			}
-		}
-
-		check_actions('link_extra', $vars);
-		$main_smarty->assign('template_stories', $template_stories);
-	}
-
-	// breadcrumbs and page title
-	$navwhere['text1'] = $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel');
-	$navwhere['link1'] = getmyurl('admin', '');
-	$navwhere['text2'] = $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel_Links');
-	$main_smarty->assign('navbar_where', $navwhere);
-	$main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel'));
-
-	// if admin changes the link status
-	if (isset($_GET['action']) && sanitize($_GET['action'], 3) == "bulkmod" && isset($_POST['admin_acction'])) {
-		// Redwine: if TOKEN is empty, no need to continue, just display the invalid token error.
-		if (empty($_POST['token'])) {
-			$CSRF->show_invalid_error(1);
-			exit;
-		}
-
-		// if valid TOKEN, proceed. A valid integer must be equal to 2.
-		if ($CSRF->check_valid(sanitize($_POST['token'], 3), 'admin_links_edit') == 2) {
-			$comment = array();
-			$admin_acction = $_POST['admin_acction'];
-
-			foreach ($_POST["link"] as $key => $v) {
-				if ($admin_acction == "published" || $admin_acction == "new" || $admin_acction == "discard" || $admin_acction == "moderated" || $admin_acction == "spam") {
-					$link_status = $db->get_var('select link_status from ' . table_links . '  WHERE link_id = "' . $key . '"');
-					if ($link_status != $admin_acction) {
-						if ($admin_acction == "published") {
-							$db->query('UPDATE `' . table_links . '` SET `link_status` = "published", link_published_date = NOW() WHERE `link_id` = "' . $key . '"');
-							$vars = array('link_id' => $key);
-							check_actions('link_published', $vars);
-						} elseif ($admin_acction == "new") {
-							$db->query('UPDATE `' . table_links . '` SET `link_status` = "new", link_published_date=NULL WHERE `link_id` = "' . $key . '"');
-						} elseif ($admin_acction == "moderated") {
-							$db->query('UPDATE `' . table_links . '` SET `link_status` = "moderated", link_published_date=0 WHERE `link_id` = "' . $key . '"');
-						} elseif ($admin_acction == "discard") {
-							$db->query('UPDATE `' . table_links . '` SET `link_status` = "discard" WHERE `link_id` = "' . $key . '"');
-							$vars = array('link_id' => $key);
-							check_actions('story_discard', $vars);
-						} elseif ($admin_acction == "spam") {
-							$user_id = $db->get_var($sql = "SELECT link_author FROM `" . table_links . "` WHERE `link_id` = " . $key . ";");
-							$db->query('UPDATE `' . table_links . '` SET `link_status` = "spam" WHERE `link_id` = "' . $key . '"');
-							$vars = array('link_id' => $key);
-							check_actions('story_discard', $vars);
-							
-							$user = new User;
-							$user->id = $user_id;
-							$user->read();
-
-							if ($user->level != 'admin' && $user->level != "Spammer") {
-								killspam($user_id);
-								$killspammed[$user_id] = 1;
-							}
-						}
-					}
+			foreach($selectedBoxes as $key => $value) {
+				if ($value == 1) {
+					$selectedIds[] = sanitize_number($key);
 				}
 			}
 
-			totals_regenerate();
-			
-			$redirect_url = $_SERVER['HTTP_REFERER'];
-			header("Location:" . $redirect_url);
-			exit();
-		} else {
-			$CSRF->show_invalid_error(1);
-			exit;
+			$sql = "UPDATE " . table_links;
+			$sql .= " SET link_status='" . $db->escape($tool_process) . "'";
+			$sql .= " WHERE link_id IN (" . implode(",", $selectedIds) . ")";
+		
+			$rs = $db->query($sql);
+
+			kahuk_log_schedule("Admin Action: [{$rs} rows affected]\nSQL: {$sql}");
+
+			kahuk_set_session_message(
+				"{$rs} stories updated.",
+				"success"
+			);
 		}
 	} else {
-		$CSRF->create('admin_links_edit', true, true);
+		$CSRF->show_invalid_error(1);
+		exit;
 	}
 
-	// pagename
-	define('pagename', 'admin_links');
-	$main_smarty->assign('pagename', pagename);
-
-	// show the template
-	$main_smarty->assign('tpl_center', '/admin/submissions');
-
-	if ($is_moderator == '1') {
-		$main_smarty->display('/admin/moderator.tpl');
-	} else {
-		$main_smarty->display('/admin/admin.tpl');
-	}
-} else {
-	echo 'This page is restricted to site Admins!';
+	kahuk_redirect($page_url);
+	exit;
 }
+
+//
+$CSRF->create('stories_edit', true, true);
+
+//
+$storiesArgs = [
+	"page_size" => $pagesize,
+    "link_status" => $stories_status,
+    "order_by" => "links.link_id DESC",
+];
+
+// If user is searching
+if ($tool_keyword) {
+	$where_clause = "";
+	$sKeyword = kahuk_analyse_keyword($tool_keyword);
+
+	// echo "<pre>tool_keyword: $tool_keyword</pre>";
+	// print_r($sKeyword);
+
+	if ($sKeyword) {
+		$readyKeyword = $sKeyword["keyword"];
+		$readyType = $sKeyword["type"];
+
+		if ($readyType == "numeric") {
+			$where_clause = "links.link_id = " . sanitize_number($readyKeyword);
+		} else if ($readyType == "domain") {
+			$where_clause = "links.link_url LIKE '%" . $db->escape($readyKeyword) . "%'";
+			// $where_clause .= " OR links.link_content LIKE '%" . $db->escape($sKeyword["keyword"]) . "%'";
+		} else if ($readyType == "author") {
+			$where_clause = "users.user_login = '" . $db->escape($readyKeyword) . "'";
+		} else if ($readyType == "quoted") {
+			$where_clause = "(links.link_title LIKE '%" . $db->escape($readyKeyword) . "%'";
+			$where_clause .= " OR links.link_content LIKE '%" . $db->escape($readyKeyword) . "%')";
+		}
+	} else {
+		$readyKeyword = explode(" ", $tool_keyword);
+        $readyKeyword = implode("%", $readyKeyword);
+
+		$where_clause = "(links.link_title LIKE '%" . $db->escape($readyKeyword) . "%'";
+		$where_clause .= " OR links.link_content LIKE '%" . $db->escape($readyKeyword) . "%')";
+	}
+
+	$storiesArgs["where_clause"] = $where_clause;
+	$paginationArgs["tool_keyword"] = $tool_keyword;
+
+	$rowCount = kahuk_count_stories($storiesArgs);
+
+} else {
+	$rowCount = kahuk_get_stories_total($stories_status);
+}
+
+if ($tool_status) {
+	$paginationArgs["tool_status"] = $tool_status;
+}
+
+// 
+$items = [];
+
+if ($rowCount) {
+	$items = kahuk_get_stories($storiesArgs);
+}
+
+/**
+ * Pagination
+ */
+if ($pagesize>0) {
+	$paginationArgs["pagesize"] = $pagesize;
+}
+
+$args = [
+	"page_limit" => $pagesize,
+	"total" => $rowCount,
+	"permalink" => kahuk_create_url("admin/admin_links.php", $paginationArgs),
+];
+
+$main_smarty->assign("pagination", kahuk_pagination($args));
+
+//
+$attr = 'name="tool_process" name="tool_process" class="form-control capitalize"';
+$first_opt='<option value="">Status Bulk Action</option>';
+$tool_process_markup = kahuk_statuses_select_markup($story_statuses, $attr, $first_opt);
+
+//
+$attr = 'name="tool_status" name="tool_status" class="form-control capitalize"';
+$first_opt='<option value="">Story Status</option>';
+$tool_status_markup = kahuk_statuses_select_markup($story_statuses, $attr, $first_opt, $tool_status);
+
+//
+$attr='name="tool_pagesize" id="tool_pagesize" class="form-control capitalize"';
+$first_opt='<option value="0">Select Record Limit</option>';
+$pagesizes_markup = kahuk_page_size_options_markup($attr, $first_opt, $pagesize);
+
+//
+$main_smarty->assign("page_url", $page_url);
+$main_smarty->assign("pagesizes_markup", $pagesizes_markup);
+$main_smarty->assign("tool_process_markup", $tool_process_markup);
+$main_smarty->assign("tool_status_markup", $tool_status_markup);
+$main_smarty->assign("data_items", $items);
+$main_smarty->assign("tool_keyword", $tool_keyword);
+
+// show the template
+$main_smarty->assign("tpl_center", "/admin/stories");
+
+$main_smarty->display("/admin/admin.tpl");
+
+exit;
