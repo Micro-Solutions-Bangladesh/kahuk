@@ -20,6 +20,7 @@ if( ! defined( 'tables_defined' ) ) {
 	define( 'table_messages', TABLE_PREFIX . "messages" );
 	define( 'table_formulas', TABLE_PREFIX . "formulas" );
 	define( 'table_saved_links', TABLE_PREFIX . "saved_links" );
+	define("table_snippets", TABLE_PREFIX . "snippets");
 	define( 'table_totals', TABLE_PREFIX . "totals" );
 	define( 'table_misc_data', TABLE_PREFIX . "misc_data" );
 	define( 'table_redirects', TABLE_PREFIX . "redirects" );

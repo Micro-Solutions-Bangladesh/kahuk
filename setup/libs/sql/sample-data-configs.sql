@@ -64,7 +64,7 @@ INSERT INTO `---table_config---` (`var_page`, `var_name`, `var_value`, `var_defa
 ('Avatars', 'Avatar_Small', '32', '32', 'number', 'Small Avatar Size', 'Size of the small avatar in pixels (both width and height). Commonly used in the comments page.', 'define', NULL),
 ('Template', 'the_template', 'aowal', 'aowal', 'Text', 'Template', 'Default Template', 'option', ''''),
 ('Template', 'Use_New_Story_Layout', 'default', 'default', 'Text', 'Use the Story layout?', 'If you want to use any additional custom Story layout, set here.', 'define', ''),
-('Plugins', 'plugins_installed', '', '', 'text', 'Installed Plugins', 'CSV list of installed plugins.', 'option', NULL),
+('Plugins', 'plugins_installed', 'snippets', '', 'text', 'Installed Plugins', 'CSV list of installed plugins.', 'option', NULL),
 ('Misc', '_time_story_totals_updated', '0', '0', 'text', 'Last updated time', 'When is the total of stories updated by status', 'option', NULL),
 ('Misc', '_story_status_published_total', '0', '0', 'text', 'Total published stories', 'Number of stories published', 'option', NULL),
 ('Misc', '_story_status_new_total', '0', '0', 'text', 'Total new stories', 'Number of stories new', 'option', NULL),

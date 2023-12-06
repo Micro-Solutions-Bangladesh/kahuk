@@ -596,6 +596,36 @@ function kahuk_create_primary_tables() {
 
     kahuk_index_query($sql);
 
+    // ********************************
+    $sql = "
+        CREATE TABLE `" . table_snippets ."` (
+            `snippet_id` int NOT NULL,
+            `snippet_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            `snippet_location` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+            `snippet_updated` datetime NOT NULL,
+            `snippet_order` int NOT NULL,
+            `snippet_content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+            `snippet_status` int NOT NULL DEFAULT '1'
+        ) {$dbSettings};
+    ";
+
+    kahuk_create_table($sql, table_snippets);
+
+    //
+    $sql = "
+        ALTER TABLE `" . table_snippets ."`
+            ADD PRIMARY KEY (`snippet_id`);
+    ";
+
+    kahuk_index_query($sql);
+
+    //
+    $sql = "
+        ALTER TABLE `" . table_snippets ."`
+            MODIFY `snippet_id` int NOT NULL AUTO_INCREMENT;
+    ";
+
+    kahuk_index_query($sql);
 
 	// ********************************
     $sql = "

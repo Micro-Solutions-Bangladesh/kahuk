@@ -4,6 +4,26 @@ if (!defined('KAHUKPATH')) {
 }
 
 /**
+ * Add a menu item in Admin under Plugins
+ */
+$menu_item_parent = "manage-plugins";
+$hooks->add_filter("kahuk_admin_menu_sub_{$menu_item_parent}", "snippets_admin_menu_sub_callback");
+
+function snippets_admin_menu_sub_callback($items) {
+    $items[] = [
+        "menu_slug" => PLUGIN_SLUG_SNIPPETS,
+        "page_title" => "Snippets Settings",
+        "menu_title" => "Snippets",
+        "capability" => "admin",
+        "icon_url" => "",
+        "url" => PLUGIN_SETTINGS_SNIPPETS,
+        "position" => 10.1,
+    ];
+
+    return $items;
+}
+
+/**
  * 
  */
 class Snippets
