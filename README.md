@@ -80,3 +80,6 @@ When a user fork a story, the story will be visible in his/her profile page as a
 - Initially the story karma will be `NEW_STORY_KARMA_INITIALY`.
 - Increase karma for the session user by the numbers mentioned as `NEW_STORY_KARMA_FOR_USER`
 
+#### Recommended Plugins
+
+- [CAPTCHA for Kahuk CMS](https://github.com/Micro-Solutions-Bangladesh/captcha) plugin enables a [Kahuk CMS](https://kahuk.com/) powered website to avoid unwanted request using Google reCaptcha.
