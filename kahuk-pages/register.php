@@ -134,7 +134,7 @@ if (is_ip_banned($userip)) {
             /**
              * User is saved, now sent a verification email
              */
-            $domain = $main_smarty->get_config_vars('KAHUK_Visual_Name');
+            $domain = $site_name;
 
             $validation = kahuk_create_url('validation/', ['code' => $verification_code, 'slug' => $username]);
 

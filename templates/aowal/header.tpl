@@ -3,11 +3,11 @@
     <div class="container flex flex-wrap items-center justify-between text-base uppercase">
         <h1 class="logo flex-initial w-auto order-1 py-4" itemscope="itemscope"
             itemtype="http://schema.org/Organization">
-            <a class="block" href="{$kahuk_base_url}" itemprop="url" rel="home" title="{#KAHUK_Visual_Name#}">
+            <a class="block" href="{$kahuk_base_url}" itemprop="url" rel="home" title="{$site_name}">
                 {if $Default_Site_Logo eq ""}
-                    {#KAHUK_Visual_Name#}
+                    {$site_name}
                 {else}
-                    <img src="{$Default_Site_Logo}" alt="{#KAHUK_Visual_Name#}" class="h-6" />
+                    <img src="{$Default_Site_Logo}" alt="{$site_name}" class="h-6" />
                 {/if}
             </a>
         </h1>

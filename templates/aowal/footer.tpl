@@ -46,17 +46,17 @@
                 <h2 class="text-lg font-bold mb-base-half">Connect With Us</h2>
                 <ul>
                     <li>
-                        <a href="https://www.facebook.com/KahukCMS" title="{#KAHUK_Visual_Name#} on Facebook">
+                        <a href="https://www.facebook.com/KahukCMS" title="{$site_name} on Facebook">
                             <i class="icon icon-facebook"></i> Facebook
                         </a>
                     </li>
                     <li>
-                        <a href="https://twitter.com/" title="{#KAHUK_Visual_Name#} on Twitter">
+                        <a href="https://twitter.com/" title="{$site_name} on Twitter">
                             <i class="icon icon-twitter"></i> Twitter
                         </a>
                     </li>
                     <li>
-                        <a href="mailto:{$site_email_contact}" title="Contact {#KAHUK_Visual_Name#}">
+                        <a href="mailto:{$site_email_contact}" title="Contact {$site_name}">
                             <i class="icon icon-link-1"></i> Contact Us
                         </a>
                     </li>
@@ -65,12 +65,12 @@
         </div><!-- /.footer-links -->
 
         <div class="footer-about w-full lg:w-1/2 mt-base">
-            <h2 class="text-lg font-bold mb-base-half">About {#KAHUK_Visual_Name#}</h2>
+            <h2 class="text-lg font-bold mb-base-half">About {$site_name}</h2>
             {#KAHUK_Visual_What_Is_Kahuk_Text#}
 
             {if $Default_Site_Logo neq ""}
                 <a class="block py-4" href="{$kahuk_base_url}">
-                    <img class="h-10 mx-auto" src="{$Default_Site_Logo}" alt="{#KAHUK_Visual_Name#}">
+                    <img class="h-10 mx-auto" src="{$Default_Site_Logo}" alt="{$site_name}">
                 </a>
             {/if}
         </div><!-- /.footer-about -->

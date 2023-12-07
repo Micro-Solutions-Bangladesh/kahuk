@@ -14,7 +14,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	
-	<title>{#KAHUK_Visual_Name#} Admin Panel</title>
+	<title>{$site_name} Admin Panel</title>
 	
 	<link rel="icon" href="{$kahuk_base_url}/favicon.ico" type="image/x-icon"/>	
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>

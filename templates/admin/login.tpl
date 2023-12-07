@@ -16,7 +16,7 @@ text-align:center;
 			</div>
 		{/if}
 		<div class="login_form">
-			<h2>{#KAHUK_Visual_Name#}</h2>
+			<h2>{$site_name}</h2>
 			<form action="{$my_kahuk_base}/admin/admin_login.php" method="post">
 				<div class="clearfix login_username">
 					<input type="text" class="form-control" name="username" {if $post_username}value="{$post_username}"{else}placeholder="{#KAHUK_Visual_Register_Username#}{/if}">

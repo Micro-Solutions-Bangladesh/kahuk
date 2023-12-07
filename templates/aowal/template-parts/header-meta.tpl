@@ -29,8 +29,8 @@
 <!-- Open Graph Protocol  & Twitter Cards -->
 
 {if $pagename eq "index"}
-	<meta property="og:title" content="{#KAHUK_Visual_Name#} | {#KAHUK_Visual_RSS_Description#}" />
-	<meta name="twitter:title" content="{#KAHUK_Visual_Name#} | {#KAHUK_Visual_RSS_Description#}" />
+	<meta property="og:title" content="{$site_name} | {#KAHUK_Visual_RSS_Description#}" />
+	<meta name="twitter:title" content="{$site_name} | {#KAHUK_Visual_RSS_Description#}" />
 {else}
 	<meta property="og:title" content="{$posttitle}" />
 	<meta name="twitter:title" content="{$posttitle}" />
