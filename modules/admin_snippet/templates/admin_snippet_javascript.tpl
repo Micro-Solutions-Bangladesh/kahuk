@@ -1,1 +1,0 @@
-{*if $modulename eq "admin_snippet"}<script src="./modules/admin_language/js/EditInPlaceAL.js" type="text/javascript"></script>{/if*}

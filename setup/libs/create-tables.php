@@ -396,7 +396,7 @@ function kahuk_create_primary_tables() {
         ) {$dbSettings};
     ";
 
-    kahuk_create_table( $sql, table_links );
+    kahuk_create_table($sql, table_links);
 
     //
     $sql = "
@@ -408,10 +408,6 @@ function kahuk_create_primary_tables() {
             ADD KEY `link_title_url` (`link_title_url`(50)),
             ADD KEY `link_date` (`link_date`),
             ADD KEY `link_published_date` (`link_published_date`);
-        ALTER TABLE `" . table_links . "` 
-            ADD FULLTEXT KEY `link_url_2` (`link_url`,`link_title`,`link_content`);
-        ALTER TABLE `" . table_links . "` 
-            ADD FULLTEXT KEY `link_search` (`link_title`,`link_content`);
     ";
 
     kahuk_index_query($sql);
@@ -420,6 +416,22 @@ function kahuk_create_primary_tables() {
     $sql = "
         ALTER TABLE `" . table_links . "`
             MODIFY `link_id` int NOT NULL AUTO_INCREMENT;
+    ";
+
+    kahuk_index_query($sql);
+
+    //
+    $sql = "
+        ALTER TABLE `" . table_links . "`
+            ADD FULLTEXT KEY `link_url_2` (`link_url`,`link_title`,`link_content`);
+    ";
+
+    kahuk_index_query($sql);
+
+    //
+    $sql = "
+        ALTER TABLE `" . table_links . "`
+            ADD FULLTEXT KEY `link_search` (`link_title`,`link_content`);
     ";
 
     kahuk_index_query($sql);
