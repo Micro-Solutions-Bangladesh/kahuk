@@ -25,7 +25,7 @@ if ($canIhaveAccess == 0) {
 // breadcrumbs and page titles
 $navwhere['text1'] = $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel');
 $navwhere['link1'] = getmyurl('admin', '');
-$navwhere['text2'] = $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel_5') . $main_smarty->get_config_vars('KAHUK_Visual_Name');
+$navwhere['text2'] = $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel_5') . kahuk_site_name();
 $navwhere['link2'] = my_kahuk_base . "/admin/admin_config.php";
 $main_smarty->assign('navbar_where', $navwhere);
 $main_smarty->assign('posttitle', " / " . $main_smarty->get_config_vars('KAHUK_Visual_Header_AdminPanel'));

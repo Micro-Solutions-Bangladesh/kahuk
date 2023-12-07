@@ -57,7 +57,7 @@
                     <h3 class="section-title mb-4">{#KAHUK_Visual_User_Profile_Bookmarklet_Title#}</h3>
 
                     <p>{#KAHUK_Visual_User_Profile_Bookmarklet_Title_1#}
-                        {#KAHUK_Visual_Name#}.{#KAHUK_Visual_User_Profile_Bookmarklet_Title_2#}
+                        {$site_name}.{#KAHUK_Visual_User_Profile_Bookmarklet_Title_2#}
                     </p>
                     <ul>
                         <li><strong>{#KAHUK_Visual_User_Profile_IE#}:</strong> {#KAHUK_Visual_User_Profile_IE_1#}</li>

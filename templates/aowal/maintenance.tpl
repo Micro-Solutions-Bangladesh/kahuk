@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-	<title>{#KAHUK_Visual_Name#} - {#KAHUK_Visual_RSS_Description#}</title>
+	<title>{$site_name} - {#KAHUK_Visual_RSS_Description#}</title>
 	<meta name="description" content="Is currently in maintenance mode. We should be back online shortly. Thank you for your patience." />
 	
 	<style>
@@ -46,14 +46,14 @@
 	<div class="page text-deep-100">
 		<h1>Maintenance</h1>
 		<p>
-			{#KAHUK_Visual_Name#} Is currently in maintenance mode. We should be back online shortly. Thank you for your patience.
+			{$site_name} Is currently in maintenance mode. We should be back online shortly. Thank you for your patience.
 		</p>
 		<p>
 			<a class="text-bold text-deep-100" href="javascript:location.reload(true)">Refresh Page</a>
 		</p>
 		<hr />
 		<footer>
-			Copyright &copy; {php} echo date('Y'); {/php} {#KAHUK_Visual_Name#}
+			Copyright &copy; {php} echo date('Y'); {/php} {$site_name}
 		</footer>
 	</div>
 </body>

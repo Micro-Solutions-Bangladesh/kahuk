@@ -10,7 +10,6 @@ function kahuk_version($isNumber = false) {
 
 /**
  * Get Website Name
- * TODO delete KAHUK_LANG_SITE_NAME 
  * 
  * @since 6.0.0
  * 

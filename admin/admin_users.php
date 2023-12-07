@@ -394,7 +394,7 @@ if ($canIhaveAccess == 1) {
 
 				if ($user) {
 					$AddAddress = $user->user_email;
-					$subject = $main_smarty->get_config_vars("KAHUK_Visual_Name") . ' ' . $main_smarty->get_config_vars("KAHUK_PassEmail_Subject");
+					$subject = $site_name . ' ' . $main_smarty->get_config_vars("KAHUK_PassEmail_Subject");
 
 					$password = substr(md5(uniqid(rand(), true)), 0, 9);
 					$saltedPass = generatePassHash($password);
@@ -404,7 +404,7 @@ if ($canIhaveAccess == 1) {
 
 					$message = sprintf(
 						$main_smarty->get_config_vars("KAHUK_PassEmail_PassBody"),
-						$main_smarty->get_config_vars("KAHUK_Visual_Name"),
+						kahuk_site_name(),
 						KAHUK_BASE_URL . '/login.php',
 						$_GET["user"],
 						$password

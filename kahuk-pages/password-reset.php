@@ -33,12 +33,12 @@ if ($action === 'reset') {
         // saltedlogin is the hashed $combined and that will be saved in the users table and serves as the identifier.
         $saltedlogin = hash('sha256', $combined);
 
-        $subject = $main_smarty->get_config_vars("KAHUK_Visual_Name") . ' ' . $main_smarty->get_config_vars("KAHUK_PassEmail_Subject");
+        $subject = $site_name . ' ' . $main_smarty->get_config_vars("KAHUK_PassEmail_Subject");
 
         $message = sprintf(
             $main_smarty->get_config_vars("KAHUK_PassEmail_Body"), 
             $salt, 
-            $main_smarty->get_config_vars("KAHUK_Visual_Name")
+            $site_name
         );
 
         $message .= "\n \n";
