@@ -60,9 +60,6 @@ $main_smarty->assign('validateuserEmail', $validateuserEmail);
 $validateuserPass = $db->get_var("SELECT `var_value` FROM " . table_config ." WHERE `var_name` = 'validate_password';");
 $main_smarty->assign('validateuserPass', $validateuserPass);
 
-$submitDraft = $db->get_var("SELECT `var_value` FROM " . table_config ." WHERE `var_name` = 'Allow_Draft';");
-$main_smarty->assign('submitDraft', $submitDraft);
-
 $submitScheduled = $db->get_var("SELECT `var_value` FROM " . table_config ." WHERE `var_name` = 'Allow_Scheduled';");
 $main_smarty->assign('submitScheduled', $submitScheduled);
 

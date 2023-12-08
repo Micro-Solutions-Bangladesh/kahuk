@@ -118,57 +118,7 @@
                 <span class="help-inline">{#KAHUK_Visual_Submit2_CatInstruct#}</span>
             </div>
 
-            {* {if $canIhaveAccess eq 1}
-                <div class="form-row">
-                    <strong>{#KAHUK_Visual_EditStory_Notify#}: </strong>
-                    <br />
-                    &nbsp; <input type="checkbox" name="notify" value="yes"> {#KAHUK_Visual_EditStory_NotifyText#}
-                    <ul class="notify_option_list">
-                        <li><input type="radio" name="reason" value="typo"
-                                onclick="notify.checked = 'true';">{#KAHUK_Visual_EditStory_Reason_typo#}</li>
-                        <li><input type="radio" name="reason" value="category"
-                                onclick="notify.checked = 'true';">{#KAHUK_Visual_EditStory_Reason_category#}</li>
-        
-                        <li><input type="radio" name="reason" value="foul"
-                                onclick="notify.checked = 'true';">{#KAHUK_Visual_EditStory_Reason_foul#}</li>
-                        <li>
-                            <input type="radio" name="reason" value="other"
-                                onclick="notify.checked = 'true';">{#KAHUK_Visual_EditStory_Reason_other#}
-                            <input type="text" name="otherreason" class="form-control" size="50">
-                        </li>
-                    </ul>
-                </div>
-            {/if} *}
-
             {$warning_message}
-
-            {* <ul class="notify_option_list alert alert-warning">
-                <li>
-                    <input type="radio" id="rd_{$submit_stat}" name="change_status" value="{$submit_stat}" checked /> 
-                    <label for="rd_{$submit_stat}">{#KAHUK_Visual_Submit2_Edit_Keep_As_Status#$submit_stat}</label>
-                </li>
-
-                {if $submit_stat eq 'draft' || $submit_stat eq 'scheduled'}
-                    <li>
-                        <input type="radio" id="rd_tonew" name="change_status" value="to_new" /> 
-                        <label for="rd_tonew">{#KAHUK_Visual_Submit2_Edit_Draft_Post#}</label>
-                    </li>
-                {/if}
-
-                {if $submit_stat eq 'new' || $submit_stat eq 'published'}
-                    {if $Allow_Draft eq 1}
-                        <li>
-                            <input type="radio" id="rd_todraft" name="change_status" value="to_draft" title="WARNING: &#10;if your article is published, when you change it to draft &#10;and want to re-post it later, &#10;it might not go back to 'published' page; &#10;it dependds on the settings in the dashboard!" />
-                            <label for="rd_todraft" title="WARNING: &#10;if your article is published, when you change it to draft &#10;and want to re-post it later, &#10;it might not go back to 'published' page; &#10;it dependds on the settings in the dashboard!">{#KAHUK_Visual_Submit2_Edit_Draft#}</label>
-                        </li>
-                    {/if}
-                {/if}
-
-                <li>
-                    <input type="radio" id="rd_discard" name="change_status" value="discard" />
-                    <label for="rd_discard">{#KAHUK_Visual_Submit2_Edit_Draft_Discard#}
-                </li>
-            </ul> *}
 
             <div class="btn-wrap">
                 <input type="submit" value="{#KAHUK_Visual_Submit2_Continue#}" class="btn btn-primary" />
