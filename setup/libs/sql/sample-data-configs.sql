@@ -1,7 +1,7 @@
 INSERT INTO `---table_config---` (`var_page`, `var_name`, `var_value`, `var_defaultvalue`, `var_optiontext`, `var_title`, `var_desc`, `var_method`, `var_enclosein`) VALUES 
 ('Primary Settings', '_site_name', 'Kahuk', 'Kahuk', '', 'Website name', 'Name  or title of the website', 'option', ''),
 ('Primary Settings', 'allow_registration', 'true', 'true', 'true / false', 'Allow registration?', 'If for a reason you want to suspend registration, permanently or definitely, set it to false!', 'define', ''),
-('Primary Settings', 'maintenance_mode', 'false', 'false', 'true / false', 'Maintenance Mode', 'Set the mode to true when you want to notify the users of the unavailability of the site (upgrade, downtime, etc.)<br /><strong>NOTE that only Admin can still access the site during maintenance mode!</strong>', 'option', ''''),
+('Primary Settings', '_maintenance_mode', 'false', 'false', 'true / false', 'Maintenance Mode', 'Set the mode to true when you want to notify the users of the unavailability of the site (upgrade, downtime, etc.)<br /><strong>NOTE that only Admin can still access the site during maintenance mode!</strong>', 'option', ''),
 ('Email Settings', '_site_email_contact', 'support@domain.com', 'support@domain.com', '', 'Contact Email', 'Contact email address for the website', 'option', ''),
 ('Email Settings', '_site_email_auto', 'auto@domain.com', 'auto@domain.com', '', 'Auto Email', 'Auto email address for the website', 'option', ''),
 ('Email Settings', '_site_email_noreply', 'noreply@domain.com', 'noreply@domain.com', '', 'No reply Email', 'No reply email address for the website', 'option', ''),

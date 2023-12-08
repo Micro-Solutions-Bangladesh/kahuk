@@ -1,4 +1,3 @@
-{if $maintenance_mode eq "true" && $user_level neq 'admin'}{include file=$the_template"/maintenance.tpl"}{else}
 {php}global $hooks;{/php}
 <!DOCTYPE html>
 <html lang="en">
@@ -72,4 +71,3 @@
     {php}$hooks->do_action("snippet_action_tpl", "tpl_kahuk_before_body_end");{/php}
 </body>
 </html>
-{/if}

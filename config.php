@@ -4,6 +4,17 @@ require_once dirname(__FILE__) . "/kahuk-loader.php";
 require_once KAHUKPATH . "kahuk-configs.php";
 require_once KAHUK_INC_DIR . "kahuk-includes.php";
 
+/**
+ * Check maintenance mode
+ */
+$maintenance_mode = is_maintenance_mode();
+
+if ($maintenance_mode) {
+	if (!kahuk_session_user_level("admin")) {
+		include_once(KAHUK_PAGES_DIR . "maintenance.php");
+		exit;
+	}
+}
 
 // Temporary fix for lowercase category // Deleteable after 2022-12-31
 if (isset($_REQUEST["category"])) {

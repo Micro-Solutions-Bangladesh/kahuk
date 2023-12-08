@@ -101,3 +101,14 @@ function kahuk_page_size() {
 }
 
 $page_size = kahuk_page_size();
+
+/**
+ * Check Admin config: _maintenance_mode
+ */
+function is_maintenance_mode() {
+    global $hooks;
+
+    $maintenance_mode = kahuk_get_config("_maintenance_mode");
+
+    return $hooks->apply_filters("is_maintenance", ($maintenance_mode == "true"));
+}
