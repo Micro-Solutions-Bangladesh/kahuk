@@ -74,6 +74,19 @@ global $thetemp, $page_size;
 $thetemp = kahuk_get_config('the_template', 'aowal');
 
 /**
+ * Get the site logo from Admin config
+ * 
+ * @return int
+ */
+function kahuk_site_logo() {
+	global $hooks;
+
+	$site_logo = kahuk_get_config("_site_logo");
+
+	return $hooks->apply_filters("site_logo", $site_logo);
+}
+
+/**
  * Determine Item limit From Admin config
  * Must have a number to display items, we hard coded it 20 when nothing found
  * 

@@ -77,10 +77,7 @@ input[type="radio"] {margin-right:10px;}
 	<fieldset>
         <legend><a href="{$kahuk_base_url}/admin/admin_config.php?page=Logo" target="_blank">Logo, openGraph and Twitter Card</a>:</legend>
         <p>If you want to use a Logo in place of the site's name, click on the title above and configure the Logo, openGraph and Twitter Card</p>
-        <label>Site Logo</label>
-		<select name="use_logo" class="form-control {if $useLogo neq ''}configured{else}notconfigured{/if}">					
-            <option selected>{$useLogo}</option>
-		</select><br />
+
         <label>OpenGraph og:image</label>
 		<select name="use_open_graph" class="form-control {if $useopenGraph neq ''}configured{else}notconfigured{/if}">					
             <option selected>{$useopenGraph}</option>

@@ -94,11 +94,13 @@ function kahuk_get_config($var_name, $default_val = '') {
 
 	$option = isset($globalDBConfs->configs[$var_name]) ? $globalDBConfs->configs[$var_name] : [];
 
+	$output = $default_val;
+
 	if ($option) {
-		return $option['var_value'];
-	} else {
-		return $default_val;
+		$output = $option["var_value"];
 	}
+	
+	return $output;
 }
 
 /**

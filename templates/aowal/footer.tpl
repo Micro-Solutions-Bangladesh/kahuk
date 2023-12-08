@@ -68,9 +68,9 @@
             <h2 class="text-lg font-bold mb-base-half">About {$site_name}</h2>
             {#KAHUK_Visual_What_Is_Kahuk_Text#}
 
-            {if $Default_Site_Logo neq ""}
+            {if $site_logo neq ""}
                 <a class="block py-4" href="{$kahuk_base_url}">
-                    <img class="h-10 mx-auto" src="{$Default_Site_Logo}" alt="{$site_name}">
+                    <img class="h-10 mx-auto" src="{$site_logo}" alt="{$site_name}">
                 </a>
             {/if}
         </div><!-- /.footer-about -->
