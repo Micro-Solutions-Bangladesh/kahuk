@@ -63,9 +63,6 @@ $main_smarty->assign('validateuserPass', $validateuserPass);
 $submitMultiCat = $db->get_var("SELECT `var_value` FROM " . table_config ." WHERE `var_name` = 'Multiple_Categories';");
 $main_smarty->assign('submitMultiCat', $submitMultiCat);
 
-$submitNoURLName = $db->get_var("SELECT `var_value` FROM " . table_config ." WHERE `var_name` = 'No_URL_Name';");
-$main_smarty->assign('submitNoURLName', $submitNoURLName);
-
 // pagename
 define('pagename', 'admin_settings'); 
 $main_smarty->assign('pagename', pagename);
