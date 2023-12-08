@@ -57,7 +57,7 @@ if (
 }
 
 include_once KAHUKPATH . 'kahuk-configs.php';
-include_once KAHUKPATH . 'libs/define_tables.php';
+// include_once KAHUKPATH . 'libs/define_tables.php';
 
 include_once KAHUKPATH . 'setup/libs/db.php';
 

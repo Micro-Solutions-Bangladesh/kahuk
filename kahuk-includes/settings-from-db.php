@@ -7,144 +7,6 @@ if (!defined('KAHUKPATH')) {
 }
 
 /**
- * 
- */
-class KahukDBOptions
-{
-	private $db;
-
-    public $configs = [];
-
-    /**
-     * Class construcotr
-     */
-    private function __construct() {
-		global $db;
-
-		$this->db = $db;
-        $this->get_db_config();
-    }
-
-    /**
-     * Initializes a singleton instance
-     *
-     * @return self instance
-     */
-    public static function init() {
-        static $instance = false;
-
-        if ( ! $instance ) {
-            $instance = new self();
-        }
-
-        return $instance;
-    }
-
-    /**
-     * Get configs from configs table
-     * 
-     * @since 5.0.7
-     * 
-     * @return void
-     */
-    private function get_db_config() {
-		$sql = 'SELECT var_name, var_value, var_method, var_enclosein FROM ' . TABLE_PREFIX . 'config';
-        $rs = $this->db->get_results($sql, ARRAY_A);
-
-		if (!$rs) {
-			die('Error. The ' . TABLE_PREFIX . 'config table is empty or does not exist');
-		}
-
-		foreach ($rs as $row) {
-			$this->configs[$row['var_name']] = $row;
-		}
-    }
-}
-
-
-/**
- * Initializes KahukDBOptions Class
- *
- * @return KahukDBOptions
- */
-function kahuk_db_options_init() {
-    return KahukDBOptions::init();
-}
-
-// Set the global variables to URL
-$globalDBConfs = kahuk_db_options_init();
-
-// echo "<pre class=\"debug\">";
-// print_r($globalDBConfs->configs);
-// echo "</pre>";
-
-
-/**
- * Get the provided config value from the static $globalDBConfs object and return
- * 
- * 
- */
-function kahuk_get_config($var_name, $default_val = '') {
-	global $globalDBConfs;
-
-	$option = isset($globalDBConfs->configs[$var_name]) ? $globalDBConfs->configs[$var_name] : [];
-
-	if ($option) {
-		return $option['var_value'];
-	} else {
-		return $default_val;
-	}
-}
-
-/**
- * Update db config option
- * 
- * @return boolean
- */
-function kahuk_update_config($var_name, $var_val) {
-	global $db;
-
-	$sql = "UPDATE `" . TABLE_PREFIX . "config` SET";
-	$sql .= " var_value  = '" . $db->escape($var_val) . "'";
-	$sql .= " WHERE var_name = '" . sanitize_text_field($var_name) . "'";
-
-	// Execute Query and return
-	$rs = $db->query( $sql );
-
-	if ( 1 == $rs ) {
-        return true;
-    } else {
-		// Take a look if the `var_name` does not exist, create it.
-		$sqlSelect  = "SELECT count(var_name) FROM " . TABLE_PREFIX . "config";
-		$sqlSelect .= " WHERE var_name = '" . $db->escape($var_name) . "'";
-
-		$rs = $db->get_var($sqlSelect);
-
-		if (!$rs) {
-			$sqlInsert  = "INSERT INTO `" . TABLE_PREFIX . "config` SET";
-			$sqlInsert .= " var_name  = '" . $db->escape(sanitize_text_field($var_name)) . "'";
-			$sqlInsert .= ", var_value  = '" . $db->escape(sanitize_text_field($var_val)) . "'";
-			$sqlInsert .= ", var_page  = 'Plugins'";
-			$sqlInsert .= ", var_defaultvalue  = ''";
-			$sqlInsert .= ", var_optiontext  = 'text'";
-			$sqlInsert .= ", var_title  = 'Plugin Settings'";
-			$sqlInsert .= ", var_desc   = 'Plugin desc'";
-			$sqlInsert .= ", var_method  = 'option'";
-			$sqlInsert .= ", var_enclosein  = ''";
-
-			$id = $db->query_insert($sqlInsert);
-
-			if (!$id) {
-				kahuk_log_unexpected( "BOTH Query FAILED:\n---------\n{$sql}\n---------\n{$sqlInsert}");
-        		return false;
-			}
-
-			return true;
-		}        
-    }
-}
-
-/**
  * No Idea, what is the use of these conditional block
  */
 if (caching == 1) {
@@ -212,6 +74,19 @@ global $thetemp, $page_size;
 $thetemp = kahuk_get_config('the_template', 'aowal');
 
 /**
+ * Get the site logo from Admin config
+ * 
+ * @return int
+ */
+function kahuk_site_logo() {
+	global $hooks;
+
+	$site_logo = kahuk_get_config("_site_logo");
+
+	return $hooks->apply_filters("site_logo", $site_logo);
+}
+
+/**
  * Determine Item limit From Admin config
  * Must have a number to display items, we hard coded it 20 when nothing found
  * 
@@ -226,3 +101,14 @@ function kahuk_page_size() {
 }
 
 $page_size = kahuk_page_size();
+
+/**
+ * Check Admin config: _maintenance_mode
+ */
+function is_maintenance_mode() {
+    global $hooks;
+
+    $maintenance_mode = kahuk_get_config("_maintenance_mode");
+
+    return $hooks->apply_filters("is_maintenance", ($maintenance_mode == "true"));
+}

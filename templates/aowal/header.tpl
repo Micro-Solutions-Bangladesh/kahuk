@@ -4,10 +4,10 @@
         <h1 class="logo flex-initial w-auto order-1 py-4" itemscope="itemscope"
             itemtype="http://schema.org/Organization">
             <a class="block" href="{$kahuk_base_url}" itemprop="url" rel="home" title="{$site_name}">
-                {if $Default_Site_Logo eq ""}
+                {if $site_logo eq ""}
                     {$site_name}
                 {else}
-                    <img src="{$Default_Site_Logo}" alt="{$site_name}" class="h-6" />
+                    <img src="{$site_logo}" alt="{$site_name}" class="h-6" />
                 {/if}
             </a>
         </h1>

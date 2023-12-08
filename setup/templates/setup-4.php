@@ -16,7 +16,8 @@ if ($output["status"] == "success") {
         "success"
     );
 
-    kahuk_redirect(KAHUK_BASE_URL);
+    $root_url = (isset( $_SERVER["HTTPS"]) && $_SERVER["HTTPS"] === "on" ? "https" : "http") . "://$_SERVER[HTTP_HOST]";
+    kahuk_redirect($root_url . kahuk_base_path());
 } else {
     die($output["message"]);
 }

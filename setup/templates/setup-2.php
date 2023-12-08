@@ -10,7 +10,7 @@ if (kahuk_has_configs_file()) {
     $settings_check = kahuk_check_db_settings();
 
     if ($settings_check) {
-        kahuk_redirect("./index.php?step=install-1&errors={$settings_check}"); // Redirect to first page
+        kahuk_redirect($redirectTo . "-1&errors={$settings_check}"); // Redirect to first page
     }
 
     $connection_check = kahuk_check_db_connection();

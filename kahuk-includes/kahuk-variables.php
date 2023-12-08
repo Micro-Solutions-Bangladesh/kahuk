@@ -21,14 +21,17 @@ $main_smarty->assign('upname', $upname);
 $pagename = kahuk_get_pagename();
 $main_smarty->assign('pagename', $pagename);
 
-// Check maintenance mode
-$maintenance_mode = kahuk_get_config('maintenance_mode');
-$main_smarty->assign('maintenance_mode', $maintenance_mode);
+// Assign smarty variable: website logo
+$site_logo = kahuk_site_logo();
+$main_smarty->assign("site_logo", $site_logo);
 
+// Assign smarty variable: maintenance mode
+$main_smarty->assign("maintenance_mode", $maintenance_mode);
 
+//
 define('MAX_NUMBER_OF_WORD_STORY_DESC', (int) kahuk_get_config('MAX_NUMBER_OF_WORD_STORY_DESC'));
 
-
+//
 $kahuk_root = kahuk_root_url();
 $main_smarty->assign('kahuk_root', $kahuk_root);
 

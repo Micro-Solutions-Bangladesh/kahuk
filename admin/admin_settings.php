@@ -44,8 +44,8 @@ $passSMTP = kahuk_get_config("_smtp_pass");
 $main_smarty->assign('passSMTP', $passSMTP);
 
 //Logo, openGraph and Twitter Card
-$useLogo = $db->get_var("SELECT `var_value` FROM " . table_config ." WHERE `var_name` = 'Default_Site_Logo';");
-$main_smarty->assign('useLogo', $useLogo);
+// $useLogo = $db->get_var("SELECT `var_value` FROM " . table_config ." WHERE `var_name` = 'Default_Site_Logo';");
+// $main_smarty->assign('useLogo', $useLogo);
 
 $useopenGraph = $db->get_var("SELECT `var_value` FROM " . table_config ." WHERE `var_name` = 'Default_Site_OG_Image';");
 $main_smarty->assign('useopenGraph', $useopenGraph);
