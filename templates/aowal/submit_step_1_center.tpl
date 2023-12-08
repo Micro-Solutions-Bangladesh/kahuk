@@ -1,7 +1,7 @@
 {php}global $hooks;{/php}
 <div class="main-content col mt-base">
     {if $Enable_Submit  neq '1'}
-        <div class="alert alert-danger">{$disable_Submit_message}</div>
+        <div class="alert alert-danger">Submitting stories is temporarily disabled!</div>
     {else}
         <h1 class="story-title">{#KAHUK_Visual_Submit1_Header#}</h1>
 
