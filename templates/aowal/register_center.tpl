@@ -1,7 +1,7 @@
 {php}global $hooks;{/php}
 <div class="main-content col mt-base">
     {if $allow_registration neq '1'}
-        <div class="alert alert-error">{$disallow_registration_message}</div>
+        <div class="alert alert-error">Registration is temporarily suspended!</div>
     {else}
         {* TODO: work for the $validate_password feature *}
 
