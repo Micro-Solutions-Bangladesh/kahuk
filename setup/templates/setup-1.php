@@ -1,4 +1,18 @@
 <?php
+if (kahuk_has_configs_file()) {
+    echo kahuk_create_markup_message(
+        "File <code>/kahuk-configs.php</code> is exist!",
+        "info"
+    );
+
+    kahuk_set_session_message(
+        "You need to delete the <code>/kahuk-configs.php</code> file to continue the setup steps.",
+        "warning"
+    );
+
+    kahuk_redirect($redirectTo);
+}
+
 global $messagesArray;
 
 include_once(KAHUKPATH . "setup/templates/header.php");

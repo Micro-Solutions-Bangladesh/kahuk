@@ -209,3 +209,14 @@ ini_set('include_path', '.');
 // 1 = on
 define('caching', 1);
 define('summarize_mysql', 1);
+
+//
+require_once KAHUK_INC_DIR . 'php-hooks.php';
+
+//
+require_once KAHUK_LIBS_DIR . 'db.php';
+include_once KAHUK_LIBS_DIR . 'define_tables.php';
+include_once KAHUK_INC_DIR . 'db-configs.php';
+
+//
+require_once KAHUK_LIBS_DIR . 'kahuk-mailer.php';

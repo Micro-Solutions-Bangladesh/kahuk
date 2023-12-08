@@ -1,7 +1,4 @@
 <?php
-//
-require_once KAHUK_INC_DIR . 'php-hooks.php';
-
 // 
 global $kahukPlugins, $pluginsInstalledArray;
 
@@ -38,11 +35,6 @@ if (KAHUK_DEBUG) {
 }
 
 //
-require_once KAHUK_LIBS_DIR . 'kahuk-mailer.php';
-
-//
-require_once KAHUK_LIBS_DIR . 'db.php';
-include_once KAHUK_LIBS_DIR . 'define_tables.php';
 include_once KAHUK_INC_DIR . 'settings-from-db.php';
 
 //
