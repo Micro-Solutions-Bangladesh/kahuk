@@ -28,7 +28,6 @@ INSERT INTO `---table_config---` (`var_page`, `var_name`, `var_value`, `var_defa
 ('Story', 'link_nofollow', 'true', 'true', 'true / false', 'Use rel="nofollow"', 'nofollow is a value that can be assigned to the rel attribute of an HTML a element to instruct some search engines that the hyperlink should not influence the ranking of the link''s target in the search engine''s index.<br /><a href="https://support.google.com/webmasters/answer/96569?hl=en" target="_blank" rel="noopener noreferrer">Google: policies</a>', 'define', NULL),
 ('Comments', '_enable_comments', 'true', 'true', 'true / false', 'Allow Comments', 'Allow users to comment on articles?', 'option', NULL),
 ('Comments', '_max_no_char_comment', '1200', '1200', 'number', 'Maximum Comment Length', 'Maximum number of characters for the comment.', 'option', NULL),
-('Voting', 'votes_to_publish', '5', '5', 'number', 'Votes to publish', 'Number of votes before story is sent to the front page.', 'define', NULL),
 ('Voting', 'days_to_publish', '10', '10', 'number', 'Days to publish', 'After this many days posts will not be eligible to move from new to published pages', 'define', NULL),
 ('Voting', 'Voting_Method', '1', '1', '1-3', 'Voting Method', '<strong>1</strong> = Up and Down Voting<br /> <strong>2</strong> = 5 Star Ratings<br /><strong>3</strong> = Karma', 'define', NULL),
 ('Voting', 'rating_to_publish', '3', '3', 'number', 'Rating To Publish', 'How many star rating votes will publish a story? For use with Voting Method 2.', 'define', NULL),
