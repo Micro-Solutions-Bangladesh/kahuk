@@ -1,13 +1,13 @@
 <?php
-require_once dirname(__FILE__) . '/kahuk-loader.php';
+require_once dirname(__FILE__) . "/kahuk-loader.php";
 
-require_once KAHUKPATH . 'kahuk-configs.php';
-require_once KAHUK_INC_DIR . 'kahuk-includes.php';
+require_once KAHUKPATH . "kahuk-configs.php";
+require_once KAHUK_INC_DIR . "kahuk-includes.php";
 
 
 // Temporary fix for lowercase category // Deleteable after 2022-12-31
-if (isset($_REQUEST['category'])) {
-	$_REQUEST['category'] = strtolower($_REQUEST['category']);
+if (isset($_REQUEST["category"])) {
+	$_REQUEST["category"] = strtolower($_REQUEST["category"]);
 }
 
 /**
@@ -17,14 +17,14 @@ if ($main_smarty) {
 	$get = array();
 
 	foreach ($_GET as $k => $v) {
-		$get[$k] = stripslashes(htmlentities(strip_tags($v), ENT_QUOTES, 'UTF-8'));
+		$get[$k] = stripslashes(htmlentities(strip_tags($v), ENT_QUOTES, "UTF-8"));
 	}
 
-	if (isset($get['return'])) {
-		$get['return'] = addslashes($get['return']);
+	if (isset($get["return"])) {
+		$get["return"] = addslashes($get["return"]);
 	}
 
-	$main_smarty->assign('get', $get);
+	$main_smarty->assign("get", $get);
 }
 
 // CSFR/XSFR protection (function check_referrer in /libs/html1.php)
@@ -32,17 +32,17 @@ if (!isset($_SESSION)) {
 	@session_start();
 }
 
-if (!empty($_SESSION['xsfr'])) {
+if (!empty($_SESSION["xsfr"])) {
 	$xsfr_first_page = 0;
 } else {
 	$xsfr_first_page = 1;
-	$_SESSION['xsfr'] = 1;
+	$_SESSION["xsfr"] = 1;
 }
 
 //
 function sanit($var)
 {
-	return addslashes(htmlentities(strip_tags($var), ENT_QUOTES, 'UTF-8'));
+	return addslashes(htmlentities(strip_tags($var), ENT_QUOTES, "UTF-8"));
 }
 
 
@@ -68,17 +68,17 @@ if (!is_readable($the_template_path)) {
 	exit;
 }
 
-define('THE_TEMPLATE', $thetemp);
+define("THE_TEMPLATE", $thetemp);
 
 // Don't touch behind this
 //Redwine: this means if there's a settings local.php file, read and include everything in that file now.
-$local_configuration = $_SERVER['SERVER_NAME'] . '-local.php';
+$local_configuration = $_SERVER["SERVER_NAME"] . "-local.php";
 @include($local_configuration);
 
 
 // start summarization and caching of mysql data
 if (caching == 1) {
-	$db->cache_dir = KAHUKPATH . 'cache';
+	$db->cache_dir = KAHUKPATH . "cache";
 	$db->use_disk_cache = true;
 	$db->cache_queries = true;
 }
@@ -118,7 +118,7 @@ ob_start();
  * if no matter what, the language file does not exist, the we throw an error and kill the script.
  * Otherwise, we define the language as KAHUK_LANG.
  *************************************/
-if (!file_exists(dirname(__FILE__) . '/languages/lang_' . KAHUK_LANG . '.conf')) {
+if (!file_exists(dirname(__FILE__) . "/languages/lang_" . KAHUK_LANG . ".conf")) {
 	$output .= '<div id="wrapper" style="width:800px;padding:10px;background-color:#FFC6C6;border:1px solid #000;color:#000;display:block;margin-left:auto;margin-right:auto;">';
 	$output .= 'The language file /languages/lang_' . KAHUK_LANG . '.conf does not exist. Either this file is missing or the server does not have permission to read it. Make sure that you renamed the file /languages/lang_' . KAHUK_LANG . '.conf.default to /languages/lang_' . KAHUK_LANG . '.conf.</div>';
 
@@ -126,7 +126,7 @@ if (!file_exists(dirname(__FILE__) . '/languages/lang_' . KAHUK_LANG . '.conf'))
 }
 
 
-include KAHUK_LIBS_DIR . 'utf8/utf8.php';
+include KAHUK_LIBS_DIR . "utf8/utf8.php";
 
 /** */
 function loadCategoriesForCache($clear_cache = false)
@@ -142,5 +142,5 @@ function loadCategoriesForCache($clear_cache = false)
 	return $db->get_results($sql);
 }
 
-include_once(KAHUK_INC_DIR . 'kahuk-variables.php');
+include_once(KAHUK_INC_DIR . "kahuk-variables.php");
 
