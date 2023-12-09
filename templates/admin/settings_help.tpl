@@ -92,11 +92,6 @@ input[type="radio"] {margin-right:10px;}
 	<fieldset>
         <legend><a href="{$kahuk_base_url}/admin/admin_config.php?page=Misc" target="_blank">Miscellaneous Settings</a>:</legend>
         <p>To set or change any of these settings, click on the title above. It is recommended to set the following settings:</p>
-        <label>Validate user email</label>
-        <p>By default, it is set to false. If you set it to true, then you have to have a site's email configured.</p>
-		<select name="validate_userEmail" class="form-control {if $validateuserEmail eq 'true'}configured{else}notconfigured{/if}">					
-            <option selected>{$validateuserEmail}</option>
-		</select><br />
         <label>Validate user password</label>
         <p>By default, it is set to true. If you want to deactivate this feature, then set it to false (not recommended)<br />When registering/password reset, it checks if the password is safe and not pwned, using "Have I Been Pwned?" database.<br />If the provided password has been pwned, the registration is not submitted until they provide a different password!<br />Yoiu really don't want users to register with hacked passwords; it will be very easy to hack their accounts and Spam your site!</p>
 		<select name="validate_userPass" class="form-control {if $validateuserPass eq 'true'}configured{else}notconfigured{/if}">					
