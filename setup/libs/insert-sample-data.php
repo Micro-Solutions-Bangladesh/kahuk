@@ -62,9 +62,7 @@ function kahuk_insert_sample_data() {
 	$stmt = str_replace("---table_config---", table_config, $stmt);
 
     // $base_path = kahuk_base_path();
-    $stmt = str_replace("___base_path___", my_kahuk_base, $stmt);
-
-    $sql = str_replace("---table_prefix---", TABLE_PREFIX, $stmt);
+    $sql = str_replace("___base_path___", my_kahuk_base, $stmt);
 
 	_kahuk_insert_sample_data($sql, table_config);
 
