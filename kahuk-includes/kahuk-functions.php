@@ -5,7 +5,7 @@
  * @return string
  */
 function kahuk_version($isNumber = false) {
-	return ($isNumber ? "600" : "6.0.0");
+	return ($isNumber ? "604" : "6.0.4");
 }
 
 /**
