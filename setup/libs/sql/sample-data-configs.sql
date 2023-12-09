@@ -39,7 +39,6 @@ INSERT INTO `---table_config---` (`var_page`, `var_name`, `var_value`, `var_defa
 ('Groups', 'group_submit_level', 'normal', 'normal', 'normal,moderator,admin', 'Group Create User Level', 'Minimum user level to create new groups', 'define', 'NULL'),
 ('Groups', '_avatar_group_medium', '___base_path___/resources/images/avatar-group-medium.png', '/resources/images/avatar-group-medium.png', '', 'Default avatar (medium) image for group', 'Default medium avatar for group.', 'option', ''),
 ('Groups', '_avatar_group_small', '___base_path___/resources/images/avatar-group-small.png', '/resources/images/avatar-group-small.png', '', 'Default avatar (small) image for group', 'Default small avatar for group.', 'option', ''),
-('Avatars', 'max_avatar_size', '200', '200KB', 'number', 'Maximum image size allowed to upload', 'Set the maximum image size a user can upload.', 'define', ''''),
 ('Avatars', 'Default_Gravatar_Small', '___base_path___/avatars/Avatar_32.png', '/avatars/Avatar_32.png', 'Path to image', 'Default avatar (small)', 'Default location of small gravatar.', 'define', ''''),
 ('Avatars', 'Avatar_Large', '100', '100', 'number', 'Large Avatar Size', 'Size of the large avatars in pixels (both width and height). Commonly used on the profile page.', 'define', NULL),
 ('Avatars', 'Avatar_Small', '32', '32', 'number', 'Small Avatar Size', 'Size of the small avatar in pixels (both width and height). Commonly used in the comments page.', 'define', NULL),
