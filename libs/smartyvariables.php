@@ -46,7 +46,6 @@ if ($current_user->authenticated == true) {
 }
 
 $main_smarty->assign('user_authenticated', $current_user->authenticated);
-$main_smarty->assign('Voting_Method', Voting_Method);
 $main_smarty->assign('kahuk_base_url', KAHUK_BASE_URL);
 $main_smarty->assign('my_base_url', my_base_url);
 $main_smarty->assign('my_kahuk_base', my_kahuk_base);
