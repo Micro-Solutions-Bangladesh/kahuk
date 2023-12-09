@@ -50,7 +50,6 @@ INSERT INTO `---table_config---` (`var_page`, `var_name`, `var_value`, `var_defa
 ('Misc', '_story_status_page_total', '0', '0', 'text', 'Total page stories', 'Number of pages', 'option', NULL),
 ('Misc', '_story_status_draft_total', '0', '0', 'text', 'Total draft', 'Number of drafts', 'option', NULL),
 ('Misc', 'trackback_url', 'kahuk.com', 'kahuk.com', 'kahuk.com', 'Trackback URL', 'The url to be used in <a href="http://en.wikipedia.org/wiki/Trackback">trackbacks</a>.', 'option', '"'),
-('Misc', 'SearchMethod', '3', '3', '1 - 3', 'Search Method', '<strong>1</strong> = uses MySQL MATCH for FULLTEXT indexes (or something). Problems are MySQL STOP words and words less than 4 characters. Note: these limitations do not affect clicking on a TAG to search by it.\r\n<br /><strong>2</strong> = uses MySQL LIKE and is much slower, but returns better results. Also supports "*" and "-"\r\n<br /><strong>3</strong> = is a hybrid, using method 1 if possible, but method 2 if needed.', 'define', NULL),
 ('Misc', '$dblang', 'en', 'en', 'Text', 'Database Language', 'Database language.<br /><strong style=\"color:#ff0000;\">DO NOT CHANGE THIS VALUE "en" IT WILL MESS UP THE URLS OF THE CATEGORIES!</STRONG>', 'normal', ''''),
 ('Misc', 'page_size', '8', '8', 'number', 'Page Size', 'How many stories to show on a page.', 'option', NULL),
 ('Misc', 'table_prefix', '---table_prefix---', 'kahuk_', 'Text', 'MySQL Table Prefix', 'Table prefix. Ex: kahuk_ makes the users table become kahuk_users. Note: changing this will not automatically rename your tables!', 'define', ''''),

@@ -56,7 +56,6 @@ $group_submit_level = group_submit_level;
 if(group_submit_level == $current_user_level || group_submit_level == 'normal' || $current_user_level == 'admin')
 	$main_smarty->assign('group_allow', 1);
 
-$main_smarty->assign('SearchMethod', SearchMethod);
 $main_smarty = SetSmartyURLs($main_smarty);
 
 if ($main_smarty->get_template_vars('tpl_center')) {
