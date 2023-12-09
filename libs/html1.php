@@ -39,7 +39,7 @@ function get_category_id($cat_name)
  */
 function get_category_name($cat_id)
 {
-	global $dblang, $the_cats;
+	global $the_cats;
 
 	foreach ($the_cats as $cat) {
 		if ($cat->category_id == $cat_id) {
@@ -79,7 +79,7 @@ function category_display()
 
 function cat_safe_name($cat_id)
 {
-	global $dblang, $the_cats;
+	global $the_cats;
 
 	foreach ($the_cats as $cat) {
 		if ($cat->category_id == $cat_id) {
@@ -220,7 +220,7 @@ function latest_avatar($client_url, $server_path)
 function do_sidebar($var_smarty, $navwhere = '')
 {
 	// show the categories in the sidebar
-	global $db, $dblang, $globals, $the_cats;
+	global $db, $globals, $the_cats;
 
 	if ($navwhere == '') {
 		global $navwhere;

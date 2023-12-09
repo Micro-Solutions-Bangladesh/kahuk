@@ -30,8 +30,6 @@ if(isset($_GET['category']) && sanitize($_GET['category'], 3) != ''){$main_smart
 if(isset($_GET['search']) && sanitize($_GET['search'], 3) != ''){$main_smarty->assign('request_search', sanitize($_GET['search'], 3));}
 if(isset($_POST['username']) && sanitize($_POST['username'], 0) != ''){$main_smarty->assign('login_username', sanitize($_POST['username'], 0));}
 
-$main_smarty->assign('dblang', $dblang);
-// $main_smarty->assign('kahuk_language', KAHUK_LANG);
 $main_smarty->assign('user_logged_in', $current_user->user_login);
 $main_smarty->assign('user_id', $current_user->user_id);
 

@@ -50,7 +50,6 @@ INSERT INTO `---table_config---` (`var_page`, `var_name`, `var_value`, `var_defa
 ('Misc', '_story_status_page_total', '0', '0', 'text', 'Total page stories', 'Number of pages', 'option', NULL),
 ('Misc', '_story_status_draft_total', '0', '0', 'text', 'Total draft', 'Number of drafts', 'option', NULL),
 ('Misc', 'trackback_url', 'kahuk.com', 'kahuk.com', 'kahuk.com', 'Trackback URL', 'The url to be used in <a href="http://en.wikipedia.org/wiki/Trackback">trackbacks</a>.', 'option', '"'),
-('Misc', '$dblang', 'en', 'en', 'Text', 'Database Language', 'Database language.<br /><strong style=\"color:#ff0000;\">DO NOT CHANGE THIS VALUE "en" IT WILL MESS UP THE URLS OF THE CATEGORIES!</STRONG>', 'normal', ''''),
 ('Misc', 'page_size', '8', '8', 'number', 'Page Size', 'How many stories to show on a page.', 'option', NULL),
 ('Misc', 'table_prefix', '---table_prefix---', 'kahuk_', 'Text', 'MySQL Table Prefix', 'Table prefix. Ex: kahuk_ makes the users table become kahuk_users. Note: changing this will not automatically rename your tables!', 'define', ''''),
 ('Misc', 'misc_validate', 'false', 'false', 'true / false', 'Validate user email', 'Require users to validate their email address?<br />If you set to true, then click on the link below to also set the email to be used for sending the message.<br /><a href="../module.php?module=admin_language">Set the email</a>. Type @ in the filter box and click Filter to get the value to modify. Do not forget to click save.', 'define', ''),

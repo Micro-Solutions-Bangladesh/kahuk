@@ -2,7 +2,6 @@
 /**
  * 
  */
-$dblang = 'en';
 $site_name = kahuk_site_name();
 $main_smarty->assign('site_name', $site_name);
 

@@ -60,8 +60,6 @@ function kahuk_create_table( $query, $table_name ) {
  * @return void
  */
 function kahuk_create_primary_tables() {
-    $dblang = 'en';
-
     // ALTER TABLE database_name.table_name ENGINE=InnoDB;
     $dbEngine = "InnoDB"; // "MyISAM";
 
