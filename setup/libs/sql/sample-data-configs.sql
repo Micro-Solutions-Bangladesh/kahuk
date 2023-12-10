@@ -64,6 +64,12 @@ INSERT INTO `---table_config---` (
     'normal'
 ),
 (
+    'Misc', '_kahuk_cms_version', '604,6.0.4', '', 'text', 
+    'Kahuk Version', 
+    'Version of Kahuk CMS<br>Please do not edit this (if you are not expert in Kahuk CMS).', 
+    'option'
+),
+(
     'Plugins', 'plugins_installed', 'snippets', '', 'text', 
     'Installed Plugins', 'CSV list of installed plugins.', 'option'
 );
