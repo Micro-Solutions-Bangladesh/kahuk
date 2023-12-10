@@ -38,16 +38,10 @@ foreach ($globalDBConfs->configs as $row) {
 
 		$thenewval = $value;
 
-		if ($row['var_enclosein'] == "") {
-			if ($value == "true") {
-				$thenewval = true;
-			} elseif ($value == "false") {
-				$thenewval = false;
-			} else {
-				$thenewval = $value;
-			}
-		} else {
-			$thenewval = $value;
+		if ($value == "true") {
+			$thenewval = true;
+		} elseif ($value == "false") {
+			$thenewval = false;
 		}
 
 		define($row['var_name'], $thenewval);
