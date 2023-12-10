@@ -43,9 +43,7 @@ $main_smarty->assign('portSMTP', $portSMTP);
 $passSMTP = kahuk_get_config("_smtp_pass");
 $main_smarty->assign('passSMTP', $passSMTP);
 
-//Logo, openGraph and Twitter Card
-// $useLogo = $db->get_var("SELECT `var_value` FROM " . table_config ." WHERE `var_name` = 'Default_Site_Logo';");
-// $main_smarty->assign('useLogo', $useLogo);
+
 
 $useopenGraph = $db->get_var("SELECT `var_value` FROM " . table_config ." WHERE `var_name` = 'Default_Site_OG_Image';");
 $main_smarty->assign('useopenGraph', $useopenGraph);
@@ -53,24 +51,11 @@ $main_smarty->assign('useopenGraph', $useopenGraph);
 $useTwittercard = $db->get_var("SELECT `var_value` FROM " . table_config ." WHERE `var_name` = 'Default_Site_Twitter_Image';");
 $main_smarty->assign('useTwittercard', $useTwittercard);
 
-//Misc settings
-$validateuserEmail = $db->get_var("SELECT `var_value` FROM " . table_config ." WHERE `var_name` = 'misc_validate';");
-$main_smarty->assign('validateuserEmail', $validateuserEmail);
-
 $validateuserPass = $db->get_var("SELECT `var_value` FROM " . table_config ." WHERE `var_name` = 'validate_password';");
 $main_smarty->assign('validateuserPass', $validateuserPass);
 
-$submitDraft = $db->get_var("SELECT `var_value` FROM " . table_config ." WHERE `var_name` = 'Allow_Draft';");
-$main_smarty->assign('submitDraft', $submitDraft);
-
-$submitScheduled = $db->get_var("SELECT `var_value` FROM " . table_config ." WHERE `var_name` = 'Allow_Scheduled';");
-$main_smarty->assign('submitScheduled', $submitScheduled);
-
 $submitMultiCat = $db->get_var("SELECT `var_value` FROM " . table_config ." WHERE `var_name` = 'Multiple_Categories';");
 $main_smarty->assign('submitMultiCat', $submitMultiCat);
-
-$submitNoURLName = $db->get_var("SELECT `var_value` FROM " . table_config ." WHERE `var_name` = 'No_URL_Name';");
-$main_smarty->assign('submitNoURLName', $submitNoURLName);
 
 // pagename
 define('pagename', 'admin_settings'); 

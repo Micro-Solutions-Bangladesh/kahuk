@@ -53,7 +53,7 @@ class KahukDBOptions
      * @return void
      */
     private function get_db_config() {
-		$sql = 'SELECT var_name, var_value, var_method, var_enclosein FROM ' . TABLE_PREFIX . 'config';
+		$sql = 'SELECT var_name, var_value, var_method FROM ' . TABLE_PREFIX . 'config';
         $rs = $this->db->get_results($sql, ARRAY_A);
 
 		if (!$rs) {
@@ -137,7 +137,6 @@ function kahuk_update_config($var_name, $var_val) {
 			$sqlInsert .= ", var_title  = 'Plugin Settings'";
 			$sqlInsert .= ", var_desc   = 'Plugin desc'";
 			$sqlInsert .= ", var_method  = 'option'";
-			$sqlInsert .= ", var_enclosein  = ''";
 
 			$id = $db->query_insert($sqlInsert);
 

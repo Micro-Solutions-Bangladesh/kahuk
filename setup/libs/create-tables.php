@@ -60,8 +60,6 @@ function kahuk_create_table( $query, $table_name ) {
  * @return void
  */
 function kahuk_create_primary_tables() {
-    $dblang = 'en';
-
     // ALTER TABLE database_name.table_name ENGINE=InnoDB;
     $dbEngine = "InnoDB"; // "MyISAM";
 
@@ -169,8 +167,7 @@ function kahuk_create_primary_tables() {
             `var_optiontext` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
             `var_title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
             `var_desc` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-            `var_method` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-            `var_enclosein` varchar(5) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL
+            `var_method` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
         ) {$dbSettings};
     ";
 

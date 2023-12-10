@@ -92,11 +92,6 @@ input[type="radio"] {margin-right:10px;}
 	<fieldset>
         <legend><a href="{$kahuk_base_url}/admin/admin_config.php?page=Misc" target="_blank">Miscellaneous Settings</a>:</legend>
         <p>To set or change any of these settings, click on the title above. It is recommended to set the following settings:</p>
-        <label>Validate user email</label>
-        <p>By default, it is set to false. If you set it to true, then you have to have a site's email configured.</p>
-		<select name="validate_userEmail" class="form-control {if $validateuserEmail eq 'true'}configured{else}notconfigured{/if}">					
-            <option selected>{$validateuserEmail}</option>
-		</select><br />
         <label>Validate user password</label>
         <p>By default, it is set to true. If you want to deactivate this feature, then set it to false (not recommended)<br />When registering/password reset, it checks if the password is safe and not pwned, using "Have I Been Pwned?" database.<br />If the provided password has been pwned, the registration is not submitted until they provide a different password!<br />Yoiu really don't want users to register with hacked passwords; it will be very easy to hack their accounts and Spam your site!</p>
 		<select name="validate_userPass" class="form-control {if $validateuserPass eq 'true'}configured{else}notconfigured{/if}">					
@@ -113,35 +108,15 @@ input[type="radio"] {margin-right:10px;}
 {*Submit settings*}
 	<fieldset>
         <legend><a href="{$kahuk_base_url}/admin/admin_config.php?page=Submit" target="_blank">Submit Settings</a>:</legend>
-        <label>Allow Draft Articles?</label>
-        <p>Under Submit Settings, Admins can enable submitting <strong><u>Draft</u></strong> stories that can later be published, by the author,  manually by changing the status of the story.</p>
-        <select name="submitDraft" class="form-control {if $submitDraft eq true}configured{else}notconfigured{/if}">					
-            <option selected>{$submitDraft}</option>
-		</select><br />
-        <label>Allow Scheduled Articles?</label>
-         <p>Under Submit Settings, Admins can enable submitting <strong><u>Scheduled</u></strong> stories that can later be published, by the author,  manually by changing the status of the story.</p>
-        <select name="submitScheduled" class="form-control {if $submitScheduled eq true}configured{else}notconfigured{/if}">					
-            <option selected>{$submitScheduled}</option>
-		</select><br />
         <label>Allow multiple categories</label>
          <p>Under Submit Settings, Admins can enable multiple categories for the stories.</p>
         <select name="submitMultiCat" class="form-control {if $submitMultiCat eq true}configured{else}notconfigured{/if}">					
             <option selected>{$submitMultiCat}</option>
 		</select><br />
-        <label>Require a URL when Submitting</label>
-         <p>Under Submit Settings, Require a URL when Submitting is by default set to true. Admins can set it to false to allow both Editorial and URL story submitting. <strong>NOTE THAT IF YOU WANT BOTH OPTIONS, YOU HAVE TO KEEP THE BELOW SETTING (Show the URL Input Box) SET TO TRUE. HOWEVER, IF YOU WANT ONLY EDITORIAL STORIES, THEN SET IT TO FALSE!</strong></p>
-        <select name="submitRequireURL" class="form-control {if $submitRequireURL eq true}configured{else}notconfigured{/if}">					
-            <option selected>{$submitRequireURL}</option>
-		</select><br />
         <label>Show the URL Input Box</label>
          <p>Under Submit Settings, Show the URL Input Box is by default set to true. <strong>SET TO FALSE IF YOU ONLY WANT EDITORIAL STORIES! (REQUIRE THAT THE ABOVE SETTING "Require a URL when Submitting" BE SET TO FALSE)</strong></p>
         <select name="submitShowURL" class="form-control {if $submitShowURL eq true}configured{else}notconfigured{/if}">					
             <option selected>{$submitShowURL}</option>
-		</select><br />
-        <label>No URL text</label>
-         <p>Under Submit Settings, if "Require a URL when Submitting" is set to false, the Label to show in place of the URL in the Story toolsbar is "Editorial". Admins can change it to fit their needs!</strong></p>
-        <select name="submitNoURLName" class="form-control configured">					
-            <option selected>{$submitNoURLName}</option>
 		</select>
     </fieldset>
     

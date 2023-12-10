@@ -5,7 +5,9 @@
  * @return string
  */
 function kahuk_version($isNumber = false) {
-	return ($isNumber ? "600" : "6.0.0");
+	$version =  kahuk_csv_to_array(kahuk_get_config("_kahuk_cms_version"));
+
+	return ($isNumber ? $version[0] : $version[1]);
 }
 
 /**

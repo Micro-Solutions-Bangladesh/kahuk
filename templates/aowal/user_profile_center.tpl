@@ -105,7 +105,6 @@
                 </div>
             {/if}
 
-            {* TODO Delete Allow_Friends config *}
             <div id="following" class="col-12 md:col-6 my-4">
                 <h3 class="block-header">{#KAHUK_LANG_FOLLOWING#}</h3>
                 <div class="box-content py-base-half">

@@ -30,9 +30,6 @@ if(isset($_GET['category']) && sanitize($_GET['category'], 3) != ''){$main_smart
 if(isset($_GET['search']) && sanitize($_GET['search'], 3) != ''){$main_smarty->assign('request_search', sanitize($_GET['search'], 3));}
 if(isset($_POST['username']) && sanitize($_POST['username'], 0) != ''){$main_smarty->assign('login_username', sanitize($_POST['username'], 0));}
 
-$main_smarty->assign('votes_per_ip', votes_per_ip);
-$main_smarty->assign('dblang', $dblang);
-// $main_smarty->assign('kahuk_language', KAHUK_LANG);
 $main_smarty->assign('user_logged_in', $current_user->user_login);
 $main_smarty->assign('user_id', $current_user->user_id);
 
@@ -46,11 +43,9 @@ if ($current_user->authenticated == true) {
 }
 
 $main_smarty->assign('user_authenticated', $current_user->authenticated);
-$main_smarty->assign('Voting_Method', Voting_Method);
 $main_smarty->assign('kahuk_base_url', KAHUK_BASE_URL);
 $main_smarty->assign('my_base_url', my_base_url);
 $main_smarty->assign('my_kahuk_base', my_kahuk_base);
-$main_smarty->assign('Allow_Friends', Allow_Friends);
 
 //groups
 $main_smarty->assign('enable_group', enable_group);
@@ -59,7 +54,6 @@ $group_submit_level = group_submit_level;
 if(group_submit_level == $current_user_level || group_submit_level == 'normal' || $current_user_level == 'admin')
 	$main_smarty->assign('group_allow', 1);
 
-$main_smarty->assign('SearchMethod', SearchMethod);
 $main_smarty = SetSmartyURLs($main_smarty);
 
 if ($main_smarty->get_template_vars('tpl_center')) {
