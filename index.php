@@ -11,7 +11,5 @@ include $loadablePage;
 //
 $main_smarty->assign("action_messages", $action_messages);
 
-echo "<pre>Kahuk Version: " . kahuk_version() . ";" . kahuk_version(true) . "</pre>";
-
 // show the template
 $main_smarty->display($the_template . "/kahuk.tpl");
