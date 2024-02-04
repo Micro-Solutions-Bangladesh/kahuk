@@ -89,7 +89,7 @@ $globalDBConfs = kahuk_db_options_init();
  * 
  * 
  */
-function kahuk_get_config($var_name, $default_val = '') {
+function kahuk_get_config($var_name, $default_val = "", $type_cast = "") {
 	global $globalDBConfs;
 
 	$option = isset($globalDBConfs->configs[$var_name]) ? $globalDBConfs->configs[$var_name] : [];
@@ -99,7 +99,13 @@ function kahuk_get_config($var_name, $default_val = '') {
 	if ($option) {
 		$output = $option["var_value"];
 	}
-	
+
+	if ($type_cast) {
+		if ($type_cast == "boolean") {
+			$output = (($output == "true") || ($output == "yes") || ($output == "1"));
+		}
+	}
+
 	return $output;
 }
 

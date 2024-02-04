@@ -6,7 +6,12 @@ INSERT INTO `---table_config---` (
     'Primary Settings', '_site_name', 'Kahuk', 'Kahuk', '', 
     'Website name', 'Name  or title of the website', 'option'
 ),
-('Primary Settings', 'allow_registration', 'true', 'true', 'true / false', 'Allow registration?', 'If for a reason you want to suspend registration, permanently or definitely, set it to false!', 'define'),
+(
+    'Primary Settings', '_registration_disable', 'false', 'false', 
+    'true / false', 'Disable registration?', 
+    'If for a reason you want to disable registration feature, set it to true!', 
+    'option'
+),
 ('Primary Settings', '_maintenance_mode', 'false', 'false', 'true / false', 'Maintenance Mode', 'Set the mode to true when you want to notify the users of the unavailability of the site (upgrade, downtime, etc.)<br /><strong>NOTE that only Admin can still access the site during maintenance mode!</strong>', 'option'),
 ('Email Settings', '_site_email_contact', 'support@domain.com', 'support@domain.com', '', 'Contact Email', 'Contact email address for the website', 'option'),
 ('Email Settings', '_site_email_auto', 'auto@domain.com', 'auto@domain.com', '', 'Auto Email', 'Auto email address for the website', 'option'),

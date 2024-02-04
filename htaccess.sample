@@ -18,11 +18,11 @@ RewriteRule ^ads.txt?$ ads.txt [L]
 RewriteRule ^sellers.json?$ sellers.json [L]
 
 ## Avoid rewriting rules for the admin section
-RewriteRule ^(admin|resources)($|/) - [L]
+RewriteRule ^(upgrades|admin|resources)($|/) - [L]
 
 ## 
 RewriteCond %{THE_REQUEST} \s/+(.+?)\.php[\s?] [NC]
-RewriteRule !^admin/ /%1 [R=301,NE,L,NC]
+RewriteRule !^(upgrades|admin)/ /%1 [R=301,NE,L,NC]
 
 ## Set Ajax Request File
 RewriteRule ^(kahuk-ajax)/?$ $1.php [L,QSA]

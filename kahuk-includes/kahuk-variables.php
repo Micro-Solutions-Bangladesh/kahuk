@@ -188,7 +188,10 @@ define('allowed_html_tags', $allowed_html_tags);
 
 $main_smarty->assign('login_special_attribute', $login_special_attribute);
 
-
+/**
+ *  Create few variables from DB
+ */
+$registration_disable = kahuk_get_config("_registration_disable", "false", "boolean");
 
 /**
  * Check for session messages
