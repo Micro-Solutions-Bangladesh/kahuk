@@ -103,6 +103,44 @@ function kahuk_error_log_file_path($log_type = 'error') {
 }
 
 /**
+ * Type casting data
+ * 
+ * @since 6.0.5
+ * 
+ * @return mixed The result.
+ */
+function kahuk_type_cast($data, $type = "") {
+	$output = "";
+
+	if ($type) {
+		if ($type == "boolean") {
+			$output = (($data == "true") || ($data == "yes") || ($data == "1"));
+		} else if ($type == "numeric") {
+			$output = (int) $data;
+		}
+	}
+
+    return $output;
+}
+
+/**
+ * Returns either a Constant value or the default
+ * 
+ * @since 6.0.5
+ * 
+ * @return mixed The result.
+ */
+function _const($name, $type_cast = "", $default = "") {
+	$output = (defined($name)) ? constant($name) : $default;
+
+	if ($type_cast) {
+		$output = kahuk_type_cast($output);
+	}
+
+    return $output;
+}
+
+/**
  * Returns either a GET value or the default
  * 
  * @since 5.0.0

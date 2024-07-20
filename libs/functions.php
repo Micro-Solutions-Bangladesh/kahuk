@@ -104,7 +104,7 @@ function kahuk_shorten_the_url($url) {
  * @return string markup
  */
 function kahuk_create_markup_message($msg, $msgtype = "info") {
-	$markup = "<div class=\"alert alert-%s mb-4\"><p class=\"m-0\">%s</p></div>";
+	$markup = "<div class=\"alert alert-%s mb-4\"><div class=\"m-0\">%s</div></div>";
 
 	return sprintf(
 		$markup, $msgtype, $msg
@@ -118,9 +118,9 @@ function kahuk_create_markup_message($msg, $msgtype = "info") {
  * 
  * @return string markup
  */
-function kahuk_markup_messages($messages, $wrapper="") {
+function kahuk_markup_messages($messages, $wrapper="<div class=\"messages-wrapper\">%s</div>") {
 	$output = "";
-	$markup = "<div class=\"alert alert-%s mb-4\"><p class=\"m-0\">%s</p></div>";
+	$markup = "<div class=\"alert alert-%s mb-4\"><div class=\"m-0\">%s</div></div>";
 
 	foreach($messages as $message) {
 		$output .= sprintf(
