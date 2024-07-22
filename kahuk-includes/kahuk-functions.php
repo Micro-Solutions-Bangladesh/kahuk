@@ -44,7 +44,7 @@ function kahuk_log_file_antispam()
 {
     global $hooks;
 
-    return $hooks->apply_filters('kahuk_log_file_antispam', KAHUK_LOG_DIR . "antispam.log");
+    return $hooks->apply_filters('kahuk_log_file_antispam', KAHUKPATH_LOGS . "antispam.log");
 }
 
 /**
@@ -56,7 +56,7 @@ function kahuk_log_file_spam()
 {
     global $hooks;
 
-    return $hooks->apply_filters('kahuk_log_file_spam', KAHUK_LOG_DIR . "spam.log");
+    return $hooks->apply_filters('kahuk_log_file_spam', KAHUKPATH_LOGS . "spam.log");
 }
 
 /**
@@ -68,7 +68,7 @@ function kahuk_log_domain_blacklist()
 {
     global $hooks;
 
-    return $hooks->apply_filters('kahuk_log_domain_blacklist', KAHUK_LOG_DIR . "domain-blacklist.log");
+    return $hooks->apply_filters('kahuk_log_domain_blacklist', KAHUKPATH_LOGS . "domain-blacklist.log");
 }
 
 /**
@@ -80,7 +80,7 @@ function kahuk_log_domain_whitelist()
 {
     global $hooks;
 
-    return $hooks->apply_filters('kahuk_log_domain_whitelist', KAHUK_LOG_DIR . "domain-whitelist.log");
+    return $hooks->apply_filters('kahuk_log_domain_whitelist', KAHUKPATH_LOGS . "domain-whitelist.log");
 }
 
 /**
@@ -99,7 +99,7 @@ function kahuk_error_log_file_name()
  * @return string error log file path
  */
 function kahuk_error_log_file_path($log_type = 'error') {
-	return KAHUK_LOG_DIR . "{$log_type}-logs/" . kahuk_error_log_file_name();
+	return KAHUKPATH_LOGS . "{$log_type}-logs/" . kahuk_error_log_file_name();
 }
 
 /**

@@ -9,7 +9,7 @@ require_once KAHUKPATH_INC . "functions-html.php";
 
 // Set Error Log File
 $error_log_file_name = kahuk_error_log_file_name();
-ini_set("error_log", KAHUK_LOG_DIR . "error-logs/" . $error_log_file_name); // Error log file location
+ini_set("error_log", KAHUKPATH_LOGS . "error-logs/" . $error_log_file_name); // Error log file location
 
 /**
  * Set PHP error reporting based on Kahuk debug settings.

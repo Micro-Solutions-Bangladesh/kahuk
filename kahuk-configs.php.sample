@@ -92,8 +92,9 @@ define("KAHUK_LANG", "english");
 /** 
  * Used by the Admin Panel error log file viewer 
  */
-define("KAHUK_LOG_DIR", KAHUKPATH . "logs/");
-define("LOG_FILE", "logs/error.log");
+ define("KAHUKDIR_LOGS", "---kahukdir_logs---"); // default: logs
+define("KAHUKPATH_LOGS", KAHUKPATH . KAHUKDIR_LOGS . "/");
+define("LOG_FILE", KAHUKDIR_LOGS . "/error.log");
 
 /**
  * Will log the activity in attention log file
