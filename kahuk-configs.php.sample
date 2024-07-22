@@ -11,9 +11,9 @@ define("KAHUKPATH_TPL", KAHUKPATH . KAHUKDIR_TPL . "/");
 define("KAHUKDIR_INC", "kahuk-includes");
 define("KAHUKPATH_INC", KAHUKPATH . KAHUKDIR_INC . "/");
 
-if (!defined("KAHUK_FOLDER_UPLOADED")) {
-	define("KAHUK_FOLDER_UPLOADED", "resources");
-}
+/** */
+define("KAHUKDIR_UPLOADED", "resources");
+define("KAHUKPATH_UPLOADED", KAHUKPATH . KAHUKDIR_UPLOADED . "/");
 
 if (!defined("KAHUK_FOLDER_PAGES")) {
 	define("KAHUK_FOLDER_PAGES", "kahuk-pages");
@@ -37,9 +37,6 @@ define("KAHUK_LIBS_DIR", KAHUKPATH . "libs/");
 
 /** */
 define("KAHUK_SMARTY_DIR", KAHUKPATH . "internal/");
-
-/** */
-define("KAHUK_UPLOADED_DIR", KAHUKPATH . KAHUK_FOLDER_UPLOADED . "/");
 
 define("KAHUK_FOLDER_GROUPS_AVATAR", "resources/groups-avatar");
 define("KAHUK_GROUPS_AVATAR_DIR", KAHUKPATH . KAHUK_FOLDER_GROUPS_AVATAR . "/");
