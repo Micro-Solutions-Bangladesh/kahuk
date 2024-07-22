@@ -72,7 +72,7 @@ if (kahuk_is_admin()) {
 /**
  * Make sure the template folder exist
  */
-$the_template_path = KAHUK_TPL_DIR . $thetemp . "/kahuk.tpl";
+$the_template_path = KAHUKPATH_TPL . $thetemp . "/kahuk.tpl";
 
 if (!is_readable($the_template_path)) {
 	echo "<pre>Template {$thetemp} not found!</pre>";

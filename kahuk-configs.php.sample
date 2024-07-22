@@ -3,13 +3,11 @@ if (!defined("KAHUKPATH")) {
 	define("KAHUKPATH", dirname(__FILE__) . "/");
 }
 
-/**
- * Create names of folders
- */
-if (!defined("KAHUK_FOLDER_TPL")) {
-	define("KAHUK_FOLDER_TPL", "templates");
-}
+/** */
+define("KAHUKDIR_TPL", "templates");
+define("KAHUKPATH_TPL", KAHUKPATH . KAHUKDIR_TPL . "/");
 
+/** */
 if (!defined("KAHUK_FOLDER_INC")) {
 	define("KAHUK_FOLDER_INC", "kahuk-includes");
 }
@@ -25,9 +23,6 @@ if (!defined("KAHUK_FOLDER_PAGES")) {
 if (!defined("KAHUK_FOLDER_PLUGINS")) {
 	define("KAHUK_FOLDER_PLUGINS", "kahuk-plugins");
 }
-
-/** */
-define("KAHUK_TPL_DIR", KAHUKPATH . KAHUK_FOLDER_TPL . "/");
 
 /** */
 define("KAHUK_PAGES_DIR", KAHUKPATH . KAHUK_FOLDER_PAGES . "/");
