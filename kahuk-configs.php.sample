@@ -4,23 +4,23 @@ if (!defined("KAHUKPATH")) {
 }
 
 /** */
-define("KAHUKDIR_TPL", "templates");
+define("KAHUKDIR_TPL", "---kahukdir_tpl---"); // default: templates
 define("KAHUKPATH_TPL", KAHUKPATH . KAHUKDIR_TPL . "/");
 
 /** */
-define("KAHUKDIR_INC", "kahuk-includes");
+define("KAHUKDIR_INC", "---kahukdir_inc---"); // default: kahuk-includes
 define("KAHUKPATH_INC", KAHUKPATH . KAHUKDIR_INC . "/");
 
 /** */
-define("KAHUKDIR_UPLOADED", "resources");
+define("KAHUKDIR_UPLOADED", "---kahukdir_uploaded---"); // default: resources
 define("KAHUKPATH_UPLOADED", KAHUKPATH . KAHUKDIR_UPLOADED . "/");
 
 /** */
-define("KAHUKDIR_PAGES", "kahuk-pages");
+define("KAHUKDIR_PAGES", "---kahukdir_pages---"); // default: kahuk-pages
 define("KAHUKPATH_PAGES", KAHUKPATH . KAHUKDIR_PAGES . "/");
 
 /** */
-define("KAHUKDIR_PLUGINS", "kahuk-plugins");
+define("KAHUKDIR_PLUGINS", "---kahukdir_plugins---"); // default: kahuk-plugins
 define("KAHUKPATH_PLUGINS", KAHUKPATH . KAHUKDIR_PLUGINS . "/");
 
 /** */
@@ -32,6 +32,7 @@ define("KAHUK_LIBS_DIR", KAHUKPATH . "libs/");
 /** */
 define("KAHUK_SMARTY_DIR", KAHUKPATH . "internal/");
 
+/** */
 define("KAHUK_FOLDER_GROUPS_AVATAR", "resources/groups-avatar");
 define("KAHUK_GROUPS_AVATAR_DIR", KAHUKPATH . KAHUK_FOLDER_GROUPS_AVATAR . "/");
 
@@ -71,7 +72,7 @@ if (!defined("KAHUK_DEBUG_DISPLAY")) {
 }
 
 /**
- * Should we report all errors?
+ * Is the website is on debugging mode?
  */
 if (!defined("KAHUK_DEBUG")) {
 	define("KAHUK_DEBUG", true);
