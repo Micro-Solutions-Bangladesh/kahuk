@@ -69,7 +69,7 @@ INSERT INTO `---table_config---` (
     'normal'
 ),
 (
-    'Misc', '_kahuk_cms_version', '604,6.0.4', '', 'text', 
+    'Misc', '_kahuk_cms_version', '605,6.0.5', '', 'text', 
     'Kahuk Version', 
     'Version of Kahuk CMS<br>Please do not edit this (if you are not expert in Kahuk CMS).', 
     'option'
