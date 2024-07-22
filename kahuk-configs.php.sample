@@ -8,9 +8,8 @@ define("KAHUKDIR_TPL", "templates");
 define("KAHUKPATH_TPL", KAHUKPATH . KAHUKDIR_TPL . "/");
 
 /** */
-if (!defined("KAHUK_FOLDER_INC")) {
-	define("KAHUK_FOLDER_INC", "kahuk-includes");
-}
+define("KAHUKDIR_INC", "kahuk-includes");
+define("KAHUKPATH_INC", KAHUKPATH . KAHUKDIR_INC . "/");
 
 if (!defined("KAHUK_FOLDER_UPLOADED")) {
 	define("KAHUK_FOLDER_UPLOADED", "resources");
@@ -26,9 +25,6 @@ if (!defined("KAHUK_FOLDER_PLUGINS")) {
 
 /** */
 define("KAHUK_PAGES_DIR", KAHUKPATH . KAHUK_FOLDER_PAGES . "/");
-
-/** */
-define("KAHUK_INC_DIR", KAHUKPATH . KAHUK_FOLDER_INC . "/");
 
 /** */
 define("KAHUK_PLUGINS_DIR", KAHUKPATH . KAHUK_FOLDER_PLUGINS . "/");
@@ -206,12 +202,12 @@ define("caching", 1);
 define("summarize_mysql", 1);
 
 //
-require_once KAHUK_INC_DIR . "php-hooks.php";
+require_once KAHUKPATH_INC . "php-hooks.php";
 
 //
 require_once KAHUK_LIBS_DIR . "db.php";
 include_once KAHUK_LIBS_DIR . "define_tables.php";
-include_once KAHUK_INC_DIR . "db-configs.php";
+include_once KAHUKPATH_INC . "db-configs.php";
 
 //
 require_once KAHUK_LIBS_DIR . "kahuk-mailer.php";

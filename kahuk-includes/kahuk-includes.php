@@ -3,9 +3,9 @@
 global $kahukPlugins, $pluginsInstalledArray;
 
 //
-require_once KAHUK_INC_DIR . "kahuk-functions.php";
-require_once KAHUK_INC_DIR . "functions-data-enum.php";
-require_once KAHUK_INC_DIR . "functions-html.php";
+require_once KAHUKPATH_INC . "kahuk-functions.php";
+require_once KAHUKPATH_INC . "functions-data-enum.php";
+require_once KAHUKPATH_INC . "functions-html.php";
 
 // Set Error Log File
 $error_log_file_name = kahuk_error_log_file_name();
@@ -35,7 +35,7 @@ if (KAHUK_DEBUG) {
 }
 
 //
-include_once KAHUK_INC_DIR . "settings-from-db.php";
+include_once KAHUKPATH_INC . "settings-from-db.php";
 
 //
 require_once KAHUK_LIBS_DIR . "kahuk-class-error.php";
@@ -124,13 +124,13 @@ require_once KAHUK_LIBS_DIR . "functions-table-group.php";
 require_once KAHUK_LIBS_DIR . "functions-group-meta.php";
 
 //
-require_once KAHUK_INC_DIR . "functions-hook-callback.php";
+require_once KAHUKPATH_INC . "functions-hook-callback.php";
 
 
 
 //
-require_once KAHUK_INC_DIR . "functions-admin-dashboard.php";
-require_once KAHUK_INC_DIR . "kahuk-plugins.php";
+require_once KAHUKPATH_INC . "functions-admin-dashboard.php";
+require_once KAHUKPATH_INC . "kahuk-plugins.php";
 
 
 

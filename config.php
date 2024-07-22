@@ -2,7 +2,7 @@
 require_once dirname(__FILE__) . "/kahuk-loader.php";
 
 require_once KAHUKPATH . "kahuk-configs.php";
-require_once KAHUK_INC_DIR . "kahuk-includes.php";
+require_once KAHUKPATH_INC . "kahuk-includes.php";
 
 /**
  * Check maintenance mode
@@ -153,5 +153,5 @@ function loadCategoriesForCache($clear_cache = false)
 	return $db->get_results($sql);
 }
 
-include_once(KAHUK_INC_DIR . "kahuk-variables.php");
+include_once(KAHUKPATH_INC . "kahuk-variables.php");
 
