@@ -27,7 +27,8 @@ define("KAHUKPATH_PLUGINS", KAHUKPATH . KAHUKDIR_PLUGINS . "/");
 define("KAHUK_LANG_DIR", KAHUKPATH . "languages/");
 
 /** */
-define("KAHUK_LIBS_DIR", KAHUKPATH . "libs/");
+define("KAHUKDIR_LIBS", "---kahukdir_libs---"); // default: libs
+define("KAHUKPATH_LIBS", KAHUKPATH . KAHUKDIR_LIBS . "/");
 
 /** */
 define("KAHUK_SMARTY_DIR", KAHUKPATH . "internal/");
@@ -197,9 +198,9 @@ define("caching", 1);
 require_once KAHUKPATH_INC . "php-hooks.php";
 
 //
-require_once KAHUK_LIBS_DIR . "db.php";
-include_once KAHUK_LIBS_DIR . "define_tables.php";
+require_once KAHUKPATH_LIBS . "db.php";
+include_once KAHUKPATH_LIBS . "define_tables.php";
 include_once KAHUKPATH_INC . "db-configs.php";
 
 //
-require_once KAHUK_LIBS_DIR . "kahuk-mailer.php";
+require_once KAHUKPATH_LIBS . "kahuk-mailer.php";

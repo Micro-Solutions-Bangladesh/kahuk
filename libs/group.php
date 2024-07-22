@@ -141,7 +141,7 @@ function group_display($group_or_id) {
 		$main_smarty->assign('is_gr_Moderator', $is_gr_Moderator);
 
 		//check member
-		//include_once(KAHUK_LIBS_DIR.'group.php');
+		//include_once(KAHUKPATH_LIBS.'group.php');
 		$main_smarty->assign('is_group_member', isMember($group_id));
 
 		//check isMemberActive

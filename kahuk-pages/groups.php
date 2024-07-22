@@ -3,7 +3,7 @@ if (!(defined('enable_group') || enable_group)) {
 	kahuk_redirect_404();
 }
 
-include(KAHUK_LIBS_DIR . 'group.php');
+include(KAHUKPATH_LIBS . 'group.php');
 
 $args = [];
 

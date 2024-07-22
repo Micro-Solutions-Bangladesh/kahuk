@@ -137,7 +137,7 @@ if (!file_exists(dirname(__FILE__) . "/languages/lang_" . KAHUK_LANG . ".conf"))
 }
 
 
-include KAHUK_LIBS_DIR . "utf8/utf8.php";
+include KAHUKPATH_LIBS . "utf8/utf8.php";
 
 /** */
 function loadCategoriesForCache($clear_cache = false)

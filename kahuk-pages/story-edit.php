@@ -8,7 +8,7 @@ if (!$story) {
 
 check_referrer();
 
-include(KAHUK_LIBS_DIR . 'page-submit.php');
+include(KAHUKPATH_LIBS . 'page-submit.php');
 
 $theid = sanitize_number((sanitize_text_field(_get('id'))));
 
@@ -33,7 +33,7 @@ if (
     }
 
     //
-    include(KAHUK_LIBS_DIR . 'csrf.php');
+    include(KAHUKPATH_LIBS . 'csrf.php');
     $CSRF = new csrf();
 
     //

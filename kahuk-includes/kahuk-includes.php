@@ -38,90 +38,90 @@ if (KAHUK_DEBUG) {
 include_once KAHUKPATH_INC . "settings-from-db.php";
 
 //
-require_once KAHUK_LIBS_DIR . "kahuk-class-error.php";
+require_once KAHUKPATH_LIBS . "kahuk-class-error.php";
 
 //
-include_once KAHUK_LIBS_DIR . "functions-data.php";
+include_once KAHUKPATH_LIBS . "functions-data.php";
 
 //
-require_once KAHUK_LIBS_DIR . "wp/formatting.php";
-require_once KAHUK_LIBS_DIR . "wp/functions.php";
-require_once KAHUK_LIBS_DIR . "kahuk-functions-sanitize.php";
+require_once KAHUKPATH_LIBS . "wp/formatting.php";
+require_once KAHUKPATH_LIBS . "wp/functions.php";
+require_once KAHUKPATH_LIBS . "kahuk-functions-sanitize.php";
 
 //
-require_once KAHUK_LIBS_DIR . "functions-process-url.php";
-require_once KAHUK_LIBS_DIR . "functions.php";
+require_once KAHUKPATH_LIBS . "functions-process-url.php";
+require_once KAHUKPATH_LIBS . "functions.php";
 
 //
-require_once(KAHUK_LIBS_DIR . "check_behind_proxy.php");
+require_once(KAHUKPATH_LIBS . "check_behind_proxy.php");
 
 //
-include_once KAHUK_LIBS_DIR . "login.php";
+include_once KAHUKPATH_LIBS . "login.php";
 
 //
-require_once KAHUK_LIBS_DIR . "utils.php";
+require_once KAHUKPATH_LIBS . "utils.php";
 
 //
-require_once KAHUK_LIBS_DIR . "functions-user-authentication.php";
+require_once KAHUKPATH_LIBS . "functions-user-authentication.php";
 
 // Load early Kahuk files.
-require_once KAHUK_LIBS_DIR . "functions-create-url.php";
-require_once KAHUK_LIBS_DIR . "functions-components.php";
-require_once KAHUK_LIBS_DIR . "html1.php";
+require_once KAHUKPATH_LIBS . "functions-create-url.php";
+require_once KAHUKPATH_LIBS . "functions-components.php";
+require_once KAHUKPATH_LIBS . "html1.php";
 
 // Load the L10n library.
-require_once KAHUK_LIBS_DIR . "wp/l10n.php";
+require_once KAHUKPATH_LIBS . "wp/l10n.php";
 
 // Load most of Kahuk library.
-require_once KAHUK_LIBS_DIR . "wp/kses.php";
+require_once KAHUKPATH_LIBS . "wp/kses.php";
 
 
 // Lately included functions and class files
-require_once KAHUK_LIBS_DIR . "user.php"; // To be depricate
-require_once KAHUK_LIBS_DIR . "kahuk-class-users.php";
+require_once KAHUKPATH_LIBS . "user.php"; // To be depricate
+require_once KAHUKPATH_LIBS . "kahuk-class-users.php";
 
-require_once KAHUK_LIBS_DIR . "kahuk-class-story.php";
-
-//
-require_once KAHUK_LIBS_DIR . "kahuk-class-categories.php";
+require_once KAHUKPATH_LIBS . "kahuk-class-story.php";
 
 //
-require_once KAHUK_LIBS_DIR . "kahuk-class-groups.php";
+require_once KAHUKPATH_LIBS . "kahuk-class-categories.php";
 
 //
-require_once KAHUK_LIBS_DIR . "kahuk-class-comments.php";
+require_once KAHUKPATH_LIBS . "kahuk-class-groups.php";
 
 //
-require_once KAHUK_LIBS_DIR . "kahuk-class-votes.php";
+require_once KAHUKPATH_LIBS . "kahuk-class-comments.php";
 
 //
-require_once KAHUK_LIBS_DIR . "kahuk-class-friends.php";
+require_once KAHUKPATH_LIBS . "kahuk-class-votes.php";
+
+//
+require_once KAHUKPATH_LIBS . "kahuk-class-friends.php";
 
 
 // 
-require_once KAHUK_LIBS_DIR . "functions-user.php";
-require_once KAHUK_LIBS_DIR . "functions-table-user.php";
+require_once KAHUKPATH_LIBS . "functions-user.php";
+require_once KAHUKPATH_LIBS . "functions-table-user.php";
 
 // 
-require_once KAHUK_LIBS_DIR . "functions-story.php";
+require_once KAHUKPATH_LIBS . "functions-story.php";
 
 //
-require_once KAHUK_LIBS_DIR . "functions-saved-story.php";
+require_once KAHUKPATH_LIBS . "functions-saved-story.php";
 
 //
-require_once KAHUK_LIBS_DIR . "functions-comment.php";
+require_once KAHUKPATH_LIBS . "functions-comment.php";
 
 //
-require_once KAHUK_LIBS_DIR . "functions-vote.php";
+require_once KAHUKPATH_LIBS . "functions-vote.php";
 
 //
-require_once KAHUK_LIBS_DIR . "functions-table-category.php";
+require_once KAHUKPATH_LIBS . "functions-table-category.php";
 
 //
-require_once KAHUK_LIBS_DIR . "functions-table-group.php";
+require_once KAHUKPATH_LIBS . "functions-table-group.php";
 
 //
-require_once KAHUK_LIBS_DIR . "functions-group-meta.php";
+require_once KAHUKPATH_LIBS . "functions-group-meta.php";
 
 //
 require_once KAHUKPATH_INC . "functions-hook-callback.php";

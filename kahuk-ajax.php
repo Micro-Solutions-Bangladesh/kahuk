@@ -14,7 +14,7 @@ include_once(KAHUKPATH . 'internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include(KAHUKPATH . 'config.php');
-include(KAHUK_LIBS_DIR . 'smartyvariables.php');
+include(KAHUKPATH_LIBS . 'smartyvariables.php');
 
 check_referrer();
 
