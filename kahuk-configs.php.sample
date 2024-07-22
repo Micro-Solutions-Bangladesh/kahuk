@@ -4,38 +4,42 @@ if (!defined("KAHUKPATH")) {
 }
 
 /** */
-define("KAHUKDIR_TPL", "---kahukdir_tpl---"); // default: templates
+define("KAHUKDIR_TPL", "templates"); // default: templates
 define("KAHUKPATH_TPL", KAHUKPATH . KAHUKDIR_TPL . "/");
 
 /** */
-define("KAHUKDIR_INC", "---kahukdir_inc---"); // default: kahuk-includes
+define("KAHUKDIR_INC", "kahuk-includes"); // default: kahuk-includes
 define("KAHUKPATH_INC", KAHUKPATH . KAHUKDIR_INC . "/");
 
 /** */
-define("KAHUKDIR_UPLOADED", "---kahukdir_uploaded---"); // default: resources
-define("KAHUKPATH_UPLOADED", KAHUKPATH . KAHUKDIR_UPLOADED . "/");
-
-/** */
-define("KAHUKDIR_PAGES", "---kahukdir_pages---"); // default: kahuk-pages
+define("KAHUKDIR_PAGES", "kahuk-pages"); // default: kahuk-pages
 define("KAHUKPATH_PAGES", KAHUKPATH . KAHUKDIR_PAGES . "/");
 
 /** */
-define("KAHUKDIR_PLUGINS", "---kahukdir_plugins---"); // default: kahuk-plugins
+define("KAHUKDIR_PLUGINS", "kahuk-plugins"); // default: kahuk-plugins
 define("KAHUKPATH_PLUGINS", KAHUKPATH . KAHUKDIR_PLUGINS . "/");
 
 /** */
-define("KAHUK_LANG_DIR", KAHUKPATH . "languages/");
+define("KAHUKDIR_LIBS", "libs"); // default: libs
+define("KAHUKPATH_LIBS", KAHUKPATH . KAHUKDIR_LIBS . "/");
 
 /** */
-define("KAHUKDIR_LIBS", "---kahukdir_libs---"); // default: libs
-define("KAHUKPATH_LIBS", KAHUKPATH . KAHUKDIR_LIBS . "/");
+define("KAHUKDIR_LOGS", "logs"); // default: logs
+define("KAHUKPATH_LOGS", KAHUKPATH . KAHUKDIR_LOGS . "/");
+
+/** */
+define("KAHUKDIR_UPLOADED", "resources"); // default: resources
+define("KAHUKPATH_UPLOADED", KAHUKPATH . KAHUKDIR_UPLOADED . "/");
+
+/** */
+define("KAHUK_FOLDER_GROUPS_AVATAR", "resources/groups-avatar");
+define("KAHUK_GROUPS_AVATAR_DIR", KAHUKPATH . KAHUK_FOLDER_GROUPS_AVATAR . "/");
 
 /** */
 define("KAHUK_SMARTY_DIR", KAHUKPATH . "internal/");
 
 /** */
-define("KAHUK_FOLDER_GROUPS_AVATAR", "resources/groups-avatar");
-define("KAHUK_GROUPS_AVATAR_DIR", KAHUKPATH . KAHUK_FOLDER_GROUPS_AVATAR . "/");
+define("KAHUK_LANG_DIR", KAHUKPATH . "languages/");
 
 
 // ** MySQL settings - You can get this info from your web host ** //
@@ -93,8 +97,6 @@ define("KAHUK_LANG", "english");
 /** 
  * Used by the Admin Panel error log file viewer 
  */
- define("KAHUKDIR_LOGS", "---kahukdir_logs---"); // default: logs
-define("KAHUKPATH_LOGS", KAHUKPATH . KAHUKDIR_LOGS . "/");
 define("LOG_FILE", KAHUKDIR_LOGS . "/error.log");
 
 /**
