@@ -43,7 +43,7 @@ function kahuk_create_url($path, $args = [], $relativePath = false) {
  */
 function kahuk_create_plugin_url($path, $args = []) {
     $root_path_url = kahuk_root_url();
-    $output = $root_path_url . KAHUK_FOLDER_PLUGINS . "/" . $path;
+    $output = $root_path_url . KAHUKDIR_PLUGINS . "/" . $path;
 
     if (!empty($args)) {
         $output = add_query_arg($args, $output);

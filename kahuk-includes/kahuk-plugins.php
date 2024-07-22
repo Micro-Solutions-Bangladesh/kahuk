@@ -60,8 +60,8 @@ function kahuk_is_valid_plugin($plugin) {
     $output = false;
 
     if (
-        is_readable(KAHUK_PLUGINS_DIR . $plugin . "/index.php") &&
-        is_readable(KAHUK_PLUGINS_DIR . $plugin . "/configs.php")
+        is_readable(KAHUKPATH_PLUGINS . $plugin . "/index.php") &&
+        is_readable(KAHUKPATH_PLUGINS . $plugin . "/configs.php")
     ) {
         $output = true;
     }
@@ -73,16 +73,16 @@ function kahuk_is_valid_plugin($plugin) {
 /**
  * Collect the plugins detail
  */
-$pluginFolders = scandir(KAHUK_PLUGINS_DIR);
+$pluginFolders = scandir(KAHUKPATH_PLUGINS);
 
 foreach($pluginFolders as $pluginFolder) {
-    if (is_dir(KAHUK_PLUGINS_DIR . $pluginFolder)) {
+    if (is_dir(KAHUKPATH_PLUGINS . $pluginFolder)) {
         if (in_array($pluginFolder, [".",".."])) {
             continue;
         }
 
         if (kahuk_is_valid_plugin($pluginFolder)) {
-            include_once KAHUK_PLUGINS_DIR . $pluginFolder . "/configs.php";
+            include_once KAHUKPATH_PLUGINS . $pluginFolder . "/configs.php";
 
             if (!isset($kahukPlugins[$pluginFolder]['title'])) {
                 // Delete the Plugin detail if Plugin title not mentioned in the `$pluginFolder/configs.php` file.
@@ -101,7 +101,7 @@ $pluginsInstalledArray = kahuk_get_activated_plugins();
 
 foreach($pluginsInstalledArray as $pluginInstalled) {
     if (kahuk_is_valid_plugin($pluginInstalled)) {
-        include_once KAHUK_PLUGINS_DIR . $pluginInstalled . "/index.php";
+        include_once KAHUKPATH_PLUGINS . $pluginInstalled . "/index.php";
     } else {
         kahuk_log_unexpected("Plugin folder $pluginInstalled not found!");
         kahuk_deactivate_plugin($pluginInstalled);

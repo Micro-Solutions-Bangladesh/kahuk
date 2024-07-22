@@ -20,8 +20,8 @@ define("KAHUKDIR_PAGES", "kahuk-pages");
 define("KAHUKPATH_PAGES", KAHUKPATH . KAHUKDIR_PAGES . "/");
 
 /** */
-define("KAHUK_FOLDER_PLUGINS", "kahuk-plugins");
-define("KAHUK_PLUGINS_DIR", KAHUKPATH . KAHUK_FOLDER_PLUGINS . "/");
+define("KAHUKDIR_PLUGINS", "kahuk-plugins");
+define("KAHUKPATH_PLUGINS", KAHUKPATH . KAHUKDIR_PLUGINS . "/");
 
 /** */
 define("KAHUK_LANG_DIR", KAHUKPATH . "languages/");
