@@ -1,7 +1,7 @@
 AddDefaultCharset UTF-8
 
 ## 404 Error Page
-ErrorDocument 404 __my_kahuk_base__error_404
+ErrorDocument 404 __my_kahuk_base__error-404
 
 ##
 Options +FollowSymlinks -MultiViews

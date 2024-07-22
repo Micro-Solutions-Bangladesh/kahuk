@@ -192,7 +192,6 @@ ini_set("include_path", ".");
 // 0 = off
 // 1 = on
 define("caching", 1);
-define("summarize_mysql", 1);
 
 //
 require_once KAHUKPATH_INC . "php-hooks.php";

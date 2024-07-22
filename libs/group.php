@@ -166,9 +166,6 @@ function group_display($group_or_id) {
 		//check logged or not
 		$main_smarty->assign('user_logged_in', $current_user->user_login);
 
-		//sidebar
-		//$main_smarty = do_sidebar($main_smarty);	
-
 		//$main_smarty->assign('form_action', $_SERVER["PHP_SELF"]);
 		$group_story_url = getmyurl("group_story_title", $group_safename);
 		$main_smarty->assign('group_story_url', $group_story_url);

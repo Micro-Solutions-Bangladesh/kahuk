@@ -41,8 +41,6 @@ if ($canIhaveAccess == 0) {
 // misc smarty
 $main_smarty->assign('isAdmin', $canIhaveAccess);
 
-// sidebar
-//$main_smarty = do_sidebar($main_smarty);
 
 // pagename
 define('pagename', 'admin_group');
