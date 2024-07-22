@@ -11,7 +11,7 @@ $maintenance_mode = is_maintenance_mode();
 
 if ($maintenance_mode) {
 	if (!kahuk_session_user_level("admin")) {
-		include_once(KAHUK_PAGES_DIR . "maintenance.php");
+		include_once(KAHUKPATH_PAGES . "maintenance.php");
 		exit;
 	}
 }
