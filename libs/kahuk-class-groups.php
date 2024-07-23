@@ -232,6 +232,7 @@ class KahukGroups
 
         $group_name = sanitize_text_field($group_name);
         $minWordsGroupName = kahuk_get_config("_min_words_group_name", "2", "number");
+        $maxWordsGroupName = kahuk_get_config("_max_words_group_name", "10", "number");
 
         if (kahuk_word_count($group_name) < $minWordsGroupName) {
             $this->errors->add( 'min-word-name', "Minimum {$minWordsGroupName} word required for group name." );
@@ -239,8 +240,8 @@ class KahukGroups
             return $this->errors;
         }
 
-        if (kahuk_word_count($group_name) > MAX_NUMBER_OF_WORD_GROUP_NAME) {
-            $this->errors->add( 'max-word-name', "Maximum " . MAX_NUMBER_OF_WORD_GROUP_NAME . " word for group name." );
+        if (kahuk_word_count($group_name) > $maxWordsGroupName) {
+            $this->errors->add( 'max-word-name', "Maximum {$maxWordsGroupName} word for group name." );
             
             return $this->errors;
         }
