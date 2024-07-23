@@ -35,8 +35,6 @@ INSERT INTO `---table_config---` (
 ('Submit', '_allowed_html_tags_normal', '', '', 'HTML tags', 'HTML tags to allow to Normal users', 'leave blank to not allow tags. Examples are: &lt;br&gt;&lt;p&gt;&lt;strong&gt;&lt;em&gt;&lt;u&gt;&lt;s&gt;&lt;sub&gt;&lt;sup&gt;&lt;ol&gt;&lt;ul&gt;&lt;li&gt;&lt;blockquote&gt;&lt;span&gt;&lt;div&gt;&lt;big&gt;&lt;small&gt;&lt;tt&gt;&lt;code&gt;&lt;kbd&gt;&lt;samp&gt;&lt;var&gt;&lt;del&gt;&lt;ins&gt;&lt;hr&gt;&lt;pre&gt;<br /><strong style=\"color:#ff0000;\">NEVER ALLOW OTHER THAN THESE TAGS, ESPECIALLY FORM, SCRIPT, IMG, SVG AND IFRAME TAGS!</strong>', 'option'),
 ('Submit', '_allowed_html_tags_moderator', '', '', 'HTML tags', 'HTML tags to allow for Moderators', 'leave blank to not allow tags. Examples are: &lt;br&gt;&lt;p&gt;&lt;strong&gt;&lt;em&gt;&lt;u&gt;&lt;s&gt;&lt;sub&gt;&lt;sup&gt;&lt;ol&gt;&lt;ul&gt;&lt;li&gt;&lt;blockquote&gt;&lt;span&gt;&lt;div&gt;&lt;big&gt;&lt;small&gt;&lt;tt&gt;&lt;code&gt;&lt;kbd&gt;&lt;samp&gt;&lt;var&gt;&lt;del&gt;&lt;ins&gt;&lt;hr&gt;&lt;pre&gt;<br /><strong style=\"color:#ff0000;\">NEVER ALLOW OTHER THAN THESE TAGS, ESPECIALLY FORM, SCRIPT, IMG, SVG AND IFRAME TAGS!</strong>', 'option'),
 ('Submit', '_allowed_html_tags_admin', '', '', 'HTML tags', 'HTML tags to allow for Admins', 'leave blank to not allow tags. Examples are: &lt;br&gt;&lt;p&gt;&lt;strong&gt;&lt;em&gt;&lt;u&gt;&lt;s&gt;&lt;sub&gt;&lt;sup&gt;&lt;ol&gt;&lt;ul&gt;&lt;li&gt;&lt;blockquote&gt;&lt;span&gt;&lt;div&gt;&lt;big&gt;&lt;small&gt;&lt;tt&gt;&lt;code&gt;&lt;kbd&gt;&lt;samp&gt;&lt;var&gt;&lt;del&gt;&lt;ins&gt;&lt;hr&gt;&lt;pre&gt;<br /><strong style=\"color:#ff0000;\">NEVER ALLOW OTHER THAN THESE TAGS, ESPECIALLY FORM, SCRIPT, IMG, SVG AND IFRAME TAGS!</strong>', 'option'),
-('Story', 'open_in_new_window', 'false', 'false', 'true / false', 'Open Story Link in New Window', 'If "Use story title as link" is set to true, setting this to true will open the link in a new window.', 'define'),
-('Story', 'link_nofollow', 'true', 'true', 'true / false', 'Use rel="nofollow"', 'nofollow is a value that can be assigned to the rel attribute of an HTML a element to instruct some search engines that the hyperlink should not influence the ranking of the link''s target in the search engine''s index.<br /><a href="https://support.google.com/webmasters/answer/96569?hl=en" target="_blank" rel="noopener noreferrer">Google: policies</a>', 'define'),
 ('Comments', '_enable_comments', 'true', 'true', 'true / false', 'Allow Comments', 'Allow users to comment on articles?', 'option'),
 ('Comments', '_max_no_char_comment', '1200', '1200', 'number', 'Maximum Comment Length', 'Maximum number of characters for the comment.', 'option'),
 ('Groups', 'enable_group', 'true', 'true', 'true/false', 'Groups', 'Activate the Group Feature?', 'define'),
@@ -117,4 +115,15 @@ INSERT INTO `---table_config---` (
 (
     'Karma', '_comment_karma_for_story', '1', '1', 'text', 
     'Comment karma for story', 'Karma Value for STORY When user comment.', 'option'
+),
+(
+    'Story', 'open_in_new_window', 'false', 'false', 
+    'true / false', 'Open Story Link in New Window', 
+    'If "Use story title as link" is set to true, setting this to true will open the link in a new window.', 
+    'define'
+),
+(
+    'Story', 'link_nofollow', 'true', 'true', 'true / false', 
+    'Use rel="nofollow"', 'nofollow is a value that can be assigned to the rel attribute of an HTML a element to instruct some search engines that the hyperlink should not influence the ranking of the link''s target in the search engine''s index.<br /><a href="https://support.google.com/webmasters/answer/96569?hl=en" target="_blank" rel="noopener noreferrer">Google: policies</a>', 
+    'define'
 );
