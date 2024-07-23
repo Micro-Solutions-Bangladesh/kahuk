@@ -70,8 +70,9 @@ function kahuk_check_unique_story( $story_url, $story_slug, $skipId = [] ) {
 
     //
     $storyCountBySlug = kahuk_count_story_by_slug( $story_slug, ['not_id' => $skipId] );
+    $maxSameTitle = kahuk_get_config("_max_same_title", "1", "number");
 
-    if ( MAX_NUMBER_OF_DUPLICATE_STORY_TITLE <= $storyCountBySlug ) {
+    if ($maxSameTitle <= $storyCountBySlug) {
         $output['code'] = "duplicate_title_reject";
         $output['message'] = "Seems like matching title for the story exist, please try to make it unique and more readable."; // TODO dynamic
 

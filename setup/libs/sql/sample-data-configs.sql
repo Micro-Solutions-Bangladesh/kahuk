@@ -134,5 +134,8 @@ INSERT INTO `---table_config---` (
 (
     'Story', '_max_same_url', '5', '5', 'text', 
     'Max same url', 'Maximum number of story with same url.', 'option'
+),
+(
+    'Story', '_max_same_title', '1', '1', 'text', 
+    'Max same title', 'Maximum number of story with same title.', 'option'
 );
-
