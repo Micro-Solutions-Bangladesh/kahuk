@@ -138,4 +138,8 @@ INSERT INTO `---table_config---` (
 (
     'Story', '_max_same_title', '1', '1', 'text', 
     'Max same title', 'Maximum number of story with same title.', 'option'
+),
+(
+    'Groups', '_min_words_group_name', '2', '2', 'text', 
+    'Min words group title', 'Minimum number of words for group name.', 'option'
 );

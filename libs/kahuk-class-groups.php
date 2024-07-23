@@ -231,9 +231,10 @@ class KahukGroups
         global $db;
 
         $group_name = sanitize_text_field($group_name);
+        $minWordsGroupName = kahuk_get_config("_min_words_group_name", "2", "number");
 
-        if (kahuk_word_count($group_name) < MIN_NUMBER_OF_WORD_GROUP_NAME) {
-            $this->errors->add( 'min-word-name', "Minimum " . MIN_NUMBER_OF_WORD_GROUP_NAME . " word required for group name." );
+        if (kahuk_word_count($group_name) < $minWordsGroupName) {
+            $this->errors->add( 'min-word-name', "Minimum {$minWordsGroupName} word required for group name." );
             
             return $this->errors;
         }
