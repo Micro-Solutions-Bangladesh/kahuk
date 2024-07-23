@@ -120,9 +120,6 @@ define("LOG_DB_QUERY_FILE", LOG_FILE);
 /**
  * Determine the Karma Values
  */
-// Karma Value for USER When user vote
-define("REACTION_KARMA_FOR_USER", 1);
-
 // Karma Value for USER When user comment
 define("COMMENT_KARMA_FOR_USER", 1);
 
