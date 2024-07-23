@@ -67,7 +67,7 @@ When a user fork a story, the story will be visible in his/her profile page as a
 #### Story Reaction
 
 - When a user react to a story, the story will be visible in his/her profile page with the Reaction information. In the process, the CMS also update few Karma numbers:
-- Increase story karma by the numbers mentioned as `REACTION_KARMA_FOR_STORY`
+- Increase story karma by the numbers mentioned in the `_reaction_karma_for_story` db config.
 - Increase karma for the session user by the numbers mentioned as `REACTION_KARMA_FOR_USER`
 
 

@@ -101,4 +101,8 @@ INSERT INTO `---table_config---` (
 (
     'Karma', '_new_to_published_karma', '20', '20', 'text', 
     'New to Published', 'Karma Value to upgrade status of a story into PUBLISHED from NEW.', 'option'
+),
+(
+    'Karma', '_reaction_karma_for_story', '2', '2', 'text', 
+    'New to Published', 'Karma Value for a story When A story Get or Loss reaction.', 'option'
 );

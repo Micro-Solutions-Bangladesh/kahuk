@@ -103,9 +103,10 @@ $hooks->add_filter('process_story', 'kahuk_process_story_callback');
  */
 function kahuk_reaction_inserted_callback($output = [], $args = []) {
     $is_increase = true;
+    $reactionKarmaStory = kahuk_get_config("_reaction_karma_for_story", "0");
 
     //
-    kahuk_update_story_karma($args['story_id'], REACTION_KARMA_FOR_STORY, $is_increase);
+    kahuk_update_story_karma($args['story_id'], $reactionKarmaStory, $is_increase);
 
     // Update user karma
     kahuk_update_user_karma($args['user_id'], REACTION_KARMA_FOR_USER, $is_increase);
