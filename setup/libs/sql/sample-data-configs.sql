@@ -92,5 +92,9 @@ INSERT INTO `---table_config---` (
 ),
 (
     'Karma', '_fork_karma_for_story', '2', '2', 'text', 
-    'Fork karma', 'Karma Value for a story when it is forked by user.', 'option'
+    'Fork karma story', 'Karma Value for a story when it is forked by user.', 'option'
+),
+(
+    'Karma', '_fork_karma_for_user', '1', '1', 'text', 
+    'Fork karma user', 'Karma Value for User when he or she save a STORY.', 'option'
 );

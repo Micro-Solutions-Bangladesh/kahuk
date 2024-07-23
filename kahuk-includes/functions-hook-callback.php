@@ -210,13 +210,14 @@ $hooks->add_action('saved_story', 'kahuk_increase_story_total_callback');
  */
 function kahuk_saved_saved_story_callback($data) {
     $is_increase = ($data["saved_status"] == "enable");
-    $forkKarma = kahuk_get_config("_fork_karma_for_story", "0");
+    $forkKarmaStory = kahuk_get_config("_fork_karma_for_story", "0");
+    $forkKarmaUser = kahuk_get_config("_fork_karma_for_user", "0");
 
     //
-    kahuk_update_story_karma($data['story_id'], $forkKarma, $is_increase);
+    kahuk_update_story_karma($data['story_id'], $forkKarmaStory, $is_increase);
 
     //
-    kahuk_update_user_karma($data['user_id'], FORK_KARMA_FOR_USER, $is_increase);
+    kahuk_update_user_karma($data['user_id'], $forkKarmaUser, $is_increase);
 }
 
 $hooks->add_action('saved_saved_story', 'kahuk_saved_saved_story_callback');
@@ -235,13 +236,14 @@ function kahuk_updated_saved_story_callback($data) {
     // We only proceed when status changed
     if ($data["saved_status_prev"] && ($data["saved_status"] !== $data["saved_status_prev"])) {
         $is_increase = ($data["saved_status"] == "enable");
-        $forkKarma = kahuk_get_config("_fork_karma_for_story", "0");
+        $forkKarmaStory = kahuk_get_config("_fork_karma_for_story", "0");
+        $forkKarmaUser = kahuk_get_config("_fork_karma_for_user", "0");
 
         //
-        kahuk_update_story_karma($data['story_id'], $forkKarma, $is_increase);
+        kahuk_update_story_karma($data['story_id'], $forkKarmaStory, $is_increase);
 
         //
-        kahuk_update_user_karma($data['user_id'], FORK_KARMA_FOR_USER, $is_increase);
+        kahuk_update_user_karma($data['user_id'], $forkKarmaUser, $is_increase);
     }
 }
 

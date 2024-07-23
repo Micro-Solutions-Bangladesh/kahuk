@@ -61,7 +61,7 @@ When a new user register he/she will be sent an email to verify the email addres
 When a user fork a story, the story will be visible in his/her profile page as a forked story. In the process, the CMS also update few Karma numbers:
  
 - Increase story karma by the numbers mentioned in the `_fork_karma_for_story` db config.
-- Increase karma for the session user by the numbers mentioned as `FORK_KARMA_FOR_USER`
+- Increase karma for the session user by the numbers mentioned in the `_fork_karma_for_user` db config.
 
 
 #### Story Reaction
