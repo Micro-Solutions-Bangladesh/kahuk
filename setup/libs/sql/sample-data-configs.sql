@@ -132,6 +132,10 @@ INSERT INTO `---table_config---` (
     'Min words for title', 'Minimum number of words required for title to submit a story.', 'option'
 ),
 (
+    'Story', '_max_words_story_title', '18', '18', 'text', 
+    'Max words for title', 'Max number of words allowed for title to submit a story.', 'option'
+),
+(
     'Story', '_max_same_url', '5', '5', 'text', 
     'Max same url', 'Maximum number of story with same url.', 'option'
 ),

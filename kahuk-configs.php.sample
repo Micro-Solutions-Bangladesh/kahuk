@@ -41,8 +41,10 @@ define("KAHUK_SMARTY_DIR", KAHUKPATH . "internal/");
 /** */
 define("KAHUK_LANG_DIR", KAHUKPATH . "languages/");
 
+/** */
+define("KAHUK_LANG", "english");
 
-// ** MySQL settings - You can get this info from your web host ** //
+// *** MySQL settings - You can get this info from your web host *** //
 
 /** MySQL database name */
 define("DB_NAME", "database_name_here");
@@ -90,9 +92,6 @@ if (!defined("KAHUK_DEBUG")) {
 if (!defined("KAHUK_DEBUG_LEVEL")) {
 	define("KAHUK_DEBUG_LEVEL", "E_CORE_ERROR | E_CORE_WARNING | E_COMPILE_ERROR | E_ERROR | E_WARNING | E_PARSE | E_USER_ERROR | E_USER_WARNING | E_RECOVERABLE_ERROR");
 }
-
-/** */
-define("KAHUK_LANG", "english");
 
 /** Used by the Admin Panel error log file viewer */
 define("LOG_FILE", KAHUKDIR_LOGS . "/error.log");

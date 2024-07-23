@@ -182,11 +182,12 @@ function do_submit2()
 		kahuk_redirect($page_submit_url_begin);
 	}
 
-	$minWordsStoryTitle = kahuk_get_config("_min_words_story_title", "3");
+	$minWordsStoryTitle = kahuk_get_config("_min_words_story_title", "3", "number");
+	$maxWordsStoryTitle = kahuk_get_config("_max_words_story_title", "18", "number");
 
-	if (kahuk_word_count($story_title) < sanitize_number($minWordsStoryTitle)) {
+	if ((kahuk_word_count($story_title) < $minWordsStoryTitle) || (kahuk_word_count($story_title) > $maxWordsStoryTitle)) {
 		kahuk_set_session_message(
-			"Please write a minimum of {$minWordsStoryTitle} words for the story title.",
+			"Story title minimum {$minWordsStoryTitle} to maximum {$maxWordsStoryTitle} words are allowed.",
 			"error"
 		);
 
