@@ -78,7 +78,7 @@ When a user fork a story, the story will be visible in his/her profile page as a
 > In the process of new story submit, the CMS also update few Karma numbers:
  
 - Initially the story karma will be `NEW_STORY_KARMA_INITIALY`.
-- Increase karma for the session user by the numbers mentioned as `NEW_STORY_KARMA_FOR_USER`
+- Increase karma for the session user by the numbers mentioned in the `_new_story_karma_for_user` config from db.
 
 #### Recommended Plugins
 

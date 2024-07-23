@@ -126,9 +126,6 @@ define("FOLLOW_KARMA_FOR_USER", 50);
 // Karma Value initially for new STORY
 define("NEW_STORY_KARMA_INITIALY", 10);
 
-// Karma Value for USER When user submit a new STORY
-define("NEW_STORY_KARMA_FOR_USER", 5);
-
 // Karma Value to upgrade status of a story into PUBLISHED from NEW
 define("NEW_TO_PUBLISHED_KARMA", 20);
 

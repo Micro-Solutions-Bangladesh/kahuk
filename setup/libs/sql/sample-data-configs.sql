@@ -77,4 +77,8 @@ INSERT INTO `---table_config---` (
 (
     'Plugins', 'plugins_installed', 'snippets', '', 'text', 
     'Installed Plugins', 'CSV list of installed plugins.', 'option'
+),
+(
+    'Karma', '_new_story_karma_for_user', '5', '5', 'text', 
+    'New story karma for user', 'Karma for user when submit a new story.', 'option'
 );
