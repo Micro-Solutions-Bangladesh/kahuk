@@ -126,4 +126,9 @@ INSERT INTO `---table_config---` (
     'Story', 'link_nofollow', 'true', 'true', 'true / false', 
     'Use rel="nofollow"', 'nofollow is a value that can be assigned to the rel attribute of an HTML a element to instruct some search engines that the hyperlink should not influence the ranking of the link''s target in the search engine''s index.<br /><a href="https://support.google.com/webmasters/answer/96569?hl=en" target="_blank" rel="noopener noreferrer">Google: policies</a>', 
     'define'
+),
+(
+    'Story', '_min_words_story_title', '3', '3', 'text', 
+    'Min words for title', 'Minimum number of words required for title to submit a story.', 'option'
 );
+

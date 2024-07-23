@@ -120,9 +120,6 @@ define("LOG_DB_QUERY_FILE", LOG_FILE);
 /**
  * 
  */
-// Minimum number of word for story title
-define( "MIN_NUMBER_OF_WORD_STORY_TITLE", 3 );
-
 // Maximum number of story with same url
 define("MAX_NUMBER_OF_DUPLICATE_STORY", 5);
 
