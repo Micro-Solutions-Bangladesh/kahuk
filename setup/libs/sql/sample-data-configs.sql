@@ -113,4 +113,8 @@ INSERT INTO `---table_config---` (
 (
     'Karma', '_comment_karma_for_user', '1', '1', 'text', 
     'Comment karma for user', 'Karma Value for USER When user comment.', 'option'
+),
+(
+    'Karma', '_comment_karma_for_story', '1', '1', 'text', 
+    'Comment karma for story', 'Karma Value for STORY When user comment.', 'option'
 );

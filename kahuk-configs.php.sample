@@ -118,12 +118,6 @@ define("LOG_DB_QUERY", false);
 define("LOG_DB_QUERY_FILE", LOG_FILE);
 
 /**
- * Determine the Karma Values
- */
-// Karma Value for STORY When user comment
-define("COMMENT_KARMA_FOR_STORY", 2);
-
-/**
  * 
  */
 // Minimum number of word for story title
