@@ -435,6 +435,7 @@ class KahukStories
     public function check_group_description($group_desc) {
         $group_desc = trim($group_desc);
         $minWordsGroupDesc = kahuk_get_config("_min_words_group_desc", "30", "number");
+        $maxWordsGroupDesc = kahuk_get_config("_max_words_group_desc", "200", "number");
 
         if (kahuk_word_count($group_desc) < $minWordsGroupDesc) {
             $this->errors->add( 'min-word-desc', "Minimum {$minWordsGroupDesc} word required for group description." );
@@ -442,8 +443,8 @@ class KahukStories
             return $this->errors;
         }
 
-        if (kahuk_word_count($group_desc) > MAX_NUMBER_OF_WORD_GROUP_DESC) {
-            $this->errors->add( 'max-word-desc', "Maximum " . MAX_NUMBER_OF_WORD_GROUP_DESC . " word for group description." );
+        if (kahuk_word_count($group_desc) > $maxWordsGroupDesc) {
+            $this->errors->add( 'max-word-desc', "Maximum {$maxWordsGroupDesc} word for group description." );
             
             return $this->errors;
         }

@@ -150,4 +150,8 @@ INSERT INTO `---table_config---` (
 (
     'Groups', '_min_words_group_desc', '30', '30', 'text', 
     'Min words group desc', 'Minimum number of words for group description.', 'option'
+),
+(
+    'Groups', '_max_words_group_desc', '200', '200', 'text', 
+    'Max words group desc', 'Maximum number of words for group description.', 'option'
 );
