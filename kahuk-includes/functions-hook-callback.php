@@ -304,8 +304,10 @@ function kahuk_saved_comment_callback($argsCustom = []) {
         return false;
     }
 
+    $commentKarmaUser = kahuk_get_config("_comment_karma_for_user", "0");
+
     //
-    kahuk_update_user_karma($args['user_id'], COMMENT_KARMA_FOR_USER);
+    kahuk_update_user_karma($args['user_id'], $commentKarmaUser);
 
     //
     kahuk_update_story_karma($args['story_id'], COMMENT_KARMA_FOR_STORY);
@@ -337,8 +339,10 @@ function kahuk_deleted_comment_callback($argsCustom = []) {
         return false;
     }
 
+    $commentKarmaUser = kahuk_get_config("_comment_karma_for_user", "0");
+
     //
-    kahuk_update_user_karma($args['user_id'], COMMENT_KARMA_FOR_USER, false);
+    kahuk_update_user_karma($args['user_id'], $commentKarmaUser, false);
 
     //
     kahuk_update_story_karma($args['story_id'], COMMENT_KARMA_FOR_STORY, false);

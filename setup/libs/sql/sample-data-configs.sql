@@ -104,9 +104,13 @@ INSERT INTO `---table_config---` (
 ),
 (
     'Karma', '_reaction_karma_for_story', '2', '2', 'text', 
-    'Story karma for reaction', 'Karma Value for a story When A story Get or Loss reaction.', 'option'
+    'Reaction karma for story', 'Karma Value for a story When A story Get or Loss reaction.', 'option'
 ),
 (
     'Karma', '_reaction_karma_for_user', '1', '1', 'text', 
-    'User karma for reaction', 'Karma Value for USER When user react for a story.', 'option'
+    'Reaction karma for user', 'Karma Value for USER When user react for a story.', 'option'
+),
+(
+    'Karma', '_comment_karma_for_user', '1', '1', 'text', 
+    'Comment karma for user', 'Karma Value for USER When user comment.', 'option'
 );
