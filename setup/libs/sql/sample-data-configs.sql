@@ -146,4 +146,8 @@ INSERT INTO `---table_config---` (
 (
     'Groups', '_max_words_group_name', '20', '20', 'text', 
     'Max words group name', 'Maximum number of words for group name.', 'option'
+),
+(
+    'Groups', '_min_words_group_desc', '30', '30', 'text', 
+    'Min words group desc', 'Minimum number of words for group description.', 'option'
 );

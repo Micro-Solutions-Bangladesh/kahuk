@@ -120,9 +120,6 @@ define("LOG_DB_QUERY_FILE", LOG_FILE);
 /**
  * 
  */
-// Minimum number of word for group description
-define( "MIN_NUMBER_OF_WORD_GROUP_DESC", 30 );
-
 // Maximum number of word for group description
 define( "MAX_NUMBER_OF_WORD_GROUP_DESC", 200 );
 
