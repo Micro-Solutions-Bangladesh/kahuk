@@ -97,4 +97,8 @@ INSERT INTO `---table_config---` (
 (
     'Karma', '_fork_karma_for_user', '1', '1', 'text', 
     'Fork karma user', 'Karma Value for User when he or she save a STORY.', 'option'
+),
+(
+    'Karma', '_new_to_published_karma', '20', '20', 'text', 
+    'New to Published', 'Karma Value to upgrade status of a story into PUBLISHED from NEW.', 'option'
 );

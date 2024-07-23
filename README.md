@@ -73,7 +73,7 @@ When a user fork a story, the story will be visible in his/her profile page as a
 
 #### Story Submit
  
-- When a new story submited, the story initially shows in as a new story and also in the trending story pages. By the time when a story karma reach equal or higher then `NEW_TO_PUBLISHED_KARMA` the story will be appear in publish story and trending story pages depending on the submit time and karma value.
+- When a new story submited, the story initially shows in as a new story and also in the trending story pages. By the time when a story karma reach equal or higher then db config `_new_to_published_karma` the story will be appear in publish story and trending story pages depending on the submit time and karma value.
 
 > In the process of new story submit, the CMS also update few Karma numbers:
  

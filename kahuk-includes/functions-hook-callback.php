@@ -128,10 +128,11 @@ $hooks->add_filter("reaction_inserted", "kahuk_reaction_inserted_callback");
 function kahuk_refactor_story_status_callback($args = []) {
     global $db;
     $story = kahuk_story($args['story_id']);
+    $publishedKarma = kahuk_get_config("_new_to_published_karma");
 
     if (
         ($story["link_status"] == "new") &&
-        (sanitize_number($story["link_karma"]) > sanitize_number(NEW_TO_PUBLISHED_KARMA))
+        (sanitize_number($story["link_karma"]) > sanitize_number($publishedKarma))
     ) {
         $sql = "UPDATE " . table_links . "";
         $sql .= " SET link_status = 'published'";

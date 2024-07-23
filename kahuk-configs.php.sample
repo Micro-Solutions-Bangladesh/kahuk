@@ -120,9 +120,6 @@ define("LOG_DB_QUERY_FILE", LOG_FILE);
 /**
  * Determine the Karma Values
  */
-// Karma Value to upgrade status of a story into PUBLISHED from NEW
-define("NEW_TO_PUBLISHED_KARMA", 20);
-
 // Karma Value for LINK When A Link Get/Loss Vote
 define("REACTION_KARMA_FOR_STORY", 2);
 

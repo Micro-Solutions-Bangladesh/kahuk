@@ -66,6 +66,7 @@ global $thetemp, $page_size;
 
 //
 $thetemp = kahuk_get_config('the_template', 'aowal');
+$StoryKarmaToPublish = kahuk_get_config("_new_to_published_karma");
 
 /**
  * Get the site logo from Admin config
