@@ -129,9 +129,6 @@ define("COMMENT_KARMA_FOR_STORY", 2);
 /**
  * 
  */
-//
-define("SEO_FRIENDLY_URL", true);
-
 // Minimum number of word for story title
 define( "MIN_NUMBER_OF_WORD_STORY_TITLE", 3 );
 
