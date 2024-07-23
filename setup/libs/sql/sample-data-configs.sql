@@ -85,4 +85,8 @@ INSERT INTO `---table_config---` (
 (
     'Karma', '_new_story_karma_initialy', '10', '10', 'text', 
     'New story karma', 'Story karma initially.', 'option'
+),
+(
+    'Karma', '_follow_karma_for_user', '50', '50', 'text', 
+    'Follow karma', 'Karma for user when somebody follow him or her.', 'option'
 );
