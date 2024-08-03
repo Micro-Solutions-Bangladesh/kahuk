@@ -465,6 +465,7 @@ function kahuk_insert_story( $initialData ) {
     ];
 
     $data = array_merge( $defaultData, $initialData );
+    $storyKarma = kahuk_get_config("_new_story_karma_initialy", "0");
 
 
     // SQL Query
@@ -476,7 +477,7 @@ function kahuk_insert_story( $initialData ) {
 
     // $sql .= ", link_votes=''"; // Need to update later
 
-    $sql .= ", link_karma='" . NEW_STORY_KARMA_INITIALY . "'"; // Need to update while vote
+    $sql .= ", link_karma='" . $db->escape($storyKarma) . "'"; // Need to update while vote
 
     $sql .= ", link_modified=NOW()";
 

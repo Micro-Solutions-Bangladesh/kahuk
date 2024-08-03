@@ -5,7 +5,7 @@ include_once('../internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('../config.php');
-include(KAHUK_LIBS_DIR . 'smartyvariables.php');
+include(KAHUKPATH_LIBS . 'smartyvariables.php');
 
 check_referrer();
 
@@ -27,7 +27,7 @@ if ($canIhaveAccess == 0) {
  * 
  * @return array
  */
-function kahuk_log_files_list($path = KAHUK_LOG_DIR)
+function kahuk_log_files_list($path = KAHUKPATH_LOGS)
 {
     $output = [];
 
@@ -48,14 +48,14 @@ function kahuk_log_files_list($path = KAHUK_LOG_DIR)
 }
 
 
-$logFiles = kahuk_log_files_list(KAHUK_LOG_DIR . 'error-logs/');
+$logFiles = kahuk_log_files_list(KAHUKPATH_LOGS . 'error-logs/');
 
 
 // Delete Error File Action
 $deleteFile = _get('delete');
 
-if (file_exists(KAHUK_LOG_DIR . "error-logs/" . $deleteFile . ".log")) {
-    $deleteableFile = KAHUK_LOG_DIR . "error-logs/" . $deleteFile . ".log";
+if (file_exists(KAHUKPATH_LOGS . "error-logs/" . $deleteFile . ".log")) {
+    $deleteableFile = KAHUKPATH_LOGS . "error-logs/" . $deleteFile . ".log";
 
     if (!unlink($deleteableFile)) {
         trigger_error("$deleteableFile cannot be deleted due to an error", E_USER_WARNING);
@@ -70,24 +70,24 @@ $showFile = _get('show');
 $viewableFile = '';
 $viewableFilePath = '';
 
-if (file_exists(KAHUK_LOG_DIR . "error-logs/" . $showFile . ".log")) {
+if (file_exists(KAHUKPATH_LOGS . "error-logs/" . $showFile . ".log")) {
     $viewableFile = "error-logs/" . $showFile . ".log";
-    // $viewableFilePath = KAHUK_LOG_DIR . $viewableFile;
+    // $viewableFilePath = KAHUKPATH_LOGS . $viewableFile;
 }
 
 if (empty($viewableFile)) {
     $defaultErrorLogFile = kahuk_error_log_file_name();
 
-    if (file_exists(KAHUK_LOG_DIR . "error-logs/" . $defaultErrorLogFile)) {
+    if (file_exists(KAHUKPATH_LOGS . "error-logs/" . $defaultErrorLogFile)) {
         $viewableFile = "error-logs/" . $defaultErrorLogFile;
-        // $viewableFilePath = KAHUK_LOG_DIR . "error-logs/" . $defaultErrorLogFile;
+        // $viewableFilePath = KAHUKPATH_LOGS . "error-logs/" . $defaultErrorLogFile;
     }
 }
 
 //
 $main_smarty->assign('kahuk_viewable_log_file', $viewableFile);
 
-$kahuk_logs = file_get_contents(KAHUK_LOG_DIR . $viewableFile);
+$kahuk_logs = file_get_contents(KAHUKPATH_LOGS . $viewableFile);
 $main_smarty->assign('kahuk_logs', $kahuk_logs);
 
 

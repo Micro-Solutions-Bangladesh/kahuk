@@ -252,8 +252,6 @@ function create_kahuk_configs_file() {
 	$new_content = str_replace("my_base_url_here", $root_url, $new_content);
 	$new_content = str_replace("my_kahuk_base_here", $path, $new_content);
 
-	// $new_content = str_replace("seo_friendly_url_here", SEO_FRIENDLY_URL, $new_content);
-
 	//
 	$path_to_kahuk_configs = KAHUKPATH . "kahuk-configs.php";
 

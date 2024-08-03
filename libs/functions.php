@@ -104,7 +104,7 @@ function kahuk_shorten_the_url($url) {
  * @return string markup
  */
 function kahuk_create_markup_message($msg, $msgtype = "info") {
-	$markup = "<div class=\"alert alert-%s mb-4\"><p class=\"m-0\">%s</p></div>";
+	$markup = "<div class=\"alert alert-%s mb-4\"><div class=\"m-0\">%s</div></div>";
 
 	return sprintf(
 		$markup, $msgtype, $msg
@@ -118,9 +118,9 @@ function kahuk_create_markup_message($msg, $msgtype = "info") {
  * 
  * @return string markup
  */
-function kahuk_markup_messages($messages, $wrapper="") {
+function kahuk_markup_messages($messages, $wrapper="<div class=\"messages-wrapper\">%s</div>") {
 	$output = "";
-	$markup = "<div class=\"alert alert-%s mb-4\"><p class=\"m-0\">%s</p></div>";
+	$markup = "<div class=\"alert alert-%s mb-4\"><div class=\"m-0\">%s</div></div>";
 
 	foreach($messages as $message) {
 		$output .= sprintf(
@@ -144,11 +144,11 @@ function kahuk_markup_messages($messages, $wrapper="") {
  * 
  * @return array
  */
-function kahuk_get_session_messages($isMarkup = false, $wrapper="") {
+function kahuk_get_session_messages($isMarkup = false, $wrapper="", $sessionName = "kahuk_session_message") {
 	kahuk_session_start();
 
-	$output = ( isset( $_SESSION['kahuk_session_message'] ) ? $_SESSION['kahuk_session_message'] : [] );
-	$_SESSION['kahuk_session_message'] = [];
+	$output = ( isset( $_SESSION[$sessionName] ) ? $_SESSION[$sessionName] : [] );
+	$_SESSION[$sessionName] = [];
 
 	if ($isMarkup) {
 		$output = kahuk_markup_messages($output, $wrapper);
@@ -165,13 +165,13 @@ function kahuk_get_session_messages($isMarkup = false, $wrapper="") {
  * 
  * @since 5.0.0
  */
-function kahuk_set_session_message( $msg, $msgtype = 'info', $msgcode = '' ) {
+function kahuk_set_session_message( $msg, $msgtype = "info", $msgcode = "", $sessionName = "kahuk_session_message" ) {
 	kahuk_session_start();
 
 	$output = [];
 
-	if ( isset( $_SESSION['kahuk_session_message'] ) ) {
-		$output = $_SESSION['kahuk_session_message'];
+	if ( isset( $_SESSION[$sessionName] ) ) {
+		$output = $_SESSION[$sessionName];
 	}
 
 	$output[] = [
@@ -180,7 +180,7 @@ function kahuk_set_session_message( $msg, $msgtype = 'info', $msgcode = '' ) {
 		'msgcode' => $msgcode,
 	];
 
-	$_SESSION['kahuk_session_message'] = $output;
+	$_SESSION[$sessionName] = $output;
 }
 
 /**

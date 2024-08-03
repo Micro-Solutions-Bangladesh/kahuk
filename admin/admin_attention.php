@@ -5,7 +5,7 @@ include_once('../internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('../config.php');
-include(KAHUK_LIBS_DIR . 'smartyvariables.php');
+include(KAHUKPATH_LIBS . 'smartyvariables.php');
 
 check_referrer();
 
@@ -26,7 +26,7 @@ if ($canIhaveAccess == 0) {
  * 
  * @return array
  */
-function kahuk_log_files_list($path = KAHUK_LOG_DIR)
+function kahuk_log_files_list($path = KAHUKPATH_LOGS)
 {
     $output = [];
 
@@ -46,14 +46,14 @@ function kahuk_log_files_list($path = KAHUK_LOG_DIR)
     return $output;
 }
 
-$logFiles = kahuk_log_files_list(KAHUK_LOG_DIR . 'attention-logs/');
+$logFiles = kahuk_log_files_list(KAHUKPATH_LOGS . 'attention-logs/');
 
 
 // Delete Error File Action
 $deleteFile = _get('delete');
 
-if (file_exists(KAHUK_LOG_DIR . "attention-logs/" . $deleteFile . ".log")) {
-    $deleteableFile = KAHUK_LOG_DIR . "attention-logs/" . $deleteFile . ".log";
+if (file_exists(KAHUKPATH_LOGS . "attention-logs/" . $deleteFile . ".log")) {
+    $deleteableFile = KAHUKPATH_LOGS . "attention-logs/" . $deleteFile . ".log";
 
     if (!unlink($deleteableFile)) {
         trigger_error("$deleteableFile cannot be deleted due to an error", E_USER_WARNING);
@@ -68,14 +68,14 @@ $showFile = _get('show');
 $viewableFile = '';
 $viewableFilePath = '';
 
-if (file_exists(KAHUK_LOG_DIR . "attention-logs/" . $showFile . ".log")) {
+if (file_exists(KAHUKPATH_LOGS . "attention-logs/" . $showFile . ".log")) {
     $viewableFile = "attention-logs/" . $showFile . ".log";
 }
 
 if (empty($viewableFile)) {
     $defaultErrorLogFile = kahuk_error_log_file_name();
 
-    if (file_exists(KAHUK_LOG_DIR . "attention-logs/" . $defaultErrorLogFile)) {
+    if (file_exists(KAHUKPATH_LOGS . "attention-logs/" . $defaultErrorLogFile)) {
         $viewableFile = "attention-logs/" . $defaultErrorLogFile;
     }
 }
@@ -85,8 +85,8 @@ $main_smarty->assign('kahuk_viewable_log_file', $viewableFile);
 
 $kahuk_logs = '';
 
-if (!empty($viewableFile) && file_exists(KAHUK_LOG_DIR . $viewableFile)) {
-    $kahuk_logs = file_get_contents(KAHUK_LOG_DIR . $viewableFile);
+if (!empty($viewableFile) && file_exists(KAHUKPATH_LOGS . $viewableFile)) {
+    $kahuk_logs = file_get_contents(KAHUKPATH_LOGS . $viewableFile);
 }
 
 $main_smarty->assign('kahuk_logs', $kahuk_logs);

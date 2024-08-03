@@ -231,15 +231,17 @@ class KahukGroups
         global $db;
 
         $group_name = sanitize_text_field($group_name);
+        $minWordsGroupName = kahuk_get_config("_min_words_group_name", "2", "number");
+        $maxWordsGroupName = kahuk_get_config("_max_words_group_name", "10", "number");
 
-        if (kahuk_word_count($group_name) < MIN_NUMBER_OF_WORD_GROUP_NAME) {
-            $this->errors->add( 'min-word-name', "Minimum " . MIN_NUMBER_OF_WORD_GROUP_NAME . " word required for group name." );
+        if (kahuk_word_count($group_name) < $minWordsGroupName) {
+            $this->errors->add( 'min-word-name', "Minimum {$minWordsGroupName} word required for group name." );
             
             return $this->errors;
         }
 
-        if (kahuk_word_count($group_name) > MAX_NUMBER_OF_WORD_GROUP_NAME) {
-            $this->errors->add( 'max-word-name', "Maximum " . MAX_NUMBER_OF_WORD_GROUP_NAME . " word for group name." );
+        if (kahuk_word_count($group_name) > $maxWordsGroupName) {
+            $this->errors->add( 'max-word-name', "Maximum {$maxWordsGroupName} word for group name." );
             
             return $this->errors;
         }
@@ -292,15 +294,17 @@ class KahukGroups
      */
     public function check_group_description($group_desc) {
         $group_desc = trim($group_desc);
+        $minWordsGroupDesc = kahuk_get_config("_min_words_group_desc", "30", "number");
+        $maxWordsGroupDesc = kahuk_get_config("_max_words_group_desc", "200", "number");
 
-        if (kahuk_word_count($group_desc) < MIN_NUMBER_OF_WORD_GROUP_DESC) {
-            $this->errors->add( 'min-word-desc', "Minimum " . MIN_NUMBER_OF_WORD_GROUP_DESC . " word required for group description." );
+        if (kahuk_word_count($group_desc) < $minWordsGroupDesc) {
+            $this->errors->add( 'min-word-desc', "Minimum {$minWordsGroupDesc} word required for group description." );
 
             return $this->errors;
         }
 
-        if (kahuk_word_count($group_desc) > MAX_NUMBER_OF_WORD_GROUP_DESC) {
-            $this->errors->add( 'max-word-desc', "Maximum " . MAX_NUMBER_OF_WORD_GROUP_DESC . " word for group description." );
+        if (kahuk_word_count($group_desc) > $maxWordsGroupDesc) {
+            $this->errors->add( 'max-word-desc', "Maximum {$maxWordsGroupDesc} word for group description." );
             
             return $this->errors;
         }

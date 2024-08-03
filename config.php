@@ -2,7 +2,7 @@
 require_once dirname(__FILE__) . "/kahuk-loader.php";
 
 require_once KAHUKPATH . "kahuk-configs.php";
-require_once KAHUK_INC_DIR . "kahuk-includes.php";
+require_once KAHUKPATH_INC . "kahuk-includes.php";
 
 /**
  * Check maintenance mode
@@ -11,7 +11,7 @@ $maintenance_mode = is_maintenance_mode();
 
 if ($maintenance_mode) {
 	if (!kahuk_session_user_level("admin")) {
-		include_once(KAHUK_PAGES_DIR . "maintenance.php");
+		include_once(KAHUKPATH_PAGES . "maintenance.php");
 		exit;
 	}
 }
@@ -72,7 +72,7 @@ if (kahuk_is_admin()) {
 /**
  * Make sure the template folder exist
  */
-$the_template_path = KAHUK_TPL_DIR . $thetemp . "/kahuk.tpl";
+$the_template_path = KAHUKPATH_TPL . $thetemp . "/kahuk.tpl";
 
 if (!is_readable($the_template_path)) {
 	echo "<pre>Template {$thetemp} not found!</pre>";
@@ -137,7 +137,7 @@ if (!file_exists(dirname(__FILE__) . "/languages/lang_" . KAHUK_LANG . ".conf"))
 }
 
 
-include KAHUK_LIBS_DIR . "utf8/utf8.php";
+include KAHUKPATH_LIBS . "utf8/utf8.php";
 
 /** */
 function loadCategoriesForCache($clear_cache = false)
@@ -153,5 +153,5 @@ function loadCategoriesForCache($clear_cache = false)
 	return $db->get_results($sql);
 }
 
-include_once(KAHUK_INC_DIR . "kahuk-variables.php");
+include_once(KAHUKPATH_INC . "kahuk-variables.php");
 

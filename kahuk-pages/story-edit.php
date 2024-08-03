@@ -8,7 +8,7 @@ if (!$story) {
 
 check_referrer();
 
-include(KAHUK_LIBS_DIR . 'page-submit.php');
+include(KAHUKPATH_LIBS . 'page-submit.php');
 
 $theid = sanitize_number((sanitize_text_field(_get('id'))));
 
@@ -33,7 +33,7 @@ if (
     }
 
     //
-    include(KAHUK_LIBS_DIR . 'csrf.php');
+    include(KAHUKPATH_LIBS . 'csrf.php');
     $CSRF = new csrf();
 
     //
@@ -75,8 +75,9 @@ if (
 
                 if ($link_title_url != $link_title_url_hidden) {
                     $storyCountBySlug = kahuk_count_story_by_slug( $link_title_url, ['not_id' => [$story_id]] );
+                    $maxSameTitle = kahuk_get_config("_max_same_title", "1", "number");
 
-                    if ( MAX_NUMBER_OF_DUPLICATE_STORY_TITLE <= $storyCountBySlug ) {
+                    if ( $maxSameTitle <= $storyCountBySlug ) {
                         kahuk_set_session_message(
                             'Failed to save story, slug is duplicate!',
                             'notice'

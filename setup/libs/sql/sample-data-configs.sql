@@ -6,7 +6,12 @@ INSERT INTO `---table_config---` (
     'Primary Settings', '_site_name', 'Kahuk', 'Kahuk', '', 
     'Website name', 'Name  or title of the website', 'option'
 ),
-('Primary Settings', 'allow_registration', 'true', 'true', 'true / false', 'Allow registration?', 'If for a reason you want to suspend registration, permanently or definitely, set it to false!', 'define'),
+(
+    'Primary Settings', '_registration_disable', 'false', 'false', 
+    'true / false', 'Disable registration?', 
+    'If for a reason you want to disable registration feature, set it to true!', 
+    'option'
+),
 ('Primary Settings', '_maintenance_mode', 'false', 'false', 'true / false', 'Maintenance Mode', 'Set the mode to true when you want to notify the users of the unavailability of the site (upgrade, downtime, etc.)<br /><strong>NOTE that only Admin can still access the site during maintenance mode!</strong>', 'option'),
 ('Email Settings', '_site_email_contact', 'support@domain.com', 'support@domain.com', '', 'Contact Email', 'Contact email address for the website', 'option'),
 ('Email Settings', '_site_email_auto', 'auto@domain.com', 'auto@domain.com', '', 'Auto Email', 'Auto email address for the website', 'option'),
@@ -30,8 +35,6 @@ INSERT INTO `---table_config---` (
 ('Submit', '_allowed_html_tags_normal', '', '', 'HTML tags', 'HTML tags to allow to Normal users', 'leave blank to not allow tags. Examples are: &lt;br&gt;&lt;p&gt;&lt;strong&gt;&lt;em&gt;&lt;u&gt;&lt;s&gt;&lt;sub&gt;&lt;sup&gt;&lt;ol&gt;&lt;ul&gt;&lt;li&gt;&lt;blockquote&gt;&lt;span&gt;&lt;div&gt;&lt;big&gt;&lt;small&gt;&lt;tt&gt;&lt;code&gt;&lt;kbd&gt;&lt;samp&gt;&lt;var&gt;&lt;del&gt;&lt;ins&gt;&lt;hr&gt;&lt;pre&gt;<br /><strong style=\"color:#ff0000;\">NEVER ALLOW OTHER THAN THESE TAGS, ESPECIALLY FORM, SCRIPT, IMG, SVG AND IFRAME TAGS!</strong>', 'option'),
 ('Submit', '_allowed_html_tags_moderator', '', '', 'HTML tags', 'HTML tags to allow for Moderators', 'leave blank to not allow tags. Examples are: &lt;br&gt;&lt;p&gt;&lt;strong&gt;&lt;em&gt;&lt;u&gt;&lt;s&gt;&lt;sub&gt;&lt;sup&gt;&lt;ol&gt;&lt;ul&gt;&lt;li&gt;&lt;blockquote&gt;&lt;span&gt;&lt;div&gt;&lt;big&gt;&lt;small&gt;&lt;tt&gt;&lt;code&gt;&lt;kbd&gt;&lt;samp&gt;&lt;var&gt;&lt;del&gt;&lt;ins&gt;&lt;hr&gt;&lt;pre&gt;<br /><strong style=\"color:#ff0000;\">NEVER ALLOW OTHER THAN THESE TAGS, ESPECIALLY FORM, SCRIPT, IMG, SVG AND IFRAME TAGS!</strong>', 'option'),
 ('Submit', '_allowed_html_tags_admin', '', '', 'HTML tags', 'HTML tags to allow for Admins', 'leave blank to not allow tags. Examples are: &lt;br&gt;&lt;p&gt;&lt;strong&gt;&lt;em&gt;&lt;u&gt;&lt;s&gt;&lt;sub&gt;&lt;sup&gt;&lt;ol&gt;&lt;ul&gt;&lt;li&gt;&lt;blockquote&gt;&lt;span&gt;&lt;div&gt;&lt;big&gt;&lt;small&gt;&lt;tt&gt;&lt;code&gt;&lt;kbd&gt;&lt;samp&gt;&lt;var&gt;&lt;del&gt;&lt;ins&gt;&lt;hr&gt;&lt;pre&gt;<br /><strong style=\"color:#ff0000;\">NEVER ALLOW OTHER THAN THESE TAGS, ESPECIALLY FORM, SCRIPT, IMG, SVG AND IFRAME TAGS!</strong>', 'option'),
-('Story', 'open_in_new_window', 'false', 'false', 'true / false', 'Open Story Link in New Window', 'If "Use story title as link" is set to true, setting this to true will open the link in a new window.', 'define'),
-('Story', 'link_nofollow', 'true', 'true', 'true / false', 'Use rel="nofollow"', 'nofollow is a value that can be assigned to the rel attribute of an HTML a element to instruct some search engines that the hyperlink should not influence the ranking of the link''s target in the search engine''s index.<br /><a href="https://support.google.com/webmasters/answer/96569?hl=en" target="_blank" rel="noopener noreferrer">Google: policies</a>', 'define'),
 ('Comments', '_enable_comments', 'true', 'true', 'true / false', 'Allow Comments', 'Allow users to comment on articles?', 'option'),
 ('Comments', '_max_no_char_comment', '1200', '1200', 'number', 'Maximum Comment Length', 'Maximum number of characters for the comment.', 'option'),
 ('Groups', 'enable_group', 'true', 'true', 'true/false', 'Groups', 'Activate the Group Feature?', 'define'),
@@ -49,27 +52,110 @@ INSERT INTO `---table_config---` (
 ('Avatars', 'Avatar_Small', '32', '32', 'number', 'Small Avatar Size', 'Size of the small avatar in pixels (both width and height). Commonly used in the comments page.', 'define'),
 ('Template', 'the_template', 'aowal', 'aowal', 'Text', 'Template', 'Default Template', 'option'),
 ('Misc', '_time_story_totals_updated', '0', '0', 'text', 'Last updated time', 'When is the total of stories updated by status', 'option'),
-('Misc', '_story_status_published_total', '0', '0', 'text', 'Total published stories', 'Number of stories published', 'option'),
-('Misc', '_story_status_new_total', '0', '0', 'text', 'Total new stories', 'Number of stories new', 'option'),
-('Misc', '_story_status_trash_total', '0', '0', 'text', 'Total trash stories', 'Number of stories trash', 'option'),
-('Misc', '_story_status_page_total', '0', '0', 'text', 'Total page stories', 'Number of pages', 'option'),
-('Misc', '_story_status_draft_total', '0', '0', 'text', 'Total draft', 'Number of drafts', 'option'),
+('Misc', '_story_status_published_total', '0', '0', 'number', 'Total published stories', 'Number of stories published', 'option'),
+('Misc', '_story_status_new_total', '0', '0', 'number', 'Total new stories', 'Number of stories new', 'option'),
+('Misc', '_story_status_trash_total', '0', '0', 'number', 'Total trash stories', 'Number of stories trash', 'option'),
+('Misc', '_story_status_page_total', '0', '0', 'number', 'Total page stories', 'Number of pages', 'option'),
+('Misc', '_story_status_draft_total', '0', '0', 'number', 'Total draft', 'Number of drafts', 'option'),
 ('Misc', 'trackback_url', 'kahuk.com', 'kahuk.com', 'kahuk.com', 'Trackback URL', 'The url to be used in <a href="http://en.wikipedia.org/wiki/Trackback">trackbacks</a>.', 'option'),
 ('Misc', 'page_size', '8', '8', 'number', 'Page Size', 'How many stories to show on a page.', 'option'),
 ('Misc', 'validate_password', 'true', 'true', 'true / false', 'Validate user password', 'Validate user password, when registering/password reset, to check if it is safe and not pwned?<br />If you set to true, then a check is done using HIBP API. If the provided password has been pwned, the registration is not submitted until they provide a different password!.<br /><a href="https://haveibeenpwned.com/" target="_blank" rel="noopener noreferrer">Have I Been Pwned?</a>', 'define'),
 (
     'Misc', 'what_is_kahuk', 'true', 'true', 'true / false', 
     'Display What is Kahuk in the sidebar?', 
-    'Set it to false if you do not want it to display.<br />If you want it to display but with your own content, Keep it set to true and edit the language file where the entry is KAHUK_Visual_What_Is_Kahuk and KAHUK_Visual_What_Is_Kahuk_Text under the Sidebar section.<br /><a href=\"../admin/module.php?module=admin_language\" target=\"_blank\" rel=\"noopener noreferrer\">Modify Language</a>', 
+    'Set it to false if you do not want it to display.<br>If you want it to display but with your own content, Keep it set to true and edit the language file where the entry is KAHUK_Visual_What_Is_Kahuk and KAHUK_Visual_What_Is_Kahuk_Text under the Sidebar section.<br /><a href=\"../admin/module.php?module=admin_language\" target=\"_blank\" rel=\"noopener noreferrer\">Modify Language</a>', 
     'normal'
 ),
 (
-    'Misc', '_kahuk_cms_version', '604,6.0.4', '', 'text', 
+    'Misc', '_kahuk_cms_version', '605,6.0.5', '', 'text', 
     'Kahuk Version', 
     'Version of Kahuk CMS<br>Please do not edit this (if you are not expert in Kahuk CMS).', 
     'option'
 ),
 (
-    'Plugins', 'plugins_installed', 'snippets', '', 'text', 
+    'Plugins', 'plugins_installed', 'snippets', '', 'number', 
     'Installed Plugins', 'CSV list of installed plugins.', 'option'
+),
+(
+    'Karma', '_new_story_karma_for_user', '5', '5', 'number', 
+    'New story karma for user', 'Karma for user when submit a new story.', 'option'
+),
+(
+    'Karma', '_new_story_karma_initialy', '10', '10', 'number', 
+    'New story karma', 'Story karma initially.', 'option'
+),
+(
+    'Karma', '_follow_karma_for_user', '50', '50', 'number', 
+    'Follow karma', 'Karma for user when somebody follow him or her.', 'option'
+),
+(
+    'Karma', '_fork_karma_for_story', '2', '2', 'number', 
+    'Fork karma story', 'Karma Value for a story when it is forked by user.', 'option'
+),
+(
+    'Karma', '_fork_karma_for_user', '1', '1', 'number', 
+    'Fork karma user', 'Karma Value for User when he or she save a STORY.', 'option'
+),
+(
+    'Karma', '_new_to_published_karma', '20', '20', 'number', 
+    'New to Published', 'Karma Value to upgrade status of a story into PUBLISHED from NEW.', 'option'
+),
+(
+    'Karma', '_reaction_karma_for_story', '2', '2', 'number', 
+    'Reaction karma for story', 'Karma Value for a story When A story Get or Loss reaction.', 'option'
+),
+(
+    'Karma', '_reaction_karma_for_user', '1', '1', 'number', 
+    'Reaction karma for user', 'Karma Value for USER When user react for a story.', 'option'
+),
+(
+    'Karma', '_comment_karma_for_user', '1', '1', 'number', 
+    'Comment karma for user', 'Karma Value for USER When user comment.', 'option'
+),
+(
+    'Karma', '_comment_karma_for_story', '1', '1', 'number', 
+    'Comment karma for story', 'Karma Value for STORY When user comment.', 'option'
+),
+(
+    'Story', 'open_in_new_window', 'false', 'false', 
+    'true / false', 'Open Story Link in New Window', 
+    'If "Use story title as link" is set to true, setting this to true will open the link in a new window.', 
+    'define'
+),
+(
+    'Story', 'link_nofollow', 'true', 'true', 'true / false', 
+    'Use rel="nofollow"', 'nofollow is a value that can be assigned to the rel attribute of an HTML a element to instruct some search engines that the hyperlink should not influence the ranking of the link''s target in the search engine''s index.<br /><a href="https://support.google.com/webmasters/answer/96569?hl=en" target="_blank" rel="noopener noreferrer">Google: policies</a>', 
+    'define'
+),
+(
+    'Story', '_min_words_story_title', '3', '3', 'number', 
+    'Min words for title', 'Minimum number of words required for title to submit a story.', 'option'
+),
+(
+    'Story', '_max_words_story_title', '18', '18', 'number', 
+    'Max words for title', 'Max number of words allowed for title to submit a story.', 'option'
+),
+(
+    'Story', '_max_same_url', '5', '5', 'number', 
+    'Max same url', 'Maximum number of story with same url.', 'option'
+),
+(
+    'Story', '_max_same_title', '1', '1', 'number', 
+    'Max same title', 'Maximum number of story with same title.', 'option'
+),
+(
+    'Groups', '_min_words_group_name', '2', '2', 'number', 
+    'Min words group name', 'Minimum number of words for group name.', 'option'
+),
+(
+    'Groups', '_max_words_group_name', '20', '20', 'number', 
+    'Max words group name', 'Maximum number of words for group name.', 'option'
+),
+(
+    'Groups', '_min_words_group_desc', '30', '30', 'number', 
+    'Min words group desc', 'Minimum number of words for group description.', 'option'
+),
+(
+    'Groups', '_max_words_group_desc', '200', '200', 'number', 
+    'Max words group desc', 'Maximum number of words for group description.', 'option'
 );

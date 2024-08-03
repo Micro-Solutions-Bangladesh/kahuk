@@ -59,18 +59,20 @@ function kahuk_check_unique_story( $story_url, $story_slug, $skipId = [] ) {
 
     //
     $storyCountByUrl = kahuk_count_story_by_url( $story_url );
+    $maxSameUrl = kahuk_get_config("_max_same_url", "2", "number");
 
-    if ( MAX_NUMBER_OF_DUPLICATE_STORY <= $storyCountByUrl ) {
+    if ($maxSameUrl <= $storyCountByUrl) {
         $output['code'] = "duplicate_url_reject";
-        $output['message'] = MAX_NUMBER_OF_DUPLICATE_STORY . " or more stories found with the submitted url."; // TODO dynamic
+        $output['message'] = $maxSameUrl . " or more stories found with the submitted url."; // TODO dynamic
 
         return $output;
     }
 
     //
     $storyCountBySlug = kahuk_count_story_by_slug( $story_slug, ['not_id' => $skipId] );
+    $maxSameTitle = kahuk_get_config("_max_same_title", "1", "number");
 
-    if ( MAX_NUMBER_OF_DUPLICATE_STORY_TITLE <= $storyCountBySlug ) {
+    if ($maxSameTitle <= $storyCountBySlug) {
         $output['code'] = "duplicate_title_reject";
         $output['message'] = "Seems like matching title for the story exist, please try to make it unique and more readable."; // TODO dynamic
 
@@ -103,7 +105,7 @@ function kahuk_unique_title_slug( $title_slug ) {
         return $title_slug;
     }
 
-    $maxNumberOfDuplicateTitle = MAX_NUMBER_OF_DUPLICATE_STORY;
+    $maxSameUrl = kahuk_get_config("_max_same_url", "2", "number");
 
     $uniqueSlug = '';
     $slugNameCheck = true;
@@ -122,7 +124,7 @@ function kahuk_unique_title_slug( $title_slug ) {
         //
         $maxLoopCount++;
 
-        if ( $maxNumberOfDuplicateTitle < $maxLoopCount ) {
+        if ( $maxSameUrl < $maxLoopCount ) {
             $slugNameCheck = false;
             $uniqueSlug = '';
 

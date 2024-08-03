@@ -3,58 +3,48 @@ if (!defined("KAHUKPATH")) {
 	define("KAHUKPATH", dirname(__FILE__) . "/");
 }
 
-/**
- * Create names of folders
- */
-if (!defined("KAHUK_FOLDER_TPL")) {
-	define("KAHUK_FOLDER_TPL", "templates");
-}
-
-if (!defined("KAHUK_FOLDER_INC")) {
-	define("KAHUK_FOLDER_INC", "kahuk-includes");
-}
-
-if (!defined("KAHUK_FOLDER_UPLOADED")) {
-	define("KAHUK_FOLDER_UPLOADED", "resources");
-}
-
-if (!defined("KAHUK_FOLDER_PAGES")) {
-	define("KAHUK_FOLDER_PAGES", "kahuk-pages");
-}
-
-if (!defined("KAHUK_FOLDER_PLUGINS")) {
-	define("KAHUK_FOLDER_PLUGINS", "kahuk-plugins");
-}
+/** */
+define("KAHUKDIR_TPL", "templates"); // default: templates
+define("KAHUKPATH_TPL", KAHUKPATH . KAHUKDIR_TPL . "/");
 
 /** */
-define("KAHUK_TPL_DIR", KAHUKPATH . KAHUK_FOLDER_TPL . "/");
+define("KAHUKDIR_INC", "kahuk-includes"); // default: kahuk-includes
+define("KAHUKPATH_INC", KAHUKPATH . KAHUKDIR_INC . "/");
 
 /** */
-define("KAHUK_PAGES_DIR", KAHUKPATH . KAHUK_FOLDER_PAGES . "/");
+define("KAHUKDIR_PAGES", "kahuk-pages"); // default: kahuk-pages
+define("KAHUKPATH_PAGES", KAHUKPATH . KAHUKDIR_PAGES . "/");
 
 /** */
-define("KAHUK_INC_DIR", KAHUKPATH . KAHUK_FOLDER_INC . "/");
+define("KAHUKDIR_PLUGINS", "kahuk-plugins"); // default: kahuk-plugins
+define("KAHUKPATH_PLUGINS", KAHUKPATH . KAHUKDIR_PLUGINS . "/");
 
 /** */
-define("KAHUK_PLUGINS_DIR", KAHUKPATH . KAHUK_FOLDER_PLUGINS . "/");
+define("KAHUKDIR_LIBS", "libs"); // default: libs
+define("KAHUKPATH_LIBS", KAHUKPATH . KAHUKDIR_LIBS . "/");
 
 /** */
-define("KAHUK_LANG_DIR", KAHUKPATH . "languages/");
+define("KAHUKDIR_LOGS", "logs"); // default: logs
+define("KAHUKPATH_LOGS", KAHUKPATH . KAHUKDIR_LOGS . "/");
 
 /** */
-define("KAHUK_LIBS_DIR", KAHUKPATH . "libs/");
+define("KAHUKDIR_UPLOADED", "resources"); // default: resources
+define("KAHUKPATH_UPLOADED", KAHUKPATH . KAHUKDIR_UPLOADED . "/");
+
+/** */
+define("KAHUK_FOLDER_GROUPS_AVATAR", "resources/groups-avatar");
+define("KAHUK_GROUPS_AVATAR_DIR", KAHUKPATH . KAHUK_FOLDER_GROUPS_AVATAR . "/");
 
 /** */
 define("KAHUK_SMARTY_DIR", KAHUKPATH . "internal/");
 
 /** */
-define("KAHUK_UPLOADED_DIR", KAHUKPATH . KAHUK_FOLDER_UPLOADED . "/");
+define("KAHUK_LANG_DIR", KAHUKPATH . "languages/");
 
-define("KAHUK_FOLDER_GROUPS_AVATAR", "resources/groups-avatar");
-define("KAHUK_GROUPS_AVATAR_DIR", KAHUKPATH . KAHUK_FOLDER_GROUPS_AVATAR . "/");
+/** */
+define("KAHUK_LANG", "english");
 
-
-// ** MySQL settings - You can get this info from your web host ** //
+// *** MySQL settings - You can get this info from your web host *** //
 
 /** MySQL database name */
 define("DB_NAME", "database_name_here");
@@ -89,7 +79,7 @@ if (!defined("KAHUK_DEBUG_DISPLAY")) {
 }
 
 /**
- * Should we report all errors?
+ * Is the website is on debugging mode?
  */
 if (!defined("KAHUK_DEBUG")) {
 	define("KAHUK_DEBUG", true);
@@ -103,14 +93,8 @@ if (!defined("KAHUK_DEBUG_LEVEL")) {
 	define("KAHUK_DEBUG_LEVEL", "E_CORE_ERROR | E_CORE_WARNING | E_COMPILE_ERROR | E_ERROR | E_WARNING | E_PARSE | E_USER_ERROR | E_USER_WARNING | E_RECOVERABLE_ERROR");
 }
 
-/** */
-define("KAHUK_LANG", "english");
-
-/** 
- * Used by the Admin Panel error log file viewer 
- */
-define("KAHUK_LOG_DIR", KAHUKPATH . "logs/");
-define("LOG_FILE", "logs/error.log");
+/** Used by the Admin Panel error log file viewer */
+define("LOG_FILE", KAHUKDIR_LOGS . "/error.log");
 
 /**
  * Will log the activity in attention log file
@@ -124,73 +108,11 @@ define("KAHUK_DEBUG_MANUAL", true);
  */
 define("LOG_QUERY_ACTIVITY", true);
 
-/**
- * Will log the activity in error log file
- */
+/** Will log the activity in error log file */
 define("LOG_DB_QUERY", false);
 define("LOG_DB_QUERY_FILE", LOG_FILE);
 
-/**
- * Determine the Karma Values
- */
-// Karma Value for USER when somebody Follow the USER
-define("FOLLOW_KARMA_FOR_USER", 50);
-
-// Karma Value initially for new STORY
-define("NEW_STORY_KARMA_INITIALY", 10);
-
-// Karma Value for USER When user submit a new STORY
-define("NEW_STORY_KARMA_FOR_USER", 5);
-
-// Karma Value to upgrade status of a story into PUBLISHED from NEW
-define("NEW_TO_PUBLISHED_KARMA", 20);
-
-// Karma Value for LINK When A Link is fork by user
-define("FORK_KARMA_FOR_STORY", 2);
-
-// Karma Value for User when he/she save a STORY
-define("FORK_KARMA_FOR_USER", 1);
-
-// Karma Value for LINK When A Link Get/Loss Vote
-define("REACTION_KARMA_FOR_STORY", 2);
-
-// Karma Value for USER When user vote
-define("REACTION_KARMA_FOR_USER", 1);
-
-// Karma Value for USER When user comment
-define("COMMENT_KARMA_FOR_USER", 1);
-
-// Karma Value for STORY When user comment
-define("COMMENT_KARMA_FOR_STORY", 2);
-
-/**
- * 
- */
-//
-define("SEO_FRIENDLY_URL", true);
-
-// Minimum number of word for story title
-define( "MIN_NUMBER_OF_WORD_STORY_TITLE", 3 );
-
-// Maximum number of story with same url
-define("MAX_NUMBER_OF_DUPLICATE_STORY", 5);
-
-// Maximum number of story with same title
-define("MAX_NUMBER_OF_DUPLICATE_STORY_TITLE", 1);
-
-// Minimum number of word for group name
-define( "MIN_NUMBER_OF_WORD_GROUP_NAME", 2 );
-
-// Maximum number of word for group name
-define( "MAX_NUMBER_OF_WORD_GROUP_NAME", 20 );
-
-// Minimum number of word for group description
-define( "MIN_NUMBER_OF_WORD_GROUP_DESC", 30 );
-
-// Maximum number of word for group description
-define( "MAX_NUMBER_OF_WORD_GROUP_DESC", 200 );
-
-//
+/** */
 define("KAHUK_BASE_URL", "kahuk_base_url_here"); // ex: http[s]://example.com
 
 define("my_base_url", "my_base_url_here"); // ex: http[s]://example.com
@@ -208,15 +130,14 @@ ini_set("include_path", ".");
 // 0 = off
 // 1 = on
 define("caching", 1);
-define("summarize_mysql", 1);
 
 //
-require_once KAHUK_INC_DIR . "php-hooks.php";
+require_once KAHUKPATH_INC . "php-hooks.php";
 
 //
-require_once KAHUK_LIBS_DIR . "db.php";
-include_once KAHUK_LIBS_DIR . "define_tables.php";
-include_once KAHUK_INC_DIR . "db-configs.php";
+require_once KAHUKPATH_LIBS . "db.php";
+include_once KAHUKPATH_LIBS . "define_tables.php";
+include_once KAHUKPATH_INC . "db-configs.php";
 
 //
-require_once KAHUK_LIBS_DIR . "kahuk-mailer.php";
+require_once KAHUKPATH_LIBS . "kahuk-mailer.php";

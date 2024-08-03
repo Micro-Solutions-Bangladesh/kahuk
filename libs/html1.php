@@ -217,104 +217,6 @@ function latest_avatar($client_url, $server_path)
 	return $client_url . '?cache_timestamp=' . filemtime($server_path);
 }
 
-function do_sidebar($var_smarty, $navwhere = '')
-{
-	// show the categories in the sidebar
-	global $db, $globals, $the_cats;
-
-	if ($navwhere == '') {
-		global $navwhere;
-	}
-
-	// fix for 'undefined index' errors
-	if (!isset($navwhere['text4'])) {
-		$navwhere['text4'] = '';
-	} else {
-		$navwhere['text4'] = htmlspecialchars($navwhere['text4']);
-	}
-	if (!isset($navwhere['text3'])) {
-		$navwhere['text3'] = '';
-	} else {
-		$navwhere['text3'] = htmlspecialchars($navwhere['text3']);
-	}
-	if (!isset($navwhere['text2'])) {
-		$navwhere['text2'] = '';
-	} else {
-		$navwhere['text2'] = htmlspecialchars($navwhere['text2']);
-	}
-	if (!isset($navwhere['text1'])) {
-		$navwhere['text1'] = '';
-	} else {
-		$navwhere['text1'] = htmlspecialchars($navwhere['text1']);
-	}
-	if (!isset($navwhere['link4'])) {
-		$navwhere['link4'] = '';
-	}
-	if (!isset($navwhere['link3'])) {
-		$navwhere['link3'] = '';
-	}
-	if (!isset($navwhere['link2'])) {
-		$navwhere['link2'] = '';
-	}
-	if (!isset($navwhere['link1'])) {
-		$navwhere['link1'] = '';
-	}
-	$var_smarty->assign('navbar_where', $navwhere);
-
-	$var_smarty->assign('body_args', '');
-	// fix for 'undefined index' errors
-
-	$_caching = $var_smarty->cache; 	// get the current cache settings
-	$var_smarty->cache = true; 			// cache has to be on otherwise is_cached will always be false
-	$var_smarty->cache_lifetime = -1;   // lifetime has to be set to something otherwise is_cached will always be false
-	$thetpl = $var_smarty->get_template_vars('the_template') . '/categories.tpl';
-
-	// check to see if the category sidebar module is already cached
-	// if it is, use it
-
-	if (isset($_GET['category'])) {
-		$thecat = sanitize($_GET['category'], 3);
-	} else {
-		$thecat = '';
-	}
-	if (isset($var_smarty) && is_object($var_smarty) && $var_smarty->is_cached($thetpl, 'sidebar|category|' . $thecat)) {
-		$var_smarty->assign('cat_array', 'x'); // this is needed. sidebar.tpl won't include the category module if cat_array doesnt have some data
-	} else {
-		if (isset($_GET['category'])) {
-			$thecat = get_cached_category_data('category_safe_name', urlencode(sanitize($_GET['category'], 1)));
-			$catID  = $thecat->category_id;
-			$thecat = $thecat->category_name;
-		}
-
-		if (!empty($catID)) {
-			foreach ($the_cats as $cat) {
-				if ($cat->category_id == $catID && $cat->category_parent == 0) {
-					$globals['category_id'] = $cat->category_id;
-					$globals['category_name'] = $cat->category_name;
-				}
-			}
-		}
-
-		$pos = strrpos($_SERVER["SCRIPT_NAME"], "/");
-		$script_name = substr($_SERVER["SCRIPT_NAME"], $pos + 1, 100);
-		$script_name = str_replace(".php", "", $script_name);
-
-
-		// use the 'totals' table now 
-		$published_count = get_story_count('published');
-
-		$var_smarty->assign('published_count', $published_count);
-		$var_smarty->assign('category_url', getmyurl('maincategory'));
-	}
-
-	$var_smarty->cache = $_caching; // set cache back to original value
-
-	return $var_smarty;
-}
-
-
-
-
 
 /**
  * Depricated in favour of the kahuk_pagination_test()
@@ -876,34 +778,6 @@ function totals_adjust_count($name, $adjust)
 	}
 
 	return true;
-}
-
-function get_story_count($name)
-{
-	global $db, $cached_totals;
-
-	$name = $db->escape($name);
-	if (summarize_mysql == 1) {
-		if (isset($cached_totals[$name])) {
-			return $cached_totals[$name];
-		} else {
-			if (caching == 1) {
-				$db->cache_dir = KAHUKPATH . 'cache';
-				$db->use_disk_cache = true;
-				$db->cache_queries = true;
-			}
-			$totals = $db->get_results("SELECT * FROM `" . table_totals . "`");
-
-			$db->cache_queries = false;
-
-			foreach ($totals as $total) {
-				$cached_totals[$total->name] = $total->total;
-			}
-			return $cached_totals[$name];
-		}
-	} else {
-		return $db->get_var("SELECT count(*) FROM " . table_links . " WHERE link_status='$name';");
-	}
 }
 
 function close_tags($html)

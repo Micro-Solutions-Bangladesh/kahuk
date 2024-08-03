@@ -20,7 +20,7 @@ if ($globalUser) {
 }
 
 //
-include(KAHUK_LIBS_DIR . 'csrf.php');
+include(KAHUKPATH_LIBS . 'csrf.php');
 $CSRF = new csrf();
 
 $user_id = $globalUser['user_id'];

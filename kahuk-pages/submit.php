@@ -2,11 +2,11 @@
 force_authentication();
 
 //
-include(KAHUK_LIBS_DIR . 'kahuk-manage-spam.php');
-include(KAHUK_LIBS_DIR . 'class-kahuk-http-request.php');
-include(KAHUK_LIBS_DIR . 'smartyvariables.php');
+include(KAHUKPATH_LIBS . 'kahuk-manage-spam.php');
+include(KAHUKPATH_LIBS . 'class-kahuk-http-request.php');
+include(KAHUKPATH_LIBS . 'smartyvariables.php');
 
-include(KAHUK_LIBS_DIR . 'page-submit.php');
+include(KAHUKPATH_LIBS . 'page-submit.php');
 
 $submit_error_code = '';
 $phase = 0; //sanitize_number(_post("phase", 0));
@@ -74,7 +74,7 @@ function do_submit1()
 {
 	global $globalCategoriesObj, $globalGroup, $main_smarty, $the_template, $urlFound, $the_template_center, $submit_error_code;
 
-	include(KAHUK_LIBS_DIR . 'kahuk-link.php');
+	include(KAHUKPATH_LIBS . 'kahuk-link.php');
 	$kahukLink = kahuk_link_init($urlFound);
 
 	if ($kahukLink->errors->has_errors()) {
@@ -182,10 +182,13 @@ function do_submit2()
 		kahuk_redirect($page_submit_url_begin);
 	}
 
-	if (kahuk_word_count($story_title) < MIN_NUMBER_OF_WORD_STORY_TITLE) {
+	$minWordsStoryTitle = kahuk_get_config("_min_words_story_title", "3", "number");
+	$maxWordsStoryTitle = kahuk_get_config("_max_words_story_title", "18", "number");
+
+	if ((kahuk_word_count($story_title) < $minWordsStoryTitle) || (kahuk_word_count($story_title) > $maxWordsStoryTitle)) {
 		kahuk_set_session_message(
-			'Please write a minimum of ' . MIN_NUMBER_OF_WORD_STORY_TITLE . ' words for the story title.',
-			'error'
+			"Story title minimum {$minWordsStoryTitle} to maximum {$maxWordsStoryTitle} words are allowed.",
+			"error"
 		);
 
 		kahuk_redirect($page_submit_url_begin);

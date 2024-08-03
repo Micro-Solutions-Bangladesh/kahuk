@@ -455,6 +455,15 @@ function kahuk_admin_menu_sub_manage_settings_callback($items) {
     ];
 
     $items[] = [
+        "menu_slug" => "settings-karma",
+        "page_title" => "Karma",
+        "menu_title" => "Karma",
+        "capability" => "admin",
+        "url" => kahuk_create_url('admin/admin_config.php?page=Karma'),
+        "position" => "10.11",
+    ];
+
+    $items[] = [
         "menu_slug" => "settings-email-settings",
         "page_title" => "Email Settings",
         "menu_title" => "Email Settings",

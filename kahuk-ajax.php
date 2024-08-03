@@ -14,7 +14,7 @@ include_once(KAHUKPATH . 'internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include(KAHUKPATH . 'config.php');
-include(KAHUK_LIBS_DIR . 'smartyvariables.php');
+include(KAHUKPATH_LIBS . 'smartyvariables.php');
 
 check_referrer();
 
@@ -29,10 +29,10 @@ $returnOutput = [
 
 $pagePrefix = sanitize_text_field(_get('prefix'));
 
-if (file_exists(KAHUK_PAGES_DIR . "ajax-prefixes/{$pagePrefix}.php")) {
+if (file_exists(KAHUKPATH_PAGES . "ajax-prefixes/{$pagePrefix}.php")) {
     $action = _request('action');
 
-    include KAHUK_PAGES_DIR . "ajax-prefixes/{$pagePrefix}.php";
+    include KAHUKPATH_PAGES . "ajax-prefixes/{$pagePrefix}.php";
 }
 
 die();

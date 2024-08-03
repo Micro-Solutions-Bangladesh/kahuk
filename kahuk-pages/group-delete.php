@@ -9,7 +9,7 @@ check_referrer();
 force_authentication();
 
 // 
-include(KAHUK_LIBS_DIR . 'csrf.php');
+include(KAHUKPATH_LIBS . 'csrf.php');
 $CSRF = new csrf();
 
 $url_redirect = kahuk_permalink_group();

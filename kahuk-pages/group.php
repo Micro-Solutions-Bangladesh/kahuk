@@ -14,10 +14,10 @@ $group_status = $globalGroup['group_status']; // 'enable', 'pending', 'disable'
 $group_privacy = $globalGroup['group_privacy']; // 'private', 'public', 'restricted'
 
 //
-include_once KAHUK_LIBS_DIR . 'group.php';
+include_once KAHUKPATH_LIBS . 'group.php';
 
 //
-include(KAHUK_LIBS_DIR . 'csrf.php');
+include(KAHUKPATH_LIBS . 'csrf.php');
 $CSRF = new csrf();
 
 if (kahuk_check_user_role("admin")) {

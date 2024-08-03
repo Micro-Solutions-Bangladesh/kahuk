@@ -58,7 +58,6 @@
                 <span class="story-link-out">
                     <i class="icon icon-globe"></i> 
                     <a href="{$story.link_url}" 
-                        {if $open_in_new_window eq true}target="_blank" rel="noopener noreferrer"{/if}
                         {if $pagename eq "story" && $link_nofollow eq "1" && $story.link_status neq 'published'}
                             rel="nofollow"
                         {elseif $pagename eq "stories"}

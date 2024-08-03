@@ -37,7 +37,7 @@ if(!in_array($session_user_level, $allowed_user_roles)) {
 }
 
 // 
-include(KAHUK_LIBS_DIR . 'csrf.php');
+include(KAHUKPATH_LIBS . 'csrf.php');
 $CSRF = new csrf();
 
 /**

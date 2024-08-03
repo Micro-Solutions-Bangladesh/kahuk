@@ -9,7 +9,7 @@ if (kahuk_redirect_group_access()) {
 //     exit;
 // }
 
-include_once KAHUK_LIBS_DIR . 'group.php';
+include_once KAHUKPATH_LIBS . 'group.php';
 
 //
 $group_id = $globalGroup['group_id'];
@@ -30,7 +30,7 @@ if (!((in_array($session_user_level, ['admin'])) || ($group_creator == $session_
 }
 
 // 
-include(KAHUK_LIBS_DIR . 'csrf.php');
+include(KAHUKPATH_LIBS . 'csrf.php');
 $CSRF = new csrf();
 
 /**
@@ -107,7 +107,7 @@ if (isset($_POST["action"])) {
                 $group_avatar_medium_height = kahuk_get_config("_group_avatar_medium_height");
 
                 // create large avatar
-                include KAHUK_LIBS_DIR . "class.pThumb.php";
+                include KAHUKPATH_LIBS . "class.pThumb.php";
 
                 $img = new pThumb();
                 $img->pSetSize($group_avatar_medium_width, $group_avatar_medium_height);

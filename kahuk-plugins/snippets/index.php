@@ -110,7 +110,7 @@ function snippet_action_tpl_callback($location) {
             global $main_smarty;
 
             $main_smarty->assign('snippet_content', $snippet['snippet_content']);
-            echo $main_smarty->fetch(KAHUK_PLUGINS_DIR . PLUGIN_SLUG_SNIPPETS . "/tpl/snippet_eval.tpl");
+            echo $main_smarty->fetch(KAHUKPATH_PLUGINS . PLUGIN_SLUG_SNIPPETS . "/tpl/snippet_eval.tpl");
         }
     }
 }

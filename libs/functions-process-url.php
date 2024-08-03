@@ -296,9 +296,9 @@ function kahuk_loadable_page_path() {
     //
     $unexpectedMessage = '';
 
-	$loadablePage = KAHUK_PAGES_DIR . $pagename . ".php";
+	$loadablePage = KAHUKPATH_PAGES . $pagename . ".php";
 
-	if (!file_exists(KAHUK_PAGES_DIR . $pagename . ".php")) {
+	if (!file_exists(KAHUKPATH_PAGES . $pagename . ".php")) {
         $unexpectedMessage = "Page: {$loadablePage} is not exist!";
         $conPageCheck = explode(".", $pageCon);
 

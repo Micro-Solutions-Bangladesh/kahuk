@@ -114,7 +114,7 @@ class UserAuth {
 				$sha_hash = substr( $user->user_pass, SALT_LENGTH );
 
 				if ( ! function_exists( 'password_hash' ) ) {
-					require( KAHUK_LIBS_DIR."password.php" );
+					require( KAHUKPATH_LIBS."password.php" );
 					$new_pass = 'bcrypt:' . $salt . password_hash ( $sha_hash, PASSWORD_BCRYPT );
 				} else {
 					$new_pass = 'bcrypt:' . $salt . password_hash ( $sha_hash, PASSWORD_BCRYPT );

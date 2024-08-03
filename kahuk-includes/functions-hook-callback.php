@@ -103,12 +103,14 @@ $hooks->add_filter('process_story', 'kahuk_process_story_callback');
  */
 function kahuk_reaction_inserted_callback($output = [], $args = []) {
     $is_increase = true;
+    $reactionKarmaStory = kahuk_get_config("_reaction_karma_for_story", "0");
+    $reactionKarmaUser = kahuk_get_config("_reaction_karma_for_user", "0");
 
     //
-    kahuk_update_story_karma($args['story_id'], REACTION_KARMA_FOR_STORY, $is_increase);
+    kahuk_update_story_karma($args['story_id'], $reactionKarmaStory, $is_increase);
 
     // Update user karma
-    kahuk_update_user_karma($args['user_id'], REACTION_KARMA_FOR_USER, $is_increase);
+    kahuk_update_user_karma($args['user_id'], $reactionKarmaUser, $is_increase);
 
     return $output;
 }
@@ -128,10 +130,11 @@ $hooks->add_filter("reaction_inserted", "kahuk_reaction_inserted_callback");
 function kahuk_refactor_story_status_callback($args = []) {
     global $db;
     $story = kahuk_story($args['story_id']);
+    $publishedKarma = kahuk_get_config("_new_to_published_karma");
 
     if (
         ($story["link_status"] == "new") &&
-        (sanitize_number($story["link_karma"]) > sanitize_number(NEW_TO_PUBLISHED_KARMA))
+        (sanitize_number($story["link_karma"]) > sanitize_number($publishedKarma))
     ) {
         $sql = "UPDATE " . table_links . "";
         $sql .= " SET link_status = 'published'";
@@ -210,12 +213,14 @@ $hooks->add_action('saved_story', 'kahuk_increase_story_total_callback');
  */
 function kahuk_saved_saved_story_callback($data) {
     $is_increase = ($data["saved_status"] == "enable");
+    $forkKarmaStory = kahuk_get_config("_fork_karma_for_story", "0");
+    $forkKarmaUser = kahuk_get_config("_fork_karma_for_user", "0");
 
     //
-    kahuk_update_story_karma($data['story_id'], FORK_KARMA_FOR_STORY, $is_increase);
+    kahuk_update_story_karma($data['story_id'], $forkKarmaStory, $is_increase);
 
     //
-    kahuk_update_user_karma($data['user_id'], FORK_KARMA_FOR_USER, $is_increase);
+    kahuk_update_user_karma($data['user_id'], $forkKarmaUser, $is_increase);
 }
 
 $hooks->add_action('saved_saved_story', 'kahuk_saved_saved_story_callback');
@@ -234,12 +239,14 @@ function kahuk_updated_saved_story_callback($data) {
     // We only proceed when status changed
     if ($data["saved_status_prev"] && ($data["saved_status"] !== $data["saved_status_prev"])) {
         $is_increase = ($data["saved_status"] == "enable");
+        $forkKarmaStory = kahuk_get_config("_fork_karma_for_story", "0");
+        $forkKarmaUser = kahuk_get_config("_fork_karma_for_user", "0");
 
         //
-        kahuk_update_story_karma($data['story_id'], FORK_KARMA_FOR_STORY, $is_increase);
+        kahuk_update_story_karma($data['story_id'], $forkKarmaStory, $is_increase);
 
         //
-        kahuk_update_user_karma($data['user_id'], FORK_KARMA_FOR_USER, $is_increase);
+        kahuk_update_user_karma($data['user_id'], $forkKarmaUser, $is_increase);
     }
 }
 
@@ -298,10 +305,12 @@ function kahuk_saved_comment_callback($argsCustom = []) {
     }
 
     //
-    kahuk_update_user_karma($args['user_id'], COMMENT_KARMA_FOR_USER);
+    $commentKarmaUser = kahuk_get_config("_comment_karma_for_user", "0");
+    kahuk_update_user_karma($args['user_id'], $commentKarmaUser);
 
     //
-    kahuk_update_story_karma($args['story_id'], COMMENT_KARMA_FOR_STORY);
+    $commentKarmaStory = kahuk_get_config("_comment_karma_for_story", "0");
+    kahuk_update_story_karma($args['story_id'], $commentKarmaStory);
 
     return true;
 }
@@ -331,10 +340,12 @@ function kahuk_deleted_comment_callback($argsCustom = []) {
     }
 
     //
-    kahuk_update_user_karma($args['user_id'], COMMENT_KARMA_FOR_USER, false);
+    $commentKarmaUser = kahuk_get_config("_comment_karma_for_user", "0");
+    kahuk_update_user_karma($args['user_id'], $commentKarmaUser, false);
 
     //
-    kahuk_update_story_karma($args['story_id'], COMMENT_KARMA_FOR_STORY, false);
+    $commentKarmaStory = kahuk_get_config("_comment_karma_for_story", "0");
+    kahuk_update_story_karma($args['story_id'], $commentKarmaStory, false);
 
     return true;
 }

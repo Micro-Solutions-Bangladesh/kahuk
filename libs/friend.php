@@ -5,7 +5,7 @@
  */
 
 
-if(!defined('KAHUK_LIBS_DIR')){die();}
+if(!defined('KAHUKPATH_LIBS')){die();}
 
 
 class Friend {

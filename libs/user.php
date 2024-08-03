@@ -302,7 +302,7 @@ function user_group_read($user_id,$order_by='')
 
 	if ($order_by == "")
 		$order_by = "group_name DESC";
-	include_once(KAHUK_LIBS_DIR.'smartyvariables.php');
+	include_once(KAHUKPATH_LIBS.'smartyvariables.php');
 
 	$groups = $db->get_results($sql="SELECT * FROM " . table_group_member . "  	
 					LEFT JOIN " . table_groups . " ON group_id=member_group_id

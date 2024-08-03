@@ -6,9 +6,9 @@ if (!defined('KAHUKPATH')) {
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require KAHUK_LIBS_DIR . 'phpmailer/src/Exception.php';
-require KAHUK_LIBS_DIR . 'phpmailer/src/PHPMailer.php';
-require KAHUK_LIBS_DIR . 'phpmailer/src/SMTP.php';
+require KAHUKPATH_LIBS . 'phpmailer/src/Exception.php';
+require KAHUKPATH_LIBS . 'phpmailer/src/PHPMailer.php';
+require KAHUKPATH_LIBS . 'phpmailer/src/SMTP.php';
 
 /**
  * Initializes KahukMailer Class

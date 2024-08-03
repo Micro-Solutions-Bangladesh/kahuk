@@ -5,8 +5,8 @@ include_once('../internal/Smarty.class.php');
 $main_smarty = new Smarty;
 
 include('../config.php');
-include(KAHUK_LIBS_DIR . 'csrf.php');
-include(KAHUK_LIBS_DIR . 'smartyvariables.php');
+include(KAHUKPATH_LIBS . 'csrf.php');
+include(KAHUKPATH_LIBS . 'smartyvariables.php');
 
 check_referrer();
 
