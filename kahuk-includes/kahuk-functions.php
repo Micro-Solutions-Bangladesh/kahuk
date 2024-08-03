@@ -114,8 +114,8 @@ function kahuk_type_cast($data, $type = "") {
 
 	if ($type) {
 		if ($type == "boolean") {
-			$output = (($data == "true") || ($data == "yes") || ($data == "1"));
-		} else if ($type == "numeric") {
+			$output = (in_array($data, ["1", "true", "yes"]));
+		} else if ($type == "number") {
 			$output = (int) $data;
 		}
 	}

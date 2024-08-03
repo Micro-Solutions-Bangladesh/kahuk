@@ -101,11 +101,7 @@ function kahuk_get_config($var_name, $default_val = "", $type_cast = "") {
 	}
 
 	if ($type_cast) {
-		if ($type_cast == "boolean") {
-			$output = (($output == "true") || ($output == "yes") || ($output == "1"));
-		} else if ($type_cast == "number") {
-			$output = sanitize_number($output);
-		}
+		$output = kahuk_type_cast($output, $type_cast);
 	}
 
 	return $output;
