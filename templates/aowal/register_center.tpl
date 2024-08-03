@@ -1,6 +1,6 @@
 {php}global $hooks;{/php}
 <div class="main-content col mt-base">
-    {if !$registration_disable}
+    {if $registration_disable == "1"}
         <div class="alert alert-error">Registration feature is now disable!</div>
     {else}
         {* TODO: work for the $validate_password feature *}
