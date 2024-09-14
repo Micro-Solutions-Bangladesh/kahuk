@@ -532,6 +532,10 @@ function kahuk_delete_story($story_or_id) {
 
     if (!is_array($story_or_id)) {
         $story = kahuk_story($story_or_id);
+
+        if (empty($story)) {
+            // TODO :: Log Story Not Found
+        }
     } else {
         $story = $story_or_id;
     }
@@ -612,6 +616,59 @@ function kahuk_delete_stories_by_user($user) {
     ];
 
     // print_r($output);
+
+    return $output;
+}
+
+
+/**
+ * Delete Stories By User
+ * 
+ * @since 5.0.7
+ * 
+ * @return boolean
+ */
+function kahuk_delete_stories_by_status($status, $limit = 100) {
+	global $globalStories;
+
+    $statuses = kahuk_story_statuses(false);
+
+    if (!in_array($status, $statuses)) {
+        // TODO:: Log Invalid Request
+    }
+
+    $args = [
+        "link_status" => [$status],
+    ];
+
+    if ($limit == 0) {
+        $args["pagination_enabled"] = false;
+    } else {
+        $args["page_size"] = $limit;
+    }
+
+    $stories = $globalStories->get_stories($args);
+
+    $total_deleted = 0;
+    $deleteSuccess = [];
+    $deleteError = [];
+
+    foreach($stories as $story) {
+        $rs = kahuk_delete_story($story);
+
+        if ($rs) {
+            $total_deleted++;
+            $deleteSuccess[] = $story;
+        } else {
+            $deleteError[] = $story;
+        }
+    }
+
+    $output = [
+        "total_deleted" => $total_deleted,
+        "success" => $deleteSuccess,
+        "error" => $deleteError,
+    ];
 
     return $output;
 }
