@@ -188,7 +188,7 @@
 
 				// If invalid output type was specified..
 			} else {
-				kahuk_log_unexpected("db->get_row() SQL: {$query}");
+				kahuk_log_debug("db->get_row() SQL: {$query}");
 				$this->register_error( " \$db->get_row(string query, output type, int offset) -- Output type must be one of: OBJECT, ARRAY_A, ARRAY_N");
 			}
 		}
@@ -292,7 +292,7 @@
 			// disk caching of queries
 			if ( $this->use_disk_cache && ( $this->cache_queries && ! $is_insert ) || ( $this->cache_inserts && $is_insert )) {
 				if ( ! is_dir($this->cache_dir) ) {
-					kahuk_log_unexpected("db->store_cache() SQL: {$query}");
+					kahuk_log_debug("db->store_cache() SQL: {$query}");
 					$this->register_error("Could not open cache dir: $this->cache_dir");
 					$this->show_errors ? trigger_error("Could not open cache dir: $this->cache_dir",E_USER_WARNING) : null;
 				} else {

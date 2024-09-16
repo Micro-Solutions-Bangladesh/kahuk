@@ -214,7 +214,7 @@ function snippet_settings_page_callback() {
                 $snippet_id = $db->query_insert($sql);
 
                 if (!$snippet_id) {
-                    // kahuk_log_unexpected("New Record Failed!\nSQL: {$sql}");
+                    // kahuk_log_debug("New Record Failed!\nSQL: {$sql}");
                     die('Database error!');
                 }                
             } else {
@@ -222,7 +222,7 @@ function snippet_settings_page_callback() {
                 $output = $db->query($sql);
 
                 if ($output !== 1) {
-                    kahuk_log_unexpected("Update Snippet Record Failed!\nSQL: {$sql}");
+                    kahuk_log_debug("Update Snippet Record Failed!\nSQL: {$sql}");
                 }
             }
 

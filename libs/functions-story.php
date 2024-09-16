@@ -563,7 +563,7 @@ function kahuk_delete_story($story_or_id) {
         return true;
     } else {
         if ($rs > 1) {
-            kahuk_log_unexpected("DB Warning: [output: {$rs}]\nSQL: {$sql}");
+            kahuk_log_debug("DB Warning: [output: {$rs}]\nSQL: {$sql}");
         }
 
         return false;

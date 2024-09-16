@@ -116,7 +116,7 @@ if ($canIhaveAccess == 1) {
 			$username = trim($db->escape($_POST['username']));
 			$password = trim($db->escape($_POST['password']));
 			$email = trim($db->escape($_POST['email']));
-			$saltedpass = generatePassHash($password);
+			$saltedpass = kahuk_hashed_password($password);
 
 			// Only Admin accounts can create moderators and other admins
 			if ($amIadmin) {
@@ -397,7 +397,7 @@ if ($canIhaveAccess == 1) {
 					$subject = $site_name . ' ' . $main_smarty->get_config_vars("KAHUK_PassEmail_Subject");
 
 					$password = substr(md5(uniqid(rand(), true)), 0, 9);
-					$saltedPass = generatePassHash($password);
+					$saltedPass = kahuk_hashed_password($password);
 
 					$sql = 'UPDATE `' . table_users . "` SET `user_pass` = '$saltedPass' WHERE `user_login` = '" . sanitize($_GET["user"], 3) . "'";
 					$db->query($sql);
@@ -421,7 +421,7 @@ if ($canIhaveAccess == 1) {
 
 					if ($isMailSent) {
 						if (KAHUK_DEBUG) {
-							kahuk_log_unexpected("Email send success. [admin/admin_user.php]\n" . $message);
+							kahuk_log_debug("Email send success. [admin/admin_user.php]\n" . $message);
 						}
 
 						$main_smarty->assign('adminResetPassword', $main_smarty->get_config_vars("KAHUK_Visual_Group_Email_Invitation") . " To: $AddAddress<br /><hr />$message");

@@ -4,15 +4,6 @@ if (!defined('KAHUKPATH')) {
 }
 
 /**
- * @since 5.0.6
- */
-function kahuk_session_start() {
-	if(!isset($_SESSION)) {
-		session_start();
-	}
-}
-
-/**
  * 
  * @since 4.1.5
  */
@@ -395,6 +386,34 @@ function kahuk_redirect( $location = '', $status = 302 ) {
  * return void
  */
 function kahuk_log_unexpected($message) {
+	if (defined("KAHUK_DISABLE_UNEXPECTED_LOG") && KAHUK_DISABLE_UNEXPECTED_LOG == true) {
+		return;
+	}
+
+	static $permalink = false;
+	$current_time = kahuk_date('', 'datetime');
+	$output = "";
+
+	if (!$permalink) {
+		$permalink = kahuk_get_permalink();
+		$output = "\n\n" . "*** ATTENTION *** [{$current_time}] {$permalink}\n";
+	}
+
+	$output .= $message . "\n";
+	$logFile = kahuk_error_log_file_path('attention');
+
+	error_log($output, 3, $logFile);
+}
+
+
+/**
+ * Log when KAHUK_DEBUG_MANUAL positive
+ * 
+ * @since 5.0.6
+ * 
+ * return void
+ */
+function kahuk_log_debug($message) {
 	if (!KAHUK_DEBUG_MANUAL) {
 		return;
 	}
@@ -413,6 +432,7 @@ function kahuk_log_unexpected($message) {
 
 	error_log($output, 3, $logFile);
 }
+
 
 /**
  * Log query message
@@ -550,6 +570,17 @@ function kahuk_generate_password( $psaa_length = 8 ) {
     return implode($output); //turn the array into a string
 }
 
+/**
+ * Create a hashed password from user password
+ * 
+ * @since 6.0.6
+ * 
+ * @return string
+ */
+function kahuk_hashed_password($plainText) {
+	$salt = substr(md5(uniqid(rand(), true)), 0, SALT_LENGTH);
+	return 'bcrypt:' . $salt . password_hash(sha1($salt . $plainText), PASSWORD_BCRYPT);
+}
 
 
 /**

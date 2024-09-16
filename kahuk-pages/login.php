@@ -3,7 +3,7 @@
  * Process logout request
  */
 if ($pageTask == 'logout') {
-    $current_user->Logout();
+    $current_user->kahuk_logout();
     die();
 }
 
@@ -64,7 +64,9 @@ if ($processlogin === 1) {
     }
 
     if (!$errorMsg) {
-        if ($current_user->Authenticate($username, $password, $persistent) == false) {
+        $checkAuthentication = $current_user->kahuk_authentication($username, $password, $persistent);
+        
+        if ($checkAuthentication["status"] == false) {
             //
             $sql = "UPDATE " . table_login_attempts . " SET login_username='" . $db->escape($dbusername) . "', login_count=login_count+1, login_time=NOW() WHERE login_id=" . $db->escape($login_id);
             $db->query($sql);
@@ -76,7 +78,7 @@ if ($processlogin === 1) {
             if ($user && $user->user_lastlogin == NULL) {
                 $errorMsg = $main_smarty->fetch($the_template . "/template-parts/resend-email-verification-form.tpl");
             } else {
-                $errorMsg = $main_smarty->get_config_vars('KAHUK_Visual_Login_Error');
+                $errorMsg = $checkAuthentication["msg"];
             }
         } else {
             $sql = "DELETE FROM " . table_login_attempts . " WHERE login_ip='" . $db->escape($lastip) . "'";

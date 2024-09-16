@@ -7,9 +7,11 @@ if ( ! defined( 'KAHUKPATH' ) ) {
 class UserAuth {
 	var $user_id       = 0;
 	var $user_login    = "";
+	var $user_email    = "";
 	var $md5_pass      = "";
 	var $authenticated = false;
 	var $user_level = "";
+	var $auth_session_name = "_kahuk_user_authentication_data";
 
 	// Additional parameters for cookie security
 	protected $ip, $user_agent;
@@ -18,172 +20,115 @@ class UserAuth {
 	private $token, $validator;
 
 	function __construct() {
-		global $db, $cached_users;
+		kahuk_session_start();
+
 		$this->ip = check_ip_behind_proxy();
-		$this->user_agent = $_SERVER['HTTP_USER_AGENT'];
+		// $this->user_agent = $_SERVER['HTTP_USER_AGENT'];
 
-		if(isset($_COOKIE['mnm_user'], $_COOKIE['mnm_key'], $_COOKIE['mnm_data']) && $_COOKIE['mnm_user'] !== '' &&
-            $_COOKIE['mnm_data'] == md5(sha1($this->ip.':'.$this->user_agent)) ) {
-			$userInfo=explode(":", base64_decode($db->escape($_COOKIE['mnm_key'])));
-			if(crypt($userInfo[0], 22)===$userInfo[1] 
-				&& $db->escape($_COOKIE['mnm_user']) === $userInfo[0]) {
-				$dbusername = $db->escape($_COOKIE['mnm_user']);
+		$sesRecord = (isset($_SESSION[$this->auth_session_name]) ? $_SESSION[$this->auth_session_name] : []);
 
-				$sql = "SELECT * FROM " . table_users . " WHERE user_login = '$dbusername'";
-				$dbuser = $db->get_row($sql);
+		if (
+			!empty($sesRecord) &&
+			isset($sesRecord["user_email"]) &&
+			$sesRecord["authenticated"] == true &&
+			$sesRecord["session_ip"] == $this->ip
+		) {
+			$this->user_level = $sesRecord["user_level"];
+			$this->user_email = $sesRecord["user_email"];
+			$this->user_login = $sesRecord["user_login"];
+			$this->user_id = $sesRecord["user_id"];
+			$this->authenticated = true;
+		}
+	}
 
-				if ($dbuser) {
-					$cached_users[$dbuser->user_id] = $dbuser;
+	/**
+	 * User Authentication (Login)
+	 * 
+	 * This function will depricate the $this->Authenticate() function
+	 */
+	function kahuk_authentication($username, $pass, $remember = false) {
+		global $db, $main_smarty;
 
-					if($dbuser->user_id > 0 && md5($dbuser->user_pass)==$userInfo[2] && ($dbuser->user_status=='enable')) {
-						$this->user_id = $dbuser->user_id;
-						$this->user_level = $dbuser->user_level;
-						$this->user_login  = $userInfo[0];
-						$this->md5_pass = $userInfo[2];
+		$output = [
+			"status" => false,
+		];
+		$dbusername =  $db->escape(sanitize_text_field($username));
+		$isEmail = sanitize_email($dbusername);
+
+		if ($isEmail) {
+			$sql = "SELECT * FROM " . table_users . " WHERE user_email= '$dbusername'";
+		} else {
+			$sql = "SELECT * FROM " . table_users . " WHERE user_login = '$dbusername'";
+		}
+
+		$dbRecord = $db->get_row($sql, ARRAY_A);
+
+		if (!empty($dbRecord)) {
+			$user_id = $dbRecord["user_id"];
+			$hashedPass = $dbRecord["user_pass"];
+
+			$hashTrim = substr($hashedPass, (SALT_LENGTH + 7));
+			$salt = substr($hashedPass, 7, SALT_LENGTH);
+
+			if (password_verify(sha1($salt . $pass), $hashTrim)) {
+				if ($dbRecord["user_level"] == "unverified") {
+					// User email is NOT verified
+					$output["msg"] = "You need to verify your email address before login.";
+				} else {
+					if ($dbRecord["user_status"] == "enable") {
+						// Let's create user session
+						kahuk_session_start();
+	
+						$this->user_level = $dbRecord["user_level"];
+						$this->user_login = $dbRecord["user_login"];
+						$this->user_email = $dbRecord["user_email"];
+						$this->user_id = $dbRecord["user_id"];
 						$this->authenticated = true;
+	
+						$authDataSession = [
+							"authenticated" => true,
+							"session_ip" => $this->ip,
+							"user_id" => $dbRecord["user_id"],
+							"user_email" => $dbRecord["user_email"],
+							"user_login" => $dbRecord["user_login"],
+							"user_level" => $dbRecord["user_level"],
+						];
+	
+						$_SESSION[$this->auth_session_name] = $authDataSession;
+	
+						$sql = "UPDATE " . table_users . " SET user_lastip = '{$this->ip}', user_lastlogin = NOW() WHERE user_id = '{$user_id}' LIMIT 1";
+						$db->query($sql);
+	
+						// Authentication Successful
+						$output["status"] = true;
+						$output["msg"] = "Login Successful.";
+					} else {
+						$output["msg"] = "Login successful, however the user is disable.";
 					}
 				}
-			}
-		}
-	}
-
-
-	function SetIDCookie($what, $remember) {
-		global $db;
-		$domain = preg_replace('/^www/','',$_SERVER['HTTP_HOST']);
-		// Remove port information.
-        $port = strpos($domain, ':');
-        if ($port !== false)  $domain = substr($domain, 0, $port);			
-		if (!strstr($domain,'.') || strpos($domain,'localhost:')===0) $domain='';
-		switch ($what) {
-			case 0:	// Borra cookie, logout
-				setcookie ("mnm_user", "", time()-3600, "/",$domain); // Expiring cookie
-				setcookie ("mnm_key", "", time()-3600, "/",$domain); // Expiring cookie
-                setcookie ("mnm_data", "", time()-3600, "/",$domain); // Expiring cookie
-				setcookie ("mnm_user", "", time()-3600, "/"); // Expiring cookie
-				setcookie ("mnm_key", "", time()-3600, "/"); // Expiring cookie
-                setcookie ("mnm_data", "", time()-3600, "/"); // Expiring cookie
-				break;
-			case 1: //Usuario logeado, actualiza el cookie
-				// Atencion, cambiar aqu�cuando se cambie el password de base de datos a MD5
-				$strCookie=base64_encode(join(':',
-					array(
-						$this->user_login,
-						crypt($this->user_login, 22),
-						$this->md5_pass)
-					)
-				);
-				if($remember){
-					$time = time() + (86400 * 10); //Cookie will expire in 10 days if remember option is selected at login. 86400 = 1 day
-				} else {
-					$time = 0; //Cookie will expire when browser session ends. Note: This may depend on your browser settings. Example: in Chrome if 'Continue where you left off' option is checked the cookie won't expire.
-				}
-
-				// Setting httponly and secure true to add additional security for cookies
-                if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
-                    setcookie('mnm_user', $this->user_login, $time, '/',$domain, TRUE, TRUE);
-                    setcookie('mnm_key', $strCookie, $time, '/',$domain, TRUE, TRUE);
-                    setcookie('mnm_data', md5(sha1($this->ip.':'.$this->user_agent)), $time, '/', $domain, TRUE, TRUE);
-                } else {
-                    setcookie('mnm_user', $this->user_login, $time, '/',$domain, FALSE, TRUE);
-                    setcookie('mnm_key', $strCookie, $time, '/',$domain, FALSE, TRUE);
-                    setcookie('mnm_data', md5(sha1($this->ip.':'.$this->user_agent)), $time, '/', $domain, FALSE, TRUE);
-                }
-
-				break;
-		}
-	}
-
-	function Authenticate( $username, $pass, $remember = false ) {
-		global $db;
-		$dbusername = sanitize( $db->escape( $username ), 4 );
-
-		$user = $db->get_row( "SELECT * FROM " . table_users . " WHERE user_login = '$dbusername' or user_email= '$dbusername'" );
-		
-		/***
-		Redwine: the code below is to check for the hashed password of the user logging in. If it contains the string 'bcrypt:' it means that the new password hashing has been applied to it, otherwise, it rehash the password based on the new password hashing!
-		***/
-		if (
-			$user &&
-			$user->user_id > 0 && 
-			$user->user_lastlogin != NULL  && 
-			($user->user_status == 'enable')
-		) {
-			if ( substr($user->user_pass, 0, 7) !== 'bcrypt:' ) {
-				$salt = substr( $user->user_pass, 0, SALT_LENGTH );
-				$sha_hash = substr( $user->user_pass, SALT_LENGTH );
-
-				if ( ! function_exists( 'password_hash' ) ) {
-					require( KAHUKPATH_LIBS."password.php" );
-					$new_pass = 'bcrypt:' . $salt . password_hash ( $sha_hash, PASSWORD_BCRYPT );
-				} else {
-					$new_pass = 'bcrypt:' . $salt . password_hash ( $sha_hash, PASSWORD_BCRYPT );
-				}
-
-				$db->query( "UPDATE ".table_users." SET user_pass = '$new_pass' WHERE user_id ='$user->user_id' LIMIT 1" );
-			}
-		}
-
-		/* Redwine: End checking/applying the new password hashing */
-		if (
-			$user &&
-			$user->user_id > 0 && 
-			verifyPassHash($pass, $user->user_pass) && 
-			$user->user_lastlogin != NULL  && 
-			($user->user_status == 'enable')
-		) {
-			$this->user_login = $user->user_login;  
-			$this->user_id = $user->user_id;
-
-			$this->authenticated = true;
-			$this->md5_pass = md5($user->user_pass);
-			$this->SetIDCookie(1, $remember);
-
-			$lastip=check_ip_behind_proxy();
-
-			$sql = "UPDATE " . table_users . " SET user_lastip = '$lastip', user_lastlogin = NOW() WHERE user_id = {$user->user_id} LIMIT 1";
-			$db->query( $sql );
-
-			return true;
-		}
-
-		return false;
-	}
-
-	function Logout($url='./') {
-		global $main_smarty;
-		
-		$this->user_login = "";
-		$this->authenticated = false;
-		$this->SetIDCookie (0, '');
-
-		define('wheretoreturn', $url);
-
-		if (preg_match('/user\.php\?login=(.+)$/', $url, $m)) {
-			$user=new User();
-			$user->username = $m[1];
-			if(!$user->all_stats() || $user->total_links+$user->total_comments==0) 
-				$url = my_kahuk_base.'/';
-		}
-
-		header("Cache-Control: no-cache, must-revalidate");
-		if(!strpos($_SERVER['SERVER_SOFTWARE'], "IIS") && !strpos(php_sapi_name(), "cgi") >= 0){
-			if(strlen(sanitize($url, 3)) > 1) {
-				$url = sanitize($url, 3);
 			} else {
-				$url =  my_kahuk_base.'/';
+				$output["msg"] = $main_smarty->get_config_vars('KAHUK_Visual_Login_Error');
 			}
-			header("Location: $url");
+		} else {
+			$output["msg"] = $main_smarty->get_config_vars('KAHUK_Visual_Login_Error');
 		}
-		header("Expires: " . gmdate("r", time()-3600));
-		header("ETag: \"logingout" . time(). "\"");
-		if(strpos($_SERVER['SERVER_SOFTWARE'], "IIS") && strpos(php_sapi_name(), "cgi") >= 0){
-			echo '<SCRIPT LANGUAGE="JavaScript">window.location="' . $url . '";</script>';
-			echo $main_smarty->get_config_vars('KAHUK_Visual_IIS_Logged_Out') . '<a href = "'.$url.'">' . $main_smarty->get_config_vars('KAHUK_Visual_IIS_Continue') . '</a>';
-		}
-		die;
+
+		return $output;
 	}
 
+	/**
+	 * Delete user session related to authentication
+	 * 
+	 * This function will depricate the $this->Logout() function
+	 */
+	function kahuk_logout($url='./') {
+		if (isset($_SESSION[$this->auth_session_name])) {
+			$_SESSION[$this->auth_session_name] = [];
+			unset($_SESSION[$this->auth_session_name]);
+		}
+
+		kahuk_redirect(KAHUK_BASE_URL);
+	}
 }
 
 $current_user = new UserAuth();

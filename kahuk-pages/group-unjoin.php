@@ -59,7 +59,7 @@ if (empty($group_membership)) {
     $output['msg'] = 'Something went wrong, we will fix it soon.';
     $output['type'] = 'notice';
 
-    kahuk_log_unexpected("Record still exist even after executed the query!\n{$sql}");
+    kahuk_log_debug("Record still exist even after executed the query!\n{$sql}");
 }
 
 kahuk_set_session_message($output['msg'], $output['type']);

@@ -334,7 +334,7 @@ class KahukUsers
         }
 
         if (empty($this->userRanks)) {
-            kahuk_log_unexpected('User ranks array should never be empty!');
+            kahuk_log_debug('User ranks array should never be empty!');
             return false;
         }
 
@@ -416,7 +416,7 @@ class KahukUsers
         $args = array_merge($defaults, $argsCustom);
 
         if (empty($args['user_status'])) {
-            kahuk_log_unexpected("user_status is required. Found the following args in KahukUsers->get_users_temporary_func function:\n" . print_r($args, true));
+            kahuk_log_debug("user_status is required. Found the following args in KahukUsers->get_users_temporary_func function:\n" . print_r($args, true));
             return [];
         }
 
@@ -593,7 +593,7 @@ class KahukUsers
 
             // Salt the user password
             if ($column == 'user_pass') {
-                $sql .= " {$column} = '" . generatePassHash( $value ) . "',";
+                $sql .= " {$column} = '" . kahuk_hashed_password( $value ) . "',";
                 continue;
             }
 

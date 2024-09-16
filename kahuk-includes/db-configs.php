@@ -145,7 +145,7 @@ function kahuk_update_config($var_name, $var_val) {
 			$id = $db->query_insert($sqlInsert);
 
 			if (!$id) {
-				kahuk_log_unexpected( "BOTH Query FAILED:\n---------\n{$sql}\n---------\n{$sqlInsert}");
+				kahuk_log_debug( "BOTH Query FAILED:\n---------\n{$sql}\n---------\n{$sqlInsert}");
         		return false;
 			}
 

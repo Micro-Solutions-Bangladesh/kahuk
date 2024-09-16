@@ -97,7 +97,7 @@ function kahuk_get_user( $argsCustom = [] ) {
  */
 function kahuk_user_login_by_id( $user_id ) {
     if (!is_numeric($user_id)) {
-		kahuk_log_unexpected("Function: kahuk_user_login_by_id() \n Expected: user_id should be number \n Found: {$user_id}");
+		kahuk_log_debug("Function: kahuk_user_login_by_id() \n Expected: user_id should be number \n Found: {$user_id}");
 	}
 
     $output = kahuk_get_user( [ 'user_id' => $user_id ]  );
@@ -238,7 +238,7 @@ function kahuk_insert_user( $initialData ) {
 
         // Salt the user password
         if ($index == 'user_pass') {
-            $sql .= ", {$index} = '" . generatePassHash( $value ) . "'";
+            $sql .= ", {$index} = '" . kahuk_hashed_password( $value ) . "'";
             continue;
         }
 

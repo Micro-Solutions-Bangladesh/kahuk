@@ -36,7 +36,7 @@ function kahuk_process_story_callback($story) {
         $story['category_primary']['url'] = $cat_primary['url'];
         $story['category_primary']['category_name'] = $cat_primary['category_name'];
     } else {
-        kahuk_log_unexpected("Story: [{$story_id}: " . $story_url . "] does not have a category!!");
+        kahuk_log_debug("Story: [{$story_id}: " . $story_url . "] does not have a category!!");
     }
 
     //
@@ -149,9 +149,9 @@ function kahuk_refactor_story_status_callback($args = []) {
             $story["link_status"] = "published";
         } else {
             if ($rs > 1) {
-                kahuk_log_unexpected("Issue Multi record Updated! [OUTPUT: {$rs}] \nSQL: {$sql}");
+                kahuk_log_debug("Issue Multi record Updated! [OUTPUT: {$rs}] \nSQL: {$sql}");
             } else {
-                kahuk_log_unexpected("Update Failed! [OUTPUT: {$rs}] \nSQL: {$sql}");
+                kahuk_log_debug("Update Failed! [OUTPUT: {$rs}] \nSQL: {$sql}");
             }
         }
     }
@@ -300,7 +300,7 @@ function kahuk_saved_comment_callback($argsCustom = []) {
     $args = array_merge($defaults, $argsCustom);
 
     if (!$args['comment_id'] || !$args['story_id'] || !$args['user_id']) {
-        kahuk_log_unexpected("Invalid data for kahuk_saved_comment_callback()\n" . print_r($args, true));
+        kahuk_log_debug("Invalid data for kahuk_saved_comment_callback()\n" . print_r($args, true));
         return false;
     }
 
@@ -335,7 +335,7 @@ function kahuk_deleted_comment_callback($argsCustom = []) {
     $args = array_merge($defaults, $argsCustom);
 
     if (!$args['comment_id'] || !$args['story_id'] || !$args['user_id']) {
-        kahuk_log_unexpected("Invalid data for kahuk_saved_comment_callback()\n" . print_r($args, true));
+        kahuk_log_debug("Invalid data for kahuk_saved_comment_callback()\n" . print_r($args, true));
         return false;
     }
 

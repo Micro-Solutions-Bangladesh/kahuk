@@ -149,7 +149,7 @@ function kahuk_save_saved_story($data) {
                 "message" => "Story fork failed!",
             ];
 
-            kahuk_log_unexpected("New Record Failed!\nSQL: {$sql}");
+            kahuk_log_debug("New Record Failed!\nSQL: {$sql}");
         }
     }
 
@@ -183,7 +183,7 @@ function kahuk_delete_forks( $customArgs ) {
     if (($args["story_id"] > 0) || ($args["user_id"] > 0)) {
         //
     } else {
-        kahuk_log_unexpected("Invalid params to delete fork!");
+        kahuk_log_debug("Invalid params to delete fork!");
         return 0;
     }
 
