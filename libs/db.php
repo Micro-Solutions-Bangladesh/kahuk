@@ -586,6 +586,10 @@ class ezSQL_mysql extends ezSQLcore {
 
 		return $output[0];
 	}
+
+	function close() {
+		@mysqli_close($this->dbh);
+	}
 }
 
 $db = new ezSQL_mysql( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST );
