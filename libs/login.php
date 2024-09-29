@@ -133,3 +133,31 @@ class UserAuth {
 
 $current_user = new UserAuth();
 
+
+/**
+ * Get and return user name from session (if exist)
+ * 
+ * @since 6.0.7
+ * 
+ * @return string|empty 
+ */
+function kahuk_user_from_session($dataType = "login") {
+	global $current_user;
+
+	$output = "";
+
+	if ($current_user->authenticated) {
+		if ($dataType == "id") {
+			$output = $current_user->user_id;
+		} elseif ($dataType == "level") {
+			$output = $current_user->user_level;
+		} elseif ($dataType == "level") {
+			$output = $current_user->user_level;
+		} else {
+			$output = $current_user->user_login;
+		}
+	}
+
+	return $output;
+}
+
