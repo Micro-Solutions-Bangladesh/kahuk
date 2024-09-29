@@ -15,8 +15,10 @@ function kahuk_link_summary( $content ) {
  * 
  */
 function kahuk_create_url_records( $randkey, $url ) {
-    if ( isset( $_COOKIE['mnm_user'] ) ) {
-        $uniqueKey = "kahuk" . $_COOKIE['mnm_user'] . $randkey;
+    $userlogin = kahuk_user_from_session("login");
+
+    if (!empty($userlogin)) {
+        $uniqueKey = "kahuk" . $userlogin . $randkey;
         setcookie( $uniqueKey, $url, time()+600 );  /* expire in 10 minutes */
 
         return true;
@@ -31,9 +33,10 @@ function kahuk_create_url_records( $randkey, $url ) {
  */
 function kahuk_has_url_in_record( $randkey, $url ) {
     $output = false;
+    $userlogin = kahuk_user_from_session("login");
 
-    if ( isset( $_COOKIE['mnm_user'] ) ) {
-        $uniqueKey = "kahuk" . $_COOKIE['mnm_user'] . $randkey;
+    if (!empty($userlogin)) {
+        $uniqueKey = "kahuk" . $userlogin . $randkey;
 
         if ( isset( $_COOKIE[$uniqueKey] ) && ( $url == $_COOKIE[$uniqueKey] ) ) {
             $output = true;
