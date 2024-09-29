@@ -42,7 +42,7 @@ if (isset($_REQUEST["mode"]) && sanitize($_REQUEST["mode"], 3) == "newuser") {
 		$password = trim($db->escape($_POST['password']));
 		$email = trim($db->escape($_POST['email']));
 		$level = trim($db->escape($_POST['level']));
-		$saltedpass = generatePassHash($password);
+		$saltedpass = kahuk_hashed_password($password);
 
 		if (!isset($username) || strlen($username) < 3) {
 			$main_smarty->assign(username_error, $main_smarty->get_config_vars('KAHUK_Visual_Register_Error_UserTooShort'));

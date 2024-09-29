@@ -29,7 +29,7 @@ if ($user) {
     if (check_valid($hashed_fields, urlsafe_base64_decode($n)) == 1) {
         $generated_password = kahuk_generate_password();
         $time = time();
-        $saltedPass = generatePassHash($generated_password);
+        $saltedPass = kahuk_hashed_password($generated_password);
         
         $sql = "UPDATE `" . table_users . "` SET `user_pass` = '" . $saltedPass . "', `last_reset_request` = FROM_UNIXTIME('{$time}'), `last_reset_code` = '' WHERE `user_login` = '" . $user['user_login'] . "'";
         $rs = $db->query($sql);

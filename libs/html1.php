@@ -339,53 +339,6 @@ function do_pages($total, $page_size, $thepage, $fetch = false)
 	}
 }
 
-function generateHash($plainText, $salt = null)
-{
-	if ($salt === null) {
-		$salt = substr(md5(uniqid(rand(), true)), 0, SALT_LENGTH);
-	} else {
-		$salt = substr($salt, 0, SALT_LENGTH);
-	}
-
-	return $salt . sha1($salt . $plainText);
-}
-
-function generatePassHash($plainText)
-{
-	if (!function_exists('password_hash')) {
-		require "password.php";
-		$salt = substr(md5(uniqid(rand(), true)), 0, SALT_LENGTH);
-
-		return 'bcrypt:' . $salt . password_hash(sha1($salt . $plainText), PASSWORD_BCRYPT);
-	} else {
-		$salt = substr(md5(uniqid(rand(), true)), 0, SALT_LENGTH);
-
-		return 'bcrypt:' . $salt . password_hash(sha1($salt . $plainText), PASSWORD_BCRYPT);
-	}
-}
-
-function verifyPassHash($plainText, $hashedPass)
-{
-	$hashTrim = substr($hashedPass, (SALT_LENGTH + 7));
-	$salt = substr($hashedPass, 7, SALT_LENGTH);
-
-	if (!function_exists('password_verify')) {
-		require "password.php";
-
-		if (password_verify(sha1($salt . $plainText), $hashTrim)) {
-			return true;
-		} else {
-			return false;
-		}
-	} else {
-		if (password_verify(sha1($salt . $plainText), $hashTrim)) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-}
-
 function urlsafe_base64_encode($data)
 {
 	return strtr(base64_encode($data), ['+' => '-', '/' => '_', '=' => '']);

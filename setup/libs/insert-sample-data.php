@@ -22,10 +22,10 @@ function kahuk_insert_sample_data() {
     $ipAddress = mysqli_real_escape_string( $kahukDB, $_SERVER['REMOTE_ADDR'] );
 
     //
-	$saltedpass = generatePassHash($_POST['upassword']);
+	$saltedpass = kahuk_hashed_password($_POST['upassword']);
 
     $kahukcmsPass = kahuk_generate_password();
-	$saltedpassForKahukcms = generatePassHash($kahukcmsPass);
+	$saltedpassForKahukcms = kahuk_hashed_password($kahukcmsPass);
 
     $sql = "
         INSERT INTO `" . table_users . "` (

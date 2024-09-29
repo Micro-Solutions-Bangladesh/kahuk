@@ -76,7 +76,7 @@ if ($group_membership['member_status'] == $member_status) {
     $redirect_msg['msg'] = 'Something went wrong, we will fix it soon.';
     $redirect_msg['type'] = 'notice';
 
-    kahuk_log_unexpected("Record not saved!\n{$sql}");
+    kahuk_log_debug("Record not saved!\n{$sql}");
 }
 
 kahuk_set_session_message($redirect_msg['msg'], $redirect_msg['type']);

@@ -56,7 +56,7 @@ if ($process == "Apply") {
 					$rs = $db->query($sql);
 	
 					if ($rs !== 1) {
-						kahuk_log_unexpected("DB Warning: [output: {$rs}]\nSQL: {$sql}");
+						kahuk_log_debug("DB Warning: [output: {$rs}]\nSQL: {$sql}");
 					}
 				}
 			}

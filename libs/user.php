@@ -81,9 +81,9 @@ class User
 		$user_avatar_source = $db->escape($this->avatar_source);
 		
 		if (strlen($user_pass) < 49) {
-			$saltedpass=generatePassHash($user_pass);
+			$saltedpass = kahuk_hashed_password($user_pass);
 		} else {
-			$saltedpass=$user_pass;
+			$saltedpass = $user_pass;
 		}
 			
 		if ($this->id===0) {

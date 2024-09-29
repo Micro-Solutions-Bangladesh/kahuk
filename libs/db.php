@@ -550,7 +550,7 @@ class ezSQL_mysql extends ezSQLcore {
 		
 		// If there is an error then take note of it..
 		if ( $str = @mysqli_error( $this->dbh ) ) {
-			kahuk_log_unexpected("DB Error: {$str}\nSQL: {$query}");
+			kahuk_log_debug("DB Error: {$str}\nSQL: {$query}");
 			$this->register_error( $str );
 			$this->show_errors ? trigger_error($str, E_USER_WARNING) : null;
 

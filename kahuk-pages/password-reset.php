@@ -63,7 +63,7 @@ if ($action === 'reset') {
             $errorMsg = $main_smarty->get_config_vars('KAHUK_Visual_Password_Sent');
 
             if (KAHUK_DEBUG) { // Log for developer/admin
-                kahuk_log_unexpected("Email send success. [password-reset.php]\n" . $message);
+                kahuk_log_debug("Email send success. [password-reset.php]\n" . $message);
             }
         } else {
             // Set message for browser

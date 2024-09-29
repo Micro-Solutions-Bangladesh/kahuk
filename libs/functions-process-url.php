@@ -308,7 +308,7 @@ function kahuk_loadable_page_path() {
         }
 
         $unexpectedMessage .= "\nRedirecting to: {$redirect}";
-        // kahuk_log_unexpected($unexpectedMessage);
+        // kahuk_log_debug($unexpectedMessage);
 
         kahuk_redirect($redirect);
         die();

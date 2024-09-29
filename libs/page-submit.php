@@ -86,7 +86,7 @@ function kahuk_check_unique_story( $story_url, $story_slug, $skipId = [] ) {
         $output['code'] = "story_slug_fail";
         $output['message'] = sprintf( 'Sorry, We are unable to create an unique slug from your title!', $story_url ); // TODO dynamic
 
-        kahuk_log_unexpected("Unable to create unique slug from: [story_slug: {$story_slug}, story_url: {$story_url}]");
+        kahuk_log_debug("Unable to create unique slug from: [story_slug: {$story_slug}, story_url: {$story_url}]");
     } else {
         $output['status'] = true;
         $output['story_slug'] = $stroy_slug_new;
@@ -128,7 +128,7 @@ function kahuk_unique_title_slug( $title_slug ) {
             $slugNameCheck = false;
             $uniqueSlug = '';
 
-            kahuk_log_unexpected( "Fail to create new slug for {$title_slug}");
+            kahuk_log_debug( "Fail to create new slug for {$title_slug}");
         }
     } while ( $slugNameCheck );
 

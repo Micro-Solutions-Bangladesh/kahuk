@@ -1,5 +1,18 @@
 <?php
 /**
+ * Start a session if already not exist
+ * 
+ * @since 5.0.6
+ * 
+ * @return void
+ */
+function kahuk_session_start() {
+	if(!isset($_SESSION)) {
+		session_start();
+	}
+}
+
+/**
  * Kahuk CMS Version
  * 
  * @return string

@@ -137,7 +137,7 @@ class KahukFriends
 
         // User ids should be more than 0
 		if ((!is_numeric($target_user_id) || $target_user_id < 1) || (is_numeric($current_user_id) && $current_user_id < 1)) {
-            kahuk_log_unexpected("globalFriendsObj->get_friend_status function get wrong data! [target_user_id: {target_user_id}] and [current_user_id: {$current_user_id}]");
+            kahuk_log_debug("globalFriendsObj->get_friend_status function get wrong data! [target_user_id: {target_user_id}] and [current_user_id: {$current_user_id}]");
             die();
         }
 
@@ -198,7 +198,7 @@ class KahukFriends
 
         // User ids should be more than 0
 		if ((!is_numeric($target_user_id) || $target_user_id < 1) || (!is_numeric($current_user_id) || $current_user_id < 1)) {
-            kahuk_log_unexpected("globalFriendsObj -> follow_user function get wrong data! [target_user_login_or_id: {target_user_login_or_id}] and [current_user_or_id: " . print_r($current_user_or_id, true) . "]");
+            kahuk_log_debug("globalFriendsObj -> follow_user function get wrong data! [target_user_login_or_id: {target_user_login_or_id}] and [current_user_or_id: " . print_r($current_user_or_id, true) . "]");
             die();
         }
 
@@ -206,7 +206,7 @@ class KahukFriends
         $output = '';
 
         if (in_array($friendshipType, ['mutual', 'following'])) {
-            // kahuk_log_unexpected("globalFriendsObj -> follow_user friendshipType TRYING TO FOLLOW AGAIN [current_user_id: {$current_user_id}, target_user_id: {$target_user_id}]");
+            // kahuk_log_debug("globalFriendsObj -> follow_user friendshipType TRYING TO FOLLOW AGAIN [current_user_id: {$current_user_id}, target_user_id: {$target_user_id}]");
             $output = $friendshipType;
         } else {
             $sql = "INSERT IGNORE INTO " . table_friends . " (friend_from, friend_to) values (" . $current_user_id . ", " . $target_user_id . ");";
@@ -253,7 +253,7 @@ class KahukFriends
 
         // User ids should be more than 0
 		if ((!is_numeric($target_user_id) || $target_user_id < 1) || (!is_numeric($current_user_id) || $current_user_id < 1)) {
-            kahuk_log_unexpected("globalFriendsObj -> unfollow_user function get wrong data! [target_user_login_or_id: {target_user_login_or_id}] and [current_user_or_id: " . print_r($current_user_or_id, true) . "]");
+            kahuk_log_debug("globalFriendsObj -> unfollow_user function get wrong data! [target_user_login_or_id: {target_user_login_or_id}] and [current_user_or_id: " . print_r($current_user_or_id, true) . "]");
             die();
         }
 
@@ -272,7 +272,7 @@ class KahukFriends
             }
 		} else {
             $output = $friendshipType;
-            // kahuk_log_unexpected("globalFriendsObj -> unfollow_user friendshipType TRYING TO UNFOLLOW AGAIN [current_user_id: {$current_user_id}, target_user_id: {$target_user_id}]");
+            // kahuk_log_debug("globalFriendsObj -> unfollow_user friendshipType TRYING TO UNFOLLOW AGAIN [current_user_id: {$current_user_id}, target_user_id: {$target_user_id}]");
         }
 
         return $output;

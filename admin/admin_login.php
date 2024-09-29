@@ -50,7 +50,9 @@ if ((isset($_POST["processlogin"]) && is_numeric($_POST["processlogin"])) || (is
 		}
 
 		if (!$errorMsg) {
-			if ($current_user->Authenticate($username, $password, $persistent) == false) {
+			$checkAuthentication = $current_user->kahuk_authentication($username, $password, $persistent);
+
+			if ($checkAuthentication["status"] == false) {
 				$db->query("UPDATE " . table_login_attempts . " SET login_username='$dbusername', login_count=login_count+1, login_time=NOW() WHERE login_id=" . $login_id);
 				$user = $db->get_row("SELECT * FROM " . table_users . " WHERE user_login = '$username' or user_email= '$username'");
 				

@@ -162,7 +162,7 @@ if (is_ip_banned($userip)) {
                 /**
                  * Save The Email message in log file for developer
                  */
-                // kahuk_log_unexpected("Mail delivery seccess for {$email}, Validation link: {$validation}");
+                // kahuk_log_debug("Mail delivery seccess for {$email}, Validation link: {$validation}");
 
                 // User is saved, now create the page permalink to redirect
                 $url_redirect = kahuk_create_url('register-complete/', ['slug' => $username, 'verification' => 1]);
@@ -177,7 +177,7 @@ if (is_ip_banned($userip)) {
             }
 
         } else {
-            kahuk_log_unexpected("User Registration Not Done although all the Data Seemed to be OK\n" . print_r($data, true));
+            kahuk_log_debug("User Registration Not Done although all the Data Seemed to be OK\n" . print_r($data, true));
 
             kahuk_set_session_message(
                 'Something went wrong, registration is not complete!',

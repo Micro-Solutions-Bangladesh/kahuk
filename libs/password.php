@@ -237,10 +237,13 @@ namespace {
          *
          * @return boolean If the password matches the hash
          */
-        function password_verify( $password, $hash ) {
+        function password_verify_ss( $password, $hash ) {
             if ( ! function_exists( 'crypt' ) ) {
                 trigger_error( "Crypt must be loaded for password_verify to function", E_USER_WARNING );
+                die("Crypt must be loaded for password_verify to function");
                 return false;
+            } else {
+                echo "<p>Crypt FOUND</p>";
             }
 
             $ret = crypt($password, $hash);

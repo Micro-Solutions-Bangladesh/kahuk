@@ -46,7 +46,7 @@ function kahuk_get_reaction($argsCustom = []) {
     if ($args['vote_id'] || ($args["story_id"] && $args["user_id"])) {
         //
     } else {
-        kahuk_log_unexpected("Unexpected arguments to fetch Vote record!\n" . print_r($argsCustom, true));
+        kahuk_log_debug("Unexpected arguments to fetch Vote record!\n" . print_r($argsCustom, true));
         return [];
     }
     
@@ -274,7 +274,7 @@ function kahuk_delete_reactions( $customArgs ) {
     if (($args["story_id"] > 0) || ($args["user_id"] > 0)) {
         //
     } else {
-        kahuk_log_unexpected("Invalid params to delete reaction!");
+        kahuk_log_debug("Invalid params to delete reaction!");
         return 0;
     }
 

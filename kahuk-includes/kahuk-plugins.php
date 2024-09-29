@@ -103,7 +103,7 @@ foreach($pluginsInstalledArray as $pluginInstalled) {
     if (kahuk_is_valid_plugin($pluginInstalled)) {
         include_once KAHUKPATH_PLUGINS . $pluginInstalled . "/index.php";
     } else {
-        kahuk_log_unexpected("Plugin folder $pluginInstalled not found!");
+        kahuk_log_debug("Plugin folder $pluginInstalled not found!");
         kahuk_deactivate_plugin($pluginInstalled);
     }
 }

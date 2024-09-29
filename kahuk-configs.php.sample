@@ -98,7 +98,7 @@ define("LOG_FILE", KAHUKDIR_LOGS . "/error.log");
 
 /**
  * Will log the activity in attention log file
- * used in the kahuk_log_unexpected() function
+ * used in the kahuk_log_debug() function
  */
 define("KAHUK_DEBUG_MANUAL", true);
 

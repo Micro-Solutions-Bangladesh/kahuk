@@ -85,7 +85,7 @@ function kahuk_delete_user_completely($user_id) {
         }
 
     } else {
-        kahuk_log_unexpected("UNAUTHENTIC USER DELETE REQUEST FOUND for {$user_id}");
+        kahuk_log_debug("UNAUTHENTIC USER DELETE REQUEST FOUND for {$user_id}");
         die("INVALID ACTION!");
     }
 
