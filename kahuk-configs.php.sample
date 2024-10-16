@@ -131,6 +131,34 @@ ini_set("include_path", ".");
 // 1 = on
 define("caching", 1);
 
+/*****************************
+ * Set Error Log File
+ *****************************/
+/**
+ * Create a file name using the current date for error log
+ *
+ * @return string error log file name
+ */
+function kahuk_error_log_file_name() {
+	return date("dMY") . ".log";
+}
+
+/**
+ * Create a file path using file name from kahuk_error_log_file_name() for error log
+ *
+ * @return string error log file path
+ */
+function kahuk_error_log_file_path($log_type = 'error') {
+	return KAHUKPATH_LOGS . "{$log_type}-logs/" . kahuk_error_log_file_name();
+}
+
+ini_set("error_log", kahuk_error_log_file_path());
+
+
+/*****************************
+ * Include Files
+ *****************************/
+
 //
 require_once KAHUKPATH_INC . "php-hooks.php";
 

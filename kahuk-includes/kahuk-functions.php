@@ -97,25 +97,6 @@ function kahuk_log_domain_whitelist()
 }
 
 /**
- * Create a file name using the current date for error log
- *
- * @return string error log file name
- */
-function kahuk_error_log_file_name()
-{
-	return date("dMY") . ".log";
-}
-
-/**
- * Create a file path using file name from kahuk_error_log_file_name() for error log
- *
- * @return string error log file path
- */
-function kahuk_error_log_file_path($log_type = 'error') {
-	return KAHUKPATH_LOGS . "{$log_type}-logs/" . kahuk_error_log_file_name();
-}
-
-/**
  * Type casting data
  * 
  * @since 6.0.5

@@ -26,6 +26,7 @@ define('pagename', 'admin_index');
 $process = sanitize_text_field(_post('submit'));
 
 
+$msg_test_or_send_email = "";
 $msg_delete_trash_stories = "";
 $msg_optimize_database = "";
 
@@ -33,9 +34,53 @@ if (in_array($session_user_level, ['admin'])) {
     // Only if the user is ADMIN
 
     if ($process == "Yes Optimize") {
-        $msg_optimize_database = "********* DB Optimize ********";
+        $msg_optimize_database = "********* TODO DB Optimize ********";
     }
 
+    //
+    if ($process == "Send Email") {
+        $messages = [];
+
+        $email_send_reason = sanitize_text_field(_post('email_send_reason'));
+        $email_receiver = sanitize_email(_post('email_receiver'));
+        $email_massage = kahuk_kses(nl2br(_post("email_massage")), "<p><br><b>");
+
+        if (empty($email_send_reason) || empty($email_receiver) || empty($email_massage)) {
+            $messages[] = [
+                "msg" => "Required information not found to send email!",
+                "msgtype" => "error",
+            ];
+        } else {
+            $subject = sanitize_text_field(_post('subject'));
+            $send_type = sanitize_text_field(_post('send_type'));
+
+            $data = [
+                "to_email" => $email_receiver,
+                "subject" => $subject,
+                "message" => $email_massage,
+                "force_debug" => true,
+                "send_type" => $send_type,
+            ];
+
+            $isMailSent = kahuk_send_email($data);
+
+            if ($isMailSent == "success") {
+                $messages[] = [
+                    "msg" => "Email Send Successful!",
+                    "msgtype" => "info",
+                ];
+            } else {
+                $messages[] = [
+                    "msg" => "Failed to Send Email!",
+                    "msgtype" => "error",
+                ];
+            }
+        }
+
+        $msg_test_or_send_email = kahuk_markup_messages($messages);
+    }
+
+    // 
     if ($process == "Yes Delete") {
         $rs = kahuk_delete_stories_by_status("trash");
 
@@ -74,6 +119,7 @@ if (in_array($session_user_level, ['admin'])) {
 
 
 $main_smarty->assign('msg_optimize_database', $msg_optimize_database);
+$main_smarty->assign('msg_test_or_send_email', $msg_test_or_send_email);
 $main_smarty->assign('msg_delete_trash_stories', $msg_delete_trash_stories);
 
 // show the template
